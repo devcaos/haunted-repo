@@ -15,6 +15,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 5. [ ] Spec: exorcismo (explicación + preguntas + corrección)
 6. [ ] Spec: web de demostración con repo de ejemplo encantado
 7. [ ] Spec: empaquetar como Kiro Power
+8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
 
 ## Pendientes (Low, ideas, "después si da tiempo")
 - Decidir la categoría definitiva (Costume Contest u otra con menos competencia)
