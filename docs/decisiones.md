@@ -12,6 +12,8 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-06 | Idea: **Haunted Repo** (ver `docs/idea.md`) | Problema real vivido, demo gratis sin APIs de pago, gancho de Halloween, encaje con el jurado de Kiro | Las ideas de la tabla "Rechazado" |
 | 2026-11-06 | Público principal: estudiantes y profesores | Convierte las preguntas en algo que alguien necesita, no en deberes | Público general de "vibe coders" |
 | 2026-11-06 | Repo en `C:\proyectos\haunted-repo` en los dos ordenadores, fuera de OneDrive | Misma ruta en ambos; OneDrive no puede sincronizarlo por error | Carpeta en el Escritorio |
+| 2026-11-06 | Stack: TypeScript + Vite + GitHub Pages, sin base de datos | Gratis sin intervención hasta el 29 ene 2027, un solo lenguaje | Python, HTML puro, Astro, Cloudflare Pages, Netlify, Biome |
+| 2026-11-06 | Excepción a la regla de test con servicio real para la IA del usuario | Un test automático no puede llamar al Kiro del usuario; se cubre con el spike manual (punto 3 de PLAN.md) | — |
 
 ## Rechazado (no volver a proponer sin evidencia nueva)
 
