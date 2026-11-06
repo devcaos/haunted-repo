@@ -36,6 +36,7 @@ inclusion: always
 - Build: `npm run build`
 - Test: `npm test` (single run, not watch mode)
 - Before every commit: lint, build and test must all pass.
+- Until the project scaffold exists (there is no `package.json` yet), these commands cannot run. Say so in the pull request instead of creating `package.json` outside an approved spec.
 
 ## Dependencies
 - Exact versions only (no `^` or `~`). Commit `package-lock.json`.
