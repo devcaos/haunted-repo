@@ -1,0 +1,13 @@
+# IMPORTANT: never add .kiro/ or any of its subfolders here (hackathon rule)
+
+# Secrets
+.env
+.env.local
+.env*.local
+
+# Dependencies and builds
+node_modules/
+.next/
+dist/
+build/
+target/
