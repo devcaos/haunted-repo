@@ -37,3 +37,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** no fijar el disparador todavía; se decide en la spec de detección de fantasmas.
 
 - **Estado:** abierto.
+
+## 2026-11-06 — PowerShell rompió el cuerpo del PR por el carácter `#`
+
+- **Qué intentaba:** crear un pull request con `gh pr create --body`, pasando el cuerpo como texto con varias líneas que empezaban por `#`.
+
+- **Qué pasó:** PowerShell interpretó el `#` como comentario y partió el texto, así que `gh` recibió argumentos sueltos y falló.
+
+- **Cómo lo rodeé:** escribir el cuerpo en un archivo temporal y pasarlo con `gh pr create --body-file`, borrando el archivo después.
+
+- **Estado:** resuelto.
