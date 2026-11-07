@@ -14,6 +14,8 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-06 | Repo en `C:\proyectos\haunted-repo` en los dos ordenadores, fuera de OneDrive | Misma ruta en ambos; OneDrive no puede sincronizarlo por error | Carpeta en el Escritorio |
 | 2026-11-06 | Stack: TypeScript + Vite + GitHub Pages, sin base de datos | Gratis sin intervención hasta el 29 ene 2027, un solo lenguaje | Python, HTML puro, Astro, Cloudflare Pages, Netlify, Biome |
 | 2026-11-06 | Excepción a la regla de test con servicio real para la IA del usuario | Un test automático no puede llamar al Kiro del usuario; se cubre con el spike manual (punto 3 de PLAN.md) | — |
+| 2026-11-06 | "Certificado de exorcismo" fuera de la primera versión | Es solo una idea para profesores; la versión mínima se centra en detectar y exorcizar fantasmas. Sigue en "Pendientes" de `PLAN.md` | Incluirlo en `product.md` como entregable |
+| 2026-11-06 | Las fricciones se anotan en `docs/frictions.md` el mismo día que ocurren | Si no se anotan en el momento se pierden; sirven para el texto de Devpost y el feedback a Kiro | Reconstruirlas al final del proyecto |
 
 ## Rechazado (no volver a proponer sin evidencia nueva)
 
