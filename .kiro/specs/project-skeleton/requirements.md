@@ -26,6 +26,7 @@ Acceptance criteria:
 3. `npm run format:check` exits with code 0 on the scaffold.
 4. `npm run format` fixes formatting.
 5. ESLint and Prettier do not conflict (no rule fights over formatting).
+6. A `.prettierignore` excludes all Markdown files (`**/*.md`), `package-lock.json`, `dist/` and `node_modules/`. Prettier only checks code and config files, so existing docs, steering and specs are never reformatted.
 
 ### R4. Tests
 Acceptance criteria:
@@ -45,15 +46,25 @@ Acceptance criteria:
 2. `package-lock.json` is committed.
 3. `npm ci` from a clean clone succeeds, then lint, build and test all pass.
 4. `node_modules` and build output (`dist/`) are in `.gitignore`. `.kiro/` is not.
-5. The root `package.json` declares the Node.js engine as the current LTS (to confirm when implementing).
+5. The root `package.json` declares `"engines": { "node": ">=24" }`, matching Node.js v24 installed on the development computers. `tech.md` records this version.
+6. A root `.npmrc` contains `save-exact=true`, so future `npm install` commands also write exact versions.
 
 ### R7. Windows compatibility
 Acceptance criteria:
-1. No npm script uses shell-only commands (`rm -rf`, `&&` chains that PowerShell 5 rejects, env var prefixes like `FOO=1 cmd`).
+1. No npm script uses Unix-only commands (`rm -rf`, `cp`, environment variable prefixes like `FOO=1 cmd`). npm runs scripts with cmd.exe on Windows, so `&&` inside an npm script is allowed.
 2. Cleaning build output, if a script exists, uses a cross-platform Node tool.
+
+### R8. Single check command and steering update
+
+Acceptance criteria:
+1. `npm run check` runs lint, format:check, build and test, in that order, and stops at the first failure.
+2. In `tech.md`, the 'Before every commit' line says: run `npm run check` (lint, format check, build and test must all pass).
+3. In `testing.md`, the first rule refers to `npm run check`.
+4. In `tech.md`, the sentence 'Until the project scaffold exists…' is removed, the Node.js row states v24, and 'Layout (proposed)' becomes 'Layout'.
 
 ## Edge cases
 - Windows CRLF checkouts: covered by R5.
+- Existing Markdown files (PLAN.md, docs/, .kiro/) do not pass Prettier today (10 of 17 files fail). This spec must not reformat them.
 - Empty `dist/` or stale build output must not make tests pick up compiled `.js` test files (Vitest includes only `src/**/*.test.ts`).
 - ESLint must ignore `dist/` and `node_modules/`.
 - Node.js version differences: `engines` documents the minimum version.
@@ -65,7 +76,8 @@ Acceptance criteria:
 - CI on GitHub Actions.
 - Husky or any git hook tooling.
 - Deploying to GitHub Pages.
+- Checking that `npm ci` works on Linux (GitHub Actions) with a lockfile created on Windows. To verify in the GitHub Pages spec.
 
-## Open questions for Luis Miguel
-1. Should `npm run format:check` be part of the "before every commit" check? (Low item in `PLAN.md`.) Proposal: yes, add it to `tech.md` in this branch.
-2. Is the first PR size acceptable? Estimate: about 150 lines of hand-written files plus the lockfile, so one PR.
+## Resolved questions
+1. `npm run format:check` is part of the check before every commit, through `npm run check` (R8).
+2. One pull request is fine (about 150 lines plus the lockfile, under the 500-line limit). Each task in tasks.md is still its own commit.
