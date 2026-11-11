@@ -200,7 +200,7 @@ Rules for running these tasks:
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 - [ ] 15. Public exports and wrap-up
-  - [ ] 15.1 Export the public API and check browser safety
+  - [x] 15.1 Export the public API and check browser safety
     - Create `ghost-detection/index.ts` exporting: `detectGhosts`, `parseReport`, `parseRepoUrl`, `formatRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport`, `createGitHubClient`, and all public types (`HauntedReport`, `Ghost`, `Overview`, `Result`, `ErrorCode`, ...). Do not export `DetectError`, test helpers or the internal `NOT_TEXT` code. Change `packages/core/src/index.ts` to `export * from "./ghost-detection/index.js";`.
     - Write `index.test.ts` (replace the smoke test): importing from `./index.js` gives the exported functions, and `parseReport(JSON.stringify(report))` works on a report built with `buildReport`.
     - Browser-safety check (how it is verified): (1) `npm run build` compiles core with `types: []`, so any Node global (`process`, `Buffer`) or Node module typing is a compile error; this was proven in task 1.1. (2) Run `Select-String -Path packages/core/src -Recurse -Include *.ts -Pattern 'node:|require\(|process\.|Buffer' -Exclude *.test.ts,*.testutil.ts` and expect no match outside strings in comments or messages (the factor regex for `require(` in `factors.ts` is an allowed match). (3) Check that no file in core imports a package other than `vitest` and `fast-check` (tests only): `Select-String -Path packages/core/src -Recurse -Include *.ts -Pattern '^import .* from "[^.]'` lists only test files. (4) The real browser run is part of the demo website spec and is not checked here; say so in the final report.
