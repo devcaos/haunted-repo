@@ -24,7 +24,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
 - Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
-- Medium (hook de tests): probar con un fallo provocado en la primera tarea de la próxima spec si el agente recibe el error de PostTaskExec; si no, añadir acción de agente (opción B). Comprobar si 'Agent Hooks v2' (anunciado en What's new de Kiro) obliga a migrar este hook.
+- Medium (hook de tests): NO comprobado de verdad. En la sesión de la PR de `feat/test-hook` no pude disparar PostTaskExec (marqué la tarea como hecha editando `tasks.md` y no apareció salida de ningún hook). Se añadió igualmente la opción B (segundo hook de tipo agente que ejecuta `npm run check`). Comprobar con el botón real de "Start task" en la próxima spec: provocar un fallo en la primera tarea y anotar si Kiro recibe el error y si el hook de agente se dispara. Si se dispara dos veces o molesta, quitar uno de los dos.
+- Cerrado (hook de tests): 'Agent Hooks v2' no obliga a migrar. La documentación actual (kiro.dev/docs/hooks, actualizada oct 2026) usa `"version": "v1"` con `trigger` y `action`, igual que nuestro archivo. `timeout` va al nivel del hook, no dentro de `action`. Solo cambió el formato de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`. La documentación no dice que la salida de un hook PostTaskExec llegue al agente.
 - Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
 
 ## Hecho
@@ -37,6 +38,6 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 ## Para retomar (traspaso)
 
 - Dónde lo dejé: esqueleto terminado y fusionado en main (PR #4). Siguiente: hook de tests (punto 2) y después el spike (punto 3).
-- Qué estaba a medias: nada.
+- Qué estaba a medias: la comprobación real del hook de tests (ver Pendientes, Medium). El hook tiene dos acciones (comando + agente), pero ninguna se ha visto disparar todavía.
 - Lo próximo: punto 2 de "Siguientes" (hook de tests, rama `feat/test-hook`) y después el punto 3 (spike de las preguntas).
 - Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) GitHub Pages: comprobar que `npm ci` funciona en Linux con un lockfile creado en Windows.
