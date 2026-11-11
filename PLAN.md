@@ -25,6 +25,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
 - Low (PR #1): añadir `.gitattributes` con `* text=auto eol=lf` en la spec del esqueleto, para que Prettier no falle en Windows por los saltos de línea CRLF
 - Low (PR #1): decidir si `npm run format:check` entra en la comprobación antes de cada commit (`tech.md` y `testing.md` solo piden lint, build y test)
+- Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
