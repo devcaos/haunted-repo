@@ -13,7 +13,7 @@ Rules for running these tasks:
 ## Tasks
 
 - [ ] 1. Root package and dependencies
-  - [ ] 1.1 Add the root package setup
+  - [x] 1.1 Add the root package setup
     - Step 0, before creating files: check the branch with `git branch --show-current`. If it is `main`, create the branch with `git checkout -b feat/project-skeleton`.
     - Step 1, re-check versions with `npm view <package> version` for all 10 packages in the design versions table: typescript, eslint, @eslint/js, typescript-eslint, eslint-config-prettier, prettier, vitest, vite, fast-check, @types/node. Also re-check `peerDependencies` and `engines` (for example `npm view typescript-eslint@8.72.2 peerDependencies`, `npm view vitest@5.1.0 peerDependencies engines`).
     - Step 2, read the current docs: ESLint 10 flat config (`defineConfig`, `globalIgnores` from `eslint/config`), typescript-eslint flat config, and Vitest 5 config (`include`, `passWithNoTests`).
@@ -25,7 +25,7 @@ Rules for running these tasks:
     - Commit message: `chore: set up root package`
     - _Requirements: 1.1, 5.1, 6.1, 6.2, 6.4, 6.5, 6.6, 7.1_
 
-  - [ ] 1.2 Add the TypeScript config and the two packages
+  - [x] 1.2 Add the TypeScript config and the two packages
     - Create `tsconfig.base.json` as in the design (strict on).
     - Create `packages/power/package.json`, `packages/power/tsconfig.json`, `packages/power/src/index.ts` (`add`), and the same three files in `packages/web` (`double`, package name `@haunted-repo/web`).
     - Run `npm install` so the workspaces are linked. Check that `package-lock.json` only changes by the workspace entries.
