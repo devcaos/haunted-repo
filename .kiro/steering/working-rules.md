@@ -12,7 +12,9 @@ inclusion: always
 
 ## Language
 - Talk to Luis Miguel in **Spanish**, with simple words. The first time you use a technical term, define it in one sentence.
-- Code, comments, commit messages, PRs, specs and README are written in **English**.
+- Code, comments, commit messages, PR titles and descriptions, branch names, specs and README are written in **English**.
+- All user-visible text of the app (the demo website, Power messages, questions and explanations shown to users) is written in **English**.
+- Internal documents (`PLAN.md`, `docs/*.md`, internal specs) may stay in Spanish.
 
 ## Source of truth
 - `.kiro/steering/product.md` and `.kiro/steering/tech.md`: what the product is and which stack it uses.
