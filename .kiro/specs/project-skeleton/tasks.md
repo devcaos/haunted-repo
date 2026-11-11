@@ -12,7 +12,7 @@ Rules for running these tasks:
 
 ## Tasks
 
-- [ ] 1. Root package and dependencies
+- [x] 1. Root package and dependencies
   - [x] 1.1 Add the root package setup
     - Step 0, before creating files: check the branch with `git branch --show-current`. If it is `main`, create the branch with `git checkout -b feat/project-skeleton`.
     - Step 1, re-check versions with `npm view <package> version` for all 10 packages in the design versions table: typescript, eslint, @eslint/js, typescript-eslint, eslint-config-prettier, prettier, vitest, vite, fast-check, @types/node. Also re-check `peerDependencies` and `engines` (for example `npm view typescript-eslint@8.72.2 peerDependencies`, `npm view vitest@5.1.0 peerDependencies engines`).
