@@ -31,7 +31,6 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
 - Medium (PR #11, revisión): la frase de cada fantasma empieza siempre por "It is hard mostly because…", también en archivos fáciles. Resolver en la spec de la web o del exorcismo.
 - Low (PR #11, revisión): `parseReport` acepta campos desconocidos sin quitarlos.
-- Por comprobar por Luis Miguel (tarea 1.2 de ghost-detection): prueba manual del hook PostTaskExec con un test que falla a propósito. Falta saber si el hook de comando y el de agente devuelven el fallo a Kiro. Ya está confirmado que el hook se dispara al completar una tarea (tarea 2.1); no hay resultado anotado sobre el fallo. Si no funciona, anotarlo en `docs/decisiones.md` ("Rechazado") o como Low.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
