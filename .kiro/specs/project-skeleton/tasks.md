@@ -48,7 +48,7 @@ Rules for running these tasks:
     - _Requirements: 3.1, 3.2, 3.5_
 
 - [ ] 3. Tests
-  - [ ] 3.1 Add Vitest config and the unit tests
+  - [x] 3.1 Add Vitest config and the unit tests
     - Create `vitest.config.ts` with `include: ["packages/*/src/**/*.test.ts"]`.
     - Create `packages/power/src/index.test.ts` with one example test for `add` (2 + 3 is 5), and `packages/web/src/index.test.ts` with one example test for `double` (4 gives 8). Use `.js` in relative imports.
     - Verify: `npm test` shows 2 passing tests and `echo $LASTEXITCODE` prints `0`. Then `npm run lint`, `npm run format:check` and `npm run build` all exit `0`.
