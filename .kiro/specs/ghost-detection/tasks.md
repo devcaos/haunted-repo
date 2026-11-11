@@ -177,7 +177,7 @@ Rules for running these tasks:
     - _Requirements: 2.7, 2.8, 2.9, 2.10, 2.11, 2.12, 6.6, 6.7_
 
 - [ ] 12. Live test setup
-  - [ ] 12.1 Split live tests from `npm test`
+  - [x] 12.1 Split live tests from `npm test`
     - In `vitest.config.ts` keep `include` and add `exclude: [...configDefaults.exclude, "**/*.live.test.ts"]` (`configDefaults` from `vitest/config`; check the Vitest 5 docs for the exact import).
     - Create `vitest.live.config.ts` with `include: ["packages/*/src/**/*.live.test.ts"]` and `testTimeout: 30_000`.
     - Add the root script `"test:live": "vitest run --config vitest.live.config.ts"`. Do not add it to `check`.
