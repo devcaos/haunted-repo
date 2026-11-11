@@ -144,7 +144,7 @@ Rules for running these tasks:
     - Commit message: `test(core): add strict fake GitHub`
     - _Requirements: 7.5_
 
-  - [ ] 10.2 Add `createGitHubClient` with `getRepo` and `getTree`
+  - [x] 10.2 Add `createGitHubClient` with `getRepo` and `getTree`
     - Create `ghost-detection/githubClient.ts`: options `fetch` (default global) and `timeoutMs` (default 10,000), `AbortSignal.timeout(timeoutMs)` on every request, headers `Accept: application/vnd.github+json` and `X-GitHub-Api-Version: 2022-11-28` (no `User-Agent`, no auth header), `requestCount`, and a plain `Error` if a 9th request is attempted.
     - `getRepo` calls `GET /repos/{owner}/{repo}` and returns `{ defaultBranch: string | null }`. `getTree` calls `GET /repos/{owner}/{repo}/git/trees/{ref}?recursive=1` and returns `{ entries, truncated }`.
     - Response mapping from the design table, rate-limit check first: 403 or 429 with `x-ratelimit-remaining: 0` gives `RATE_LIMITED` with the UTC reset time from `x-ratelimit-reset`; 403 or 429 with `retry-after` or otherwise gives `RATE_LIMITED` with a generic text; repo 404 gives `REPO_NOT_FOUND`; tree 409 gives `EMPTY_REPO`; anything else (tree 404 or 422, 5xx, not JSON, fetch rejects, timeout) gives `NETWORK_ERROR`. All thrown as `DetectError` with English messages from the design.
