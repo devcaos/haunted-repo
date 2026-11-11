@@ -161,7 +161,7 @@ Rules for running these tasks:
     - _Requirements: 2.7, 2.10, 2.11_
 
 - [ ] 11. Orchestrator
-  - [ ] 11.1 Add `detectGhosts` for the normal path and the simple errors
+  - [x] 11.1 Add `detectGhosts` for the normal path and the simple errors
     - Create `ghost-detection/detectGhosts.ts` with `DetectOptions` (`GitHubClientOptions` plus the test-only `ref`) and `detectGhosts(url, opts)` following the design "Orchestrator": parse the URL, `getRepo`, use `opts.ref ?? defaultBranch` (`EMPTY_REPO` if there is none), `getTree`, cut to 5,000 entries and set `truncated`, keep only regular blobs (`type === "blob"`, mode starting with `100`), `rankKeyFiles`, read up to 5 files in order, measure, `buildReport`. Return `Result`, catch `DetectError` and return it as an error; rethrow anything else.
     - `NO_SUPPORTED_FILES` when there is no eligible file, with the English message listing the four languages and saying test files alone are not analysed.
     - Write `detectGhosts.test.ts` with the strict fake: a small repo with 5 or more files (check order, floors, `analysed`, `picked`, `ref` is the default branch); the test-only `ref` as commit SHA; `INVALID_URL`; `REPO_NOT_FOUND`; `RATE_LIMITED`; `NETWORK_ERROR`; `EMPTY_REPO` by 409 and by no default branch; docs-only repo and tests-only repo give `NO_SUPPORTED_FILES`; 5,001 entries give `truncated: true`; symlink and submodule entries are ignored; 1 and 2 files give `fewFiles: true`; `detectGhosts` never throws for any `fc.string()` URL.
