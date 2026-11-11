@@ -162,6 +162,88 @@ describe("createGitHubClient", () => {
     expect(signal).toBeInstanceOf(AbortSignal);
   });
 
+  describe("getFileText", () => {
+    it("reads a normal file", async () => {
+      const { client } = setup();
+      expect(await client.getFileText("o", "r", "main", "src/a.ts")).toBe(
+        "const a = 1;\n",
+      );
+    });
+
+    it("reads a path with spaces and non-ASCII characters", async () => {
+      const { client } = setup([
+        {
+          owner: "o",
+          repo: "r",
+          files: { "mi carpeta/año #1.ts": "ok ñ\n" },
+        },
+      ]);
+      expect(
+        await client.getFileText("o", "r", "main", "mi carpeta/año #1.ts"),
+      ).toBe("ok ñ\n");
+    });
+
+    it("maps invalid UTF-8 to NOT_TEXT", async () => {
+      const { client } = setup([
+        {
+          owner: "o",
+          repo: "r",
+          files: { "bad.txt": new Uint8Array([0x61, 0xff, 0xfe, 0x62]) },
+        },
+      ]);
+      expect(
+        await codeOf(client.getFileText("o", "r", "main", "bad.txt")),
+      ).toBe("NOT_TEXT");
+    });
+
+    it("maps a NUL byte to NOT_TEXT", async () => {
+      const { client } = setup([
+        { owner: "o", repo: "r", files: { "nul.txt": "ab\u0000cd" } },
+      ]);
+      expect(
+        await codeOf(client.getFileText("o", "r", "main", "nul.txt")),
+      ).toBe("NOT_TEXT");
+    });
+
+    it("maps a missing file (404) to NETWORK_ERROR mentioning the file", async () => {
+      const { client } = setup();
+      const error = await client
+        .getFileText("o", "r", "main", "nope.ts")
+        .catch((e: unknown) => e);
+      expect(isCode(error, "NETWORK_ERROR")).toBe(true);
+      expect((error as Error).message).toContain("nope.ts");
+    });
+
+    it("maps a rate limit to RATE_LIMITED", async () => {
+      const { client } = setup(undefined, { rateLimitAfter: 0 });
+      expect(
+        await codeOf(client.getFileText("o", "r", "main", "src/a.ts")),
+      ).toBe("RATE_LIMITED");
+    });
+
+    it("always sends the raw Accept header and counts the request", async () => {
+      const accepts: string[] = [];
+      const { client, fake } = setup();
+      const spy = createGitHubClient({
+        fetch: ((url: string, init?: RequestInit) => {
+          accepts.push(new Headers(init?.headers).get("accept") ?? "");
+          return fake(url, {
+            ...init,
+            headers: {
+              ...Object.fromEntries(new Headers(init?.headers)),
+              "User-Agent": "vitest",
+            },
+          });
+        }) as typeof fetch,
+      });
+      await spy.getFileText("o", "r", "main", "src/a.ts");
+      expect(accepts).toEqual(["application/vnd.github.raw+json"]);
+      expect(spy.requestCount).toBe(1);
+      await client.getFileText("o", "r", "main", "README.md");
+      expect(client.requestCount).toBe(1);
+    });
+  });
+
   it("counts requests and throws a plain Error on the 9th", async () => {
     const { client, fake } = setup();
     expect(client.requestCount).toBe(0);

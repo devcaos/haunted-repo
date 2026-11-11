@@ -24,6 +24,13 @@ export interface GitHubClient {
     repo: string,
     ref: string,
   ): Promise<{ entries: TreeEntry[]; truncated: boolean }>;
+  /** Raw text of one file. Throws NOT_TEXT if it is not valid UTF-8 or has a NUL byte. */
+  getFileText(
+    owner: string,
+    repo: string,
+    ref: string,
+    path: string,
+  ): Promise<string>;
   readonly requestCount: number;
 }
 
@@ -71,7 +78,10 @@ export function createGitHubClient(
   let count = 0;
 
   /** One anonymous GET. Throws DetectError for rate limits and network failures. */
-  async function get(path: string): Promise<Response> {
+  async function get(
+    path: string,
+    accept = "application/vnd.github+json",
+  ): Promise<Response> {
     if (count >= MAX_REQUESTS) {
       throw new Error(`GitHub request budget of ${MAX_REQUESTS} exceeded`);
     }
@@ -82,7 +92,7 @@ export function createGitHubClient(
       response = await doFetch(`${API_ROOT}${path}`, {
         method: "GET",
         headers: {
-          Accept: "application/vnd.github+json",
+          Accept: accept,
           "X-GitHub-Api-Version": "2022-11-28",
         },
         signal: AbortSignal.timeout(timeoutMs),
@@ -167,6 +177,32 @@ export function createGitHubClient(
         );
       }
       return { entries, truncated: body["truncated"] === true };
+    },
+
+    async getFileText(owner, repo, ref, path) {
+      const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+      const response = await get(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}` +
+          `/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`,
+        "application/vnd.github.raw+json",
+      );
+      if (response.status !== 200) {
+        throw new DetectError(
+          "NETWORK_ERROR",
+          `Could not read the file "${path}" from GitHub. Please try again in a moment.`,
+        );
+      }
+      let text: string;
+      try {
+        const bytes = await response.arrayBuffer();
+        text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      } catch {
+        throw new DetectError("NOT_TEXT", `The file "${path}" is not text.`);
+      }
+      if (text.includes("\u0000")) {
+        throw new DetectError("NOT_TEXT", `The file "${path}" is not text.`);
+      }
+      return text;
     },
   };
 }

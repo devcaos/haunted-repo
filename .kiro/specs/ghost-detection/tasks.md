@@ -153,7 +153,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add GitHub client for repo and tree`
     - _Requirements: 1.3, 1.4, 1.5, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7_
 
-  - [ ] 10.3 Add `getFileText` with the UTF-8 check
+  - [x] 10.3 Add `getFileText` with the UTF-8 check
     - In `githubClient.ts` add `getFileText(owner, repo, ref, path)`: `GET /repos/{owner}/{repo}/contents/{path}?ref={ref}` with `Accept: application/vnd.github.raw+json`; path parts encoded one by one with `encodeURIComponent` and joined with `/`; read `arrayBuffer()` and decode with `new TextDecoder("utf-8", { fatal: true })`. A decoding error, or a NUL byte in the text, throws `DetectError` with the internal code `NOT_TEXT`. Any non-200 gives `NETWORK_ERROR` (message mentions the file), rate limit mapping as in 10.2.
     - Write tests against the fake: a normal file, a path with spaces and non-ASCII characters, invalid UTF-8 gives `NOT_TEXT`, a NUL byte gives `NOT_TEXT`, 404 gives `NETWORK_ERROR`, rate limit gives `RATE_LIMITED`, the non-raw `Accept` is never sent.
     - Verify: `npm run check` exits `0`.
