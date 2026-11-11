@@ -186,11 +186,11 @@ Rules for running these tasks:
     - Commit message: `chore: add test:live script`
     - _Requirements: 7.3_
 
-- [ ] 13. Checkpoint before the live test
+- [x] 13. Checkpoint before the live test
   - Run `npm run check` and make sure it exits `0` (lint, format check, build and all unit and property tests). Check that `git status --short` prints nothing. Ask the owner if questions arise.
 
-- [ ] 14. Live test against the real GitHub
-  - [ ] 14.1 Add the live test for `lukeed/sirv`
+- [x] 14. Live test against the real GitHub
+  - [x] 14.1 Add the live test for `lukeed/sirv`
     - Create `ghost-detection/detectGhosts.live.test.ts` with one call: `detectGhosts("https://github.com/lukeed/sirv", { ref: "1135207e92c40354543cbd15c763c7a61d79d432" })`, no token, no environment variable, default client timeout.
     - Assertions on that one result: it is `ok`; `overview.ref` equals the SHA; there are 1 to 5 ghosts; every score is an integer 0 to 100; ghosts are ordered by score then path; `parseReport(JSON.stringify(report))` gives an equal report.
     - If the result is an error, the test fails. For `RATE_LIMITED` the failure message is: `GitHub rate limit reached (60 requests per hour without a token). Wait until the limit resets (<reset time from the error>) and run npm run test:live again.` There is no skipping.
