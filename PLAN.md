@@ -5,10 +5,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- (nada)
+- Esqueleto del proyecto terminado (spec `project-skeleton` completa, rama `feat/project-skeleton`). PR abierto a `main`, pendiente de revisar y fusionar por Luis Miguel.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
-1. [ ] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
+1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
 2. [ ] Crear el hook de tests (Post Task Execution) cuando exista el stack
 3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
 4. [ ] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
@@ -25,6 +25,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
 - Low (PR #1): añadir `.gitattributes` con `* text=auto eol=lf` en la spec del esqueleto, para que Prettier no falle en Windows por los saltos de línea CRLF
 - Low (PR #1): decidir si `npm run format:check` entra en la comprobación antes de cada commit (`tech.md` y `testing.md` solo piden lint, build y test)
+- Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
@@ -34,6 +35,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - [x] Crear `docs/frictions.md` y su recordatorio en el plan (PR #2, 6 nov)
 
 ## Para retomar (traspaso)
-- Dónde lo dejé: PR #1 y #2 fusionados. `product.md` y `tech.md` ya cargan siempre en Kiro; `docs/frictions.md` existe con 4 entradas.
-- Qué estaba a medias: nada. Todavía no hay `package.json`, así que lint, build y test no pueden ejecutarse hasta el esqueleto.
-- Lo próximo: punto 1 de "Siguientes" (spec del esqueleto del proyecto).
+
+- Dónde lo dejé: esqueleto terminado. Spec `project-skeleton` completa (las 10 tareas hechas, una por commit) en la rama `feat/project-skeleton`, subida y con PR abierto a `main`. `npm ci` y `npm run check` pasan también en un clon limpio.
+- Qué estaba a medias: nada. El PR no está fusionado.
+- Lo próximo: revisar y fusionar el PR (lo hace Luis Miguel en GitHub). Después, punto 2 de "Siguientes" (hook de tests) y el punto 3 (spike de las preguntas).
+- Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) GitHub Pages: comprobar que `npm ci` funciona en Linux con un lockfile creado en Windows.

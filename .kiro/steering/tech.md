@@ -14,7 +14,7 @@ inclusion: always
 ## Stack
 | Part | Choice |
 |---|---|
-| Language | TypeScript (strict mode) on Node.js, current LTS version (to confirm when the project is created) |
+| Language | TypeScript 6.0 (strict mode) on Node.js v24 |
 | Package manager | npm, with workspaces |
 | Kiro Power | `POWER.md` + steering files + a small MCP server in TypeScript (`@modelcontextprotocol/sdk`). Exact format to confirm in the Power spec against kiro.dev/docs/powers |
 | Kiro hook | JSON file in `.kiro/hooks/`, running a Node command that marks the file as a ghost. Exact trigger to be decided in the ghost-detection spec. It must mark files written by the agent, not files edited by the user. |
@@ -24,7 +24,7 @@ inclusion: always
 | Lint / format | ESLint + Prettier |
 | Tests | Vitest, plus fast-check for property-based tests |
 
-## Layout (proposed)
+## Layout
 - `packages/power/`: the Kiro Power and its MCP server
 - `packages/web/`: the static demo website
 - `.kiro/`: steering, specs, agents, hooks
@@ -35,8 +35,8 @@ inclusion: always
 - Format check: `npm run format:check`
 - Build: `npm run build`
 - Test: `npm test` (single run, not watch mode)
-- Before every commit: lint, build and test must all pass.
-- Until the project scaffold exists (there is no `package.json` yet), these commands cannot run. Say so in the pull request instead of creating `package.json` outside an approved spec.
+- Check everything at once: `npm run check`.
+- Before every commit: run `npm run check` (lint, format check, build and test must all pass).
 
 ## Dependencies
 - Exact versions only (no `^` or `~`). Commit `package-lock.json`.
