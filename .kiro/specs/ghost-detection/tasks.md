@@ -160,7 +160,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): read file text from GitHub`
     - _Requirements: 2.7, 2.10, 2.11_
 
-- [ ] 11. Orchestrator
+- [x] 11. Orchestrator
   - [x] 11.1 Add `detectGhosts` for the normal path and the simple errors
     - Create `ghost-detection/detectGhosts.ts` with `DetectOptions` (`GitHubClientOptions` plus the test-only `ref`) and `detectGhosts(url, opts)` following the design "Orchestrator": parse the URL, `getRepo`, use `opts.ref ?? defaultBranch` (`EMPTY_REPO` if there is none), `getTree`, cut to 5,000 entries and set `truncated`, keep only regular blobs (`type === "blob"`, mode starting with `100`), `rankKeyFiles`, read up to 5 files in order, measure, `buildReport`. Return `Result`, catch `DetectError` and return it as an error; rethrow anything else.
     - `NO_SUPPORTED_FILES` when there is no eligible file, with the English message listing the four languages and saying test files alone are not analysed.
@@ -176,7 +176,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): skip unreadable files and limit requests`
     - _Requirements: 2.7, 2.8, 2.9, 2.10, 2.11, 2.12, 6.6, 6.7_
 
-- [ ] 12. Live test setup
+- [x] 12. Live test setup
   - [x] 12.1 Split live tests from `npm test`
     - In `vitest.config.ts` keep `include` and add `exclude: [...configDefaults.exclude, "**/*.live.test.ts"]` (`configDefaults` from `vitest/config`; check the Vitest 5 docs for the exact import).
     - Create `vitest.live.config.ts` with `include: ["packages/*/src/**/*.live.test.ts"]` and `testTimeout: 30_000`.
@@ -199,7 +199,7 @@ Rules for running these tasks:
     - Commit message: `test(core): add live GitHub test for ghost detection`
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 15. Public exports and wrap-up
+- [x] 15. Public exports and wrap-up
   - [x] 15.1 Export the public API and check browser safety
     - Create `ghost-detection/index.ts` exporting: `detectGhosts`, `parseReport`, `parseRepoUrl`, `formatRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport`, `createGitHubClient`, and all public types (`HauntedReport`, `Ghost`, `Overview`, `Result`, `ErrorCode`, ...). Do not export `DetectError`, test helpers or the internal `NOT_TEXT` code. Change `packages/core/src/index.ts` to `export * from "./ghost-detection/index.js";`.
     - Write `index.test.ts` (replace the smoke test): importing from `./index.js` gives the exported functions, and `parseReport(JSON.stringify(report))` works on a report built with `buildReport`.
