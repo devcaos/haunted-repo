@@ -47,7 +47,7 @@ Rules for running these tasks:
     - Commit message: `chore: add ESLint flat config`
     - _Requirements: 3.1, 3.2, 3.5_
 
-- [ ] 3. Tests
+- [x] 3. Tests
   - [x] 3.1 Add Vitest config and the unit tests
     - Create `vitest.config.ts` with `include: ["packages/*/src/**/*.test.ts"]`.
     - Create `packages/power/src/index.test.ts` with one example test for `add` (2 + 3 is 5), and `packages/web/src/index.test.ts` with one example test for `double` (4 gives 8). Use `.js` in relative imports.
@@ -55,7 +55,7 @@ Rules for running these tasks:
     - Commit message: `test: set up Vitest with placeholder tests`
     - _Requirements: 4.1, 4.2_
 
-  - [ ] 3.2 Add the fast-check property test
+  - [x] 3.2 Add the fast-check property test
     - In `packages/power/src/index.test.ts`, add the test for Property 1 (add is commutative) with 100 runs and the comment `// Feature: project-skeleton, Property 1: add is commutative`. Import `fc` from `fast-check`.
     - **Property 1: add is commutative**
     - **Validates: Requirements 4.3**
