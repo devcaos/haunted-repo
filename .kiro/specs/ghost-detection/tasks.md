@@ -71,7 +71,7 @@ Rules for running these tasks:
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
 
 - [ ] 5. Key files
-  - [ ] 5.1 Add `keyScore` and `rankKeyFiles`
+  - [-] 5.1 Add `keyScore` and `rankKeyFiles`
     - Create `ghost-detection/keyFiles.ts` with `keyScore` (name 40, location 30/20/10/0, size 0 to 30 linear between 200 and 20,000 bytes) and `rankKeyFiles` (filter with `isEligible`, sort by score descending, then path ascending with `a < b`, not `localeCompare`).
     - Write `keyFiles.test.ts`: score table with boundary sizes 199, 200, 10,100, 20,000 and 20,001; location cases with 0, 1 and 2 folder levels (`src`, `app`, `lib` and another folder name); a monorepo path such as `packages/x/src/index.ts` gets 0 location points; tie broken by path.
     - Verify: `npm run check` exits `0`.
