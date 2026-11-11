@@ -37,7 +37,7 @@ Explain to Luis Miguel, in Spanish and briefly:
 2. Which files changed.
 3. How to check it works (exact commands or steps).
 
-When finishing each task of a spec, include `tasks.md` (its status marker) in the commit of that task.
+Before committing each task of a spec, mark it yourself as completed (`[x]`) in `tasks.md` and include `tasks.md` in that same commit.
 
 ## Reviews
 - Classify findings as Critical / High / Medium / Low.
