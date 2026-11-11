@@ -70,7 +70,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add file eligibility rules`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
 
-- [ ] 5. Key files
+- [x] 5. Key files
   - [x] 5.1 Add `keyScore` and `rankKeyFiles`
     - Create `ghost-detection/keyFiles.ts` with `keyScore` (name 40, location 30/20/10/0, size 0 to 30 linear between 200 and 20,000 bytes) and `rankKeyFiles` (filter with `isEligible`, sort by score descending, then path ascending with `a < b`, not `localeCompare`).
     - Write `keyFiles.test.ts`: score table with boundary sizes 199, 200, 10,100, 20,000 and 20,001; location cases with 0, 1 and 2 folder levels (`src`, `app`, `lib` and another folder name); a monorepo path such as `packages/x/src/index.ts` gets 0 location points; tie broken by path.
@@ -87,7 +87,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): pick the five key files`
     - _Requirements: 4.5, 4.6, 4.9_
 
-- [ ] 6. Factors
+- [x] 6. Factors
   - [x] 6.1 Add `measureFactors`
     - Create `ghost-detection/factors.ts` with `measureFactors(text)` following the design "Factors": remove a leading BOM, split on `/\r?\n/`, cut each line to its first 500 characters, drop empty lines, comment lines start with `//`, `#`, `/*` or `*`, count `lines`, `branches` (`/\b(if|elif|for|while|switch|case|catch)\b/g` on non-comment lines), `maxIndent` (`tabs + floor(spaces / 4)`) and `imports`.
     - Write `factors.test.ts` with hand-written snippets: one per factor; `else if` counts once; `elif` counts once; a bare `else` does not count; a comment-only file; a line of 600 characters counts as one line; CRLF and LF give the same result; a BOM at the start; an empty file gives all zeros; tabs and spaces for indentation; `import`, `from x import y` and `require(` lines.

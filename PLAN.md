@@ -5,7 +5,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Esqueleto (PR #4) y hook de tests (PR #5, confirmado en real) fusionados en main. Siguiente: el spike de preguntas (`docs/spike-preguntas.md`, punto 3).
+- Spec de detección de fantasmas: PR #11 (tareas 1 a 9, módulos puros de `packages/core`) fusionada en main. Seguimos con la tarea 10 (cliente de GitHub y GitHub falso estricto) en la rama `feat/ghost-detection-fetch`.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
@@ -28,7 +28,9 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Cerrado (hook de tests, prueba real en la tarea 2.1): el hook PostTaskExec está confirmado. Se dispara al marcar una tarea como completada, no al pulsar Start task. Al completar la 2.1 llegó al agente la instrucción de ejecutar `npm run check`. Queda decidir cuál de los dos hooks (comando o agente) se deja.
 - Cerrado (hook de tests): 'Agent Hooks v2' no obliga a migrar. La documentación actual (kiro.dev/docs/hooks, actualizada oct 2026) usa `"version": "v1"` con `trigger` y `action`, igual que nuestro archivo. `timeout` va al nivel del hook, no dentro de `action`. Solo cambió el formato de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`. La documentación no dice que la salida de un hook PostTaskExec llegue al agente.
 - Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
-- Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y 	ech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
+- Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
+- Medium (PR #11, revisión): la frase de cada fantasma empieza siempre por "It is hard mostly because…", también en archivos fáciles. Resolver en la spec de la web o del exorcismo.
+- Low (PR #11, revisión): `parseReport` acepta campos desconocidos sin quitarlos.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
@@ -41,7 +43,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé: esqueleto (PR #4) y hook de tests (PR #5) fusionados en main. Siguiente: el spike de preguntas.
+- Dónde lo dejé: PR #11 (tareas 1 a 9 de la spec de detección de fantasmas) fusionada en main. Siguiente: la tarea 10 (cliente de GitHub y GitHub falso estricto), en la rama `feat/ghost-detection-fetch`.
 - Qué estaba a medias: nada del hook. Está confirmado que se dispara al completar una tarea (tarea 2.1 de la spec de detección). Solo queda decidir si se deja el hook de comando o el de agente.
-- Lo próximo: punto 3 de "Siguientes" (spike, `docs/spike-preguntas.md`) y después el punto 4 (spec de detección de fantasmas).
+- Lo próximo: tareas 10 a 15 de `.kiro/specs/ghost-detection/tasks.md` (cliente, orquestador, test en vivo, exportaciones). Después, punto 3 de "Siguientes" (spike, `docs/spike-preguntas.md`) si sigue pendiente.
 - Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) GitHub Pages: comprobar que `npm ci` funciona en Linux con un lockfile creado en Windows.
