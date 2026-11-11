@@ -82,7 +82,7 @@ Rules for running these tasks:
     - Commit message: `docs: use npm run check in steering files`
     - _Requirements: 8.2, 8.3, 8.4, 6.5_
 
-- [ ] 5. Final verification (after everything is committed)
+- [x] 5. Final verification (after everything is committed)
   - [x] 5.1 Run the manual failure-case checks
     - Precondition: `git status --short` prints nothing (everything committed). Run each check, then restore only the changed file before the next one. Never use `git restore .`.
     - Check 1 (R2.3): in `packages/power/src/index.ts` change `return a + b;` to `return "x";`. Run `npm run build`. Expect a TypeScript error and `$LASTEXITCODE` not `0`. Restore: `git restore packages/power/src/index.ts`.
@@ -93,7 +93,7 @@ Rules for running these tasks:
     - Finish: `git status --short` prints nothing. No commit unless a check needed a fix.
     - _Requirements: 2.3, 4.4, 5.2_
 
-  - [ ] 5.2 Check a clean clone
+  - [x] 5.2 Check a clean clone
     - If `$env:TEMP\haunted-repo-check` already exists, remove it first with `Remove-Item -Recurse -Force $env:TEMP\haunted-repo-check`.
     - Run: `git clone . $env:TEMP\haunted-repo-check; Set-Location $env:TEMP\haunted-repo-check; git checkout feat/project-skeleton; npm ci; npm run check; echo $LASTEXITCODE`.
     - Expect `npm ci` to succeed and `npm run check` to print exit `0`.
