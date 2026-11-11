@@ -5,7 +5,7 @@ Plain TypeScript functions in the new shared package `packages/core` (`@haunted-
 
 Rules for running these tasks:
 - Kiro runs a task only when the project owner says so. Kiro asks permission before modifying code.
-- Work on branch `feat/ghost-detection`, never on `main`. Never merge.
+- Work on branch `feat/ghost-detection-fetch`, never on `main`. Never merge.
 - Run every command from the repository root, in PowerShell.
 - One task = one commit. A task is done only when its own tests and `npm run check` pass (exit code `0`). Then make its commit. If a commit message needs an "and", it is two commits.
 - Task 1.2 is not a commit: it is a manual check by the project owner (Luis Miguel).
