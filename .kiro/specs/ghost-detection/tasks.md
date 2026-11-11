@@ -137,7 +137,7 @@ Rules for running these tasks:
     - _Requirements: 6.7, 6.8, 6.9_
 
 - [ ] 10. GitHub client and strict fake
-  - [ ] 10.1 Add the strict fake GitHub
+  - [x] 10.1 Add the strict fake GitHub
     - Create `ghost-detection/fakeGitHub.testutil.ts` with `createFakeGitHub(repos)` returning a `fetch` function, as in the design "Strict fake GitHub": 404 for an unknown owner/repo, tree ref or contents path; 409 on the tree of an empty repo; 405 for methods other than GET; 400 when `User-Agent` or `Accept` is missing; real field names (`default_branch`, `tree[].path/mode/type/size`, `truncated`), `size` only for blobs; the contents route returns the JSON/base64 form unless the raw `Accept` header is sent. The fake adds a default `User-Agent` check only for its own test: because the real client does not set `User-Agent`, the fake must receive it from a wrapper in the tests (Node's fetch and browsers send one themselves). Options: answer 403 with `x-ratelimit-remaining: 0` and `x-ratelimit-reset` after N requests, invalid UTF-8 bytes for a file, hang until the abort signal fires, answer 5xx; and a request counter.
     - Write `fakeGitHub.test.ts` (tests of the fake itself): unknown ref gives 404, missing `User-Agent` gives 400, POST gives 405, non-raw contents returns JSON, rate-limit headers after N requests, counter increases.
     - Verify: `npm run check` exits `0`.
