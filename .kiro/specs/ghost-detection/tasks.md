@@ -71,14 +71,14 @@ Rules for running these tasks:
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
 
 - [ ] 5. Key files
-  - [-] 5.1 Add `keyScore` and `rankKeyFiles`
+  - [x] 5.1 Add `keyScore` and `rankKeyFiles`
     - Create `ghost-detection/keyFiles.ts` with `keyScore` (name 40, location 30/20/10/0, size 0 to 30 linear between 200 and 20,000 bytes) and `rankKeyFiles` (filter with `isEligible`, sort by score descending, then path ascending with `a < b`, not `localeCompare`).
     - Write `keyFiles.test.ts`: score table with boundary sizes 199, 200, 10,100, 20,000 and 20,001; location cases with 0, 1 and 2 folder levels (`src`, `app`, `lib` and another folder name); a monorepo path such as `packages/x/src/index.ts` gets 0 location points; tie broken by path.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(core): score and rank key files`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.8_
 
-  - [ ] 5.2 Add `pickKeyFiles` and its property test
+  - [x] 5.2 Add `pickKeyFiles` and its property test
     - In `keyFiles.ts` add `pickKeyFiles(entries, max = 5)` (`rankKeyFiles(entries).slice(0, max)`).
     - Add unit tests: fewer than 5 eligible files returns all of them; ignored non-eligible files; 0 eligible files returns an empty list.
     - **Property 3: Picking is deterministic and bounded** (generator: `fc.uniqueArray` of `{ path, size }` with size 0 to 200,000, max 30 items, plus a permutation). Checks: same result twice, same result for any permutation, at most 5 items, all eligible, and with 5 or more eligible files the picked ones have the 5 highest scores.

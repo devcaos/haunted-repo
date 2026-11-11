@@ -52,3 +52,8 @@ export function rankKeyFiles(entries: FileEntry[]): FileEntry[] {
     })
     .map((item) => item.entry);
 }
+
+/** The best `max` eligible files (default 5), best candidates first. */
+export function pickKeyFiles(entries: FileEntry[], max = 5): FileEntry[] {
+  return rankKeyFiles(entries).slice(0, max);
+}
