@@ -20,7 +20,7 @@ A session can be saved as JSON data (the list of events plus the texts the Tutor
 
 This feature also fixes a known problem of ghost detection: the `reason` sentence of every ghost starts with "It is hard mostly because…", which sounds wrong for easy files (PLAN.md, PR #11 review). This changes ghost-detection Requirement 5.4 and its tests; the change is made in this spec.
 
-Before the design starts, a second spike must be done with a file that has real logic (loops and conditions), because the first spike (`docs/spike-explicacion.md`) only tested a types file. The first version uses only floors by difficulty; folders as rooms are an optional improvement outside the minimum version.
+A second spike with a file that has real logic (loops and conditions) was done on 11 Nov 2026, because the first spike (`docs/spike-explicacion.md`) only tested a types file. Its findings are in Requirements 2.11, 4.9, 5.4, 6.3 and 10.9. The first version uses only floors by difficulty; folders as rooms are an optional improvement outside the minimum version.
 
 Deadline: minimum working version by 20 Nov 2026.
 
@@ -30,7 +30,7 @@ Deadline: minimum working version by 20 Nov 2026.
 - **Ghost_Text**: the text of a Ghost, given to the Exorcism_Engine by the caller. The engine does not read it from anywhere.
 - **Haunted_Report**: the result of ghost detection: an overview plus the ordered list of Ghosts. It holds no progress state.
 - **Exorcism_Engine**: the code in `packages/core` that runs the exorcism as a pure step machine. It never calls an AI and never reads GitHub or the disk.
-- **Session_State**: the state of the Exorcism_Engine: the current Step, the Exorcism_Progress, the Student_Profile, the current Ghost, the Ratings of the current attempt, and the question texts already asked for each Ghost. It is JSON-serialisable.
+- **Session_State**: the state of the Exorcism_Engine: the current Step, the Exorcism_Progress, the Student_Profile, the current Ghost, the Ghost_Text and the explanation text of the current Ghost, the Ratings of the current attempt, and the question texts already asked for each Ghost. It is JSON-serialisable.
 - **Step**: the part of the exorcism where the Session_State is. One of `choosing`, `explaining`, `asking`, `simplifying`, `model-answer`, `self-check`, `failed` or `house-clean`.
 - **Event**: one input of the Exorcism_Engine, from the closed list in Requirement 10: `pick-ghost`, `explanation-done`, `answer-rated`, `dont-know`, `self-check-answered`, `retry-ghost` and `leave-ghost`.
 - **Tutor**: the student's own Kiro, which writes the explanations and the questions and judges the answers, following the Tutor_Instructions.
@@ -42,9 +42,9 @@ Deadline: minimum working version by 20 Nov 2026.
 - **File_Kind**: one of four labels for a Ghost: `data-shape` (describes the shape of data, with no real logic), `logic` (functions that take inputs and give results), `entry-point` (starts or connects other parts) or `general` (anything else).
 - **Question_Set**: the 3 question objectives of a File_Kind. An objective says what a question must find out. The Tutor writes the real question.
 - **Core_Question**: the question of the first objective of a Question_Set (the one about what the file is for or does). It is always the first question asked in an attempt.
-- **Simpler_Explanation**: a second explanation of the same part, with a new everyday analogy and fewer words, given after a `dont-know` Verdict.
+- **Simpler_Explanation**: a second explanation of the same part, with a new everyday analogy, of about 150 words at most, that adds the details the first explanation left out, given after a `dont-know` Verdict.
 - **Exorcism_Progress**: plain JSON-serialisable data that says, for each Ghost, whether it is `haunted` or `exorcised`, the Ratings of the last attempt and the self-check answer.
-- **Haunted_Share**: the number of Ghosts still `haunted` divided by the number of Ghosts in the Haunted_Report.
+- **Haunted_Share**: the number of Ghosts still `haunted` divided by the number of Ghosts in the Haunted_Report, or 0 when the Haunted_Report has no Ghosts.
 - **Ghost_Sentence**: the `reason` field of a Ghost: one English sentence that says why the file is easy, medium or hard.
 - **Session_Recording**: JSON data with the starting inputs of a session and the ordered list of Events, including the texts the Tutor wrote.
 
@@ -123,7 +123,7 @@ Deadline: minimum working version by 20 Nov 2026.
 3. WHEN the Event `dont-know` arrives in the Step `asking` for the first time for a question, THE Exorcism_Engine SHALL go to the Step `simplifying`, SHALL NOT give a Rating, and SHALL build Tutor_Instructions that ask for a Simpler_Explanation of the part the question is about.
 4. THE Tutor_Instructions for a Simpler_Explanation SHALL contain the explanation text given before, and SHALL ask the Tutor to use a new everyday analogy that is different from the one used before, to use at most about 150 words, and to add the details that the first explanation left out, only for the part the question is about.
 5. WHEN the Simpler_Explanation is finished, THE Exorcism_Engine SHALL go back to the Step `asking` and ask the same question again.
-6. WHEN the Event `dont-know` arrives for the same question a second time, THE Exorcism_Engine SHALL give that question the Rating `wrong`, go to the Step `model-answer`, and ask the Tutor to show a short model answer; WHEN the model answer is finished, THE Exorcism_Engine SHALL continue with the next question.
+6. WHEN the Event `dont-know` arrives for the same question a second time, THE Exorcism_Engine SHALL give that question the Rating `wrong`, go to the Step `model-answer`, and ask the Tutor to show a short model answer; WHEN the model answer is finished, THE Exorcism_Engine SHALL continue with the next question IF questions remain; IF it was the 3rd question, THE Exorcism_Engine SHALL apply the decision of Requirements 6.3 and 6.4.
 7. THE Exorcism_Engine SHALL allow at most one Simpler_Explanation per question.
 8. FOR ALL sequences of Events, the number of Simpler_Explanations in one attempt at a Ghost SHALL be at most 3 and each question SHALL be asked at most twice (bounded-loop property).
 
@@ -153,7 +153,7 @@ Deadline: minimum working version by 20 Nov 2026.
 5. IF JSON text is not a valid Exorcism_Progress, THEN THE Exorcism_Progress parser SHALL return the error `INVALID_PROGRESS` with an English message.
 6. IF the Exorcism_Progress names a path that is not in the Haunted_Report, or misses a Ghost of the Haunted_Report, THEN THE Exorcism_Engine SHALL ignore the unknown path and treat the missing Ghost as `haunted`.
 7. THE Exorcism_Engine SHALL calculate the Haunted_Share for a Haunted_Report and an Exorcism_Progress.
-8. FOR ALL Haunted_Reports and Exorcism_Progress values, the Haunted_Share SHALL be a number from 0 to 1, SHALL be 1 when no Ghost is `exorcised`, and SHALL be 0 when all Ghosts are `exorcised`.
+8. FOR ALL Haunted_Reports and Exorcism_Progress values, the Haunted_Share SHALL be a number from 0 to 1, SHALL be 1 when the Haunted_Report has at least 1 Ghost and no Ghost is `exorcised`, and SHALL be 0 when all Ghosts are `exorcised`. WHEN the Haunted_Report has 0 Ghosts, THE Haunted_Share SHALL be 0 and the Exorcism_Engine SHALL NOT divide by zero.
 9. FOR ALL Haunted_Reports, marking one more Ghost `exorcised` SHALL NOT raise the Haunted_Share (monotonic property).
 10. THE Exorcism_Progress SHALL NOT be saved by the Exorcism_Engine; saving it is the job of the caller. The web demo SHALL NOT save any progress.
 
@@ -183,7 +183,7 @@ Deadline: minimum working version by 20 Nov 2026.
 2. THE Exorcism_Engine SHALL run in Node.js 24 and in a browser, using no Node-only APIs, and SHALL work without any token, key or environment variable.
 3. THE Exorcism_Engine SHALL take the Ghost_Text as input and SHALL NOT read GitHub, the disk or any other network service, and SHALL NOT call any AI service.
 4. THE project SHALL include property-based tests for these properties: suggestion (1.6), Java rule (2.10), File_Kind determinism (4.2), instruction rules (4.11), bounded loop (5.8), decision (6.6), Exorcism_Progress round-trip (7.4), Haunted_Share range (7.8) and monotonic (7.9), Ghost_Sentence determinism (8.6) and floor wording (8.7), invalid Event (10.6), engine determinism (10.7), Verdict round-trip (10.9), Session_Recording round-trip (11.2), replay (11.3) and sample-answer-ignored (11.9).
-5. THE Exorcism_Engine SHALL use no external service, so no live test is required. THE Tutor text SHALL be checked by manual spikes (`docs/spike-explicacion.md` and the second spike with a file with logic), because no automated test can call the user's Kiro. The tests for Tutor_Instructions SHALL check only that the required rules are present in the text.
+5. THE Exorcism_Engine SHALL use no external service, so no live test is required. THE Tutor text SHALL be reviewed through manual spikes (see `docs/spike-explicacion.md`), because no automated test can call the user's Kiro. The tests for Tutor_Instructions SHALL check only that the required rules are present in the text.
 6. THE commands `npm test` and `npm run check` SHALL pass and SHALL NOT call the network.
 
 ### Requirement 10: Run the exorcism as a pure step machine
@@ -202,6 +202,10 @@ Deadline: minimum working version by 20 Nov 2026.
 8. WHEN the Event `leave-ghost` arrives, THE Exorcism_Engine SHALL go to the Step `choosing`, keep the Ghost `haunted`, and discard the unfinished attempt but keep the question texts already asked.
 9. THE Tutor_Instructions SHALL ask the Tutor to end every judgement with one last line that is exactly `VERDICT: right`, `VERDICT: half-right`, `VERDICT: wrong` or `VERDICT: dont-know`. THE Tutor_Instructions SHALL ask for exactly one Verdict per message and per question, and never for the Verdicts of several questions in one message. THE Verdict parser SHALL accept only that last line and SHALL return the error `INVALID_VERDICT` with an English message otherwise, including when the text has more than one line that starts with `VERDICT:`; it SHALL NOT search the text of the Student for phrases.
 10. FOR ALL Verdicts and for all reason texts without a line that starts with `VERDICT:`, formatting the reason and the Verdict and parsing it back SHALL give the same Verdict (Verdict round-trip property).
+11. THE Exorcism_Engine SHALL provide a start function that receives the Haunted_Report, optionally an Exorcism_Progress and optionally a Student_Profile, and returns the first Session_State. The Session_State SHALL start in the Step `choosing` with the suggested Ghost (Requirement 1.1), or in the Step `house-clean` with the message of Requirement 1.3 IF no Ghost is `haunted`. A missing Exorcism_Progress SHALL count as all Ghosts `haunted`, and a missing Student_Profile SHALL follow Requirement 2.9.
+12. WHEN the Event `self-check-answered` arrives, THE Exorcism_Engine SHALL store the answer in the Exorcism_Progress and go to the Step `choosing` with the Ghost suggested again by Requirement 1.2, or to the Step `house-clean` IF no Ghost is `haunted`.
+13. WHEN the Event `retry-ghost` arrives in the Step `failed`, THE Exorcism_Engine SHALL start a new attempt at the same Ghost: it SHALL discard the Ratings of the previous attempt and go to the Step `explaining`. THE Tutor_Instructions SHALL contain the explanation text given before and SHALL ask the Tutor for another explanation with an everyday analogy different from the one used before, following the rules of Requirements 2.2 to 2.5, 2.8 and 2.11.
+14. WHEN the Event `pick-ghost` arrives in the Step `failed`, THE Exorcism_Engine SHALL follow the same rules as in the Step `choosing` (Requirements 1.4 and 1.6).
 
 ### Requirement 11: Save a session and replay it with the same results
 
@@ -223,6 +227,7 @@ Deadline: minimum working version by 20 Nov 2026.
 
 - The Student gives an empty answer or an answer that tries nothing: the Tutor reports `dont-know`.
 - The Student answers "I don't know" twice to the same question: Rating `wrong`, model answer, next question.
+- `dont-know` twice on the last question: model answer, then the exorcised/failed decision.
 - The Student fails a Ghost (fewer than 2 good Ratings, or the Core_Question is `wrong`): it stays `haunted`; the Student can retry it or pick another Ghost.
 - The Student gets 2 good Ratings but the Core_Question is `wrong`: the Ghost stays `haunted`.
 - The Tutor puts the Verdicts of several questions in one message: `INVALID_VERDICT`.
@@ -236,6 +241,8 @@ Deadline: minimum working version by 20 Nov 2026.
 - The Haunted_Report changes (another repository or another `ref`) while an Exorcism_Progress exists: the progress of unknown paths is ignored (Requirement 7.6).
 - The Student's answer is long or in another language: the Tutor judges the behaviour described, not the language.
 - All Ghosts are `exorcised`: Step `house-clean`; no more questions.
+- A Haunted_Report with 0 Ghosts: the session starts in the Step `house-clean` and the Haunted_Share is 0 (never a division by zero).
+- The Student finishes the self-check of the last `haunted` Ghost: Step `house-clean`.
 - A Session_Recording with an Event in the wrong Step: `INVALID_SESSION` with the position.
 
 ## Out of Scope
