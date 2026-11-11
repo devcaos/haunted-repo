@@ -7,6 +7,15 @@
       "trigger": "PostTaskExec",
       "action": { "type": "command", "command": "npm run check" },
       "timeout": 120
+    },
+    {
+      "name": "Agent runs npm run check and fixes failures after each spec task",
+      "description": "Fallback: the command hook output may not reach the agent, so the agent runs the check itself.",
+      "trigger": "PostTaskExec",
+      "action": {
+        "type": "agent",
+        "prompt": "A spec task just finished. Run `npm run check` from the repository root. If anything fails (lint, format, build or tests), read the error output, fix the cause, and run `npm run check` again until it passes. Follow working-rules: propose code changes to Luis Miguel before modifying code outside the task's scope. Do not commit."
+      }
     }
   ]
 }
