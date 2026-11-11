@@ -60,8 +60,8 @@ Rules for running these tasks:
     - Commit message: `feat(core): parse and format GitHub repository URLs`
     - _Requirements: 1.1, 1.2, 1.6, 1.7_
 
-- [ ] 4. Eligibility
-  - [ ] 4.1 Add `isEligible`
+- [x] 4. Eligibility
+  - [x] 4.1 Add `isEligible`
     - Create `ghost-detection/eligibility.ts` with `isEligible(path)` following the design "Eligibility" (extensions, excluded folders, excluded names such as `.d.ts`, `.min.js`, `.generated.`, `.gen.`, `.config.`, `.eslintrc.`, `setup.py`, and test files). Folder and extension checks are case-insensitive. Also export `languageOf(path)` (`.ts .tsx` TypeScript, `.js .jsx .mjs .cjs` JavaScript, `.java` Java, `.py` Python).
     - Write `eligibility.test.ts`: a table of examples for each rule of Requirement 3 (including `.d.ts`, `.min.js`, `setup.py`, `FooTest.java`, `__tests__/`, `node_modules/`, upper-case `SRC/Index.TS`), and `languageOf` for each extension.
     - **Property 2: Eligible set does not depend on order** (generator `pathArb` from the design; permutation by sorting with a random key).
