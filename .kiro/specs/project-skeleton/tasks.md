@@ -64,7 +64,7 @@ Rules for running these tasks:
     - _Requirements: 4.3_
 
 - [ ] 4. Check command and steering
-  - [ ] 4.1 Add the check script
+  - [x] 4.1 Add the check script
     - In the root `package.json`, add `"check": "npm run lint && npm run format:check && npm run build && npm test"`.
     - Verify: `npm run check`, then `echo $LASTEXITCODE` prints `0`. The output shows lint, format check, build and test in that order.
     - Commit message: `chore: add check script`
