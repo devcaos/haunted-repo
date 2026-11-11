@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
-import { difficultyScore, measureFactors } from "./factors.js";
+import { difficultyScore, measureFactors, reasonFor } from "./factors.js";
 import { branchLineArb, textArb } from "./textArb.testutil.js";
 
 const zeros = { lines: 0, branches: 0, maxIndent: 0, imports: 0 };
@@ -169,5 +169,38 @@ describe("difficultyScore properties", () => {
       }),
       { numRuns: 100 },
     );
+  });
+});
+
+describe("reasonFor", () => {
+  it("names lines when it wins", () => {
+    expect(reasonFor({ ...zeros, lines: 200 })).toBe(
+      "It is hard mostly because it is long (200 lines of code).",
+    );
+  });
+  it("names branches when it wins", () => {
+    expect(reasonFor({ ...zeros, branches: 30 })).toBe(
+      "It is hard mostly because it makes many decisions (30 if/elif/for/while/switch/case/catch).",
+    );
+  });
+  it("names maxIndent when it wins", () => {
+    expect(reasonFor({ ...zeros, maxIndent: 4 })).toBe(
+      "It is hard mostly because the code is deeply nested (4 levels).",
+    );
+  });
+  it("names imports when it wins", () => {
+    expect(reasonFor({ ...zeros, imports: 10 })).toBe(
+      "It is hard mostly because it depends on many other files (10 imports).",
+    );
+  });
+  it("breaks ties in the order lines, branches, maxIndent, imports", () => {
+    // every factor gives 10 points
+    const all = { lines: 100, branches: 20, maxIndent: 4, imports: 20 };
+    expect(reasonFor(all)).toContain("long");
+    expect(reasonFor({ ...all, lines: 0 })).toContain("decisions");
+    expect(reasonFor({ ...all, lines: 0, branches: 0 })).toContain("nested");
+  });
+  it("says the file is simple when all points are 0", () => {
+    expect(reasonFor(zeros)).toBe("It is very short and simple.");
   });
 });

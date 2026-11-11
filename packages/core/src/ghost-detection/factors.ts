@@ -58,3 +58,29 @@ export function difficultyScore(f: Factors): number {
       part(f.imports, 20, 10),
   );
 }
+
+export function reasonFor(f: Factors): string {
+  const candidates: { points: number; sentence: string }[] = [
+    {
+      points: part(f.lines, 400, 40),
+      sentence: `It is hard mostly because it is long (${f.lines} lines of code).`,
+    },
+    {
+      points: part(f.branches, 60, 30),
+      sentence: `It is hard mostly because it makes many decisions (${f.branches} if/elif/for/while/switch/case/catch).`,
+    },
+    {
+      points: part(f.maxIndent, 8, 20),
+      sentence: `It is hard mostly because the code is deeply nested (${f.maxIndent} levels).`,
+    },
+    {
+      points: part(f.imports, 20, 10),
+      sentence: `It is hard mostly because it depends on many other files (${f.imports} imports).`,
+    },
+  ];
+  let best = candidates[0]!;
+  for (const c of candidates) {
+    if (c.points > best.points) best = c;
+  }
+  return best.points === 0 ? "It is very short and simple." : best.sentence;
+}

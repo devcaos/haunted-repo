@@ -108,7 +108,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): compute the difficulty score`
     - _Requirements: 5.3, 5.5, 5.6, 5.7, 5.8, 5.9_
 
-  - [ ] 7.2 Add `floorOf` and `reasonFor`
+  - [-] 7.2 Add `floorOf` and `reasonFor`
     - In `factors.ts` add `reasonFor(f)` (the four English sentences of the design table, tie order `lines`, `branches`, `maxIndent`, `imports`, and `It is very short and simple.` when all points are 0).
     - Create `ghost-detection/report.ts` with only `floorOf(score)` for now (`<= 33` attic, `<= 66` middle floor, else basement).
     - Write unit tests: `reasonFor` for each winning factor, the tie order, and the empty file; `floorOf` at 0, 33, 34, 66, 67 and 100.
