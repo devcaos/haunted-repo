@@ -17,8 +17,8 @@ Rules for running these tasks:
 
 ## Tasks
 
-- [ ] 1. Core package skeleton
-  - [ ] 1.1 Create `packages/core` and verify the build order
+- [x] 1. Core package skeleton
+  - [x] 1.1 Create `packages/core` and verify the build order
     - Step 0: check the branch with `git branch --show-current`. If it is `main`, create it with `git checkout -b feat/ghost-detection`.
     - Create `packages/core/package.json` and `packages/core/tsconfig.json` exactly as in the design ("Package `@haunted-repo/core`": `types: []`, `lib: ["ES2023", "DOM"]`, `declaration: true`).
     - Create `packages/core/src/index.ts` with only `export {};` and `packages/core/src/index.test.ts` with one smoke test (for example `expect(true).toBe(true)`), so the package has one test file.
@@ -30,7 +30,7 @@ Rules for running these tasks:
     - Commit message: `chore: add core package with explicit build order`
     - _Requirements: 7.7, 7.8, 7.9_
 
-  - [ ] 1.2 Manual check of the PostTaskExec hook (project owner, no commit)
+  - [x] 1.2 Manual check of the PostTaskExec hook (project owner, no commit)
     - This closes the "Medium (hook de tests)" item in `PLAN.md`, "Pendientes". It is a manual step for Luis Miguel. Kiro cannot do it, because earlier attempts to trigger the hook by editing `tasks.md` did not work.
     - Step A, provoke a failure: before pressing "Start task" on task 1.1, ask Kiro to leave a deliberate failing test in `packages/core/src/index.test.ts` (for example `expect(1).toBe(2)`) in the working tree. Do not commit it.
     - Step B: press "Start task" on a task in this file and let Kiro finish it. Look at the chat and the Kiro hook output after the task ends.
@@ -40,8 +40,8 @@ Rules for running these tasks:
     - Result is for the owner to decide; nothing here changes code on its own.
     - _Requirements: 7.7_
 
-- [ ] 2. Shared types and errors
-  - [ ] 2.1 Add types, `DetectError` and Result helpers
+- [x] 2. Shared types and errors
+  - [x] 2.1 Add types, `DetectError` and Result helpers
     - Create `ghost-detection/types.ts` with all the types of the design "Data Models" (`Language`, `Floor`, `ErrorCode`, `DetectErrorInfo`, `Result<T>`, `RepoReference`, `FileEntry`, `Factors`, `Ghost`, `SkippedFile`, `Overview`, `HauntedReport`). There is no "exorcised" field.
     - Create `ghost-detection/errors.ts` with the `DetectError` class (carries a `DetectErrorInfo`, plus the internal code `NOT_TEXT` that is not part of the public `ErrorCode`), `ok(value)`, `fail(code, message)` and `isCode(error, code)`.
     - Write `errors.test.ts` (unit tests): `ok` and `fail` shapes, `DetectError` keeps `code` and `message`, `isCode` is `false` for a plain `Error`.
