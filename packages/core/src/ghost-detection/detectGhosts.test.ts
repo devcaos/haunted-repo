@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { detectGhosts } from "./detectGhosts.js";
 import { createFakeGitHub } from "./fakeGitHub.testutil.js";
 import type { FakeGitHubOptions, FakeRepo } from "./fakeGitHub.testutil.js";
+import { parseReport } from "./parseReport.js";
 import type { HauntedReport, Result } from "./types.js";
 
 type Rewrite = (url: URL, body: Record<string, unknown>) => unknown;
@@ -208,6 +209,113 @@ describe("detectGhosts", () => {
       expect(report.overview.fewFiles).toBe(true);
       expect(report.overview.message).toContain(`only ${n} file(s)`);
     }
+  });
+
+  describe("skips, partial reports and the request budget", () => {
+    const big = "x".repeat(102_401);
+    const binary = new Uint8Array(30_000).fill(0xff);
+    const repoWith = (files: FakeRepo["files"]): FakeRepo => ({
+      owner: "o",
+      repo: "r",
+      files,
+    });
+
+    it("replaces a large file with the next candidate", async () => {
+      const { fetch, fake } = setup([
+        repoWith({ "src/index.ts": big, "src/a.ts": ts(3), "src/b.ts": ts(4) }),
+      ]);
+      const report = value(await detectGhosts("github.com/o/r", { fetch }));
+      expect(report.ghosts.map((g) => g.path).sort()).toEqual([
+        "src/a.ts",
+        "src/b.ts",
+      ]);
+      expect(report.overview.skipped).toEqual([
+        { path: "src/index.ts", reason: "TOO_LARGE" },
+      ]);
+      expect(fake.requestCount).toBe(4);
+    });
+
+    it("replaces a binary file with the next candidate", async () => {
+      const { fetch } = setup([
+        repoWith({
+          "src/index.ts": binary,
+          "src/a.ts": ts(3),
+          "src/b.ts": ts(4),
+        }),
+      ]);
+      const report = value(await detectGhosts("github.com/o/r", { fetch }));
+      expect(report.ghosts.map((g) => g.path)).not.toContain("src/index.ts");
+      expect(report.ghosts).toHaveLength(2);
+      expect(report.overview.skipped).toEqual([
+        { path: "src/index.ts", reason: "NOT_TEXT" },
+      ]);
+    });
+
+    it("returns a partial report when the limit hits on the third file", async () => {
+      // Requests: repo, tree, file 1, file 2, then file 3 is limited.
+      const { fetch } = setup(
+        [
+          repoWith({
+            "src/a.ts": ts(3),
+            "src/b.ts": ts(4),
+            "src/c.ts": ts(5),
+            "src/d.ts": ts(6),
+          }),
+        ],
+        { rateLimitAfter: 4 },
+      );
+      const report = value(await detectGhosts("github.com/o/r", { fetch }));
+      expect(report.overview.partial).toBe(true);
+      expect(report.ghosts).toHaveLength(2);
+      expect(parseReport(JSON.stringify(report))).toEqual({
+        ok: true,
+        value: report,
+      });
+    });
+
+    it("returns RATE_LIMITED when the limit hits on the first file", async () => {
+      const { fetch } = setup([repoWith({ "src/a.ts": ts(3) })], {
+        rateLimitAfter: 2,
+      });
+      expect(codeOf(await detectGhosts("github.com/o/r", { fetch }))).toBe(
+        "RATE_LIMITED",
+      );
+    });
+
+    it("returns NO_SUPPORTED_FILES listing the skipped paths", async () => {
+      const { fetch, fake } = setup([
+        repoWith({ "src/a.ts": big, "src/b.ts": big }),
+      ]);
+      const result = await detectGhosts("github.com/o/r", { fetch });
+      expect(codeOf(result)).toBe("NO_SUPPORTED_FILES");
+      if (!result.ok) {
+        expect(result.error.message).toContain("src/a.ts (too large)");
+        expect(result.error.message).toContain("src/b.ts (too large)");
+      }
+      expect(fake.requestCount).toBe(2);
+    });
+
+    it("lists a binary file with its reason when all files are skipped", async () => {
+      const { fetch } = setup([repoWith({ "src/a.ts": binary })]);
+      const result = await detectGhosts("github.com/o/r", { fetch });
+      expect(codeOf(result)).toBe("NO_SUPPORTED_FILES");
+      if (!result.ok)
+        expect(result.error.message).toContain("src/a.ts (not text)");
+    });
+
+    it("never makes more than 8 requests and no request for large files", async () => {
+      const files: Record<string, string> = {};
+      for (let i = 0; i < 20; i++) files[`src/big${i}.ts`] = big;
+      const large = setup([repoWith(files)]);
+      await detectGhosts("github.com/o/r", { fetch: large.fetch });
+      expect(large.fake.requestCount).toBe(2);
+
+      const bins: Record<string, Uint8Array> = {};
+      for (let i = 0; i < 20; i++) bins[`src/bin${i}.ts`] = binary;
+      const worst = setup([repoWith(bins)]);
+      await detectGhosts("github.com/o/r", { fetch: worst.fetch });
+      expect(worst.fake.requestCount).toBe(8);
+    });
   });
 
   it("never throws for any URL text", async () => {

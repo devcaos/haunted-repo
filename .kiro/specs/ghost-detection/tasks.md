@@ -169,7 +169,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add detectGhosts orchestrator`
     - _Requirements: 1.2, 1.3, 1.4, 1.5, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.5, 4.7, 4.8, 6.3, 6.4, 6.6_
 
-  - [ ] 11.2 Add skips, partial reports and the request budget
+  - [x] 11.2 Add skips, partial reports and the request budget
     - In `detectGhosts.ts` add: a picked file larger than 102,400 bytes is skipped without a request and listed as `TOO_LARGE`; a `NOT_TEXT` file is skipped and listed; a skipped file is replaced by the next candidate while no more than 6 content requests are used; `RATE_LIMITED` after at least one file was read gives a report with `partial: true`; `RATE_LIMITED` before any file gives the error; if eligible files exist but every one was skipped, return `NO_SUPPORTED_FILES` with a message that lists the skipped paths and reasons (`skippedMessage`).
     - Add tests with the strict fake: a large file replaced by the next one; a binary file replaced by the next one; skipped files listed in `overview.skipped`; partial report after the limit hits on the third file; rate limit on the first file gives `RATE_LIMITED`; all eligible files too large gives `NO_SUPPORTED_FILES` with the paths in the message; the fake's request counter is never above 8 (worst case: 1 + 1 + 6) and a repo with many large files makes no content request for them; the report from a run passes `parseReport(JSON.stringify(report))`.
     - Verify: `npm run check` exits `0`.
