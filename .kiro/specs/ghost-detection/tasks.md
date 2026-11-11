@@ -95,7 +95,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): measure file factors`
     - _Requirements: 5.1, 5.2, 5.5_
 
-- [ ] 7. Difficulty score
+- [x] 7. Difficulty score
   - [x] 7.1 Add `difficultyScore` and its property tests
     - In `factors.ts` add `difficultyScore(f)` using the design formula (`part(value, cap, weight)` with lines 400/40, branches 60/30, maxIndent 8/20, imports 20/10, summed and rounded).
     - Add unit tests: all zeros gives 0; all factors at or above their caps give 100; one example for each factor alone (for example 200 lines alone gives 20).
@@ -108,7 +108,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): compute the difficulty score`
     - _Requirements: 5.3, 5.5, 5.6, 5.7, 5.8, 5.9_
 
-  - [-] 7.2 Add `floorOf` and `reasonFor`
+  - [x] 7.2 Add `floorOf` and `reasonFor`
     - In `factors.ts` add `reasonFor(f)` (the four English sentences of the design table, tie order `lines`, `branches`, `maxIndent`, `imports`, and `It is very short and simple.` when all points are 0).
     - Create `ghost-detection/report.ts` with only `floorOf(score)` for now (`<= 33` attic, `<= 66` middle floor, else basement).
     - Write unit tests: `reasonFor` for each winning factor, the tie order, and the empty file; `floorOf` at 0, 33, 34, 66, 67 and 100.
@@ -116,8 +116,8 @@ Rules for running these tasks:
     - Commit message: `feat(core): add floor labels and reason sentences`
     - _Requirements: 5.4, 6.2_
 
-- [ ] 8. Report builder
-  - [ ] 8.1 Add `buildReport`
+- [x] 8. Report builder
+  - [x] 8.1 Add `buildReport`
     - In `report.ts` add `BuildInput` and `buildReport(input)`: for each scored file compute factors, score, floor and reason; sort ghosts by `difficultyScore` ascending, then `path` ascending (`a < b`); fill the overview (`owner`, `repo`, `ref`, `analysed`, `picked`, `truncated`, `partial`, `skipped`); set `fewFiles` and the message `This looks like a small project, so only N file(s) were picked.` when `picked` is 1 or 2, else `fewFiles: false` and `message: null`. Use `null`, never `undefined`.
     - Write `report.test.ts`: fields of each ghost, `fewFiles` for 0 (not applicable), 1, 2 and 3 ghosts, `partial` and `truncated` copied, `skipped` copied, ordering with a tie broken by path.
     - **Property 8: Report order does not depend on download order** (generator: `fc.uniqueArray` of `{ path, language, factors }` with factors from 0 to 500, plus a permutation). Checks: equal reports for any permutation, and ghosts sorted by score then path.
@@ -126,8 +126,8 @@ Rules for running these tasks:
     - Commit message: `feat(core): build the haunted report`
     - _Requirements: 4.7, 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 9. Report parser
-  - [ ] 9.1 Add `parseReport` and its round-trip property
+- [x] 9. Report parser
+  - [x] 9.1 Add `parseReport` and its round-trip property
     - Create `ghost-detection/parseReport.ts` with `parseReport(jsonText)`: `JSON.parse` inside try/catch, then a hand-written type guard (root object with `overview` and `ghosts`; right primitive types for every field; `floor`, `language` and skipped `reason` in their unions; scores integers 0 to 100; factors non-negative integers). Any failure returns `INVALID_REPORT` with the English message of the design. It never throws.
     - Create `ghost-detection/reportArb.testutil.ts` with `reportArb` (from the design: `fc.record` with `fc.integer`, `fc.string()`, `fc.boolean()`, `fc.constantFrom` for unions, `fc.array` for ghosts and skipped; no NaN, no `-0`).
     - Write `parseReport.test.ts`: a valid report, invalid JSON, wrong types, a missing field, a floor not in the union, a score of 101, and `fc.jsonValue()` never throws.
