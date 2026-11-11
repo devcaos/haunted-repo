@@ -63,14 +63,14 @@ Rules for running these tasks:
     - Commit message: `test: add fast-check property test for add`
     - _Requirements: 4.3_
 
-- [ ] 4. Check command and steering
+- [x] 4. Check command and steering
   - [x] 4.1 Add the check script
     - In the root `package.json`, add `"check": "npm run lint && npm run format:check && npm run build && npm test"`.
     - Verify: `npm run check`, then `echo $LASTEXITCODE` prints `0`. The output shows lint, format check, build and test in that order.
     - Commit message: `chore: add check script`
     - _Requirements: 8.1_
 
-  - [ ] 4.2 Update the steering files
+  - [x] 4.2 Update the steering files
     - Edit `.kiro/steering/tech.md` with the exact before/after text of the design:
       - Stack row Language becomes `| Language | TypeScript 6.0 (strict mode) on Node.js v24 |`.
       - Heading `## Layout (proposed)` becomes `## Layout`.

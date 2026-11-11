@@ -4,7 +4,7 @@ inclusion: always
 
 # Testing
 
-- After every change, run lint, build and tests (commands in `tech.md`). Fix errors before saying a task is done.
+- After every change, run `npm run check` (lint, format check, build and tests; see `tech.md`). Fix errors before saying a task is done.
 - **Anything that uses an external service** (AI, cloud database, third-party API, RSS feed) needs at least one test against the **real service**, not only against a mock. Exception: the user's own Kiro, which no automated test can call. It is covered by the manual spike (see `tech.md` and `docs/decisiones.md`).
 - Mocks must never be more permissive than the real service. If the real service rejects something, the mock rejects it too.
 - When a requirement states a rule that must always hold (for example "no line is longer than 40 characters"), propose a property-based test for it in the design.
