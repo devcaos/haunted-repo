@@ -41,6 +41,7 @@ Deadline: minimum working version by 20 Nov 2026.
 - **Student_Profile**: input data about the Student. For now it has one field, `knowsJava` (true or false).
 - **File_Kind**: one of four labels for a Ghost: `data-shape` (describes the shape of data, with no real logic), `logic` (functions that take inputs and give results), `entry-point` (starts or connects other parts) or `general` (anything else).
 - **Question_Set**: the 3 question objectives of a File_Kind. An objective says what a question must find out. The Tutor writes the real question.
+- **Core_Question**: the question of the first objective of a Question_Set (the one about what the file is for or does). It is always the first question asked in an attempt.
 - **Simpler_Explanation**: a second explanation of the same part, with a new everyday analogy and fewer words, given after a `dont-know` Verdict.
 - **Exorcism_Progress**: plain JSON-serialisable data that says, for each Ghost, whether it is `haunted` or `exorcised`, the Ratings of the last attempt and the self-check answer.
 - **Haunted_Share**: the number of Ghosts still `haunted` divided by the number of Ghosts in the Haunted_Report.
@@ -78,6 +79,7 @@ Deadline: minimum working version by 20 Nov 2026.
 8. WHERE the Student_Profile has `knowsJava` set to `true`, THE Tutor_Instructions SHALL allow the Tutor to compare with Java; OTHERWISE THE Tutor_Instructions SHALL forbid comparisons with Java and ask for everyday analogies only.
 9. WHEN the Student_Profile is missing, THE Exorcism_Engine SHALL treat `knowsJava` as `false`.
 10. FOR ALL Student_Profiles and Ghosts, THE Tutor_Instructions SHALL allow comparisons with Java if and only if `knowsJava` is `true` (Java-rule property).
+11. THE Tutor_Instructions for the first explanation SHALL ask the Tutor to use at most about 150 words and to leave out secondary details; those details belong to the Simpler_Explanation (Requirement 5.4).
 
 ### Requirement 3: Present every "why" as a probable reason
 
@@ -104,7 +106,7 @@ Deadline: minimum working version by 20 Nov 2026.
 6. THE Question_Set of `entry-point` SHALL have the objectives: what the file starts or connects, which other parts it uses and in what order, and what happens if one of those parts fails.
 7. THE Question_Set of `general` SHALL have the objectives: what the file is for, what the Student would notice in the project if the file did not exist, and what could go wrong in it.
 8. THE Exorcism_Engine SHALL NOT use the objective "what goes in and what comes out" for a Ghost whose File_Kind is `data-shape`.
-9. THE Exorcism_Engine SHALL ask the questions one at a time, and SHALL NOT go to the next question until the current one has a Rating.
+9. THE Exorcism_Engine SHALL ask the questions one at a time, and SHALL NOT go to the next question until the current one has a Rating. THE Tutor_Instructions for a question SHALL ask the Tutor to write exactly one question in the message, and SHALL NOT contain the objective of any other question. THE Core_Question SHALL be the first question of every attempt.
 10. THE Tutor_Instructions for a question SHALL give the objective of that question and ask the Tutor to write the question about this concrete file, using its real names, data and behaviour, and SHALL forbid questions about specific lines, line numbers or syntax details.
 11. FOR ALL Ghosts and attempts, THE Tutor_Instructions for a question SHALL contain the objective, the path of the Ghost, the rule that the question is about this concrete file and the ban on lines, and for an attempt after the first they SHALL also contain the question texts already asked for that Ghost and the rule to ask different questions; no objective SHALL contain a line number (instruction-rules property).
 12. THE Tutor SHALL be allowed to write a question that asks the Student to predict a behaviour (for example, "What happens if the list arrives empty?"), and THE Tutor_Instructions SHALL forbid a prediction question about one specific line.
@@ -119,7 +121,7 @@ Deadline: minimum working version by 20 Nov 2026.
 1. THE Tutor SHALL decide whether an answer of the Student means "I don't know", in any language, and an empty answer or an answer that does not try to answer SHALL count as "I don't know"; the Tutor reports it with the Verdict `dont-know`.
 2. THE Exorcism_Engine SHALL NOT search the text of the Student for any phrase and SHALL NOT receive the text of the Student answers.
 3. WHEN the Event `dont-know` arrives in the Step `asking` for the first time for a question, THE Exorcism_Engine SHALL go to the Step `simplifying`, SHALL NOT give a Rating, and SHALL build Tutor_Instructions that ask for a Simpler_Explanation of the part the question is about.
-4. THE Tutor_Instructions for a Simpler_Explanation SHALL contain the explanation text given before, and SHALL ask the Tutor to use a new everyday analogy that is different from the one used before, and to be shorter than the previous explanation.
+4. THE Tutor_Instructions for a Simpler_Explanation SHALL contain the explanation text given before, and SHALL ask the Tutor to use a new everyday analogy that is different from the one used before, to use at most about 150 words, and to add the details that the first explanation left out, only for the part the question is about.
 5. WHEN the Simpler_Explanation is finished, THE Exorcism_Engine SHALL go back to the Step `asking` and ask the same question again.
 6. WHEN the Event `dont-know` arrives for the same question a second time, THE Exorcism_Engine SHALL give that question the Rating `wrong`, go to the Step `model-answer`, and ask the Tutor to show a short model answer; WHEN the model answer is finished, THE Exorcism_Engine SHALL continue with the next question.
 7. THE Exorcism_Engine SHALL allow at most one Simpler_Explanation per question.
@@ -133,10 +135,10 @@ Deadline: minimum working version by 20 Nov 2026.
 
 1. WHEN the Student gives an answer, THE Tutor_Instructions SHALL ask the Tutor to give a short reason in plain language and then the Verdict in the fixed format of Requirement 10.
 2. THE Tutor_Instructions SHALL ask the Tutor to judge the behaviour that the answer describes, not the exact words used.
-3. WHEN all 3 questions of a Ghost have a Rating, THE Exorcism_Engine SHALL mark the Ghost `exorcised` IF at least 2 of the 3 Ratings are `right` or `half-right`, and SHALL go to the Step `self-check`.
-4. IF fewer than 2 of the 3 Ratings are `right` or `half-right`, THEN THE Exorcism_Engine SHALL keep the Ghost `haunted`, go to the Step `failed` and offer the Student to try the same Ghost again after a new explanation, or to pick another Ghost.
+3. WHEN all 3 questions of a Ghost have a Rating, THE Exorcism_Engine SHALL mark the Ghost `exorcised` IF at least 2 of the 3 Ratings are `right` or `half-right` AND the Rating of the Core_Question is not `wrong`, and SHALL go to the Step `self-check`.
+4. IF fewer than 2 of the 3 Ratings are `right` or `half-right`, OR the Rating of the Core_Question is `wrong`, THEN THE Exorcism_Engine SHALL keep the Ghost `haunted`, go to the Step `failed` and offer the Student to try the same Ghost again after a new explanation, or to pick another Ghost.
 5. WHEN the Step is `self-check`, THE Tutor_Instructions SHALL ask the Student whether the file is now understood, with the options "yes", "half" and "no"; THE Exorcism_Engine SHALL show the answer and store it in the Exorcism_Progress, and SHALL NOT use it to change the state of the Ghost.
-6. FOR ALL lists of 3 Ratings, the Ghost SHALL be `exorcised` if and only if at least 2 Ratings are `right` or `half-right` (decision property).
+6. FOR ALL lists of 3 Ratings, where the first Rating is the one of the Core_Question, the Ghost SHALL be `exorcised` if and only if at least 2 Ratings are `right` or `half-right` and the first Rating is not `wrong` (decision property).
 
 ### Requirement 7: Keep the progress as plain data and show how haunted the house is
 
@@ -198,7 +200,7 @@ Deadline: minimum working version by 20 Nov 2026.
 6. FOR ALL Session_States and Events, an Event that is not accepted in the current Step SHALL return the error `INVALID_EVENT` and the Session_State SHALL be equal to the one before (invalid-event property).
 7. FOR ALL Session_States and Events, calling the Exorcism_Engine twice with the same Session_State and the same Event SHALL give the same result (determinism property).
 8. WHEN the Event `leave-ghost` arrives, THE Exorcism_Engine SHALL go to the Step `choosing`, keep the Ghost `haunted`, and discard the unfinished attempt but keep the question texts already asked.
-9. THE Tutor_Instructions SHALL ask the Tutor to end every judgement with one last line that is exactly `VERDICT: right`, `VERDICT: half-right`, `VERDICT: wrong` or `VERDICT: dont-know`. THE Verdict parser SHALL accept only that last line and SHALL return the error `INVALID_VERDICT` with an English message otherwise; it SHALL NOT search the text of the Student for phrases.
+9. THE Tutor_Instructions SHALL ask the Tutor to end every judgement with one last line that is exactly `VERDICT: right`, `VERDICT: half-right`, `VERDICT: wrong` or `VERDICT: dont-know`. THE Tutor_Instructions SHALL ask for exactly one Verdict per message and per question, and never for the Verdicts of several questions in one message. THE Verdict parser SHALL accept only that last line and SHALL return the error `INVALID_VERDICT` with an English message otherwise, including when the text has more than one line that starts with `VERDICT:`; it SHALL NOT search the text of the Student for phrases.
 10. FOR ALL Verdicts and for all reason texts without a line that starts with `VERDICT:`, formatting the reason and the Verdict and parsing it back SHALL give the same Verdict (Verdict round-trip property).
 
 ### Requirement 11: Save a session and replay it with the same results
@@ -221,7 +223,9 @@ Deadline: minimum working version by 20 Nov 2026.
 
 - The Student gives an empty answer or an answer that tries nothing: the Tutor reports `dont-know`.
 - The Student answers "I don't know" twice to the same question: Rating `wrong`, model answer, next question.
-- The Student fails a Ghost (fewer than 2 good Ratings): it stays `haunted`; the Student can retry it or pick another Ghost.
+- The Student fails a Ghost (fewer than 2 good Ratings, or the Core_Question is `wrong`): it stays `haunted`; the Student can retry it or pick another Ghost.
+- The Student gets 2 good Ratings but the Core_Question is `wrong`: the Ghost stays `haunted`.
+- The Tutor puts the Verdicts of several questions in one message: `INVALID_VERDICT`.
 - The Student leaves a Ghost halfway: it stays `haunted`; the unfinished attempt is discarded.
 - The Student picks a Ghost that is `exorcised` or not in the Haunted_Report: `INVALID_EVENT`, nothing changes.
 - The Ghost has 0 lines or only comments: File_Kind `general`, and the explanation says that the file has almost no code.
