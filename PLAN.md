@@ -24,6 +24,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
 - Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
+- Medium (hook de tests): probar con un fallo provocado en la primera tarea de la próxima spec si el agente recibe el error de PostTaskExec; si no, añadir acción de agente (opción B). Comprobar si 'Agent Hooks v2' (anunciado en What's new de Kiro) obliga a migrar este hook.
 - Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
 
 ## Hecho
