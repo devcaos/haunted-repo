@@ -47,3 +47,33 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** escribir el cuerpo en un archivo temporal y pasarlo con `gh pr create --body-file`, borrando el archivo después.
 
 - **Estado:** resuelto.
+
+## 2026-11-11 — No pude comprobar que el hook PostTaskExec devuelve el error al agente
+
+- **Qué intentaba:** probar que `.kiro/hooks/test-after-task.json` (PostTaskExec → `npm run check`) detecta un test que falla y que el agente recibe el error.
+
+- **Qué pasó:** creé una spec desechable con una tarea que añadía `expect(1).toBe(2)` y la marqué como hecha editando `tasks.md`. No apareció ninguna salida de hook en el contexto del agente, dos veces (con el hook de comando solo y con un segundo hook de agente). `npm run check` lanzado a mano sí fallaba como se esperaba. Probablemente PostTaskExec solo se dispara con el cambio de estado de la tarea hecho por el propio IDE, no al editar el archivo. Además, la documentación de triggers no dice que la salida de PostTaskExec llegue al agente.
+
+- **Cómo lo rodeé:** añadí un segundo hook de tipo agente (opción B) que ejecuta `npm run check` y corrige fallos. La prueba real queda pendiente en la próxima spec (ver `PLAN.md`).
+
+- **Estado:** abierto.
+
+## 2026-11-11 — `timeout` dentro de `action` daba error de formato
+
+- **Qué intentaba:** poner un tiempo máximo de 120 s al hook de `npm run check`.
+
+- **Qué pasó:** con `timeout` dentro de `action` Kiro daba un error de formato. La documentación actual lo define como campo del hook (`hooks[].timeout`), en segundos, solo para acciones de comando.
+
+- **Cómo lo rodeé:** mover `timeout` al nivel del hook, junto a `trigger` y `action`.
+
+- **Estado:** resuelto.
+
+## 2026-11-11 — "Agent Hooks v2": no hay que migrar
+
+- **Qué intentaba:** saber si el anuncio de Agent Hooks v2 obligaba a cambiar el formato de nuestro hook.
+
+- **Qué pasó:** la documentación (kiro.dev/docs/hooks) usa `"version": "v1"` con `trigger`, `matcher` y `action`, igual que nuestro archivo. El único cambio de formato documentado es de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`.
+
+- **Cómo lo rodeé:** no hizo falta.
+
+- **Estado:** resuelto.

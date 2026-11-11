@@ -5,11 +5,11 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Esqueleto del proyecto terminado (spec `project-skeleton` completa, rama `feat/project-skeleton`). PR abierto a `main`, pendiente de revisar y fusionar por Luis Miguel.
+- Esqueleto (PR #4) y hook de tests (PR #5) fusionados en main. Siguiente: el spike de preguntas (`docs/spike-preguntas.md`, punto 3).
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
-2. [ ] Crear el hook de tests (Post Task Execution) cuando exista el stack
+2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; la prueba real queda en Pendientes)
 3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
 4. [ ] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [ ] Spec: exorcismo (explicación + preguntas + corrección)
@@ -23,9 +23,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26
 - Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
-- Low (PR #1): añadir `.gitattributes` con `* text=auto eol=lf` en la spec del esqueleto, para que Prettier no falle en Windows por los saltos de línea CRLF
-- Low (PR #1): decidir si `npm run format:check` entra en la comprobación antes de cada commit (`tech.md` y `testing.md` solo piden lint, build y test)
 - Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
+- Medium (hook de tests): NO comprobado de verdad. En la sesión de la PR de `feat/test-hook` no pude disparar PostTaskExec (marqué la tarea como hecha editando `tasks.md` y no apareció salida de ningún hook). Se añadió igualmente la opción B (segundo hook de tipo agente que ejecuta `npm run check`). La prueba real se hará en la primera tarea de la spec de detección de fantasmas: Luis pulsa "Start task" con un fallo provocado, se anota si Kiro recibe el error y si el hook de agente se dispara, y después se deja un solo hook (se quita el que sobre).
+- Cerrado (hook de tests): 'Agent Hooks v2' no obliga a migrar. La documentación actual (kiro.dev/docs/hooks, actualizada oct 2026) usa `"version": "v1"` con `trigger` y `action`, igual que nuestro archivo. `timeout` va al nivel del hook, no dentro de `action`. Solo cambió el formato de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`. La documentación no dice que la salida de un hook PostTaskExec llegue al agente.
+- Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
@@ -33,10 +34,12 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - [x] Repo creado con licencia MIT (6 nov)
 - [x] Generar `product.md` y `tech.md` con Kiro a partir de `docs/idea.md` (PR #1, 6 nov)
 - [x] Crear `docs/frictions.md` y su recordatorio en el plan (PR #2, 6 nov)
+- [x] Esqueleto del proyecto: workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check (PR #4)
+- [x] Hook de tests con acción de comando y de agente (PR #5; sin comprobar en real, ver Pendientes)
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé: esqueleto terminado. Spec `project-skeleton` completa (las 10 tareas hechas, una por commit) en la rama `feat/project-skeleton`, subida y con PR abierto a `main`. `npm ci` y `npm run check` pasan también en un clon limpio.
-- Qué estaba a medias: nada. El PR no está fusionado.
-- Lo próximo: revisar y fusionar el PR (lo hace Luis Miguel en GitHub). Después, punto 2 de "Siguientes" (hook de tests) y el punto 3 (spike de las preguntas).
+- Dónde lo dejé: esqueleto (PR #4) y hook de tests (PR #5) fusionados en main. Siguiente: el spike de preguntas.
+- Qué estaba a medias: la comprobación real del hook de tests (ver Pendientes, Medium). El hook tiene dos acciones (comando + agente), pero ninguna se ha visto disparar todavía. Se probará en la primera tarea de la spec de detección.
+- Lo próximo: punto 3 de "Siguientes" (spike, `docs/spike-preguntas.md`) y después el punto 4 (spec de detección de fantasmas).
 - Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) GitHub Pages: comprobar que `npm ci` funciona en Linux con un lockfile creado en Windows.
