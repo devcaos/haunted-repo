@@ -88,7 +88,7 @@ Rules for running these tasks:
     - _Requirements: 4.5, 4.6, 4.9_
 
 - [ ] 6. Factors
-  - [ ] 6.1 Add `measureFactors`
+  - [x] 6.1 Add `measureFactors`
     - Create `ghost-detection/factors.ts` with `measureFactors(text)` following the design "Factors": remove a leading BOM, split on `/\r?\n/`, cut each line to its first 500 characters, drop empty lines, comment lines start with `//`, `#`, `/*` or `*`, count `lines`, `branches` (`/\b(if|elif|for|while|switch|case|catch)\b/g` on non-comment lines), `maxIndent` (`tabs + floor(spaces / 4)`) and `imports`.
     - Write `factors.test.ts` with hand-written snippets: one per factor; `else if` counts once; `elif` counts once; a bare `else` does not count; a comment-only file; a line of 600 characters counts as one line; CRLF and LF give the same result; a BOM at the start; an empty file gives all zeros; tabs and spaces for indentation; `import`, `from x import y` and `require(` lines.
     - Verify: `npm run check` exits `0`.
