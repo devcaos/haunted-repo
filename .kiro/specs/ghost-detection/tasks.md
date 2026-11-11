@@ -49,8 +49,8 @@ Rules for running these tasks:
     - Commit message: `feat(core): add ghost detection types and errors`
     - _Requirements: 6.6, 6.7, 6.10_
 
-- [ ] 3. Repository URL
-  - [ ] 3.1 Add `parseRepoUrl` and `formatRepoUrl`
+- [x] 3. Repository URL
+  - [x] 3.1 Add `parseRepoUrl` and `formatRepoUrl`
     - Create `ghost-detection/repoUrl.ts` following the design "`parseRepoUrl` rules" (trim, drop query and hash, optional scheme and `www.`, owner and repo character sets, `.git` suffix, ignore extra path parts, no ref ever read from the URL). `formatRepoUrl` returns `https://github.com/{owner}/{repo}`.
     - Error `INVALID_URL` uses the English message from the design, with an example URL.
     - Write `repoUrl.test.ts`: a table of accepted forms (with and without `https://`, `www.`, `.git`, trailing `/`, `/tree/main/src`, `/issues`) and rejected ones (empty, `gitlab.com/...`, missing owner, missing repo, `..` as repo). `parseRepoUrl` never throws for any `fc.string()`.
