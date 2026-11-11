@@ -208,7 +208,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): export ghost detection API`
     - _Requirements: 7.7, 7.8, 7.9_
 
-  - [ ] 15.2 Update `PLAN.md` and hand off
+  - [x] 15.2 Update `PLAN.md` and hand off
     - Mark the ghost detection spec as done in `PLAN.md` ("Siguientes", item 4 and "Hecho"), add "Para retomar" notes (what exists in `packages/core`, how to run `npm run test:live`, that `power` and `web` do not depend on core yet and each later spec adds `"@haunted-repo/core": "0.0.0"` and a `package-lock.json` update), and record the result of the manual hook check from task 1.2 in "Pendientes". Keep the existing Low item about updating `product.md` and `tech.md` (the old hook idea is replaced). `PLAN.md` may stay in Spanish.
     - Verify: `npm run check` exits `0` and `git status --short` shows only `PLAN.md` (and `docs/decisiones.md` if the hook check needs a record).
     - Commit message: `docs: mark ghost detection spec as done`
