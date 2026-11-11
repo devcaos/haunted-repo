@@ -5,11 +5,11 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Esqueleto (PR #4) y hook de tests (PR #5) fusionados en main. Siguiente: el spike de preguntas (`docs/spike-preguntas.md`, punto 3).
+- Esqueleto (PR #4) y hook de tests (PR #5, confirmado en real) fusionados en main. Siguiente: el spike de preguntas (`docs/spike-preguntas.md`, punto 3).
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
-2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; la prueba real queda en Pendientes)
+2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea)
 3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
 4. [ ] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [ ] Spec: exorcismo (explicación + preguntas + corrección)
