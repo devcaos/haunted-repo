@@ -83,7 +83,7 @@ Rules for running these tasks:
     - _Requirements: 8.2, 8.3, 8.4, 6.5_
 
 - [ ] 5. Final verification (after everything is committed)
-  - [ ] 5.1 Run the manual failure-case checks
+  - [x] 5.1 Run the manual failure-case checks
     - Precondition: `git status --short` prints nothing (everything committed). Run each check, then restore only the changed file before the next one. Never use `git restore .`.
     - Check 1 (R2.3): in `packages/power/src/index.ts` change `return a + b;` to `return "x";`. Run `npm run build`. Expect a TypeScript error and `$LASTEXITCODE` not `0`. Restore: `git restore packages/power/src/index.ts`.
     - Check 2 (R4.4): in `packages/power/src/index.test.ts` change `toBe(5)` to `toBe(6)`. Run `npm test`. Expect one failing test and `$LASTEXITCODE` not `0`. Restore: `git restore packages/power/src/index.test.ts`.
