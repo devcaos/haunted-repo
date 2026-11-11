@@ -34,7 +34,7 @@ Rules for running these tasks:
     - _Requirements: 1.2, 1.3, 2.1, 2.2_
 
 - [ ] 2. Formatting and linting
-  - [ ] 2.1 Add the Prettier config
+  - [x] 2.1 Add the Prettier config
     - Create `.prettierrc.json` (`{ "endOfLine": "lf" }`) and `.prettierignore` (`**/*.md`, `package-lock.json`, `dist/`, `node_modules/`).
     - If `format:check` reports files, run `npm run format` and review the diff before continuing.
     - Verify: `npm run format:check`, then `echo $LASTEXITCODE` prints `0`. Also `git ls-files --eol` shows `i/lf` for the tracked config files.
