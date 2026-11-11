@@ -5,7 +5,7 @@ Plain TypeScript functions in the new shared package `packages/core` (`@haunted-
 
 Rules for running these tasks:
 - Kiro runs a task only when the project owner says so. Kiro asks permission before modifying code.
-- Work on branch `feat/ghost-detection`, never on `main`. Never merge.
+- Work on branch `feat/ghost-detection-fetch`, never on `main`. Never merge.
 - Run every command from the repository root, in PowerShell.
 - One task = one commit. A task is done only when its own tests and `npm run check` pass (exit code `0`). Then make its commit. If a commit message needs an "and", it is two commits.
 - Task 1.2 is not a commit: it is a manual check by the project owner (Luis Miguel).
@@ -70,7 +70,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add file eligibility rules`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6_
 
-- [ ] 5. Key files
+- [x] 5. Key files
   - [x] 5.1 Add `keyScore` and `rankKeyFiles`
     - Create `ghost-detection/keyFiles.ts` with `keyScore` (name 40, location 30/20/10/0, size 0 to 30 linear between 200 and 20,000 bytes) and `rankKeyFiles` (filter with `isEligible`, sort by score descending, then path ascending with `a < b`, not `localeCompare`).
     - Write `keyFiles.test.ts`: score table with boundary sizes 199, 200, 10,100, 20,000 and 20,001; location cases with 0, 1 and 2 folder levels (`src`, `app`, `lib` and another folder name); a monorepo path such as `packages/x/src/index.ts` gets 0 location points; tie broken by path.
@@ -87,7 +87,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): pick the five key files`
     - _Requirements: 4.5, 4.6, 4.9_
 
-- [ ] 6. Factors
+- [x] 6. Factors
   - [x] 6.1 Add `measureFactors`
     - Create `ghost-detection/factors.ts` with `measureFactors(text)` following the design "Factors": remove a leading BOM, split on `/\r?\n/`, cut each line to its first 500 characters, drop empty lines, comment lines start with `//`, `#`, `/*` or `*`, count `lines`, `branches` (`/\b(if|elif|for|while|switch|case|catch)\b/g` on non-comment lines), `maxIndent` (`tabs + floor(spaces / 4)`) and `imports`.
     - Write `factors.test.ts` with hand-written snippets: one per factor; `else if` counts once; `elif` counts once; a bare `else` does not count; a comment-only file; a line of 600 characters counts as one line; CRLF and LF give the same result; a BOM at the start; an empty file gives all zeros; tabs and spaces for indentation; `import`, `from x import y` and `require(` lines.
@@ -137,14 +137,14 @@ Rules for running these tasks:
     - _Requirements: 6.7, 6.8, 6.9_
 
 - [ ] 10. GitHub client and strict fake
-  - [ ] 10.1 Add the strict fake GitHub
+  - [x] 10.1 Add the strict fake GitHub
     - Create `ghost-detection/fakeGitHub.testutil.ts` with `createFakeGitHub(repos)` returning a `fetch` function, as in the design "Strict fake GitHub": 404 for an unknown owner/repo, tree ref or contents path; 409 on the tree of an empty repo; 405 for methods other than GET; 400 when `User-Agent` or `Accept` is missing; real field names (`default_branch`, `tree[].path/mode/type/size`, `truncated`), `size` only for blobs; the contents route returns the JSON/base64 form unless the raw `Accept` header is sent. The fake adds a default `User-Agent` check only for its own test: because the real client does not set `User-Agent`, the fake must receive it from a wrapper in the tests (Node's fetch and browsers send one themselves). Options: answer 403 with `x-ratelimit-remaining: 0` and `x-ratelimit-reset` after N requests, invalid UTF-8 bytes for a file, hang until the abort signal fires, answer 5xx; and a request counter.
     - Write `fakeGitHub.test.ts` (tests of the fake itself): unknown ref gives 404, missing `User-Agent` gives 400, POST gives 405, non-raw contents returns JSON, rate-limit headers after N requests, counter increases.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(core): add strict fake GitHub`
     - _Requirements: 7.5_
 
-  - [ ] 10.2 Add `createGitHubClient` with `getRepo` and `getTree`
+  - [x] 10.2 Add `createGitHubClient` with `getRepo` and `getTree`
     - Create `ghost-detection/githubClient.ts`: options `fetch` (default global) and `timeoutMs` (default 10,000), `AbortSignal.timeout(timeoutMs)` on every request, headers `Accept: application/vnd.github+json` and `X-GitHub-Api-Version: 2022-11-28` (no `User-Agent`, no auth header), `requestCount`, and a plain `Error` if a 9th request is attempted.
     - `getRepo` calls `GET /repos/{owner}/{repo}` and returns `{ defaultBranch: string | null }`. `getTree` calls `GET /repos/{owner}/{repo}/git/trees/{ref}?recursive=1` and returns `{ entries, truncated }`.
     - Response mapping from the design table, rate-limit check first: 403 or 429 with `x-ratelimit-remaining: 0` gives `RATE_LIMITED` with the UTC reset time from `x-ratelimit-reset`; 403 or 429 with `retry-after` or otherwise gives `RATE_LIMITED` with a generic text; repo 404 gives `REPO_NOT_FOUND`; tree 409 gives `EMPTY_REPO`; anything else (tree 404 or 422, 5xx, not JSON, fetch rejects, timeout) gives `NETWORK_ERROR`. All thrown as `DetectError` with English messages from the design.
@@ -153,15 +153,15 @@ Rules for running these tasks:
     - Commit message: `feat(core): add GitHub client for repo and tree`
     - _Requirements: 1.3, 1.4, 1.5, 2.1, 2.2, 2.3, 2.5, 2.6, 2.7_
 
-  - [ ] 10.3 Add `getFileText` with the UTF-8 check
+  - [x] 10.3 Add `getFileText` with the UTF-8 check
     - In `githubClient.ts` add `getFileText(owner, repo, ref, path)`: `GET /repos/{owner}/{repo}/contents/{path}?ref={ref}` with `Accept: application/vnd.github.raw+json`; path parts encoded one by one with `encodeURIComponent` and joined with `/`; read `arrayBuffer()` and decode with `new TextDecoder("utf-8", { fatal: true })`. A decoding error, or a NUL byte in the text, throws `DetectError` with the internal code `NOT_TEXT`. Any non-200 gives `NETWORK_ERROR` (message mentions the file), rate limit mapping as in 10.2.
     - Write tests against the fake: a normal file, a path with spaces and non-ASCII characters, invalid UTF-8 gives `NOT_TEXT`, a NUL byte gives `NOT_TEXT`, 404 gives `NETWORK_ERROR`, rate limit gives `RATE_LIMITED`, the non-raw `Accept` is never sent.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(core): read file text from GitHub`
     - _Requirements: 2.7, 2.10, 2.11_
 
-- [ ] 11. Orchestrator
-  - [ ] 11.1 Add `detectGhosts` for the normal path and the simple errors
+- [x] 11. Orchestrator
+  - [x] 11.1 Add `detectGhosts` for the normal path and the simple errors
     - Create `ghost-detection/detectGhosts.ts` with `DetectOptions` (`GitHubClientOptions` plus the test-only `ref`) and `detectGhosts(url, opts)` following the design "Orchestrator": parse the URL, `getRepo`, use `opts.ref ?? defaultBranch` (`EMPTY_REPO` if there is none), `getTree`, cut to 5,000 entries and set `truncated`, keep only regular blobs (`type === "blob"`, mode starting with `100`), `rankKeyFiles`, read up to 5 files in order, measure, `buildReport`. Return `Result`, catch `DetectError` and return it as an error; rethrow anything else.
     - `NO_SUPPORTED_FILES` when there is no eligible file, with the English message listing the four languages and saying test files alone are not analysed.
     - Write `detectGhosts.test.ts` with the strict fake: a small repo with 5 or more files (check order, floors, `analysed`, `picked`, `ref` is the default branch); the test-only `ref` as commit SHA; `INVALID_URL`; `REPO_NOT_FOUND`; `RATE_LIMITED`; `NETWORK_ERROR`; `EMPTY_REPO` by 409 and by no default branch; docs-only repo and tests-only repo give `NO_SUPPORTED_FILES`; 5,001 entries give `truncated: true`; symlink and submodule entries are ignored; 1 and 2 files give `fewFiles: true`; `detectGhosts` never throws for any `fc.string()` URL.
@@ -169,15 +169,15 @@ Rules for running these tasks:
     - Commit message: `feat(core): add detectGhosts orchestrator`
     - _Requirements: 1.2, 1.3, 1.4, 1.5, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.5, 4.7, 4.8, 6.3, 6.4, 6.6_
 
-  - [ ] 11.2 Add skips, partial reports and the request budget
+  - [x] 11.2 Add skips, partial reports and the request budget
     - In `detectGhosts.ts` add: a picked file larger than 102,400 bytes is skipped without a request and listed as `TOO_LARGE`; a `NOT_TEXT` file is skipped and listed; a skipped file is replaced by the next candidate while no more than 6 content requests are used; `RATE_LIMITED` after at least one file was read gives a report with `partial: true`; `RATE_LIMITED` before any file gives the error; if eligible files exist but every one was skipped, return `NO_SUPPORTED_FILES` with a message that lists the skipped paths and reasons (`skippedMessage`).
     - Add tests with the strict fake: a large file replaced by the next one; a binary file replaced by the next one; skipped files listed in `overview.skipped`; partial report after the limit hits on the third file; rate limit on the first file gives `RATE_LIMITED`; all eligible files too large gives `NO_SUPPORTED_FILES` with the paths in the message; the fake's request counter is never above 8 (worst case: 1 + 1 + 6) and a repo with many large files makes no content request for them; the report from a run passes `parseReport(JSON.stringify(report))`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(core): skip unreadable files and limit requests`
     - _Requirements: 2.7, 2.8, 2.9, 2.10, 2.11, 2.12, 6.6, 6.7_
 
-- [ ] 12. Live test setup
-  - [ ] 12.1 Split live tests from `npm test`
+- [x] 12. Live test setup
+  - [x] 12.1 Split live tests from `npm test`
     - In `vitest.config.ts` keep `include` and add `exclude: [...configDefaults.exclude, "**/*.live.test.ts"]` (`configDefaults` from `vitest/config`; check the Vitest 5 docs for the exact import).
     - Create `vitest.live.config.ts` with `include: ["packages/*/src/**/*.live.test.ts"]` and `testTimeout: 30_000`.
     - Add the root script `"test:live": "vitest run --config vitest.live.config.ts"`. Do not add it to `check`.
@@ -186,11 +186,11 @@ Rules for running these tasks:
     - Commit message: `chore: add test:live script`
     - _Requirements: 7.3_
 
-- [ ] 13. Checkpoint before the live test
+- [x] 13. Checkpoint before the live test
   - Run `npm run check` and make sure it exits `0` (lint, format check, build and all unit and property tests). Check that `git status --short` prints nothing. Ask the owner if questions arise.
 
-- [ ] 14. Live test against the real GitHub
-  - [ ] 14.1 Add the live test for `lukeed/sirv`
+- [x] 14. Live test against the real GitHub
+  - [x] 14.1 Add the live test for `lukeed/sirv`
     - Create `ghost-detection/detectGhosts.live.test.ts` with one call: `detectGhosts("https://github.com/lukeed/sirv", { ref: "1135207e92c40354543cbd15c763c7a61d79d432" })`, no token, no environment variable, default client timeout.
     - Assertions on that one result: it is `ok`; `overview.ref` equals the SHA; there are 1 to 5 ghosts; every score is an integer 0 to 100; ghosts are ordered by score then path; `parseReport(JSON.stringify(report))` gives an equal report.
     - If the result is an error, the test fails. For `RATE_LIMITED` the failure message is: `GitHub rate limit reached (60 requests per hour without a token). Wait until the limit resets (<reset time from the error>) and run npm run test:live again.` There is no skipping.
@@ -199,8 +199,8 @@ Rules for running these tasks:
     - Commit message: `test(core): add live GitHub test for ghost detection`
     - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
-- [ ] 15. Public exports and wrap-up
-  - [ ] 15.1 Export the public API and check browser safety
+- [x] 15. Public exports and wrap-up
+  - [x] 15.1 Export the public API and check browser safety
     - Create `ghost-detection/index.ts` exporting: `detectGhosts`, `parseReport`, `parseRepoUrl`, `formatRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport`, `createGitHubClient`, and all public types (`HauntedReport`, `Ghost`, `Overview`, `Result`, `ErrorCode`, ...). Do not export `DetectError`, test helpers or the internal `NOT_TEXT` code. Change `packages/core/src/index.ts` to `export * from "./ghost-detection/index.js";`.
     - Write `index.test.ts` (replace the smoke test): importing from `./index.js` gives the exported functions, and `parseReport(JSON.stringify(report))` works on a report built with `buildReport`.
     - Browser-safety check (how it is verified): (1) `npm run build` compiles core with `types: []`, so any Node global (`process`, `Buffer`) or Node module typing is a compile error; this was proven in task 1.1. (2) Run `Select-String -Path packages/core/src -Recurse -Include *.ts -Pattern 'node:|require\(|process\.|Buffer' -Exclude *.test.ts,*.testutil.ts` and expect no match outside strings in comments or messages (the factor regex for `require(` in `factors.ts` is an allowed match). (3) Check that no file in core imports a package other than `vitest` and `fast-check` (tests only): `Select-String -Path packages/core/src -Recurse -Include *.ts -Pattern '^import .* from "[^.]'` lists only test files. (4) The real browser run is part of the demo website spec and is not checked here; say so in the final report.
@@ -208,7 +208,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): export ghost detection API`
     - _Requirements: 7.7, 7.8, 7.9_
 
-  - [ ] 15.2 Update `PLAN.md` and hand off
+  - [x] 15.2 Update `PLAN.md` and hand off
     - Mark the ghost detection spec as done in `PLAN.md` ("Siguientes", item 4 and "Hecho"), add "Para retomar" notes (what exists in `packages/core`, how to run `npm run test:live`, that `power` and `web` do not depend on core yet and each later spec adds `"@haunted-repo/core": "0.0.0"` and a `package-lock.json` update), and record the result of the manual hook check from task 1.2 in "Pendientes". Keep the existing Low item about updating `product.md` and `tech.md` (the old hook idea is replaced). `PLAN.md` may stay in Spanish.
     - Verify: `npm run check` exits `0` and `git status --short` shows only `PLAN.md` (and `docs/decisiones.md` if the hook check needs a record).
     - Commit message: `docs: mark ghost detection spec as done`
