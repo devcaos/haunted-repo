@@ -303,6 +303,26 @@ describe("detectGhosts", () => {
         expect(result.error.message).toContain("src/a.ts (not text)");
     });
 
+    it("returns NETWORK_ERROR, not a skipped file, when a file body fails to read", async () => {
+      const { fetch: inner } = setup([smallRepo]);
+      const failing = (async (
+        input: string | URL | Request,
+        init?: RequestInit,
+      ) => {
+        if (!new URL(String(input)).pathname.includes("/contents/")) {
+          return inner(input, init);
+        }
+        const body = new ReadableStream<Uint8Array>({
+          start(controller) {
+            controller.error(new Error("connection cut"));
+          },
+        });
+        return new Response(body, { status: 200 });
+      }) as typeof fetch;
+      const result = await detectGhosts("github.com/o/r", { fetch: failing });
+      expect(codeOf(result)).toBe("NETWORK_ERROR");
+    });
+
     it("never makes more than 8 requests and no request for large files", async () => {
       const files: Record<string, string> = {};
       for (let i = 0; i < 20; i++) files[`src/big${i}.ts`] = big;

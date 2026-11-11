@@ -186,15 +186,21 @@ export function createGitHubClient(
           `/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`,
         "application/vnd.github.raw+json",
       );
-      if (response.status !== 200) {
-        throw new DetectError(
+      const readError = (): DetectError =>
+        new DetectError(
           "NETWORK_ERROR",
           `Could not read the file "${path}" from GitHub. Please try again in a moment.`,
         );
+      if (response.status !== 200) throw readError();
+      let bytes: ArrayBuffer;
+      try {
+        bytes = await response.arrayBuffer();
+      } catch {
+        // A timeout or a dropped connection while reading the body.
+        throw readError();
       }
       let text: string;
       try {
-        const bytes = await response.arrayBuffer();
         text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
       } catch {
         throw new DetectError("NOT_TEXT", `The file "${path}" is not text.`);

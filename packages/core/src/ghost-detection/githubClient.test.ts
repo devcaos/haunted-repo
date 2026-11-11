@@ -221,6 +221,24 @@ describe("createGitHubClient", () => {
       ).toBe("RATE_LIMITED");
     });
 
+    it("maps a body that fails while reading to NETWORK_ERROR, not NOT_TEXT", async () => {
+      const client = createGitHubClient({
+        fetch: (() => {
+          const body = new ReadableStream<Uint8Array>({
+            start(controller) {
+              controller.error(new Error("connection cut"));
+            },
+          });
+          return Promise.resolve(new Response(body, { status: 200 }));
+        }) as typeof fetch,
+      });
+      const error = await client
+        .getFileText("o", "r", "main", "src/a.ts")
+        .catch((e: unknown) => e);
+      expect(isCode(error, "NETWORK_ERROR")).toBe(true);
+      expect((error as Error).message).toContain("src/a.ts");
+    });
+
     it("always sends the raw Accept header and counts the request", async () => {
       const accepts: string[] = [];
       const { client, fake } = setup();
