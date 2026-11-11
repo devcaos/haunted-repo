@@ -1,4 +1,4 @@
-# Spike: ¿las preguntas de Kiro obligan a entender un archivo?
+﻿# Spike: ¿las preguntas de Kiro obligan a entender un archivo?
 
 Punto 3 de `PLAN.md`. Prueba rápida y desechable. Responde a una duda antes de construir: si las preguntas que genera Kiro sobre un archivo obligan de verdad a leer y entender el código.
 
@@ -65,7 +65,7 @@ Rules for the questions:
 - Archivo: `lib/hosts.ts` de Duly (50 líneas). No se ha copiado al repo.
 - Qué hace: decide qué dominios (hosts) puede usar el servidor y devuelve un error 403 si el dominio de una petición no está permitido.
 
-> **Aviso de método.** Este documento dice que se rellena a mano durante el spike. En esta ejecución lo rellenó Kiro por encargo de Luis Miguel. Por eso hay partes que Kiro **no puede** rellenar: las respuestas de Luis y si le obligaron a entender el archivo. Quedan marcadas como `PENDIENTE (Luis Miguel)`. El veredicto es **provisional** hasta que Luis las complete.
+> **Aviso de método.** Este documento dice que se rellena a mano durante el spike. En esta ejecución Kiro hizo de examinador en el chat y anotó las respuestas reales de Luis Miguel. Dos desviaciones: (a) en la pregunta 2 Kiro añadió una pista que no está en el prompt, así que esa pregunta no es del todo limpia; (b) Luis se examinó de un archivo escrito en TypeScript con expresiones regulares, y está en primero de DAM, aprendiendo Java (bucles). Eso condiciona todo el resultado (ver Veredicto).
 
 ## Preguntas
 
@@ -77,7 +77,13 @@ Preguntas escritas por Kiro siguiendo el prompt final (en inglés el prompt, pre
 
 ## Mis respuestas
 
-PENDIENTE (Luis Miguel): responder las 3 preguntas mirando solo el código y anotar, para cada una, si podía acertarla sin abrirlo (sí / no).
+Respuestas reales de Luis Miguel (mirando el código, sin leer ninguna explicación):
+
+1. "No lo sé."
+2. "No lo sé." (con la pista de Kiro sobre la línea 33)
+3. "No lo sé."
+
+Sobre si podía acertarlas sin abrir el código: no dio un sí o un no por pregunta. Al contestar "no lo sé" en las tres, no hubo intento de adivinar, así que no se puede decir que acertara por intuición. Su comentario literal sobre las preguntas: "supongo que serán buenas, el problema es que me haces preguntas sobre código que yo no entiendo porque está hecho por IA supervisada por mí, pero estoy en primero de DAM, aprendiendo Java, en la parte de bucles."
 
 Respuestas esperadas (las comprobó Kiro leyendo el código y probando la expresión de la línea 6 en Node; no son las de Luis):
 
@@ -89,7 +95,13 @@ Prueba de la respuesta absurda (la hizo Kiro, no Luis): a la pregunta 1 se conte
 
 ## Corrección de Kiro
 
-PENDIENTE (Luis Miguel): pegar aquí la corrección real de Kiro a las respuestas de Luis, con PASS / FAIL por pregunta.
+Corrección de Kiro a las respuestas reales de Luis:
+
+- Pregunta 1: **FAIL** ("no lo sé"). Respuesta correcta: `undefined` (host permitido).
+- Pregunta 2: **FAIL** ("no lo sé"). Respuesta correcta: la línea 33 pasa el valor por `hostnameOf`, que ya quita el puerto.
+- Pregunta 3: **FAIL** ("no lo sé"). Respuesta correcta: 403, porque la expresión solo admite minúsculas.
+
+Como las tres fueron "no lo sé", no se pudo comprobar si Kiro detecta una respuesta vaga o una adivinanza, ni si aprueba una respuesta absurda dada por Luis.
 
 Lo que sí se pudo comprobar sin Luis:
 
@@ -98,20 +110,27 @@ Lo que sí se pudo comprobar sin Luis:
 
 ## Veredicto
 
-**Provisional: a medias, tendiendo a bien.** Faltan los datos de Luis.
+**No concluyente.** El spike no falla según los criterios, pero tampoco sale bien. No mide lo que queríamos medir.
 
 | Criterio | Estado |
 |---|---|
-| Al menos 2 de 3 preguntas no se podían acertar sin leer el código | Probable: la 1 va contra la intuición (un puerto 99999 "debería" fallar), la 3 depende de que la expresión no lleva `i`, y la 2 compara dos líneas concretas. Pero la 3 se puede adivinar (las mayúsculas suelen dar problemas). Lo confirma Luis. |
-| Kiro no aprueba la respuesta absurda | No probado de verdad (ver arriba). |
-| La corrección detecta los errores reales de Luis | PENDIENTE (Luis Miguel) |
-| Luis dice que le obligaron a entender el archivo (sí / a medias / no) | PENDIENTE (Luis Miguel) |
+| Al menos 2 de 3 preguntas no se podían acertar sin leer el código | Sí en la práctica: Luis no acertó ninguna y no hubo adivinanzas. Pero fue porque el código estaba muy por encima de su nivel, no porque las preguntas fueran especialmente buenas. |
+| Kiro no aprueba la respuesta absurda | No probado con Luis. La prueba de Kiro sobre sí mismo es débil. |
+| La corrección detecta los errores reales de Luis | No probado: las tres respuestas fueron "no lo sé". |
+| Luis dice que le obligaron a entender el archivo (sí / a medias / no) | Sin respuesta clara. Dijo "supongo que serán buenas", y explicó que no puede responder porque no entiende el código. Se anota tal cual, sin convertirlo en sí / a medias / no. |
 
-Conclusión provisional: ¿sirve el enfoque para Haunted Repo? **Sí, con ajustes**, siempre que Luis confirme los dos puntos pendientes. Las preguntas se apoyan en casos límite y en números de línea, y eso obliga a leer. Ajustes propuestos al prompt:
+**Lo que se aprendió (importante para Haunted Repo):**
 
-- Pedir que cada pregunta cite un número de línea o una entrada concreta, para que la pregunta "por qué X y no Y" no se pueda contestar con teoría general.
-- Pedir que Kiro dé al final una respuesta de referencia de cada pregunta, guardada aparte, para poder comprobar su corrección.
+1. El público principal son estudiantes de primer año que dirigen a una IA. Un ejemplo real: Luis está en bucles de Java y el archivo usaba TypeScript, expresiones regulares y cabeceras HTTP. Con ese salto, una pregunta fría sobre el código no obliga a pensar: obliga a rendirse. El fantasma del producto es justo el código que el usuario no entiende, así que este caso es el normal, no una rareza.
+2. El spike quitó la explicación (Luis no debía leerla antes de responder). En el producto la explicación va **antes** de las preguntas. Ese flujo (explicar con palabras sencillas y luego preguntar) **no se ha probado**.
+3. "No lo sé" es una respuesta honesta y frecuente. El producto no debe tratarla solo como FAIL, sino como el momento en que la explicación debe ayudar.
+
+**Ajustes propuestos (para decidir con Luis, no están aprobados):**
+
+- El prompt debe recibir el nivel del usuario (qué sabe ya) y adaptar el vocabulario y la dificultad. Las preguntas deben poder hacerse sobre lo que el código hace, en lenguaje sencillo, sin exigir leer una expresión regular.
+- El flujo del exorcismo: explicación primero, preguntas después, y "no lo sé" lleva a una explicación más sencilla y a una pregunta nueva.
+- Repetir el spike de la forma real: Luis lee primero la explicación de Kiro y luego responde. Mejor con un archivo más cercano a su nivel (por ejemplo uno pequeño con bucles y condiciones).
+- Pedir que cada pregunta cite una línea o una entrada concreta y que Kiro guarde la respuesta de referencia aparte.
 - Hacer la prueba de la respuesta absurda con una respuesta que Kiro no conozca de antemano.
-- Repetir el spike con un segundo archivo (por ejemplo `lib/storage/merge.ts`) antes de decidir, porque un solo archivo es poca muestra.
 
-No se registra nada en `docs/decisiones.md` porque el spike no ha fallado.
+No se ha escrito nada en `docs/decisiones.md`: la decisión sobre cómo seguir es de Luis. Si decide cambiar el flujo del exorcismo o el prompt, debería quedar allí.
