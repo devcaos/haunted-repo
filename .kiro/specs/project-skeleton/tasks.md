@@ -33,7 +33,7 @@ Rules for running these tasks:
     - Commit message: `chore: add placeholder TypeScript packages`
     - _Requirements: 1.2, 1.3, 2.1, 2.2_
 
-- [ ] 2. Formatting and linting
+- [x] 2. Formatting and linting
   - [x] 2.1 Add the Prettier config
     - Create `.prettierrc.json` (`{ "endOfLine": "lf" }`) and `.prettierignore` (`**/*.md`, `package-lock.json`, `dist/`, `node_modules/`).
     - If `format:check` reports files, run `npm run format` and review the diff before continuing.
@@ -41,7 +41,7 @@ Rules for running these tasks:
     - Commit message: `chore: add Prettier config`
     - _Requirements: 3.1, 3.3, 3.4, 3.6, 5.2_
 
-  - [ ] 2.2 Add the ESLint flat config
+  - [x] 2.2 Add the ESLint flat config
     - Create `eslint.config.js` as in the design, using the import names confirmed in task 1.1 (`@eslint/js`, `typescript-eslint`, `eslint-config-prettier` last, ignores for `**/dist/` and `**/node_modules/`).
     - Verify: `npm run lint`, then `echo $LASTEXITCODE` prints `0`. Then `npm run format:check` still prints exit `0`.
     - Commit message: `chore: add ESLint flat config`
