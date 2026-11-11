@@ -5,10 +5,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Spec del esqueleto del proyecto (rama `feat/project-skeleton`): requisitos, diseño y tareas aprobados. Implementación sin empezar.
+- Esqueleto del proyecto terminado (spec `project-skeleton` completa, rama `feat/project-skeleton`). PR abierto a `main`, pendiente de revisar y fusionar por Luis Miguel.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
-1. [ ] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
+1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
 2. [ ] Crear el hook de tests (Post Task Execution) cuando exista el stack
 3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
 4. [ ] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
@@ -36,7 +36,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé: spec `project-skeleton` completa en la rama `feat/project-skeleton` (requisitos, diseño y tareas aprobados tras revisión del crítico de planes). Ninguna tarea empezada.
-- Qué estaba a medias: nada. El árbol está limpio y la rama está subida.
-- Lo próximo: chat nuevo de Kiro en la rama `feat/project-skeleton`, tarea 1.1 de `.kiro/specs/project-skeleton/tasks.md`. Empieza volviendo a comprobar versiones y documentación y se para antes de crear archivos si algo no coincide con el diseño.
+- Dónde lo dejé: esqueleto terminado. Spec `project-skeleton` completa (las 10 tareas hechas, una por commit) en la rama `feat/project-skeleton`, subida y con PR abierto a `main`. `npm ci` y `npm run check` pasan también en un clon limpio.
+- Qué estaba a medias: nada. El PR no está fusionado.
+- Lo próximo: revisar y fusionar el PR (lo hace Luis Miguel en GitHub). Después, punto 2 de "Siguientes" (hook de tests) y el punto 3 (spike de las preguntas).
 - Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) GitHub Pages: comprobar que `npm ci` funciona en Linux con un lockfile creado en Windows.
