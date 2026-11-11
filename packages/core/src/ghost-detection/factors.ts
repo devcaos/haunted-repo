@@ -45,3 +45,16 @@ export function measureFactors(text: string): Factors {
 
   return factors;
 }
+
+function part(value: number, cap: number, weight: number): number {
+  return (Math.min(value, cap) / cap) * weight;
+}
+
+export function difficultyScore(f: Factors): number {
+  return Math.round(
+    part(f.lines, 400, 40) +
+      part(f.branches, 60, 30) +
+      part(f.maxIndent, 8, 20) +
+      part(f.imports, 20, 10),
+  );
+}

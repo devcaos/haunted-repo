@@ -96,7 +96,7 @@ Rules for running these tasks:
     - _Requirements: 5.1, 5.2, 5.5_
 
 - [ ] 7. Difficulty score
-  - [ ] 7.1 Add `difficultyScore` and its property tests
+  - [x] 7.1 Add `difficultyScore` and its property tests
     - In `factors.ts` add `difficultyScore(f)` using the design formula (`part(value, cap, weight)` with lines 400/40, branches 60/30, maxIndent 8/20, imports 20/10, summed and rounded).
     - Add unit tests: all zeros gives 0; all factors at or above their caps give 100; one example for each factor alone (for example 200 lines alone gives 20).
     - Create `ghost-detection/textArb.testutil.ts` with the shared `textArb`, `lineArb` and `branchLineArb` generators of the design (any string without `\r`/`\n`, keyword lines, random indentation, comment lines, import lines, lines over 500 characters, the empty array).
