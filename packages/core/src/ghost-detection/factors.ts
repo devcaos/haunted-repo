@@ -1,0 +1,86 @@
+import type { Factors } from "./types.js";
+
+const MAX_LINE_LENGTH = 500;
+const BRANCH_PATTERN = /\b(if|elif|for|while|switch|case|catch)\b/g;
+const IMPORT_PATTERN = /^(import\b|from\s+\S+\s+import\b)/;
+
+function isCommentLine(trimmed: string): boolean {
+  return (
+    trimmed.startsWith("//") ||
+    trimmed.startsWith("#") ||
+    trimmed.startsWith("/*") ||
+    trimmed.startsWith("*")
+  );
+}
+
+function indentOf(line: string): number {
+  let tabs = 0;
+  let spaces = 0;
+  for (const ch of line) {
+    if (ch === "\t") tabs++;
+    else if (ch === " ") spaces++;
+    else break;
+  }
+  return tabs + Math.floor(spaces / 4);
+}
+
+export function measureFactors(text: string): Factors {
+  const clean = text.startsWith("\uFEFF") ? text.slice(1) : text;
+  const factors: Factors = { lines: 0, branches: 0, maxIndent: 0, imports: 0 };
+
+  for (const rawLine of clean.split(/\r?\n/)) {
+    const line = rawLine.slice(0, MAX_LINE_LENGTH);
+    const trimmed = line.trim();
+    if (trimmed === "") continue;
+
+    factors.maxIndent = Math.max(factors.maxIndent, indentOf(line));
+    if (IMPORT_PATTERN.test(trimmed) || trimmed.includes("require(")) {
+      factors.imports++;
+    }
+    if (isCommentLine(trimmed)) continue;
+
+    factors.lines++;
+    factors.branches += trimmed.match(BRANCH_PATTERN)?.length ?? 0;
+  }
+
+  return factors;
+}
+
+function part(value: number, cap: number, weight: number): number {
+  return (Math.min(value, cap) / cap) * weight;
+}
+
+export function difficultyScore(f: Factors): number {
+  return Math.round(
+    part(f.lines, 400, 40) +
+      part(f.branches, 60, 30) +
+      part(f.maxIndent, 8, 20) +
+      part(f.imports, 20, 10),
+  );
+}
+
+export function reasonFor(f: Factors): string {
+  const candidates: { points: number; sentence: string }[] = [
+    {
+      points: part(f.lines, 400, 40),
+      sentence: `It is hard mostly because it is long (${f.lines} lines of code).`,
+    },
+    {
+      points: part(f.branches, 60, 30),
+      sentence: `It is hard mostly because it makes many decisions (${f.branches} if/elif/for/while/switch/case/catch).`,
+    },
+    {
+      points: part(f.maxIndent, 8, 20),
+      sentence: `It is hard mostly because the code is deeply nested (${f.maxIndent} levels).`,
+    },
+    {
+      points: part(f.imports, 20, 10),
+      sentence: `It is hard mostly because it depends on many other files (${f.imports} imports).`,
+    },
+  ];
+  let best = candidates[0]!;
+  for (const c of candidates) {
+    if (c.points > best.points) best = c;
+  }
+  return best.points === 0 ? "It is very short and simple." : best.sentence;
+}

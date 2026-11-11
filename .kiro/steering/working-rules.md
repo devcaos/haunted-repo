@@ -37,6 +37,8 @@ Explain to Luis Miguel, in Spanish and briefly:
 2. Which files changed.
 3. How to check it works (exact commands or steps).
 
+Before committing each task of a spec, mark it yourself as completed (`[x]`) in `tasks.md` and include `tasks.md` in that same commit.
+
 ## Reviews
 - Classify findings as Critical / High / Medium / Low.
 - Critical and High are fixed in the same branch. Medium depends on cost.
