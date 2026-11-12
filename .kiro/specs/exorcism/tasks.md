@@ -160,8 +160,8 @@ Rules for running these tasks:
     - Commit message: `test(core): check verdict round trip`
     - _Requirements: 10.9, 10.10_
 
-- [ ] 3. Event parsing
-  - [ ] 3.1 Add `parseEvent` and `ALLOWED_EVENTS`
+- [x] 3. Event parsing
+  - [x] 3.1 Add `parseEvent` and `ALLOWED_EVENTS`
     - Create `exorcism/event.ts` with `parseEvent(raw: unknown)` (hand-written validation of the closed list of events and their fields as in "Data Models": `explanation-done` text not blank, `answer-rated` rating valid and question not blank, `dont-know` question not blank, `self-check-answered` in `yes | half | no`, `pick-ghost` path string and text string that may be `""`) and the table `ALLOWED_EVENTS` of Requirement 10.4. `parseEvent` copies only the known fields, so unknown fields (including `sampleAnswer`) are dropped. On failure it returns `INVALID_EVENT` with an English message; it never throws, for any `unknown` input.
     - Write `event.test.ts`: each valid event; each missing field, wrong type or blank text; a non-object; unknown fields dropped; `sampleAnswer` dropped; `ALLOWED_EVENTS` equals the table of Requirement 10.4 step by step (`house-clean` allows none); `parseEvent` never throws for `fc.anything()` (one plain property inside the same test file is fine, no number needed).
     - Verify: `npm run check` exits `0`.
