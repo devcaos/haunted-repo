@@ -283,7 +283,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): replay a recorded session`
     - _Requirements: 11.3, 11.4, 11.8, 11.9_
 
-  - [ ] 5.3 Add the committed fixture and its end-to-end replay test
+  - [x] 5.3 Add the committed fixture and its end-to-end replay test
     - Create `exorcism/tinySession.testutil.ts` exporting a small `SessionRecording` (3 ghosts with texts, `report` valid for `parseReport`) as a TypeScript object and as a JSON string. Build it by running the engine, so the events are valid. It walks through: one ghost passed (with a self-check), one question answered with `dont-know` twice, one ghost failed, and a retry. Texts the Tutor wrote are short English fixed strings; include a `sampleAnswer` on at least one event.
     - In `recording.test.ts` add the end-to-end test: the JSON string passes `parseRecording`; `replay` succeeds; the expected steps are checked at fixed positions (for example the step after the second `dont-know`, the step after the failing decision, the step after `retry-ghost`); removing every `sampleAnswer` gives the same replay.
     - Verify: `npm run check` exits `0`.

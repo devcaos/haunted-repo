@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { HauntedReport } from "../ghost-detection/types.js";
 import { formatRecording, parseRecording, replay } from "./recording.js";
-import type { SessionRecording } from "./types.js";
+import { tinyRecording, tinyRecordingJson } from "./tinySession.testutil.js";
+import type { RecordedEvent, SessionRecording } from "./types.js";
 
 const report: HauntedReport = {
   overview: {
@@ -163,6 +164,50 @@ describe("parseRecording", () => {
       ok: true,
       value: { ...recording, events: [{ type: "leave-ghost" }] },
     });
+  });
+});
+
+describe("committed fixture", () => {
+  it("parses, replays and reaches the expected steps", () => {
+    const parsed = parseRecording(tinyRecordingJson);
+    expect(parsed).toStrictEqual({ ok: true, value: tinyRecording });
+    if (!parsed.ok) return;
+    const result = replay(parsed.value);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const steps = result.value.steps;
+    const at = (i: number) => steps[i]?.state;
+    expect(steps).toHaveLength(tinyRecording.events.length + 1);
+    expect(at(0)?.step).toBe("choosing");
+    expect(at(5)?.step).toBe("self-check");
+    expect(at(6)?.step).toBe("choosing");
+    expect(at(6)?.progress.ghosts[0]?.state).toBe("exorcised");
+    expect(at(6)?.progress.ghosts[0]?.selfCheck).toBe("yes");
+    expect(at(9)?.step).toBe("simplifying");
+    // After the second dont-know: model answer, rated wrong.
+    expect(at(11)?.step).toBe("model-answer");
+    expect(at(11)?.current?.ratings).toStrictEqual(["wrong"]);
+    // After the failing decision.
+    expect(at(14)?.step).toBe("failed");
+    expect(at(14)?.progress.ghosts[1]?.state).toBe("haunted");
+    // After retry-ghost the old explanation is kept.
+    expect(at(15)?.step).toBe("explaining");
+    expect(at(15)?.current?.explanation).not.toBe("");
+    expect(at(17)?.step).toBe("choosing");
+    expect(at(17)?.current).toBeNull();
+  });
+
+  it("replays the same without any sampleAnswer", () => {
+    expect(tinyRecording.events.some((e) => "sampleAnswer" in e)).toBe(true);
+    const stripped: SessionRecording = {
+      ...tinyRecording,
+      events: tinyRecording.events.map((event) => {
+        const copy: Record<string, unknown> = { ...event };
+        delete copy["sampleAnswer"];
+        return copy as unknown as RecordedEvent;
+      }),
+    };
+    expect(replay(stripped)).toStrictEqual(replay(tinyRecording));
   });
 });
 
