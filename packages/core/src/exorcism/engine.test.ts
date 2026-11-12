@@ -445,3 +445,133 @@ describe("advance: asking, dont-know, simplifying and model answer", () => {
     expect(state).toEqual(copy);
   });
 });
+
+function answers(state: SessionState, ratings: Rating[]): SessionState {
+  return ratings.reduce(
+    (s, rating, i) => step(s, rated(rating, `Q${i}?`)),
+    state,
+  );
+}
+
+function entryOf(state: SessionState, path = "b.ts") {
+  const entry = state.progress.ghosts.find((g) => g.path === path);
+  if (entry === undefined) throw new Error("no entry");
+  return entry;
+}
+
+describe("advance: decision, self-check, failed, retry and leave", () => {
+  it("passes with 3 right ratings and goes to self-check", () => {
+    const s = answers(asking(), ["right", "right", "right"]);
+    expect(s.step).toBe("self-check");
+    expect(entryOf(s)).toEqual({
+      path: "b.ts",
+      state: "exorcised",
+      ratings: ["right", "right", "right"],
+      selfCheck: null,
+    });
+  });
+
+  it("passes with 2 good ratings and a wrong third", () => {
+    const s = answers(asking(), ["right", "half-right", "wrong"]);
+    expect(s.step).toBe("self-check");
+    expect(entryOf(s).state).toBe("exorcised");
+  });
+
+  it("fails when the Core_Question is wrong even with 2 good ratings", () => {
+    const s = answers(asking(), ["wrong", "right", "right"]);
+    expect(s.step).toBe("failed");
+    expect(entryOf(s).state).toBe("haunted");
+    expect(entryOf(s).ratings).toEqual(["wrong", "right", "right"]);
+  });
+
+  it("decides after dont-know twice on the last question", () => {
+    let s = answers(asking(), ["right", "right"]);
+    s = step(s, { type: "dont-know", question: "Q2?" });
+    s = step(s, { type: "explanation-done", text: "Simpler." });
+    s = step(s, { type: "dont-know", question: "Q2?" });
+    expect(s.step).toBe("model-answer");
+    s = step(s, { type: "explanation-done", text: "Model." });
+    expect(s.step).toBe("self-check");
+    expect(entryOf(s).ratings).toEqual(["right", "right", "wrong"]);
+  });
+
+  it("self-check stores the answer and suggests the next ghost", () => {
+    const s = step(answers(asking(), ["right", "right", "right"]), {
+      type: "self-check-answered",
+      answer: "half",
+    });
+    expect(s.step).toBe("choosing");
+    expect(s.current).toBeNull();
+    expect(entryOf(s).selfCheck).toBe("half");
+  });
+
+  it("the last self-check goes to house-clean", () => {
+    const report = reportOf([ghost("b.ts", 10)]);
+    let s = startSession(report).state;
+    s = step(pick(s), { type: "explanation-done", text: "E." });
+    s = step(answers(s, ["right", "right", "right"]), {
+      type: "self-check-answered",
+      answer: "yes",
+    });
+    expect(s.step).toBe("house-clean");
+  });
+
+  it("retry keeps the explanation and asks for a new analogy", () => {
+    const failed = answers(asking(), ["wrong", "wrong", "wrong"]);
+    const r = advance(failed, { type: "retry-ghost" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("explaining");
+    expect(r.state.current?.explanation).toBe("It is a box.");
+    expect(r.state.current?.ratings).toEqual([]);
+    expect(r.state.current?.simpler).toEqual([]);
+    expect(r.state.current?.questionIndex).toBe(0);
+    expect(r.state.current?.attemptStart).toBe(3);
+    expect(r.instructions.rules).toContain("new-analogy");
+  });
+
+  it("pick-ghost in failed starts another attempt", () => {
+    const failed = answers(asking(), ["wrong", "wrong", "wrong"]);
+    const s = pick(failed, "a.ts");
+    expect(s.step).toBe("explaining");
+    expect(s.current?.path).toBe("a.ts");
+  });
+
+  it.each(["explaining", "asking", "simplifying", "model-answer"] as const)(
+    "leave-ghost in %s keeps the ghost haunted and keeps asked",
+    (name) => {
+      let s = asking();
+      s = step(s, { type: "dont-know", question: "Q0?" });
+      if (name === "explaining") s = pick(started());
+      if (name === "asking")
+        s = step(s, { type: "explanation-done", text: "S." });
+      if (name === "model-answer") {
+        s = step(s, { type: "explanation-done", text: "S." });
+        s = step(s, { type: "dont-know", question: "Q0?" });
+      }
+      const before = s;
+      const r = advance(s, { type: "leave-ghost" });
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.state.step).toBe("choosing");
+      expect(r.state.current).toBeNull();
+      expect(r.state.progress).toEqual(before.progress);
+      expect(r.state.asked).toEqual(before.asked);
+      expect(entryOf(r.state).state).toBe("haunted");
+    },
+  );
+
+  it("leave-ghost in self-check and failed is INVALID_EVENT", () => {
+    for (const ratings of [
+      ["right", "right", "right"],
+      ["wrong", "wrong", "wrong"],
+    ] as Rating[][]) {
+      const s = answers(asking(), ratings);
+      const r = advance(s, { type: "leave-ghost" });
+      expect(r.ok).toBe(false);
+      if (r.ok) return;
+      expect(r.error.code).toBe("INVALID_EVENT");
+      expect(r.state).toBe(s);
+    }
+  });
+});

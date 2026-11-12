@@ -9,6 +9,7 @@ import type {
   ExorcismErrorInfo,
   ExorcismEvent,
   ExorcismProgress,
+  GhostProgress,
   Rating,
   SessionState,
   StudentProfile,
@@ -142,7 +143,52 @@ export function advance(state: SessionState, event: unknown): Transition {
       current: { ...current, ratings: [...current.ratings, "wrong"] },
     });
   }
-  throw new Error("not implemented yet");
+  if (e.type === "self-check-answered" && state.step === "self-check") {
+    const progress = updateEntry(state, current.path, (entry) => ({
+      ...entry,
+      selfCheck: e.answer,
+    }));
+    const next = { ...state, progress, current: null };
+    return accept({
+      ...next,
+      step:
+        suggestGhost(state.ghosts, progress) === null
+          ? "house-clean"
+          : "choosing",
+    });
+  }
+  if (e.type === "retry-ghost" && state.step === "failed") {
+    return accept({
+      ...state,
+      step: "explaining",
+      current: {
+        ...current,
+        simpler: [],
+        attemptStart: state.asked[current.path]?.length ?? 0,
+        questionIndex: 0,
+        dontKnowCount: 0,
+        pendingQuestion: null,
+        ratings: [],
+      },
+    });
+  }
+  if (e.type === "leave-ghost") {
+    return accept({ ...state, step: "choosing", current: null });
+  }
+  return refuse(state, `The event ${e.type} cannot be applied now.`);
+}
+
+/** Returns a new progress with one entry changed (no mutation). */
+function updateEntry(
+  state: SessionState,
+  path: string,
+  change: (entry: GhostProgress) => GhostProgress,
+): ExorcismProgress {
+  return {
+    ghosts: state.progress.ghosts.map((entry) =>
+      entry.path === path ? change(entry) : entry,
+    ),
+  };
 }
 
 /** Returns the asked map with one more question for a ghost (new object, no mutation). */
@@ -154,9 +200,22 @@ function withQuestion(
   return { ...state.asked, [path]: [...(state.asked[path] ?? []), question] };
 }
 
-/** Goes to the next question, or (after the 3rd rating) to the decision of task 4.5. */
+/** Goes to the next question, or (after the 3rd rating) decides the attempt. */
 function nextQuestion(state: SessionState, current: CurrentGhost): Transition {
-  if (current.questionIndex === 2) throw new Error("not implemented yet");
+  if (current.questionIndex === 2) {
+    const passed = decide(current.ratings);
+    const progress = updateEntry(state, current.path, (entry) => ({
+      ...entry,
+      state: passed ? "exorcised" : "haunted",
+      ratings: [...current.ratings],
+    }));
+    return accept({
+      ...state,
+      step: passed ? "self-check" : "failed",
+      progress,
+      current,
+    });
+  }
   const questionIndex = current.questionIndex === 0 ? 1 : 2;
   return accept({
     ...state,

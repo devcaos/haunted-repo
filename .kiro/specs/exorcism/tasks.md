@@ -199,7 +199,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): advance the session through questions`
     - _Requirements: 4.9, 5.1, 5.2, 5.3, 5.5, 5.6, 5.7, 10.3, 10.4_
 
-  - [ ] 4.5 Add `advance`: decision, self-check, failed, retry and leave
+  - [x] 4.5 Add `advance`: decision, self-check, failed, retry and leave
     - In `engine.ts` implement the end of the attempt: after the 3rd rating apply `decide`; pass marks the progress entry `exorcised` with the 3 ratings and goes to `self-check`; fail keeps it `haunted` with the ratings of the last attempt and goes to `failed`. Then `self-check` + `self-check-answered` (store `selfCheck` in the entry, `current = null`, step `choosing` with the new suggestion, or `house-clean` if no ghost is haunted); `failed` + `retry-ghost` (reset ratings, `simpler`, index, counters; keep `explanation`; update `attemptStart`; step `explaining`); `leave-ghost` in `explaining`, `asking`, `simplifying` and `model-answer` (`current = null`, progress unchanged, `asked` kept, step `choosing`). Remove every temporary `throw`.
     - Extend `engine.test.ts` with the remaining edge cases: pass with 3 `right`; pass with 2 good and a `wrong` third; 2 good ratings but `wrong` Core_Question stays haunted and goes to `failed`; `dont-know` twice on the last question then the decision; retry after `failed` keeps the old explanation and the instruction asks for a new analogy; `pick-ghost` in `failed`; leave halfway keeps the ghost haunted and keeps `asked`; the last self-check goes to `house-clean`; `leave-ghost` in `self-check` and `failed` gives `INVALID_EVENT`.
     - Verify: `npm run check` exits `0`.
