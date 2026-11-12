@@ -206,7 +206,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): finish ghosts, retry and leave`
     - _Requirements: 1.2, 1.3, 5.6, 6.3, 6.4, 6.5, 10.8, 10.12, 10.13, 10.14_
 
-  - [ ] 4.6 Add the model-based test driver
+  - [x] 4.6 Add the model-based test driver
     - Create `exorcism/sessionArb.testutil.ts` as in the design "Test helpers": `validEventsFor(state)` is an **independent oracle** written in the test helper (not taken from `ALLOWED_EVENTS`), per step: `choosing` gives `pick-ghost` for each haunted ghost with a fixed generated text; `explaining` gives `explanation-done` and `leave-ghost`; `asking` gives `answer-rated` with each of the 3 ratings, `dont-know` and `leave-ghost` (the pending question when there is one, else a new question text); `simplifying` and `model-answer` give `explanation-done` and `leave-ghost`; `self-check` gives the 3 answers; `failed` gives `retry-ghost` and `pick-ghost`; `house-clean` gives none. `driveSession(report, profile, choices)` starts a session and picks `validEventsFor(state)[choice % length]` until the list is empty or the choices run out, returning `states`, `instructions` and `events`.
     - Reports used by the driver have unique, non-empty ghost paths (build the path from the index). Choices come from `fc.array(fc.nat())`, so failing cases shrink.
     - Write `sessionArb.test.ts` (tests of the helper): every step of every driven state allows exactly the events of `validEventsFor` (`advance` returns `ok: true` for each of them); driving ends in `house-clean` or when the choices run out; every state and instruction survives `JSON.parse(JSON.stringify(x))` with `toStrictEqual` (Requirement 10.2).
