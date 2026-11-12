@@ -6,7 +6,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
 
 ## Tasks
 
-- [ ] 1. Set up Vite in `packages/web`
+- [x] 1. Set up Vite in `packages/web`
   - Add `vite.config.ts` with `base: "/haunted-repo/"`, a minimal `index.html` and a stub `src/main.ts` so the build works
   - Update `packages/web/package.json`: dependency `@haunted-repo/core` at exact `0.0.0`, scripts `build` (`tsc --noEmit && vite build`) and `dev` (`vite`)
   - Update `packages/web/tsconfig.json` as in the design (DOM libs, `types: []`, `noEmit`, Bundler resolution, no `rootDir`/`outDir`)
