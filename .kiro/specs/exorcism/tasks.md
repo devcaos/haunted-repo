@@ -3,7 +3,7 @@
 Working branch: `feat/exorcism`.
 
 ## Overview
-The exorcism engine is a set of pure TypeScript functions in `packages/core/src/exorcism/`, plus one small fix in ghost detection (the Ghost_Sentence). The order follows the "Build Order" of the design: first the independent Ghost_Sentence fix, then the small pure modules (types, questions, file kind, rules, instructions, verdict, progress, suggestion, events), then the engine in small steps, then the model-based test driver and the mandatory properties, then recording and replay, then exports and the purity test, then docs and the pull request. The seven `aplazable` properties are at the end as optional tasks. Each task is one commit.
+The exorcism engine is a set of pure TypeScript functions in `packages/core/src/exorcism/`, plus one small fix in ghost detection (the Ghost_Sentence). The order follows the "Build Order" of the design: first the independent Ghost_Sentence fix, then the small pure modules (types, questions, file kind, rules, progress, suggestion, instructions, verdict, events), then the engine in small steps, then the model-based test driver and the mandatory properties, then recording and replay, then exports and the purity test, then docs and the pull request. The seven `aplazable` properties are at the end as optional tasks. Each task is one commit.
 
 Rules for running these tasks:
 - Kiro runs a task only when the project owner says so. Kiro asks permission before modifying code.
@@ -17,13 +17,13 @@ Rules for running these tasks:
 - Every property test is one `fc.assert(fc.property(...), { numRuns: 100 })` with the comment `// Feature: exorcism, Property N: <title>`.
 - In driver-based tests the input state and event of `advance` are deep-frozen, so any mutation fails.
 - Each task is meant to stay under about 150 changed lines. If it does not, stop and ask the owner how to split it.
-- The whole pull request is expected to be over 500 changed lines (tests are large). The last task warns the owner and proposes a split.
+- The whole pull request is expected to be over 500 changed lines (tests are large). The owner accepted one pull request; the last task states the size in its description.
 
 ## Tasks
 
 - [ ] 1. Ghost_Sentence fix in ghost detection
   - [ ] 1.1 Move `floorOf` to `ghost-detection/floor.ts`
-    - Step 0: check the branch with `git branch --show-current`. If it is `main`, create it with `git checkout -b feat/exorcism`.
+    - Step 0: check the branch with `git branch --show-current`. If it is `main`, run `git checkout feat/exorcism` followed by `git pull`. The branch already exists and holds the spec; never create it with `git checkout -b`.
     - Create `packages/core/src/ghost-detection/floor.ts` with `floorOf` moved unchanged from `report.ts`.
     - In `report.ts` import it for its own use and add `export { floorOf } from "./floor.js";`, so `index.ts` and every existing import keep working. This avoids an import cycle with `factors.ts` in task 1.3.
     - Existing tests of `floorOf` keep passing without change (move them next to `floor.ts` only if that needs no edit of their content).
@@ -64,7 +64,7 @@ Rules for running these tasks:
     - Commit message: `docs: point ghost sentence table to the exorcism design`
     - _Requirements: 8.9_
 
-- [ ] 2. Exorcism foundations: types, questions, file kind, rules, instructions, verdict
+- [ ] 2. Exorcism foundations: types, questions, file kind, rules, progress, suggestion, instructions, verdict
   - [ ] 2.1 Add the exorcism types and error helpers
     - Create `exorcism/types.ts` with all types of the design "Data Models" (`ExorcismStep`, `Rating`, `Verdict`, `FileKind`, `SelfCheck`, `StudentProfile`, `ExorcismErrorCode`, `ExorcismErrorInfo`, `GhostProgress`, `ExorcismProgress`, `ExorcismEvent`, `CurrentGhost`, `SessionState`, `TutorInstructions`, `RecordedEvent`, `SessionRecording`). `TutorInstructions.rules` uses `RuleId`, imported as a type from `./rules.js`; create `rules.ts` with only `export type RuleId = never;` for now and fill it in task 2.4 (or define the full `RuleId` union already here if it is shorter; either way the build must pass).
     - Create `exorcism/errors.ts` with small helpers `ok(value)` and `fail(code, message)` for `Result<T, ExorcismErrorInfo>` (this file is not in the design layout; it only holds these two helpers).
@@ -94,64 +94,28 @@ Rules for running these tasks:
     - Commit message: `feat(core): add the fixed rules for the tutor`
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.8, 2.11, 3.1, 3.2, 3.3, 3.4, 4.9, 4.10, 4.12, 5.1, 5.4, 5.5, 5.6, 6.1, 6.2, 6.5, 10.9, 10.13_
 
-  - [ ] 2.5 Build the instructions for the steps without questions
-    - Create `exorcism/instructions.ts` with `buildInstructions(state)` and the layout of the design (title line, `Ghost` block with path and Ghost_Text in a fence longer than any run of backticks in the text, step task, one bullet per rule in list order). In this task implement the steps `choosing`, `explaining`, `self-check`, `failed` and `house-clean`; for the other steps (`asking`, `simplifying`, `model-answer`) the function throws an `Error("not implemented yet")` that task 2.6 removes.
-    - `explaining`: rules `simple-english`, `no-jargon`, `what-before-how`, `no-question`, `no-lines`, `max-words`, the Java rule (exactly one of `java-allowed` / `java-forbidden`, from `profile.knowsJava`), `probable-reasons`, `separate-what-why`, `admit-unknown`. When `current.explanation` is not empty (after `retry-ghost`), it also contains the previous explanation and the rule `new-analogy`.
-    - `choosing`: short message with the suggested ghost (path, floor, ghost sentence) and the list of haunted ghosts; no Ghost_Text; rule `probable-reasons`. `failed`, `house-clean` and `self-check`: the fixed English messages of the design; `self-check` has `self-check-options`. `probable-reasons` is present in every step.
-    - Write `instructions.test.ts` (unit tests, fixed inputs): the text contains the sentence of every rule in `rules`, the path and the Ghost_Text; `explaining` has no question rule; the fence is longer than any backtick run in the Ghost_Text; the retry case contains the previous explanation and `new-analogy`; Java rule present in `explaining` for both profile values (and a missing profile counts as `false`).
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(core): build tutor instructions for explanation steps`
-    - _Requirements: 1.3, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.11, 3.1, 3.2, 3.3, 6.4, 6.5, 10.13_
-
-  - [ ] 2.6 Build the instructions for asking, simplifying and model answer
-    - In `instructions.ts` implement `asking`, `simplifying` and `model-answer` and remove the temporary `throw`.
-    - `asking`, new question (`pendingQuestion` is `null`): path, Ghost_Text, **only** the objective `QUESTION_SETS[kind][questionIndex]`; rules `one-question`, `concrete-file`, `ask-then-wait`, `no-lines`, `judge-behaviour`, `reason-then-verdict`, `verdict-format`, `one-verdict`, `dont-know-verdict`, `not-wrong-other-reason`, `admit-unknown`, `probable-reasons`, simple-language rules and the Java rule; `different-questions` only when `asked[path].slice(0, attemptStart)` is not empty, and then the text lists those questions.
-    - `asking`, re-ask (`pendingQuestion` set): the pending question and `same-question`, plus `ask-then-wait` and the judging rules.
-    - `simplifying`: path, Ghost_Text, the pending question, the explanation given before and the earlier simpler ones; rules `new-analogy`, `only-this-part`, `max-words`, `no-question`, `no-lines`, `separate-what-why`, Java rule. `model-answer`: path, Ghost_Text, the question and `model-answer-short`, `no-question`, `no-lines`, Java rule.
-    - Extend `instructions.test.ts` with fixed-input examples: the text of a new question contains the objective and none of the other two; a second attempt lists the questions of the first; the re-ask contains the exact pending question; `ask-then-wait` sentence appears in the text of every `asking` instruction; `simplifying` contains the explanation given before.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(core): build tutor instructions for questions`
-    - _Requirements: 3.1, 3.4, 4.9, 4.10, 4.11, 4.12, 4.13, 5.1, 5.3, 5.4, 5.5, 5.6, 6.1, 6.2, 10.9_
-
-  - [ ] 2.7 Add `formatVerdict` and `parseVerdict`
-    - Create `exorcism/verdict.ts` as in the design "Verdict format": `formatVerdict(reason, verdict)` (trailing whitespace of the reason removed, then `\nVERDICT: <verdict>`, or only the verdict line when the reason is empty); `parseVerdict(text)` accepts only a last non-empty line (trailing whitespace and `\r` removed) that is exactly one of the four verdict lines, and no other line starting with `VERDICT:`. Otherwise `INVALID_VERDICT` with the English messages of the design. It never throws.
-    - Write `verdict.test.ts` (unit tests): the four accepted verdicts; rejected: no last line, unknown verdict, two `VERDICT:` lines, text after the verdict, empty text; accepted: trailing `\r`, trailing blank lines.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(core): format and parse tutor verdicts`
-    - _Requirements: 5.2, 10.9_
-
-  - [ ] 2.8 Property test for the verdict round trip
-    - **Property 14: Verdict round trip**
-    - **Validates: Requirements 10.9, 10.10**
-    - Generator: `fc.constantFrom` of the four verdicts and a reason from `fc.string()` filtered so that no line starts with `VERDICT:` (include `\r\n`, blank lines and trailing spaces in the generator). Check `parseVerdict(formatVerdict(reason, verdict))` returns the same verdict.
-    - Test file: `packages/core/src/exorcism/verdict.test.ts`.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `test(core): check verdict round trip`
-    - _Requirements: 10.9, 10.10_
-
-- [ ] 3. Progress, suggestion and events
-  - [ ] 3.1 Add progress normalising, parsing and formatting
+  - [ ] 2.5 Add progress normalising, parsing and formatting
     - Create `exorcism/progress.ts` with `normaliseProgress(ghosts, progress)` (exactly one entry per ghost in report order, unknown paths dropped, missing ghosts `haunted` with no ratings and `selfCheck: null`), `parseProgress(jsonText)` (hand-written type guard as in the design: `ghosts` array; `path` string; `state` in the two values; `ratings` of length 0 or 3 of valid ratings; `selfCheck` in `yes | half | no | null`; no duplicate paths; `INVALID_PROGRESS` with an English message on any failure; never throws) and `formatProgress` (`JSON.stringify`). Export the type guard inside the package (not from the public index) for `parseRecording`.
     - Write `progress.test.ts` (unit tests): unknown path dropped, missing ghost becomes haunted, report order kept; `INVALID_PROGRESS` for invalid JSON, wrong types, ratings of length 2, a state not in the union, duplicate paths; a valid progress parses back equal.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(core): normalise and parse exorcism progress`
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.10_
 
-  - [ ] 3.2 Add `hauntedShare`
+  - [ ] 2.6 Add `hauntedShare`
     - In `progress.ts` add `hauntedShare(report, progress)`: normalise against the report ghosts, return `haunted / ghosts.length`, and `0` when there are no ghosts.
     - Extend `progress.test.ts` with examples: no ghost exorcised gives 1; all exorcised gives 0; half gives 0.5; 0 ghosts gives 0 (not `NaN`); unknown paths ignored; marking one more ghost exorcised does not raise the share.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(core): calculate the haunted share`
     - _Requirements: 7.7, 7.8, 7.9_
 
-  - [ ] 3.3 Add `suggestGhost` and `isPickable`
+  - [ ] 2.7 Add `suggestGhost` and `isPickable`
     - Create `exorcism/suggest.ts` as in the design "Suggestion": among `haunted` ghosts the lowest `difficultyScore`, ties by `path` ascending with `a < b` (not `localeCompare`); `null` if none is haunted. `isPickable` is true only for a `haunted` ghost that is in the list.
     - Write `suggest.test.ts` (unit tests): lowest score wins; tie broken by path; exorcised ghosts skipped; `null` when all are exorcised or the list is empty; `isPickable` is false for an exorcised ghost and for an unknown path.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(core): suggest the easiest haunted ghost`
     - _Requirements: 1.1, 1.2, 1.4_
 
-  - [ ] 3.4 Property test for the suggestion
+  - [ ] 2.8 Property test for the suggestion
     - **Property 1: Suggestion is the easiest haunted ghost**
     - **Validates: Requirements 1.1, 1.2, 1.6**
     - Create `exorcism/progressArb.testutil.ts` with `progressArb(ghosts)` (state per ghost, ratings of length 0 or 3, `selfCheck` or `null`; it may add extra unknown paths when asked) and `ratingsArb`. The optional properties 7, 8 and 9 reuse them.
@@ -161,7 +125,43 @@ Rules for running these tasks:
     - Commit message: `test(core): check the ghost suggestion rule`
     - _Requirements: 1.1, 1.2, 1.6_
 
-  - [ ] 3.5 Add `parseEvent` and `ALLOWED_EVENTS`
+  - [ ] 2.9 Build the instructions for the steps without questions
+    - Create `exorcism/instructions.ts` with `buildInstructions(state)` and the layout of the design (title line, `Ghost` block with path and Ghost_Text in a fence longer than any run of backticks in the text, step task, one bullet per rule in list order). In this task implement the steps `choosing`, `explaining`, `self-check`, `failed` and `house-clean`; for the other steps (`asking`, `simplifying`, `model-answer`) the function throws an `Error("not implemented yet")` that task 2.10 removes.
+    - `explaining`: rules `simple-english`, `no-jargon`, `what-before-how`, `no-question`, `no-lines`, `max-words`, the Java rule (exactly one of `java-allowed` / `java-forbidden`, from `profile.knowsJava`), `probable-reasons`, `separate-what-why`, `admit-unknown`. When `current.explanation` is not empty (after `retry-ghost`), it also contains the previous explanation and the rule `new-analogy`.
+    - `choosing`: short message with the suggested ghost (path, floor, ghost sentence) and the list of haunted ghosts; no Ghost_Text; rule `probable-reasons`. `failed`, `house-clean` and `self-check`: the fixed English messages of the design; `self-check` has `self-check-options`. `probable-reasons` is present in every step.
+    - Write `instructions.test.ts` (unit tests, fixed inputs): the text contains the sentence of every rule in `rules`, the path and the Ghost_Text; `explaining` has no question rule; the fence is longer than any backtick run in the Ghost_Text; the retry case contains the previous explanation and `new-analogy`; Java rule present in `explaining` for both profile values (and a missing profile counts as `false`).
+    - Verify: `npm run check` exits `0`.
+    - Commit message: `feat(core): build tutor instructions for explanation steps`
+    - _Requirements: 1.3, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.11, 3.1, 3.2, 3.3, 6.4, 6.5, 10.13_
+
+  - [ ] 2.10 Build the instructions for asking, simplifying and model answer
+    - In `instructions.ts` implement `asking`, `simplifying` and `model-answer` and remove the temporary `throw`.
+    - `asking`, new question (`pendingQuestion` is `null`): path, Ghost_Text, **only** the objective `QUESTION_SETS[kind][questionIndex]`; rules `one-question`, `concrete-file`, `ask-then-wait`, `no-lines`, `judge-behaviour`, `reason-then-verdict`, `verdict-format`, `one-verdict`, `dont-know-verdict`, `not-wrong-other-reason`, `admit-unknown`, `probable-reasons`, simple-language rules and the Java rule; `different-questions` only when `asked[path].slice(0, attemptStart)` is not empty, and then the text lists those questions.
+    - `asking`, re-ask (`pendingQuestion` set): the pending question and `same-question`, plus `ask-then-wait` and the judging rules.
+    - `simplifying`: path, Ghost_Text, the pending question, the explanation given before and the earlier simpler ones; rules `new-analogy`, `only-this-part`, `max-words`, `no-question`, `no-lines`, `separate-what-why`, Java rule. `model-answer`: path, Ghost_Text, the question and `model-answer-short`, `no-question`, `no-lines`, Java rule.
+    - Extend `instructions.test.ts` with fixed-input examples: the text of a new question contains the objective and none of the other two; a second attempt lists the questions of the first; the re-ask contains the exact pending question; `ask-then-wait` sentence appears in the text of every `asking` instruction; `simplifying` contains the explanation given before.
+    - Verify: `npm run check` exits `0`.
+    - Commit message: `feat(core): build tutor instructions for questions`
+    - _Requirements: 3.1, 3.4, 4.9, 4.10, 4.11, 4.12, 4.13, 5.1, 5.3, 5.4, 5.5, 5.6, 6.1, 6.2, 10.9_
+
+  - [ ] 2.11 Add `formatVerdict` and `parseVerdict`
+    - Create `exorcism/verdict.ts` as in the design "Verdict format": `formatVerdict(reason, verdict)` (trailing whitespace of the reason removed, then `\nVERDICT: <verdict>`, or only the verdict line when the reason is empty); `parseVerdict(text)` accepts only a last non-empty line (trailing whitespace and `\r` removed) that is exactly one of the four verdict lines, and no other line starting with `VERDICT:`. Otherwise `INVALID_VERDICT` with the English messages of the design. It never throws.
+    - Write `verdict.test.ts` (unit tests): the four accepted verdicts; rejected: no last line, unknown verdict, two `VERDICT:` lines, text after the verdict, empty text; accepted: trailing `\r`, trailing blank lines.
+    - Verify: `npm run check` exits `0`.
+    - Commit message: `feat(core): format and parse tutor verdicts`
+    - _Requirements: 5.2, 10.9_
+
+  - [ ] 2.12 Property test for the verdict round trip
+    - **Property 14: Verdict round trip**
+    - **Validates: Requirements 10.9, 10.10**
+    - Generator: `fc.constantFrom` of the four verdicts and a reason from `fc.string()` filtered so that no line starts with `VERDICT:` (include `\r\n`, blank lines and trailing spaces in the generator). Check `parseVerdict(formatVerdict(reason, verdict))` returns the same verdict.
+    - Test file: `packages/core/src/exorcism/verdict.test.ts`.
+    - Verify: `npm run check` exits `0`.
+    - Commit message: `test(core): check verdict round trip`
+    - _Requirements: 10.9, 10.10_
+
+- [ ] 3. Event parsing
+  - [ ] 3.1 Add `parseEvent` and `ALLOWED_EVENTS`
     - Create `exorcism/event.ts` with `parseEvent(raw: unknown)` (hand-written validation of the closed list of events and their fields as in "Data Models": `explanation-done` text not blank, `answer-rated` rating valid and question not blank, `dont-know` question not blank, `self-check-answered` in `yes | half | no`, `pick-ghost` path string and text string that may be `""`) and the table `ALLOWED_EVENTS` of Requirement 10.4. `parseEvent` copies only the known fields, so unknown fields (including `sampleAnswer`) are dropped. On failure it returns `INVALID_EVENT` with an English message; it never throws, for any `unknown` input.
     - Write `event.test.ts`: each valid event; each missing field, wrong type or blank text; a non-object; unknown fields dropped; `sampleAnswer` dropped; `ALLOWED_EVENTS` equals the table of Requirement 10.4 step by step (`house-clean` allows none); `parseEvent` never throws for `fc.anything()` (one plain property inside the same test file is fine, no number needed).
     - Verify: `npm run check` exits `0`.
@@ -331,7 +331,7 @@ Rules for running these tasks:
 
   - [ ] 7.3 Final check and pull request
     - Run `npm run check` from a build-first state (`npm run build` before `npm test`); it must exit `0` with no network access needed. Check `git status --short` prints nothing.
-    - Count the changed lines of the branch against `main` (`git diff --stat main...HEAD`), excluding `package-lock.json`. If it is over about 500, warn Luis Miguel and propose a split before opening the pull request. Suggested split: tasks 1 and 2 (Ghost_Sentence fix and foundations) in one pull request, and tasks 3 to 7 in a second one.
+    - Count the changed lines of the branch against `main` with `git diff --stat main...HEAD`, excluding `package-lock.json`, and write that number in the pull request description. The description also says that the pull request exceeds about 500 lines because the tests are large, that one single pull request is the owner's decision, and that it will be reviewed by task groups.
     - Mark this task `[x]`, commit `tasks.md` (commit message: `docs: close the exorcism task list`), and push with `git push -u origin feat/exorcism`.
     - Open the pull request with `gh pr create --body-file` using `.github/pull_request_template.md` filled in. Title under 70 characters, for example `feat: add exorcism engine`. The description says: what was built, that the Tutor text is covered only by manual spikes, that the seven `aplazable` properties may arrive later as extra commits, and that nothing was merged.
     - Never merge: Luis Miguel merges on GitHub.
@@ -353,7 +353,7 @@ Rules for running these tasks:
   - [ ]* 8.2 Property test for the progress round trip
     - **Property 7: Progress round trip**
     - **Validates: Requirements 7.4**
-    - Generator: `progressArb` (task 3.4) with unique paths. `parseProgress(formatProgress(p))` returns an equal progress.
+    - Generator: `progressArb` (task 2.8) with unique paths. `parseProgress(formatProgress(p))` returns an equal progress.
     - Test file: `packages/core/src/exorcism/progress.test.ts`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(core): check progress round trip`
@@ -430,11 +430,11 @@ Rules for running these tasks:
     { "id": 10, "tasks": ["2.6"] },
     { "id": 11, "tasks": ["2.7"] },
     { "id": 12, "tasks": ["2.8"] },
-    { "id": 13, "tasks": ["3.1"] },
-    { "id": 14, "tasks": ["3.2"] },
-    { "id": 15, "tasks": ["3.3"] },
-    { "id": 16, "tasks": ["3.4"] },
-    { "id": 17, "tasks": ["3.5"] },
+    { "id": 13, "tasks": ["2.9"] },
+    { "id": 14, "tasks": ["2.10"] },
+    { "id": 15, "tasks": ["2.11"] },
+    { "id": 16, "tasks": ["2.12"] },
+    { "id": 17, "tasks": ["3.1"] },
     { "id": 18, "tasks": ["4.1"] },
     { "id": 19, "tasks": ["4.2"] },
     { "id": 20, "tasks": ["4.3"] },
