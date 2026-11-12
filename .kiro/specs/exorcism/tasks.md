@@ -144,7 +144,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): build tutor instructions for questions`
     - _Requirements: 3.1, 3.4, 4.9, 4.10, 4.11, 4.12, 4.13, 5.1, 5.3, 5.4, 5.5, 5.6, 6.1, 6.2, 10.9_
 
-  - [ ] 2.11 Add `formatVerdict` and `parseVerdict`
+  - [x] 2.11 Add `formatVerdict` and `parseVerdict`
     - Create `exorcism/verdict.ts` as in the design "Verdict format": `formatVerdict(reason, verdict)` (trailing whitespace of the reason removed, then `\nVERDICT: <verdict>`, or only the verdict line when the reason is empty); `parseVerdict(text)` accepts only a last non-empty line (trailing whitespace and `\r` removed) that is exactly one of the four verdict lines, and no other line starting with `VERDICT:`. Otherwise `INVALID_VERDICT` with the English messages of the design. It never throws.
     - Write `verdict.test.ts` (unit tests): the four accepted verdicts; rejected: no last line, unknown verdict, two `VERDICT:` lines, text after the verdict, empty text; accepted: trailing `\r`, trailing blank lines.
     - Verify: `npm run check` exits `0`.
