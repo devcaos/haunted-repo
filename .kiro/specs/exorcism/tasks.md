@@ -65,7 +65,7 @@ Rules for running these tasks:
     - _Requirements: 8.9_
 
 - [ ] 2. Exorcism foundations: types, questions, file kind, rules, progress, suggestion, instructions, verdict
-  - [ ] 2.1 Add the exorcism types and error helpers
+  - [x] 2.1 Add the exorcism types and error helpers
     - Create `exorcism/types.ts` with all types of the design "Data Models" (`ExorcismStep`, `Rating`, `Verdict`, `FileKind`, `SelfCheck`, `StudentProfile`, `ExorcismErrorCode`, `ExorcismErrorInfo`, `GhostProgress`, `ExorcismProgress`, `ExorcismEvent`, `CurrentGhost`, `SessionState`, `TutorInstructions`, `RecordedEvent`, `SessionRecording`). `TutorInstructions.rules` uses `RuleId`, imported as a type from `./rules.js`; create `rules.ts` with only `export type RuleId = never;` for now and fill it in task 2.4 (or define the full `RuleId` union already here if it is shorter; either way the build must pass).
     - Create `exorcism/errors.ts` with small helpers `ok(value)` and `fail(code, message)` for `Result<T, ExorcismErrorInfo>` (this file is not in the design layout; it only holds these two helpers).
     - Write `errors.test.ts` (unit tests): shapes of `ok` and `fail`.
