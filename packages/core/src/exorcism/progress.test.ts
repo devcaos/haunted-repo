@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Ghost } from "../ghost-detection/types.js";
 import {
   formatProgress,
+  hauntedShare,
   isExorcismProgress,
   normaliseProgress,
   parseProgress,
@@ -109,5 +110,61 @@ describe("isExorcismProgress", () => {
     expect(isExorcismProgress(valid)).toBe(true);
     expect(isExorcismProgress(null)).toBe(false);
     expect(isExorcismProgress({ ghosts: [{}] })).toBe(false);
+  });
+});
+
+describe("hauntedShare", () => {
+  const ghosts = [ghost("a.ts"), ghost("b.ts"), ghost("c.ts"), ghost("d.ts")];
+  const entry = (
+    path: string,
+    state: "haunted" | "exorcised",
+  ): ExorcismProgress["ghosts"][number] => ({
+    path,
+    state,
+    ratings: [],
+    selfCheck: null,
+  });
+
+  it("is 1 when no ghost is exorcised (with or without progress)", () => {
+    expect(hauntedShare({ ghosts }, null)).toBe(1);
+    expect(hauntedShare({ ghosts }, { ghosts: [] })).toBe(1);
+  });
+
+  it("is 0 when all ghosts are exorcised", () => {
+    const progress = { ghosts: ghosts.map((g) => entry(g.path, "exorcised")) };
+    expect(hauntedShare({ ghosts }, progress)).toBe(0);
+  });
+
+  it("is 0.5 when half are exorcised", () => {
+    const progress = {
+      ghosts: [
+        entry("a.ts", "exorcised"),
+        entry("b.ts", "exorcised"),
+        entry("c.ts", "haunted"),
+        entry("d.ts", "haunted"),
+      ],
+    };
+    expect(hauntedShare({ ghosts }, progress)).toBe(0.5);
+  });
+
+  it("is 0 (not NaN) when there are no ghosts", () => {
+    expect(hauntedShare({ ghosts: [] }, null)).toBe(0);
+  });
+
+  it("ignores paths that are not in the report", () => {
+    const progress = {
+      ghosts: [entry("gone.ts", "exorcised"), entry("a.ts", "exorcised")],
+    };
+    expect(hauntedShare({ ghosts }, progress)).toBe(0.75);
+  });
+
+  it("does not rise when one more ghost is exorcised", () => {
+    const before = { ghosts: [entry("a.ts", "exorcised")] };
+    const after = {
+      ghosts: [entry("a.ts", "exorcised"), entry("b.ts", "exorcised")],
+    };
+    expect(hauntedShare({ ghosts }, after)).toBeLessThanOrEqual(
+      hauntedShare({ ghosts }, before),
+    );
   });
 });

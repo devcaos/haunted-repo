@@ -118,3 +118,14 @@ export function parseProgress(
 export function formatProgress(progress: ExorcismProgress): string {
   return JSON.stringify(progress);
 }
+
+/** Share of ghosts still haunted, from 0 to 1. It is 0 when there are no ghosts. */
+export function hauntedShare(
+  report: { readonly ghosts: readonly Ghost[] },
+  progress: ExorcismProgress | null,
+): number {
+  if (report.ghosts.length === 0) return 0;
+  const normalised = normaliseProgress(report.ghosts, progress);
+  const haunted = normalised.ghosts.filter((g) => g.state === "haunted").length;
+  return haunted / normalised.ghosts.length;
+}

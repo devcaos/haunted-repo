@@ -101,7 +101,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): normalise and parse exorcism progress`
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.10_
 
-  - [ ] 2.6 Add `hauntedShare`
+  - [x] 2.6 Add `hauntedShare`
     - In `progress.ts` add `hauntedShare(report, progress)`: normalise against the report ghosts, return `haunted / ghosts.length`, and `0` when there are no ghosts.
     - Extend `progress.test.ts` with examples: no ghost exorcised gives 1; all exorcised gives 0; half gives 0.5; 0 ghosts gives 0 (not `NaN`); unknown paths ignored; marking one more ghost exorcised does not raise the share.
     - Verify: `npm run check` exits `0`.
