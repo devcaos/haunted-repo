@@ -250,7 +250,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check the rules for a new question`
     - _Requirements: 3.1, 4.9, 4.10, 4.11, 4.12, 4.13_
 
-  - [ ] 4.11 Property test for invalid events
+  - [x] 4.11 Property test for invalid events
     - **Property 12: Invalid events leave the state unchanged**
     - **Validates: Requirements 1.4, 1.6, 10.3, 10.4, 10.5, 10.6**
     - Create `eventLikeArb` in `sessionArb.testutil.ts`: events from `fc.anything()` mixed with real events in the wrong step, with missing or wrong-typed fields, blank text, and `pick-ghost` of an exorcised or unknown path. The oracle is `validEventsFor` plus a field check written separately in the test. For every driven state and every event not accepted: `advance` returns `ok: false`, code `INVALID_EVENT`, and a state equal (`toStrictEqual`) to the input. The input state and event are deep-frozen.

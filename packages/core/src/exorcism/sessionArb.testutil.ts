@@ -129,3 +129,53 @@ export const profileArb: fc.Arbitrary<StudentProfile | null> = fc.option(
   fc.record({ knowsJava: fc.boolean() }),
   { nil: null },
 );
+
+/**
+ * Values that look like events for this state: arbitrary values, real events
+ * (also in the wrong step, with blank text, with exorcised or unknown paths)
+ * and real events with a field removed or replaced by an arbitrary value.
+ */
+export function eventLikeArb(state: SessionState): fc.Arbitrary<unknown> {
+  const paths = [
+    ...state.progress.ghosts.map((entry) => entry.path),
+    "unknown/path.ts",
+  ];
+  const text = fc.oneof(
+    fc.string(),
+    fc.constantFrom("", "  ", "\n\t", "Some text."),
+  );
+  const real: fc.Arbitrary<Record<string, unknown>> = fc.oneof(
+    fc.record({
+      type: fc.constant("pick-ghost"),
+      path: fc.constantFrom(...paths),
+      text,
+    }),
+    fc.record({ type: fc.constant("explanation-done"), text }),
+    fc.record({
+      type: fc.constant("answer-rated"),
+      rating: fc.constantFrom("right", "half-right", "wrong", "great"),
+      question: text,
+    }),
+    fc.record({ type: fc.constant("dont-know"), question: text }),
+    fc.record({
+      type: fc.constant("self-check-answered"),
+      answer: fc.constantFrom("yes", "half", "no", "maybe"),
+    }),
+    fc.record({ type: fc.constant("retry-ghost") }),
+    fc.record({ type: fc.constant("leave-ghost") }),
+  );
+  const broken = real.chain((event) => {
+    const key = fc.constantFrom(...Object.keys(event));
+    return fc.oneof(
+      key.map((k) => {
+        const rest = { ...event };
+        delete rest[k];
+        return rest;
+      }),
+      fc
+        .tuple(key, fc.anything())
+        .map(([k, value]) => ({ ...event, [k]: value })),
+    );
+  });
+  return fc.oneof(fc.anything(), real, broken);
+}

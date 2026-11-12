@@ -7,7 +7,9 @@ import {
   choicesArb,
   driverReportArb,
   driveSession,
+  eventLikeArb,
   profileArb,
+  validEventsFor,
 } from "./sessionArb.testutil.js";
 import type {
   ExorcismEvent,
@@ -682,6 +684,86 @@ describe("decision property", () => {
           });
         },
       ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+function deepFreeze<T>(value: T): T {
+  if (typeof value === "object" && value !== null && !Object.isFrozen(value)) {
+    Object.freeze(value);
+    for (const inner of Object.values(value)) deepFreeze(inner);
+  }
+  return value;
+}
+
+describe("invalid events property", () => {
+  const RATING_VALUES = ["right", "half-right", "wrong"];
+  const ANSWER_VALUES = ["yes", "half", "no"];
+  const notBlank = (v: unknown): boolean =>
+    typeof v === "string" && v.trim() !== "";
+
+  /** Field check written separately from the engine and from parseEvent. */
+  function isAccepted(state: SessionState, raw: unknown): boolean {
+    if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+      return false;
+    }
+    const e = raw as Record<string, unknown>;
+    const allowed = new Set(validEventsFor(state).map((v) => v.type));
+    if (typeof e["type"] !== "string" || !allowed.has(e["type"] as never)) {
+      return false;
+    }
+    switch (e["type"]) {
+      case "pick-ghost":
+        return (
+          typeof e["text"] === "string" &&
+          state.progress.ghosts.some(
+            (g) => g.path === e["path"] && g.state === "haunted",
+          )
+        );
+      case "explanation-done":
+        return notBlank(e["text"]);
+      case "answer-rated":
+        return (
+          RATING_VALUES.includes(e["rating"] as string) &&
+          notBlank(e["question"])
+        );
+      case "dont-know":
+        return notBlank(e["question"]);
+      case "self-check-answered":
+        return ANSWER_VALUES.includes(e["answer"] as string);
+      default:
+        return true;
+    }
+  }
+
+  it("refuses every event that is not accepted and keeps the state", () => {
+    // Feature: exorcism, Property 12: Invalid events leave the state unchanged
+    // **Validates: Requirements 1.4, 1.6, 10.3, 10.4, 10.5, 10.6**
+    const caseArb = fc
+      .tuple(driverReportArb, profileArb, choicesArb, fc.nat())
+      .chain(([report, profile, choices, pickState]) => {
+        const { states } = driveSession(report, profile, choices);
+        const state = states[pickState % states.length] as SessionState;
+        return fc.record({
+          state: fc.constant(state),
+          event: eventLikeArb(state),
+        });
+      });
+    fc.assert(
+      fc.property(caseArb, ({ state, event }) => {
+        fc.pre(!isAccepted(state, event));
+        const before = structuredClone(state);
+        deepFreeze(state);
+        deepFreeze(event);
+        const result = advance(state, event);
+        expect(result.ok).toBe(false);
+        if (!result.ok) {
+          expect(result.error.code).toBe("INVALID_EVENT");
+          expect(result.state).toStrictEqual(before);
+        }
+        expect(state).toStrictEqual(before);
+      }),
       { numRuns: 100 },
     );
   });
