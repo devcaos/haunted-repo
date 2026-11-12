@@ -268,7 +268,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check the engine is deterministic`
     - _Requirements: 10.1, 10.2, 10.7_
 
-- [ ] 5. Recording and replay
+- [x] 5. Recording and replay
   - [x] 5.1 Add `parseRecording` and `formatRecording`
     - Create `exorcism/recording.ts` with `parseRecording(jsonText)` as in the design "Recording and replay": `JSON.parse` in try/catch; the report is validated with `parseReport(JSON.stringify(report))` and a report with repeated ghost paths gives `INVALID_SESSION`; progress with the exported guard of `progress.ts` (or `null`); profile `{ knowsJava: boolean }` or `null`; each event with `parseEvent` plus the `sampleAnswer` rule (allowed only on `answer-rated` and `dont-know`, and it must be a string; the key is kept when present and never present with `undefined`). Any failure is `INVALID_SESSION` with an English message. `formatRecording` is `JSON.stringify`.
     - Write `recording.test.ts` (unit tests): a small valid recording written by hand parses back equal; invalid JSON; a bad report; repeated ghost paths; a bad event; a non-string `sampleAnswer`; `sampleAnswer` on a `retry-ghost` event; a recording with `sampleAnswer` round-trips strictly.
@@ -290,7 +290,7 @@ Rules for running these tasks:
     - Commit message: `test(core): add a recorded session fixture`
     - _Requirements: 11.1, 11.3, 11.7, 11.9_
 
-  - [ ] 5.4 Property test for replay
+  - [x] 5.4 Property test for replay
     - **Property 16: Replay equals the live session**
     - **Validates: Requirements 11.3**
     - Generator: driver choices, recorded as events (`recording = { report, progress: null, profile, events }`). Checks: `replay` called twice returns the same steps, and they equal the states and instructions the live driver produced (`steps[0]` is the start; `steps[i]` is the result of event `i`).

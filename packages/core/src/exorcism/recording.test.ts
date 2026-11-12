@@ -1,6 +1,13 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { HauntedReport } from "../ghost-detection/types.js";
 import { formatRecording, parseRecording, replay } from "./recording.js";
+import {
+  choicesArb,
+  driveSession,
+  driverReportArb,
+  profileArb,
+} from "./sessionArb.testutil.js";
 import { tinyRecording, tinyRecordingJson } from "./tinySession.testutil.js";
 import type { RecordedEvent, SessionRecording } from "./types.js";
 
@@ -283,5 +290,40 @@ describe("replay", () => {
       ),
     };
     expect(replay(withSample)).toStrictEqual(replay(recording));
+  });
+});
+
+describe("replay property", () => {
+  // Feature: exorcism, Property 16: Replay equals the live session
+  /** **Validates: Requirements 11.3** */
+  it("replays to the same states and instructions as the live session", () => {
+    fc.assert(
+      fc.property(
+        driverReportArb,
+        profileArb,
+        choicesArb,
+        (reportValue, profile, choices) => {
+          const live = driveSession(reportValue, profile, choices);
+          const rec: SessionRecording = {
+            report: reportValue,
+            progress: null,
+            profile,
+            events: live.events,
+          };
+          const first = replay(rec);
+          const second = replay(rec);
+          expect(first.ok).toBe(true);
+          expect(second).toStrictEqual(first);
+          if (!first.ok) return;
+          expect(first.value.steps.map((s) => s.state)).toStrictEqual(
+            live.states,
+          );
+          expect(first.value.steps.map((s) => s.instructions)).toStrictEqual(
+            live.instructions,
+          );
+        },
+      ),
+      { numRuns: 100 },
+    );
   });
 });
