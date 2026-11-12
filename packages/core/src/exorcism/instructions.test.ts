@@ -7,6 +7,7 @@ import {
   driverReportArb,
   driveSession,
 } from "./sessionArb.testutil.js";
+import { textArb } from "../ghost-detection/textArb.testutil.js";
 import { QUESTION_SETS } from "./questions.js";
 import { RULE_SENTENCES } from "./rules.js";
 import type {
@@ -311,6 +312,78 @@ describe("Java rule property", () => {
             expect(forbidden).toBe(knowsJava !== true);
             expect(allowed && forbidden).toBe(false);
           });
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+describe("new question property", () => {
+  const allObjectives = Object.values(QUESTION_SETS).flat();
+  const cleanOf = (s: string): boolean =>
+    !allObjectives.some((objective) => s.includes(objective));
+  const cleanTextArb = textArb.filter(cleanOf);
+  const questionArb = fc
+    .string({ minLength: 1 })
+    .filter((s) => s.trim() !== "" && cleanOf(s));
+
+  it("a new question has the fixed rules, only its objective and the earlier questions", () => {
+    // Feature: exorcism, Property 4: Instruction rules for a new question
+    // **Validates: Requirements 3.1, 4.9, 4.10, 4.11, 4.12, 4.13**
+    fc.assert(
+      fc.property(
+        driverReportArb,
+        choicesArb,
+        cleanTextArb,
+        fc.array(questionArb, { minLength: 1, maxLength: 6 }),
+        (report, choices, ghostText, questions) => {
+          const { states } = driveSession(report, null, choices);
+          for (const driven of states) {
+            const driving = driven.current;
+            if (
+              driven.step !== "asking" ||
+              driving === null ||
+              driving.pendingQuestion !== null
+            ) {
+              continue;
+            }
+            // Random Ghost_Text and random earlier questions, same lengths.
+            const earlierAsked = (driven.asked[driving.path] ?? []).map(
+              (_, i) => questions[i % questions.length] as string,
+            );
+            const state: SessionState = {
+              ...driven,
+              current: { ...driving, text: ghostText },
+              asked: { ...driven.asked, [driving.path]: earlierAsked },
+            };
+            const ins = buildInstructions(state);
+            for (const rule of [
+              "one-question",
+              "concrete-file",
+              "ask-then-wait",
+              "no-lines",
+              "probable-reasons",
+            ] as const) {
+              expect(ins.rules).toContain(rule);
+            }
+            expect(ins.text).toContain(driving.path);
+            const objectives = QUESTION_SETS[driving.kind];
+            objectives.forEach((objective, i) => {
+              if (i === driving.questionIndex) {
+                expect(ins.text).toContain(objective);
+              } else {
+                expect(ins.text).not.toContain(objective);
+              }
+            });
+            const earlier = earlierAsked.slice(0, driving.attemptStart);
+            expect(ins.rules.includes("different-questions")).toBe(
+              earlier.length > 0,
+            );
+            for (const question of earlier) {
+              expect(ins.text).toContain(question);
+            }
+          }
         },
       ),
       { numRuns: 100 },

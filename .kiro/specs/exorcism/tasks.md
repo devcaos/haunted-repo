@@ -241,7 +241,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check the Java comparison rule`
     - _Requirements: 2.8, 2.9, 2.10_
 
-  - [ ] 4.10 Property test for the instruction rules of a new question
+  - [x] 4.10 Property test for the instruction rules of a new question
     - **Property 4: Instruction rules for a new question**
     - **Validates: Requirements 4.9, 4.10, 4.11, 4.12, 4.13, 3.1**
     - Generator: driven states with `textArb` for the Ghost_Text (filtered so it contains none of the objective strings) and random non-blank question texts. For every driven state in `asking` with `pendingQuestion` null: `rules` contain `one-question`, `concrete-file`, `ask-then-wait`, `no-lines` and `probable-reasons`; `text` contains the path and the current objective and neither of the other two; `different-questions` is present iff `asked[path].slice(0, attemptStart)` is not empty, and then `text` contains every one of those questions. The "no objective contains a line number" part is the exhaustive check of task 2.2, not random.
