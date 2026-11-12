@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@haunted-repo/core": "0.0.0"
   }
 }
