@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Ghost } from "../ghost-detection/types.js";
 import { buildInstructions } from "./instructions.js";
+import { QUESTION_SETS } from "./questions.js";
 import { RULE_SENTENCES } from "./rules.js";
 import type {
   CurrentGhost,
@@ -133,6 +134,129 @@ describe("buildInstructions (steps without questions)", () => {
     for (const step of ["failed", "house-clean"] as const) {
       const ins = buildInstructions(stateOf(step, currentOf("c")));
       expect(ins.rules).toEqual(["probable-reasons"]);
+    }
+  });
+});
+
+function questionState(
+  step: ExorcismStep,
+  patch: Partial<CurrentGhost>,
+  asked: Record<string, string[]> = {},
+  profile?: StudentProfile,
+): SessionState {
+  const state = stateOf(
+    step,
+    { ...currentOf("const x = 1;"), ...patch },
+    profile,
+  );
+  return { ...state, asked };
+}
+
+describe("buildInstructions (steps with questions)", () => {
+  it("new question: only the objective of the current index", () => {
+    const ins = buildInstructions(
+      questionState("asking", { kind: "logic", questionIndex: 1 }),
+    );
+    const [o0, o1, o2] = QUESTION_SETS.logic;
+    expect(ins.text).toContain(o1);
+    expect(ins.text).not.toContain(o0);
+    expect(ins.text).not.toContain(o2);
+    expect(ins.text).toContain("src/a.ts");
+    expect(ins.text).toContain("const x = 1;");
+    for (const id of [
+      "one-question",
+      "concrete-file",
+      "ask-then-wait",
+    ] as const) {
+      expect(ins.rules).toContain(id);
+    }
+    expect(ins.rules).not.toContain("different-questions");
+    expect(ins.rules).not.toContain("same-question");
+    for (const id of ins.rules) {
+      expect(ins.text).toContain(RULE_SENTENCES[id]);
+    }
+  });
+
+  it("second attempt lists the questions of the first attempt", () => {
+    const asked = { "src/a.ts": ["Old Q1?", "Old Q2?", "Old Q3?", "Now Q?"] };
+    const ins = buildInstructions(
+      questionState("asking", { attemptStart: 3 }, asked),
+    );
+    expect(ins.rules).toContain("different-questions");
+    expect(ins.text).toContain("Old Q1?");
+    expect(ins.text).toContain("Old Q3?");
+    expect(ins.text).not.toContain("Now Q?");
+  });
+
+  it("re-ask contains the exact pending question and same-question", () => {
+    const ins = buildInstructions(
+      questionState("asking", { pendingQuestion: "What does f return?" }),
+    );
+    expect(ins.rules).toContain("same-question");
+    expect(ins.rules).toContain("ask-then-wait");
+    expect(ins.rules).toContain("judge-behaviour");
+    expect(ins.rules).not.toContain("one-question");
+    expect(ins.text).toContain(
+      'Ask the student exactly this question again: "What does f return?"',
+    );
+  });
+
+  it("ask-then-wait appears in every asking instruction", () => {
+    for (const pendingQuestion of [null, "Q?"]) {
+      const ins = buildInstructions(
+        questionState("asking", { pendingQuestion }),
+      );
+      expect(ins.text).toContain(RULE_SENTENCES["ask-then-wait"]);
+    }
+  });
+
+  it("asking has exactly one Java rule from the profile", () => {
+    const yes = buildInstructions(
+      questionState("asking", {}, {}, { knowsJava: true }),
+    );
+    const no = buildInstructions(questionState("asking", {}));
+    expect(yes.rules).toContain("java-allowed");
+    expect(yes.rules).not.toContain("java-forbidden");
+    expect(no.rules).toContain("java-forbidden");
+    expect(no.rules).not.toContain("java-allowed");
+  });
+
+  it("simplifying contains the explanation given before and earlier simpler ones", () => {
+    const ins = buildInstructions(
+      questionState("simplifying", {
+        explanation: "First explanation.",
+        simpler: ["Simpler one."],
+        pendingQuestion: "Why?",
+      }),
+    );
+    expect(ins.text).toContain("First explanation.");
+    expect(ins.text).toContain("Simpler one.");
+    expect(ins.text).toContain("Why?");
+    expect(ins.text).toContain("const x = 1;");
+    for (const id of [
+      "new-analogy",
+      "only-this-part",
+      "max-words",
+      "no-question",
+    ] as const) {
+      expect(ins.rules).toContain(id);
+    }
+    for (const id of ins.rules) {
+      expect(ins.text).toContain(RULE_SENTENCES[id]);
+    }
+  });
+
+  it("model-answer contains the question and asks for a short answer", () => {
+    const ins = buildInstructions(
+      questionState("model-answer", { pendingQuestion: "What breaks?" }),
+    );
+    expect(ins.text).toContain("What breaks?");
+    expect(ins.text).toContain("src/a.ts");
+    expect(ins.rules).toContain("model-answer-short");
+    expect(ins.rules).toContain("no-question");
+    expect(ins.rules).toContain("java-forbidden");
+    for (const id of ins.rules) {
+      expect(ins.text).toContain(RULE_SENTENCES[id]);
     }
   });
 });

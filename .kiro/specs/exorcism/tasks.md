@@ -134,7 +134,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): build tutor instructions for explanation steps`
     - _Requirements: 1.3, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.11, 3.1, 3.2, 3.3, 6.4, 6.5, 10.13_
 
-  - [ ] 2.10 Build the instructions for asking, simplifying and model answer
+  - [x] 2.10 Build the instructions for asking, simplifying and model answer
     - In `instructions.ts` implement `asking`, `simplifying` and `model-answer` and remove the temporary `throw`.
     - `asking`, new question (`pendingQuestion` is `null`): path, Ghost_Text, **only** the objective `QUESTION_SETS[kind][questionIndex]`; rules `one-question`, `concrete-file`, `ask-then-wait`, `no-lines`, `judge-behaviour`, `reason-then-verdict`, `verdict-format`, `one-verdict`, `dont-know-verdict`, `not-wrong-other-reason`, `admit-unknown`, `probable-reasons`, simple-language rules and the Java rule; `different-questions` only when `asked[path].slice(0, attemptStart)` is not empty, and then the text lists those questions.
     - `asking`, re-ask (`pendingQuestion` set): the pending question and `same-question`, plus `ask-then-wait` and the judging rules.
