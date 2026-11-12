@@ -269,7 +269,7 @@ Rules for running these tasks:
     - _Requirements: 10.1, 10.2, 10.7_
 
 - [ ] 5. Recording and replay
-  - [ ] 5.1 Add `parseRecording` and `formatRecording`
+  - [x] 5.1 Add `parseRecording` and `formatRecording`
     - Create `exorcism/recording.ts` with `parseRecording(jsonText)` as in the design "Recording and replay": `JSON.parse` in try/catch; the report is validated with `parseReport(JSON.stringify(report))` and a report with repeated ghost paths gives `INVALID_SESSION`; progress with the exported guard of `progress.ts` (or `null`); profile `{ knowsJava: boolean }` or `null`; each event with `parseEvent` plus the `sampleAnswer` rule (allowed only on `answer-rated` and `dont-know`, and it must be a string; the key is kept when present and never present with `undefined`). Any failure is `INVALID_SESSION` with an English message. `formatRecording` is `JSON.stringify`.
     - Write `recording.test.ts` (unit tests): a small valid recording written by hand parses back equal; invalid JSON; a bad report; repeated ghost paths; a bad event; a non-string `sampleAnswer`; `sampleAnswer` on a `retry-ghost` event; a recording with `sampleAnswer` round-trips strictly.
     - Verify: `npm run check` exits `0`.

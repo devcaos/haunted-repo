@@ -1,0 +1,167 @@
+import { describe, expect, it } from "vitest";
+import type { HauntedReport } from "../ghost-detection/types.js";
+import { formatRecording, parseRecording } from "./recording.js";
+import type { SessionRecording } from "./types.js";
+
+const report: HauntedReport = {
+  overview: {
+    owner: "o",
+    repo: "r",
+    ref: "main",
+    analysed: 3,
+    picked: 2,
+    truncated: false,
+    fewFiles: true,
+    partial: false,
+    skipped: [],
+    message: "Small project.",
+  },
+  ghosts: [
+    {
+      path: "src/a.ts",
+      language: "TypeScript",
+      difficultyScore: 50,
+      floor: "middle floor",
+      factors: { lines: 10, branches: 2, maxIndent: 1, imports: 3 },
+      reason: "It has many lines.",
+    },
+    {
+      path: "src/b.ts",
+      language: "TypeScript",
+      difficultyScore: 60,
+      floor: "middle floor",
+      factors: { lines: 12, branches: 2, maxIndent: 1, imports: 3 },
+      reason: "It has many lines.",
+    },
+  ],
+};
+
+const recording: SessionRecording = {
+  report,
+  progress: {
+    ghosts: [
+      { path: "src/a.ts", state: "haunted", ratings: [], selfCheck: null },
+    ],
+  },
+  profile: { knowsJava: true },
+  events: [
+    { type: "pick-ghost", path: "src/a.ts", text: "const a = 1;" },
+    { type: "explanation-done", text: "It stores a number." },
+    { type: "answer-rated", rating: "right", question: "What is a?" },
+    { type: "dont-know", question: "What is b?" },
+    { type: "leave-ghost" },
+  ],
+};
+
+function withChanges(changes: Record<string, unknown>): string {
+  return JSON.stringify({ ...recording, ...changes });
+}
+
+function expectInvalid(text: string): void {
+  const result = parseRecording(text);
+  expect(result.ok).toBe(false);
+  if (!result.ok) {
+    expect(result.error.code).toBe("INVALID_SESSION");
+    expect(result.error.message).not.toBe("");
+  }
+}
+
+describe("parseRecording", () => {
+  it("parses a valid recording back to an equal value", () => {
+    expect(parseRecording(formatRecording(recording))).toStrictEqual({
+      ok: true,
+      value: recording,
+    });
+  });
+
+  it("accepts null progress and null profile", () => {
+    const value = { ...recording, progress: null, profile: null };
+    expect(parseRecording(formatRecording(value))).toStrictEqual({
+      ok: true,
+      value,
+    });
+  });
+
+  it("rejects text that is not JSON", () => {
+    expectInvalid("not json");
+  });
+
+  it("rejects values that are not objects", () => {
+    expectInvalid("null");
+    expectInvalid("[]");
+  });
+
+  it("rejects a bad report", () => {
+    expectInvalid(withChanges({ report: { ghosts: [] } }));
+    expectInvalid(withChanges({ report: undefined }));
+  });
+
+  it("rejects a report with repeated ghost paths", () => {
+    const [first] = report.ghosts;
+    const repeated = { ...report, ghosts: [first, first] };
+    expectInvalid(withChanges({ report: repeated }));
+  });
+
+  it("rejects a bad progress", () => {
+    expectInvalid(withChanges({ progress: { ghosts: "x" } }));
+    expectInvalid(withChanges({ progress: undefined }));
+  });
+
+  it("rejects a bad profile", () => {
+    expectInvalid(withChanges({ profile: { knowsJava: "yes" } }));
+    expectInvalid(withChanges({ profile: [] }));
+  });
+
+  it("rejects events that are not a list or have a bad event", () => {
+    expectInvalid(withChanges({ events: "x" }));
+    expectInvalid(withChanges({ events: [{ type: "fly" }] }));
+    expectInvalid(
+      withChanges({ events: [{ type: "dont-know", question: " " }] }),
+    );
+  });
+
+  it("rejects a sampleAnswer that is not a string", () => {
+    expectInvalid(
+      withChanges({
+        events: [{ type: "dont-know", question: "Q?", sampleAnswer: 5 }],
+      }),
+    );
+  });
+
+  it("rejects a sampleAnswer on an event that does not allow it", () => {
+    expectInvalid(
+      withChanges({ events: [{ type: "retry-ghost", sampleAnswer: "x" }] }),
+    );
+  });
+
+  it("round-trips a recording with sampleAnswer strictly", () => {
+    const withSample: SessionRecording = {
+      ...recording,
+      events: [
+        {
+          type: "answer-rated",
+          rating: "half-right",
+          question: "What is a?",
+          sampleAnswer: "A number.",
+        },
+        { type: "dont-know", question: "What is b?", sampleAnswer: "" },
+        { type: "dont-know", question: "What is c?" },
+      ],
+    };
+    const result = parseRecording(formatRecording(withSample));
+    expect(result).toStrictEqual({ ok: true, value: withSample });
+    if (result.ok) {
+      expect("sampleAnswer" in (result.value.events[2] ?? {})).toBe(false);
+    }
+  });
+
+  it("drops unknown fields from events", () => {
+    const result = parseRecording(
+      withChanges({ events: [{ type: "leave-ghost", extra: 1 }] }),
+    );
+    expect(result).toStrictEqual({
+      ok: true,
+      value: { ...recording, events: [{ type: "leave-ghost" }] },
+    });
+  });
+});
