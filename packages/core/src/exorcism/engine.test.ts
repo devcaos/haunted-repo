@@ -768,3 +768,43 @@ describe("invalid events property", () => {
     );
   });
 });
+
+describe("determinism property", () => {
+  const jsonSafe = (value: unknown): void => {
+    expect(JSON.parse(JSON.stringify(value))).toStrictEqual(value);
+  };
+
+  it("gives equal results twice and keeps state and instructions JSON-safe", () => {
+    // Feature: exorcism, Property 13: Engine determinism and JSON-safe state
+    // **Validates: Requirements 10.1, 10.2, 10.7**
+    fc.assert(
+      fc.property(
+        driverReportArb,
+        profileArb,
+        choicesArb,
+        (report, profile, choices) => {
+          const { states, instructions } = driveSession(
+            report,
+            profile,
+            choices,
+          );
+          states.forEach(jsonSafe);
+          instructions.forEach(jsonSafe);
+          for (const state of states) {
+            for (const event of validEventsFor(state)) {
+              const first = advance(state, event);
+              const second = advance(state, event);
+              expect(second).toStrictEqual(first);
+              expect(first.ok).toBe(true);
+              if (first.ok) {
+                jsonSafe(first.state);
+                jsonSafe(first.instructions);
+              }
+            }
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});

@@ -168,7 +168,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): parse exorcism events`
     - _Requirements: 10.3, 10.4, 10.5, 11.8_
 
-- [ ] 4. Engine and the mandatory properties
+- [x] 4. Engine and the mandatory properties
   - [x] 4.1 Add `startSession`
     - Create `exorcism/engine.ts` with `StartOptions` and `startSession(report, options)` as in the design "Start": drop later ghosts that repeat a path (keep the first), copy the ghosts, `normaliseProgress`, `profile = { knowsJava: options?.profile?.knowsJava ?? false }`, step `house-clean` when `suggestGhost` is `null` (including 0 ghosts), otherwise `choosing`, `current = null`, `asked = {}`; return the state and `buildInstructions(state)`. Never throws.
     - Write `engine.test.ts` (first tests): start with and without progress and profile; start in `house-clean` when every ghost is exorcised and when the report has 0 ghosts; a repeated path keeps the first ghost; `fewFiles` and `partial` reports start normally; unknown paths in the given progress are dropped.
@@ -259,7 +259,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check invalid events change nothing`
     - _Requirements: 1.4, 1.6, 10.3, 10.4, 10.5, 10.6_
 
-  - [ ] 4.12 Property test for determinism and JSON-safe state
+  - [x] 4.12 Property test for determinism and JSON-safe state
     - **Property 13: Engine determinism and JSON-safe state**
     - **Validates: Requirements 10.1, 10.2, 10.7**
     - Generator: driver choices. For every driven state and every valid event, calling `advance` twice with the same state and event returns equal results; every state and instruction survives `JSON.parse(JSON.stringify(x))` with `toStrictEqual`.
