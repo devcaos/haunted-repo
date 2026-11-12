@@ -108,7 +108,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): calculate the haunted share`
     - _Requirements: 7.7, 7.8, 7.9_
 
-  - [ ] 2.7 Add `suggestGhost` and `isPickable`
+  - [x] 2.7 Add `suggestGhost` and `isPickable`
     - Create `exorcism/suggest.ts` as in the design "Suggestion": among `haunted` ghosts the lowest `difficultyScore`, ties by `path` ascending with `a < b` (not `localeCompare`); `null` if none is haunted. `isPickable` is true only for a `haunted` ghost that is in the list.
     - Write `suggest.test.ts` (unit tests): lowest score wins; tie broken by path; exorcised ghosts skipped; `null` when all are exorcised or the list is empty; `isPickable` is false for an exorcised ghost and for an unknown path.
     - Verify: `npm run check` exits `0`.
