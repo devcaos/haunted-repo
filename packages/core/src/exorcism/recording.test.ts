@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { HauntedReport } from "../ghost-detection/types.js";
-import { formatRecording, parseRecording } from "./recording.js";
+import { formatRecording, parseRecording, replay } from "./recording.js";
 import type { SessionRecording } from "./types.js";
 
 const report: HauntedReport = {
@@ -163,5 +163,80 @@ describe("parseRecording", () => {
       ok: true,
       value: { ...recording, events: [{ type: "leave-ghost" }] },
     });
+  });
+});
+
+describe("replay", () => {
+  it("replays a short recording to the expected steps", () => {
+    const result = replay(recording);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.steps.map((s) => s.state.step)).toStrictEqual([
+      "choosing",
+      "explaining",
+      "asking",
+      "asking",
+      "simplifying",
+      "choosing",
+    ]);
+    const last = result.value.steps.at(-1);
+    expect(last?.state.current).toBeNull();
+    expect(last?.state.profile).toStrictEqual({ knowsJava: true });
+    expect(last?.state.asked["src/a.ts"]).toStrictEqual([
+      "What is a?",
+      "What is b?",
+    ]);
+    for (const step of result.value.steps) {
+      expect(step.instructions.step).toBe(step.state.step);
+    }
+  });
+
+  it("starts without progress and profile when they are null", () => {
+    const result = replay({
+      ...recording,
+      progress: null,
+      profile: null,
+      events: [],
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.steps).toHaveLength(1);
+      expect(result.value.steps[0]?.state.profile).toStrictEqual({
+        knowsJava: false,
+      });
+    }
+  });
+
+  it("reports the position of an event in the wrong step", () => {
+    const result = replay({
+      ...recording,
+      events: [
+        { type: "pick-ghost", path: "src/a.ts", text: "const a = 1;" },
+        { type: "self-check-answered", answer: "yes" },
+      ],
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.code).toBe("INVALID_SESSION");
+      expect(result.error.message).toContain(
+        'Event 2 (self-check-answered) is not accepted in the step "explaining".',
+      );
+    }
+  });
+
+  it("gives equal results when run twice", () => {
+    expect(replay(recording)).toStrictEqual(replay(recording));
+  });
+
+  it("ignores sampleAnswer", () => {
+    const withSample: SessionRecording = {
+      ...recording,
+      events: recording.events.map((event) =>
+        event.type === "answer-rated" || event.type === "dont-know"
+          ? { ...event, sampleAnswer: "Some student text." }
+          : event,
+      ),
+    };
+    expect(replay(withSample)).toStrictEqual(replay(recording));
   });
 });

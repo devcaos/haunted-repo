@@ -276,7 +276,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): parse and format session recordings`
     - _Requirements: 11.1, 11.2, 11.5, 11.6, 11.8_
 
-  - [ ] 5.2 Add `replay`
+  - [x] 5.2 Add `replay`
     - In `recording.ts` add `replay(recording)`: `startSession(report, { progress, profile })` (a `null` means "not given") gives `steps[0]`; each event runs through `advance`; on `ok: false` return `INVALID_SESSION` with `Event <i> (<type>) is not accepted in the step "<step>".` plus the engine message. `sampleAnswer` is never read.
     - Extend `recording.test.ts`: a short hand-written recording replays to the expected steps; an event in the wrong step gives `INVALID_SESSION` with its position; `replay` twice gives equal results; a recording with `sampleAnswer` replays the same as one without.
     - Verify: `npm run check` exits `0`.

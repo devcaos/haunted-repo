@@ -1,6 +1,7 @@
 import { parseReport } from "../ghost-detection/parseReport.js";
 import type { Result } from "../ghost-detection/types.js";
 import { fail, ok } from "./errors.js";
+import { advance, startSession, type StartOptions } from "./engine.js";
 import { parseEvent } from "./event.js";
 import { isExorcismProgress } from "./progress.js";
 import type {
@@ -8,7 +9,9 @@ import type {
   ExorcismProgress,
   RecordedEvent,
   SessionRecording,
+  SessionState,
   StudentProfile,
+  TutorInstructions,
 } from "./types.js";
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -110,4 +113,40 @@ export function parseRecording(
 
 export function formatRecording(recording: SessionRecording): string {
   return JSON.stringify(recording);
+}
+
+export interface ReplayStep {
+  state: SessionState;
+  instructions: TutorInstructions;
+}
+
+/**
+ * Runs the events of a recording through the engine.
+ * steps[0] is the start; steps[i] is the result of event i (1-based).
+ * The sampleAnswer field is never read. Never throws.
+ */
+export function replay(
+  recording: SessionRecording,
+): Result<{ steps: ReplayStep[] }, ExorcismErrorInfo> {
+  try {
+    const options: StartOptions = {};
+    if (recording.progress !== null) options.progress = recording.progress;
+    if (recording.profile !== null) options.profile = recording.profile;
+    const first = startSession(recording.report, options);
+    const steps: ReplayStep[] = [first];
+    let state = first.state;
+    for (const [index, event] of recording.events.entries()) {
+      const result = advance(state, event);
+      if (!result.ok) {
+        return invalid(
+          `Event ${index + 1} (${event.type}) is not accepted in the step "${state.step}". ${result.error.message}`,
+        );
+      }
+      state = result.state;
+      steps.push({ state: result.state, instructions: result.instructions });
+    }
+    return ok({ steps });
+  } catch {
+    return invalid("The recording could not be replayed.");
+  }
 }
