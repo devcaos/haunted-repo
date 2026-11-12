@@ -48,7 +48,7 @@ Rules for running these tasks:
     - Commit message: `fix(core): make ghost sentences match the floor`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.8, 8.9_
 
-  - [ ] 1.4 Property test for the Ghost_Sentence floor wording
+  - [x] 1.4 Property test for the Ghost_Sentence floor wording
     - In `ghost-detection/factors.test.ts` add the property test.
     - **Property 11: Ghost sentence follows the floor wording**
     - **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5, 8.7**

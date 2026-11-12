@@ -174,6 +174,86 @@ describe("difficultyScore properties", () => {
   });
 });
 
+describe("reasonFor properties", () => {
+  const word = (text: string, w: string): boolean =>
+    new RegExp(`\\b${w}\\b`, "i").test(text);
+  const factorsArb = fc.oneof(
+    fc.constant({ lines: 0, branches: 0, maxIndent: 0, imports: 0 }),
+    fc.record({
+      lines: fc.integer({ min: 0, max: 1000 }),
+      branches: fc.integer({ min: 0, max: 1000 }),
+      maxIndent: fc.integer({ min: 0, max: 1000 }),
+      imports: fc.integer({ min: 0, max: 1000 }),
+    }),
+  );
+
+  // Feature: exorcism, Property 11: Ghost sentence follows the floor wording
+  // **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5, 8.7**
+  it("follows the floor wording", () => {
+    const marker = {
+      lines: "lines of code",
+      branches: "if/elif/for/while/switch/case/catch",
+      maxIndent: "levels",
+      imports: "imports",
+    } as const;
+    fc.assert(
+      fc.property(factorsArb, (f) => {
+        const text = reasonFor(f);
+        const points = [
+          ["lines", (Math.min(f.lines, 400) / 400) * 40],
+          ["branches", (Math.min(f.branches, 60) / 60) * 30],
+          ["maxIndent", (Math.min(f.maxIndent, 8) / 8) * 20],
+          ["imports", (Math.min(f.imports, 20) / 20) * 10],
+        ] as const;
+        let best: (typeof points)[number] = points[0];
+        for (const p of points) if (p[1] > best[1]) best = p;
+
+        if (best[1] === 0) {
+          return (
+            text === "It is easy to read; it is very short and simple." &&
+            !/\d/.test(text) &&
+            Object.values(marker).every((m) => !text.includes(m))
+          );
+        }
+
+        const name = best[0];
+        const value = String(f[name]);
+        const names =
+          text.includes(`(${value} ${marker[name]}`) &&
+          Object.entries(marker).every(
+            ([k, m]) => k === name || !text.includes(m),
+          ) &&
+          new RegExp(`(?<!\\d)${value}(?!\\d)`).test(text);
+
+        const floor = floorOf(difficultyScore(f));
+        const hard = word(text, "hard");
+        const easy = word(text, "easy");
+        if (floor === "attic") {
+          return names && text.startsWith("It is easy") && !hard;
+        }
+        if (floor === "middle floor") {
+          return names && text.startsWith("It is of") && !hard && !easy;
+        }
+        return names && text.startsWith("It is hard");
+      }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("uses a different start for each floor", () => {
+    const starts = ["It is easy", "It is of", "It is hard"];
+    expect(new Set(starts).size).toBe(3);
+    const attic = reasonFor({ ...zeros, lines: 200 });
+    const middle = reasonFor({ ...zeros, lines: 400 });
+    const basement = reasonFor({ ...zeros, lines: 400, branches: 60 });
+    expect(
+      [attic, middle, basement].map((s) =>
+        starts.findIndex((p) => s.startsWith(p)),
+      ),
+    ).toEqual([0, 1, 2]);
+  });
+});
+
 describe("reasonFor", () => {
   const D = "if/elif/for/while/switch/case/catch";
   it("names lines when it wins", () => {
