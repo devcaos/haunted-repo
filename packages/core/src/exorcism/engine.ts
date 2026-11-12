@@ -98,18 +98,76 @@ export function advance(state: SessionState, event: unknown): Transition {
     );
   }
   if (e.type === "pick-ghost") return pickGhost(state, e);
-  if (
-    e.type === "explanation-done" &&
-    state.step === "explaining" &&
-    state.current !== null
-  ) {
+  const current = state.current;
+  if (current === null) return refuse(state, "There is no ghost in progress.");
+  if (e.type === "explanation-done") {
+    if (state.step === "explaining") {
+      return accept({
+        ...state,
+        step: "asking",
+        current: { ...current, explanation: e.text },
+      });
+    }
+    if (state.step === "simplifying") {
+      return accept({
+        ...state,
+        step: "asking",
+        current: { ...current, simpler: [...current.simpler, e.text] },
+      });
+    }
+    if (state.step === "model-answer") return nextQuestion(state, current);
+  }
+  if (e.type === "answer-rated" && state.step === "asking") {
+    const asked =
+      current.pendingQuestion === null
+        ? withQuestion(state, current.path, e.question)
+        : state.asked;
+    return nextQuestion(
+      { ...state, asked },
+      { ...current, ratings: [...current.ratings, e.rating] },
+    );
+  }
+  if (e.type === "dont-know" && state.step === "asking") {
+    if (current.dontKnowCount === 0) {
+      return accept({
+        ...state,
+        step: "simplifying",
+        asked: withQuestion(state, current.path, e.question),
+        current: { ...current, dontKnowCount: 1, pendingQuestion: e.question },
+      });
+    }
     return accept({
       ...state,
-      step: "asking",
-      current: { ...state.current, explanation: e.text },
+      step: "model-answer",
+      current: { ...current, ratings: [...current.ratings, "wrong"] },
     });
   }
   throw new Error("not implemented yet");
+}
+
+/** Returns the asked map with one more question for a ghost (new object, no mutation). */
+function withQuestion(
+  state: SessionState,
+  path: string,
+  question: string,
+): Record<string, string[]> {
+  return { ...state.asked, [path]: [...(state.asked[path] ?? []), question] };
+}
+
+/** Goes to the next question, or (after the 3rd rating) to the decision of task 4.5. */
+function nextQuestion(state: SessionState, current: CurrentGhost): Transition {
+  if (current.questionIndex === 2) throw new Error("not implemented yet");
+  const questionIndex = current.questionIndex === 0 ? 1 : 2;
+  return accept({
+    ...state,
+    step: "asking",
+    current: {
+      ...current,
+      questionIndex,
+      dontKnowCount: 0,
+      pendingQuestion: null,
+    },
+  });
 }
 
 /** True (exorcised) iff at least 2 ratings are good and the Core_Question (first) is not wrong. */

@@ -191,7 +191,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): advance the session on pick and explanation`
     - _Requirements: 1.4, 1.5, 1.6, 2.7, 4.1, 10.1, 10.3, 10.4, 10.5, 10.6, 10.14_
 
-  - [ ] 4.4 Add `advance`: asking, "I don't know", simplifying and model answer
+  - [x] 4.4 Add `advance`: asking, "I don't know", simplifying and model answer
     - In `engine.ts` implement the transition rows: `asking` + `answer-rated` (push the rating; add the question to `asked[path]` only if `pendingQuestion` is `null`; next question: `questionIndex + 1`, `dontKnowCount = 0`, `pendingQuestion = null`); `asking` + `dont-know` the first time (`dontKnowCount = 1`, `pendingQuestion = question`, question added to `asked`, step `simplifying`, no rating); `asking` + `dont-know` the second time (push `wrong`, step `model-answer`, question not recorded again); `simplifying` + `explanation-done` (push to `simpler`, back to `asking`, same question); `model-answer` + `explanation-done` (next question). After the 3rd rating (from `asking` or `model-answer`) the step is decided in task 4.5; until then those two paths keep the temporary `throw`.
     - Use `{ ...asked, [path]: [...] }` for `asked` (design "Record keys"); never `asked[path].push`.
     - Extend `engine.test.ts`: the edge cases of the requirements that live here: answer rated right/half-right/wrong; empty answer path (`dont-know`); `dont-know` once then answer; `dont-know` twice gives `wrong` and model answer; the re-asked question is the same text; the Core_Question is always the first question; the simplifying instruction contains the explanation given before.

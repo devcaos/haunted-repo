@@ -331,3 +331,117 @@ describe("advance: pick-ghost and explanation", () => {
     expect(r.state).toEqual(state);
   });
 });
+
+function step(state: SessionState, event: unknown): SessionState {
+  const r = advance(state, event);
+  if (!r.ok) throw new Error(r.error.message);
+  return r.state;
+}
+
+function asking(): SessionState {
+  return step(pick(started()), {
+    type: "explanation-done",
+    text: "It is a box.",
+  });
+}
+
+const rated = (rating: Rating, question: string) => ({
+  type: "answer-rated",
+  rating,
+  question,
+});
+
+describe("advance: asking, dont-know, simplifying and model answer", () => {
+  it.each(["right", "half-right", "wrong"] as const)(
+    "answer-rated %s stores the rating and moves to question 1",
+    (rating) => {
+      const r = advance(asking(), rated(rating, "Q0?"));
+      expect(r.ok).toBe(true);
+      if (!r.ok) return;
+      expect(r.state.step).toBe("asking");
+      expect(r.state.current?.ratings).toEqual([rating]);
+      expect(r.state.current?.questionIndex).toBe(1);
+      expect(r.state.current?.pendingQuestion).toBeNull();
+      expect(r.state.asked).toEqual({ "b.ts": ["Q0?"] });
+    },
+  );
+
+  it("the Core_Question objective is the first one asked", () => {
+    const r = advance(pick(started()), { type: "explanation-done", text: "x" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.current?.questionIndex).toBe(0);
+    expect(r.instructions.text).toContain("what the file is for");
+  });
+
+  it("dont-know the first time goes to simplifying without a rating", () => {
+    const r = advance(asking(), { type: "dont-know", question: "Q0?" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("simplifying");
+    expect(r.state.current?.ratings).toEqual([]);
+    expect(r.state.current?.dontKnowCount).toBe(1);
+    expect(r.state.current?.pendingQuestion).toBe("Q0?");
+    expect(r.state.asked).toEqual({ "b.ts": ["Q0?"] });
+    expect(r.instructions.text).toContain("It is a box.");
+  });
+
+  it("simplifying + explanation-done re-asks the same question", () => {
+    const s1 = step(asking(), { type: "dont-know", question: "Q0?" });
+    const r = advance(s1, { type: "explanation-done", text: "Simpler." });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("asking");
+    expect(r.state.current?.simpler).toEqual(["Simpler."]);
+    expect(r.state.current?.questionIndex).toBe(0);
+    expect(r.state.current?.pendingQuestion).toBe("Q0?");
+    expect(r.instructions.text).toContain("Q0?");
+  });
+
+  it("dont-know then an answer rates the question and does not record it twice", () => {
+    const s1 = step(asking(), { type: "dont-know", question: "Q0?" });
+    const s2 = step(s1, { type: "explanation-done", text: "Simpler." });
+    const r = advance(s2, rated("half-right", "Q0?"));
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.current?.ratings).toEqual(["half-right"]);
+    expect(r.state.current?.questionIndex).toBe(1);
+    expect(r.state.current?.dontKnowCount).toBe(0);
+    expect(r.state.current?.pendingQuestion).toBeNull();
+    expect(r.state.asked).toEqual({ "b.ts": ["Q0?"] });
+  });
+
+  it("dont-know twice gives wrong and the model answer", () => {
+    const s1 = step(asking(), { type: "dont-know", question: "Q0?" });
+    const s2 = step(s1, { type: "explanation-done", text: "Simpler." });
+    const r = advance(s2, { type: "dont-know", question: "Q0?" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("model-answer");
+    expect(r.state.current?.ratings).toEqual(["wrong"]);
+    expect(r.state.asked).toEqual({ "b.ts": ["Q0?"] });
+    expect(r.instructions.text).toContain("Q0?");
+  });
+
+  it("model-answer + explanation-done moves to the next question", () => {
+    const s1 = step(asking(), { type: "dont-know", question: "Q0?" });
+    const s2 = step(s1, { type: "explanation-done", text: "Simpler." });
+    const s3 = step(s2, { type: "dont-know", question: "Q0?" });
+    const r = advance(s3, { type: "explanation-done", text: "Model." });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("asking");
+    expect(r.state.current?.questionIndex).toBe(1);
+    expect(r.state.current?.dontKnowCount).toBe(0);
+    expect(r.state.current?.pendingQuestion).toBeNull();
+    expect(r.state.current?.ratings).toEqual(["wrong"]);
+  });
+
+  it("does not mutate the input state", () => {
+    const state = asking();
+    const copy = structuredClone(state);
+    advance(state, rated("right", "Q0?"));
+    advance(state, { type: "dont-know", question: "Q0?" });
+    expect(state).toEqual(copy);
+  });
+});
