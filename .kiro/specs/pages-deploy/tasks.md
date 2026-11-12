@@ -26,7 +26,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 3. Add the CI workflow
+- [x] 3. Add the CI workflow
   - Create `.github/workflows/ci.yml` as in the design: trigger `pull_request`, permissions `contents: read`, `actions/checkout@v7`, `actions/setup-node@v7` (Node 24, `cache: npm`), `npm ci`, `npm run check`
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 4.1, 4.2, 4.3_
