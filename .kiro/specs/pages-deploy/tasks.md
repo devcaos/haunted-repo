@@ -44,7 +44,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-- [ ] 6. Add the line to `docs/kiro-usage-log.md`
+- [x] 6. Add the line to `docs/kiro-usage-log.md`
   - Append one line about the pages-deploy spec
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 6.6_
