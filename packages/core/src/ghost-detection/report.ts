@@ -1,18 +1,14 @@
 import { difficultyScore, reasonFor } from "./factors.js";
+import { floorOf } from "./floor.js";
 import type {
   Factors,
-  Floor,
   Ghost,
   HauntedReport,
   Language,
   SkippedFile,
 } from "./types.js";
 
-export function floorOf(score: number): Floor {
-  if (score <= 33) return "attic";
-  if (score <= 66) return "middle floor";
-  return "basement";
-}
+export { floorOf } from "./floor.js";
 
 export interface ScoredFile {
   path: string;

@@ -22,7 +22,7 @@ Rules for running these tasks:
 ## Tasks
 
 - [ ] 1. Ghost_Sentence fix in ghost detection
-  - [ ] 1.1 Move `floorOf` to `ghost-detection/floor.ts`
+  - [x] 1.1 Move `floorOf` to `ghost-detection/floor.ts`
     - Step 0: check the branch with `git branch --show-current`. If it is `main`, run `git checkout feat/exorcism` followed by `git pull`. The branch already exists and holds the spec; never create it with `git checkout -b`.
     - Create `packages/core/src/ghost-detection/floor.ts` with `floorOf` moved unchanged from `report.ts`.
     - In `report.ts` import it for its own use and add `export { floorOf } from "./floor.js";`, so `index.ts` and every existing import keep working. This avoids an import cycle with `factors.ts` in task 1.3.
