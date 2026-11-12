@@ -321,6 +321,8 @@ Each part is between 0 and its weight, and the weights add up to 100, so the res
 
 If all points are 0 (empty file), the sentence is `It is very short and simple.`
 
+> This table is replaced by the "Ghost_Sentence (Requirement 8)" section of `.kiro/specs/exorcism/design.md`.
+
 ### Floor
 
 `floorOf(score)`: `score <= 33` → `attic`, `score <= 66` → `middle floor`, else `basement`.
