@@ -125,7 +125,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check the ghost suggestion rule`
     - _Requirements: 1.1, 1.2, 1.6_
 
-  - [ ] 2.9 Build the instructions for the steps without questions
+  - [x] 2.9 Build the instructions for the steps without questions
     - Create `exorcism/instructions.ts` with `buildInstructions(state)` and the layout of the design (title line, `Ghost` block with path and Ghost_Text in a fence longer than any run of backticks in the text, step task, one bullet per rule in list order). In this task implement the steps `choosing`, `explaining`, `self-check`, `failed` and `house-clean`; for the other steps (`asking`, `simplifying`, `model-answer`) the function throws an `Error("not implemented yet")` that task 2.10 removes.
     - `explaining`: rules `simple-english`, `no-jargon`, `what-before-how`, `no-question`, `no-lines`, `max-words`, the Java rule (exactly one of `java-allowed` / `java-forbidden`, from `profile.knowsJava`), `probable-reasons`, `separate-what-why`, `admit-unknown`. When `current.explanation` is not empty (after `retry-ghost`), it also contains the previous explanation and the rule `new-analogy`.
     - `choosing`: short message with the suggested ghost (path, floor, ghost sentence) and the list of haunted ghosts; no Ghost_Text; rule `probable-reasons`. `failed`, `house-clean` and `self-check`: the fixed English messages of the design; `self-check` has `self-check-options`. `probable-reasons` is present in every step.
