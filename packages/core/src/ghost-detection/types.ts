@@ -15,8 +15,8 @@ export interface DetectErrorInfo {
   message: string; // English
 }
 
-export type Result<T> =
-  { ok: true; value: T } | { ok: false; error: DetectErrorInfo };
+export type Result<T, E = DetectErrorInfo> =
+  { ok: true; value: T } | { ok: false; error: E };
 
 export interface RepoReference {
   owner: string;

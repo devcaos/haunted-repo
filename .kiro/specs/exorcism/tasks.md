@@ -31,7 +31,7 @@ Rules for running these tasks:
     - Commit message: `refactor(core): move floorOf to its own file`
     - _Requirements: 8.8, 8.9 (design: "Import cycle")_
 
-  - [ ] 1.2 Make `Result` generic
+  - [x] 1.2 Make `Result` generic
     - In `ghost-detection/types.ts` change `Result<T>` to `Result<T, E = DetectErrorInfo>`, as in the design ("Ghost-detection change in `types.ts`").
     - No new test: the build (`tsc`) proves that every old use stays valid.
     - Verify: `npm run check` exits `0`.
