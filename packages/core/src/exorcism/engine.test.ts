@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { Ghost, HauntedReport } from "../ghost-detection/types.js";
-import { decide, startSession } from "./engine.js";
-import type { ExorcismProgress, Rating } from "./types.js";
+import { advance, decide, startSession } from "./engine.js";
+import { ALLOWED_EVENTS } from "./event.js";
+import type {
+  ExorcismEvent,
+  ExorcismProgress,
+  ExorcismStep,
+  Rating,
+  SessionState,
+} from "./types.js";
 
 function ghost(path: string, difficultyScore: number): Ghost {
   return {
@@ -177,5 +184,150 @@ describe("decide", () => {
   });
   it("fails when 2 good ratings come with a wrong Core_Question", () => {
     expect(decide([W, R, R])).toBe(false);
+  });
+});
+
+function started(): SessionState {
+  const report = reportOf([ghost("a.ts", 20), ghost("b.ts", 10)]);
+  return startSession(report).state;
+}
+
+function pick(state: SessionState, path = "b.ts"): SessionState {
+  const r = advance(state, { type: "pick-ghost", path, text: "const x = 1;" });
+  if (!r.ok) throw new Error(r.error.message);
+  return r.state;
+}
+
+describe("advance: pick-ghost and explanation", () => {
+  it("choosing + pick-ghost starts an attempt in explaining", () => {
+    const r = advance(started(), {
+      type: "pick-ghost",
+      path: "b.ts",
+      text: "const x = 1;",
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("explaining");
+    expect(r.state.current).toEqual({
+      path: "b.ts",
+      text: "const x = 1;",
+      kind: "general",
+      explanation: "",
+      simpler: [],
+      attemptStart: 0,
+      questionIndex: 0,
+      dontKnowCount: 0,
+      pendingQuestion: null,
+      ratings: [],
+    });
+    expect(r.instructions.step).toBe("explaining");
+    expect(r.instructions.text).toContain("const x = 1;");
+  });
+
+  it("explaining + explanation-done goes to asking at question 0", () => {
+    const r = advance(pick(started()), {
+      type: "explanation-done",
+      text: "It is a box.",
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("asking");
+    expect(r.state.current?.explanation).toBe("It is a box.");
+    expect(r.state.current?.questionIndex).toBe(0);
+    expect(r.instructions.step).toBe("asking");
+  });
+
+  it("failed + pick-ghost starts a new attempt", () => {
+    const failed: SessionState = { ...pick(started()), step: "failed" };
+    const r = advance(failed, { type: "pick-ghost", path: "a.ts", text: "" });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.step).toBe("explaining");
+    expect(r.state.current?.path).toBe("a.ts");
+    expect(r.state.current?.explanation).toBe("");
+  });
+
+  it("keeps asked of a previous attempt when the same ghost is picked again", () => {
+    const base = pick(started());
+    const withAsked: SessionState = {
+      ...base,
+      step: "failed",
+      asked: { "b.ts": ["Q1?", "Q2?"] },
+    };
+    const r = advance(withAsked, {
+      type: "pick-ghost",
+      path: "b.ts",
+      text: "x",
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.state.asked).toEqual({ "b.ts": ["Q1?", "Q2?"] });
+    expect(r.state.current?.attemptStart).toBe(2);
+  });
+
+  it("rejects an exorcised or unknown ghost and returns the same state", () => {
+    const state = startSession(reportOf([ghost("a.ts", 1), ghost("b.ts", 2)]), {
+      progress: progressOf([
+        ["a.ts", "exorcised"],
+        ["b.ts", "haunted"],
+      ]),
+    }).state;
+    for (const path of ["a.ts", "nope.ts"]) {
+      const r = advance(state, { type: "pick-ghost", path, text: "" });
+      expect(r.ok).toBe(false);
+      if (r.ok) continue;
+      expect(r.error.code).toBe("INVALID_EVENT");
+      expect(r.state).toEqual(state);
+    }
+  });
+
+  it("rejects a blank explanation", () => {
+    const state = pick(started());
+    const r = advance(state, { type: "explanation-done", text: "   " });
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.code).toBe("INVALID_EVENT");
+    expect(r.state).toEqual(state);
+  });
+
+  it("rejects malformed events", () => {
+    const state = started();
+    const r = advance(state, { type: "nope" });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.error.code).toBe("INVALID_EVENT");
+  });
+
+  const samples: Record<ExorcismEvent["type"], unknown> = {
+    "pick-ghost": { type: "pick-ghost", path: "b.ts", text: "x" },
+    "explanation-done": { type: "explanation-done", text: "t" },
+    "answer-rated": { type: "answer-rated", rating: "right", question: "q?" },
+    "dont-know": { type: "dont-know", question: "q?" },
+    "self-check-answered": { type: "self-check-answered", answer: "yes" },
+    "retry-ghost": { type: "retry-ghost" },
+    "leave-ghost": { type: "leave-ghost" },
+  };
+  const steps: ExorcismStep[] = [
+    "choosing",
+    "explaining",
+    "asking",
+    "simplifying",
+    "model-answer",
+    "self-check",
+    "failed",
+    "house-clean",
+  ];
+  const cases = steps.flatMap((step) =>
+    (Object.keys(samples) as ExorcismEvent["type"][])
+      .filter((type) => !ALLOWED_EVENTS[step].includes(type))
+      .map((type) => [step, type] as const),
+  );
+
+  it.each(cases)("%s does not accept %s", (step, type) => {
+    const state: SessionState = { ...pick(started()), step };
+    const r = advance(state, samples[type]);
+    expect(r.ok).toBe(false);
+    if (r.ok) return;
+    expect(r.error.code).toBe("INVALID_EVENT");
+    expect(r.state).toEqual(state);
   });
 });

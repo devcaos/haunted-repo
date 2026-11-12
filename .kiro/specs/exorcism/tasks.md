@@ -183,7 +183,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): decide when a ghost is exorcised`
     - _Requirements: 6.3, 6.4, 6.6_
 
-  - [ ] 4.3 Add `advance`: validation, `pick-ghost` and the explanation
+  - [x] 4.3 Add `advance`: validation, `pick-ghost` and the explanation
     - In `engine.ts` add `advance(state, event: unknown)` and the `Transition` type. Order: `parseEvent` (error gives `INVALID_EVENT`), `ALLOWED_EVENTS[state.step]` (error gives `INVALID_EVENT`), event checks (`pick-ghost` needs `isPickable`), then the effect. On error it returns `ok: false`, the error and the **same** state. It never mutates its input and never throws.
     - Implement the rows of the transition table: `choosing` and `failed` with `pick-ghost` (new attempt: `kind = classifyFileKind(text, language)`, `explanation = ""`, `simpler = []`, `attemptStart = asked[path].length`, index 0, counters 0, `pendingQuestion = null`, `ratings = []`) to `explaining`; `explaining` with `explanation-done` to `asking` at question 0. Events that are allowed in a step but not implemented yet hit a temporary `throw new Error("not implemented yet")`, removed in tasks 4.4 and 4.5.
     - Extend `engine.test.ts`: each row above; `INVALID_EVENT` for each event in a step that does not allow it (table-driven, from the spec table); `pick-ghost` of an exorcised ghost and of an unknown path gives `INVALID_EVENT` and the state is equal to the one before; blank explanation text is rejected; `asked` of a previous attempt is kept when the same ghost is picked again.
