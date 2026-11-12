@@ -232,7 +232,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check the exorcism decision rule`
     - _Requirements: 6.3, 6.4, 6.6_
 
-  - [ ] 4.9 Property test for the Java rule
+  - [x] 4.9 Property test for the Java rule
     - **Property 2: Java rule**
     - **Validates: Requirements 2.8, 2.9, 2.10**
     - Generator: `fc.option(fc.boolean())` for the profile (none counts as `false`) and `fc.array(fc.nat())` for the driver. For every driven state in `explaining`, `asking`, `simplifying` or `model-answer`, the instruction `rules` contain `java-allowed` iff `knowsJava` is true, `java-forbidden` iff it is false, and never both.

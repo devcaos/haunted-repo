@@ -1,6 +1,12 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { Ghost } from "../ghost-detection/types.js";
 import { buildInstructions } from "./instructions.js";
+import {
+  choicesArb,
+  driverReportArb,
+  driveSession,
+} from "./sessionArb.testutil.js";
 import { QUESTION_SETS } from "./questions.js";
 import { RULE_SENTENCES } from "./rules.js";
 import type {
@@ -271,5 +277,43 @@ describe("buildInstructions (steps with questions)", () => {
     for (const id of ins.rules) {
       expect(ins.text).toContain(RULE_SENTENCES[id]);
     }
+  });
+});
+
+describe("Java rule property", () => {
+  it("java-allowed iff knowsJava, java-forbidden otherwise, never both", () => {
+    // Feature: exorcism, Property 2: Java rule
+    // **Validates: Requirements 2.8, 2.9, 2.10**
+    const javaSteps: ExorcismStep[] = [
+      "explaining",
+      "asking",
+      "simplifying",
+      "model-answer",
+    ];
+    fc.assert(
+      fc.property(
+        driverReportArb,
+        fc.option(fc.boolean(), { nil: null }),
+        choicesArb,
+        (report, knowsJava, choices) => {
+          const profile = knowsJava === null ? null : { knowsJava };
+          const { states, instructions } = driveSession(
+            report,
+            profile,
+            choices,
+          );
+          states.forEach((state, k) => {
+            if (!javaSteps.includes(state.step)) return;
+            const rules = instructions[k]?.rules ?? [];
+            const allowed = rules.includes("java-allowed");
+            const forbidden = rules.includes("java-forbidden");
+            expect(allowed).toBe(knowsJava === true);
+            expect(forbidden).toBe(knowsJava !== true);
+            expect(allowed && forbidden).toBe(false);
+          });
+        },
+      ),
+      { numRuns: 100 },
+    );
   });
 });
