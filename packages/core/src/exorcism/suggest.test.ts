@@ -1,5 +1,8 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { Ghost } from "../ghost-detection/types.js";
+import { reportArb } from "../ghost-detection/reportArb.testutil.js";
+import { progressArb } from "./progressArb.testutil.js";
 import { isPickable, suggestGhost } from "./suggest.js";
 import type { ExorcismProgress } from "./types.js";
 
@@ -86,5 +89,46 @@ describe("isPickable", () => {
 
   it("is false for an unknown path", () => {
     expect(isPickable(ghosts, progress, "nope.ts")).toBe(false);
+  });
+});
+
+describe("suggestGhost properties", () => {
+  // Unique paths by index; scores from a small range to force ties.
+  const ghostsArb = reportArb.chain((report) => {
+    const ghosts = report.ghosts.map((g, i) => ({
+      ...g,
+      path: `file-${String(report.ghosts.length - i)}-${String(i % 3)}.ts`,
+      difficultyScore: g.difficultyScore % 4,
+    }));
+    return progressArb(ghosts).map((progress) => ({ ghosts, progress }));
+  });
+
+  it("returns the easiest haunted ghost, ties by smallest path", () => {
+    // Feature: exorcism, Property 1: Suggestion is the easiest haunted ghost
+    // **Validates: Requirements 1.1, 1.2, 1.6**
+    fc.assert(
+      fc.property(ghostsArb, ({ ghosts, progress }) => {
+        const haunted = ghosts.filter(
+          (g) =>
+            progress.ghosts.find((p) => p.path === g.path)?.state === "haunted",
+        );
+        const result = suggestGhost(ghosts, progress);
+        if (haunted.length === 0) {
+          expect(result).toBeNull();
+          return;
+        }
+        expect(result).not.toBeNull();
+        expect(haunted).toContainEqual(result);
+        for (const g of haunted) {
+          expect(g.difficultyScore).toBeGreaterThanOrEqual(
+            result!.difficultyScore,
+          );
+          if (g.difficultyScore === result!.difficultyScore) {
+            expect(g.path >= result!.path).toBe(true);
+          }
+        }
+      }),
+      { numRuns: 100 },
+    );
   });
 });

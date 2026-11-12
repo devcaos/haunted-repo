@@ -115,7 +115,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): suggest the easiest haunted ghost`
     - _Requirements: 1.1, 1.2, 1.4_
 
-  - [ ] 2.8 Property test for the suggestion
+  - [x] 2.8 Property test for the suggestion
     - **Property 1: Suggestion is the easiest haunted ghost**
     - **Validates: Requirements 1.1, 1.2, 1.6**
     - Create `exorcism/progressArb.testutil.ts` with `progressArb(ghosts)` (state per ghost, ratings of length 0 or 3, `selfCheck` or `null`; it may add extra unknown paths when asked) and `ratingsArb`. The optional properties 7, 8 and 9 reuse them.
