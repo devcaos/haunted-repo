@@ -87,7 +87,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): classify the kind of a file`
     - _Requirements: 4.1, 4.2 (design: "File kind")_
 
-  - [ ] 2.4 Add the Tutor rules
+  - [x] 2.4 Add the Tutor rules
     - Create (or complete) `exorcism/rules.ts` with the closed `RuleId` list and `RULE_SENTENCES` with the fixed English sentence of each rule, exactly as in the design table "Tutor rules" (including `ask-then-wait`, `java-allowed`, `java-forbidden`, `different-questions`, `same-question`, `new-analogy`, `verdict-format`, `one-verdict`, `dont-know-verdict`, `self-check-options`). Sentences with a gap (`different-questions`, `same-question`) are exported as small functions that take the question texts, or as a fixed prefix plus the texts added by the builder; pick one and keep it consistent.
     - Write `rules.test.ts`: every `RuleId` has a non-empty sentence; no sentence is repeated; `verdict-format` contains the four exact `VERDICT:` lines; no sentence contains a line number.
     - Verify: `npm run check` exits `0`.
