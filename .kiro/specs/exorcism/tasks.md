@@ -64,7 +64,7 @@ Rules for running these tasks:
     - Commit message: `docs: point ghost sentence table to the exorcism design`
     - _Requirements: 8.9_
 
-- [ ] 2. Exorcism foundations: types, questions, file kind, rules, progress, suggestion, instructions, verdict
+- [x] 2. Exorcism foundations: types, questions, file kind, rules, progress, suggestion, instructions, verdict
   - [x] 2.1 Add the exorcism types and error helpers
     - Create `exorcism/types.ts` with all types of the design "Data Models" (`ExorcismStep`, `Rating`, `Verdict`, `FileKind`, `SelfCheck`, `StudentProfile`, `ExorcismErrorCode`, `ExorcismErrorInfo`, `GhostProgress`, `ExorcismProgress`, `ExorcismEvent`, `CurrentGhost`, `SessionState`, `TutorInstructions`, `RecordedEvent`, `SessionRecording`). `TutorInstructions.rules` uses `RuleId`, imported as a type from `./rules.js`; create `rules.ts` with only `export type RuleId = never;` for now and fill it in task 2.4 (or define the full `RuleId` union already here if it is shorter; either way the build must pass).
     - Create `exorcism/errors.ts` with small helpers `ok(value)` and `fail(code, message)` for `Result<T, ExorcismErrorInfo>` (this file is not in the design layout; it only holds these two helpers).
@@ -151,7 +151,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): format and parse tutor verdicts`
     - _Requirements: 5.2, 10.9_
 
-  - [ ] 2.12 Property test for the verdict round trip
+  - [x] 2.12 Property test for the verdict round trip
     - **Property 14: Verdict round trip**
     - **Validates: Requirements 10.9, 10.10**
     - Generator: `fc.constantFrom` of the four verdicts and a reason from `fc.string()` filtered so that no line starts with `VERDICT:` (include `\r\n`, blank lines and trailing spaces in the generator). Check `parseVerdict(formatVerdict(reason, verdict))` returns the same verdict.

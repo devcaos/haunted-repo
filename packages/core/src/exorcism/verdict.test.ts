@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { formatVerdict, parseVerdict } from "./verdict.js";
 import type { Verdict } from "./types.js";
@@ -60,5 +61,37 @@ describe("parseVerdict", () => {
     if (!r.ok) {
       expect(r.error.message).toContain("more than one VERDICT line");
     }
+  });
+});
+describe("verdict round trip", () => {
+  // Feature: exorcism, Property 14: Verdict round trip
+  // **Validates: Requirements 10.9, 10.10**
+  it("parseVerdict(formatVerdict(reason, verdict)) returns the same verdict", () => {
+    const piece = fc.oneof(
+      fc.string(),
+      fc.constantFrom("", " ", "   ", "\t", "\r"),
+    );
+    const reasonArb = fc
+      .tuple(
+        fc.array(piece, { maxLength: 8 }),
+        fc.array(fc.constantFrom("\n", "\r\n", "\n\n"), { maxLength: 8 }),
+      )
+      .map(([parts, seps]) => parts.map((p, i) => p + (seps[i] ?? "")).join(""))
+      .filter((reason) =>
+        reason.split("\n").every((line) => !line.startsWith("VERDICT:")),
+      );
+    fc.assert(
+      fc.property(
+        fc.constantFrom<Verdict>("right", "half-right", "wrong", "dont-know"),
+        reasonArb,
+        (verdict, reason) => {
+          expect(parseVerdict(formatVerdict(reason, verdict))).toEqual({
+            ok: true,
+            value: verdict,
+          });
+        },
+      ),
+      { numRuns: 100 },
+    );
   });
 });
