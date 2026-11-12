@@ -299,7 +299,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check replay equals the live session`
     - _Requirements: 11.3_
 
-- [ ] 6. Public API and purity
+- [x] 6. Public API and purity
   - [x] 6.1 Export the public API
     - Create `exorcism/index.ts` exporting: `startSession`, `advance`, `decide`, `parseEvent`, `ALLOWED_EVENTS`, `buildInstructions`, `formatVerdict`, `parseVerdict`, `classifyFileKind`, `QUESTION_SETS`, `suggestGhost`, `isPickable`, `normaliseProgress`, `parseProgress`, `formatProgress`, `hauntedShare`, `parseRecording`, `formatRecording`, `replay`, and all public types (`SessionState`, `ExorcismEvent`, `ExorcismProgress`, `SessionRecording`, `TutorInstructions`, `ExorcismStep`, `Rating`, `Verdict`, `FileKind`, `StudentProfile`, `ExorcismErrorInfo`, ...). Do not export test helpers.
     - In `packages/core/src/index.ts` add `export * from "./exorcism/index.js";` (keep the existing ghost-detection export). Check that no exported name clashes with a ghost-detection export (the design prefixes the names for this reason).
@@ -308,7 +308,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): export the exorcism API`
     - _Requirements: 9.1, 9.2, 9.3_
 
-  - [ ] 6.2 Add the static purity test
+  - [x] 6.2 Add the static purity test
     - Create `exorcism/purity.test.ts`. It reads the non-test source files of `packages/core/src/exorcism/` as text with `import.meta.glob("./*.ts", { query: "?raw", import: "default", eager: true })`, excluding `*.test.ts` and `*.testutil.ts` by file name, and starts with `/// <reference types="vite/client" />` (`vite` is already installed; no new dependency).
     - It fails on real uses only: `new Date`, `Date.now`, `Math.random`, `process.`, `fetch(`, `require(`, and imports from `node:`. It must not match the English rule sentences (use the patterns above, not loose words). Add one negative self-check in the same test: the pattern list matches a small inline string with each forbidden use, so the test cannot pass by matching nothing.
     - Fallback described in the design: if `npm run build` rejects the file (the `core` tsconfig has `types: []`), exclude `purity.test.ts` from the `core` tsconfig build so it still runs in Vitest, and say so in the final report.
