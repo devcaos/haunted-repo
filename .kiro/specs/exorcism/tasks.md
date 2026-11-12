@@ -316,7 +316,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check exorcism code stays pure`
     - _Requirements: 9.2, 9.3, 10.1_
 
-- [ ] 7. Docs and pull request
+- [x] 7. Docs and pull request
   - [x] 7.1 Update `PLAN.md`
     - Mark the exorcism spec as done in "Siguientes" and "Hecho"; add "Para retomar" notes: what exists in `packages/core/src/exorcism/`, how to start a session and replay a recording, that the Tutor text is only checked by manual spikes (`docs/spike-explicacion.md` and the 11 Nov spike), and that the next specs (Power, web) will use the engine and the committed fixture. Record the seven optional properties still pending in "Pendientes" (Low), and that `.kiro/specs/ghost-detection/design.md` has a pointer to the new Ghost_Sentence section. `PLAN.md` may stay in Spanish.
     - Verify: `npm run check` exits `0` and `git status --short` shows only `PLAN.md` and `tasks.md`.
@@ -329,7 +329,7 @@ Rules for running these tasks:
     - Commit message: `docs: log Kiro usage for the exorcism spec`
     - _Requirements: 9.5_
 
-  - [ ] 7.3 Final check and pull request
+  - [x] 7.3 Final check and pull request
     - Run `npm run check` from a build-first state (`npm run build` before `npm test`); it must exit `0` with no network access needed. Check `git status --short` prints nothing.
     - Count the changed lines of the branch against `main` with `git diff --stat main...HEAD`, excluding `package-lock.json`, and write that number in the pull request description. The description also says that the pull request exceeds about 500 lines because the tests are large, that one single pull request is the owner's decision, and that it will be reviewed by task groups.
     - Mark this task `[x]`, commit `tasks.md` (commit message: `docs: close the exorcism task list`), and push with `git push -u origin feat/exorcism`.
