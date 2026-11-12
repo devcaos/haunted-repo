@@ -21,7 +21,7 @@ Rules for running these tasks:
 
 ## Tasks
 
-- [ ] 1. Ghost_Sentence fix in ghost detection
+- [x] 1. Ghost_Sentence fix in ghost detection
   - [x] 1.1 Move `floorOf` to `ghost-detection/floor.ts`
     - Step 0: check the branch with `git branch --show-current`. If it is `main`, run `git checkout feat/exorcism` followed by `git pull`. The branch already exists and holds the spec; never create it with `git checkout -b`.
     - Create `packages/core/src/ghost-detection/floor.ts` with `floorOf` moved unchanged from `report.ts`.
@@ -58,7 +58,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check ghost sentence wording by floor`
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.7_
 
-  - [ ] 1.5 Add the pointer in the ghost-detection design
+  - [x] 1.5 Add the pointer in the ghost-detection design
     - In `.kiro/specs/ghost-detection/design.md`, under the "Reason sentence" table, add one line saying that the table is replaced by the "Ghost_Sentence (Requirement 8)" section of `.kiro/specs/exorcism/design.md`. Change nothing else in that file.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: point ghost sentence table to the exorcism design`
