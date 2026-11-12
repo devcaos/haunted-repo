@@ -223,7 +223,7 @@ Rules for running these tasks:
     - Commit message: `test(core): check the question loop is bounded`
     - _Requirements: 5.7, 5.8_
 
-  - [ ] 4.8 Property test for the decision
+  - [x] 4.8 Property test for the decision
     - **Property 6: Decision**
     - **Validates: Requirements 6.3, 6.4, 6.6**
     - Two checks in one property: (1) for any list of 3 ratings (`fc.array(fc.constantFrom("right","half-right","wrong"), { minLength: 3, maxLength: 3 })`), `decide` is true iff at least 2 are `right` or `half-right` and the first is not `wrong`; (2) for any driven session, after the 3rd rating the engine goes to `self-check` and the ghost is `exorcised` iff `decide` is true, and otherwise goes to `failed` and the ghost stays `haunted`. (Placed here, after the driver, because part (2) needs it; the `decide` function itself was tested exhaustively in task 4.2.)

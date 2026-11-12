@@ -643,3 +643,46 @@ describe("bounded question loop", () => {
     );
   });
 });
+
+describe("decision property", () => {
+  const ratingArb = fc.constantFrom<Rating>("right", "half-right", "wrong");
+  it("decide matches the rule and the engine follows it", () => {
+    // Feature: exorcism, Property 6: Decision
+    // **Validates: Requirements 6.3, 6.4, 6.6**
+    fc.assert(
+      fc.property(
+        fc.array(ratingArb, { minLength: 3, maxLength: 3 }),
+        driverReportArb,
+        profileArb,
+        choicesArb,
+        (ratings, report, profile, choices) => {
+          const good = ratings.filter((r) => r !== "wrong").length;
+          expect(decide(ratings)).toBe(good >= 2 && ratings[0] !== "wrong");
+
+          const { states, events } = driveSession(report, profile, choices);
+          events.forEach((event, k) => {
+            const before = states[k];
+            const after = states[k + 1];
+            if (before === undefined || after === undefined) return;
+            const closes =
+              (before.step === "asking" || before.step === "model-answer") &&
+              (after.step === "self-check" || after.step === "failed");
+            if (!closes) {
+              expect(after.step).not.toBe("self-check");
+              return;
+            }
+            const path = after.current?.path;
+            const entry = after.progress.ghosts.find((g) => g.path === path);
+            expect(entry).toBeDefined();
+            expect(entry?.ratings).toHaveLength(3);
+            const passed = decide(entry?.ratings ?? []);
+            expect(after.step).toBe(passed ? "self-check" : "failed");
+            expect(entry?.state).toBe(passed ? "exorcised" : "haunted");
+            expect(event.type).not.toBe("leave-ghost");
+          });
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
