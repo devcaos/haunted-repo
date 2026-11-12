@@ -176,7 +176,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): start an exorcism session`
     - _Requirements: 1.1, 1.3, 1.5, 2.9, 7.6, 10.11_
 
-  - [ ] 4.2 Add `decide`
+  - [x] 4.2 Add `decide`
     - In `engine.ts` add `decide(ratings)`: true iff at least 2 ratings are `right` or `half-right` and `ratings[0]` is not `wrong`.
     - Add examples to `engine.test.ts`: all 27 combinations of three ratings checked against a hand-written table (exhaustive, not random); 2 good ratings with a `wrong` Core_Question is false.
     - Verify: `npm run check` exits `0`.

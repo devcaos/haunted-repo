@@ -4,6 +4,7 @@ import { normaliseProgress } from "./progress.js";
 import { suggestGhost } from "./suggest.js";
 import type {
   ExorcismProgress,
+  Rating,
   SessionState,
   StudentProfile,
   TutorInstructions,
@@ -41,4 +42,10 @@ export function startSession(
     current: null,
   };
   return { state, instructions: buildInstructions(state) };
+}
+
+/** True (exorcised) iff at least 2 ratings are good and the Core_Question (first) is not wrong. */
+export function decide(ratings: readonly Rating[]): boolean {
+  const good = ratings.filter((r) => r !== "wrong").length;
+  return good >= 2 && ratings[0] !== "wrong";
 }

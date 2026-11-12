@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Ghost, HauntedReport } from "../ghost-detection/types.js";
-import { startSession } from "./engine.js";
-import type { ExorcismProgress } from "./types.js";
+import { decide, startSession } from "./engine.js";
+import type { ExorcismProgress, Rating } from "./types.js";
 
 function ghost(path: string, difficultyScore: number): Ghost {
   return {
@@ -130,5 +130,52 @@ describe("startSession", () => {
     const { state } = startSession(report);
     expect(state.ghosts[0]).not.toBe(report.ghosts[0]);
     expect(state.ghosts[0]?.factors).not.toBe(report.ghosts[0]?.factors);
+  });
+});
+
+describe("decide", () => {
+  const R: Rating = "right";
+  const H: Rating = "half-right";
+  const W: Rating = "wrong";
+  // Hand-written table: [ratings, exorcised]
+  const table: [[Rating, Rating, Rating], boolean][] = [
+    [[R, R, R], true],
+    [[R, R, H], true],
+    [[R, R, W], true],
+    [[R, H, R], true],
+    [[R, H, H], true],
+    [[R, H, W], true],
+    [[R, W, R], true],
+    [[R, W, H], true],
+    [[R, W, W], false],
+    [[H, R, R], true],
+    [[H, R, H], true],
+    [[H, R, W], true],
+    [[H, H, R], true],
+    [[H, H, H], true],
+    [[H, H, W], true],
+    [[H, W, R], true],
+    [[H, W, H], true],
+    [[H, W, W], false],
+    [[W, R, R], false],
+    [[W, R, H], false],
+    [[W, R, W], false],
+    [[W, H, R], false],
+    [[W, H, H], false],
+    [[W, H, W], false],
+    [[W, W, R], false],
+    [[W, W, H], false],
+    [[W, W, W], false],
+  ];
+
+  it("covers all 27 combinations", () => {
+    expect(table).toHaveLength(27);
+    expect(new Set(table.map(([r]) => r.join())).size).toBe(27);
+  });
+  it.each(table)("decide(%j) is %s", (ratings, expected) => {
+    expect(decide(ratings)).toBe(expected);
+  });
+  it("fails when 2 good ratings come with a wrong Core_Question", () => {
+    expect(decide([W, R, R])).toBe(false);
   });
 });
