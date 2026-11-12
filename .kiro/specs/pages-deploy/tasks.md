@@ -31,7 +31,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [ ] 4. Add the deploy workflow
+- [x] 4. Add the deploy workflow
   - Create `.github/workflows/deploy.yml` as in the design: trigger push to `main`, `concurrency` group `pages`, job `build` (checkout, setup-node 24, `npm ci`, `npm run check`, `configure-pages@v6`, `upload-pages-artifact@v5` with `path: packages/web/dist`), job `deploy` (`needs: build`, permissions `pages: write` and `id-token: write`, environment `github-pages`, `deploy-pages@v5`)
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
