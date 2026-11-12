@@ -73,7 +73,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add exorcism types and error helpers`
     - _Requirements: 7.2, 10.2, 10.3, 11.1_
 
-  - [ ] 2.2 Add `QUESTION_SETS`
+  - [x] 2.2 Add `QUESTION_SETS`
     - Create `exorcism/questions.ts` with `QUESTION_SETS` (3 objectives per kind, index 0 is the Core_Question) and `objectiveOf(kind, index)`, with the exact objectives of the design table.
     - Write `questions.test.ts` with **exhaustive** checks (not random): every kind has exactly 3 objectives; none contains a digit or the words "line" or "syntax" as a target; `data-shape` does not contain "what goes in and what comes out"; index 0 of each kind is the Core_Question objective.
     - Verify: `npm run check` exits `0`.
