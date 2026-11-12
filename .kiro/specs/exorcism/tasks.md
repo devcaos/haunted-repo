@@ -300,7 +300,7 @@ Rules for running these tasks:
     - _Requirements: 11.3_
 
 - [ ] 6. Public API and purity
-  - [ ] 6.1 Export the public API
+  - [x] 6.1 Export the public API
     - Create `exorcism/index.ts` exporting: `startSession`, `advance`, `decide`, `parseEvent`, `ALLOWED_EVENTS`, `buildInstructions`, `formatVerdict`, `parseVerdict`, `classifyFileKind`, `QUESTION_SETS`, `suggestGhost`, `isPickable`, `normaliseProgress`, `parseProgress`, `formatProgress`, `hauntedShare`, `parseRecording`, `formatRecording`, `replay`, and all public types (`SessionState`, `ExorcismEvent`, `ExorcismProgress`, `SessionRecording`, `TutorInstructions`, `ExorcismStep`, `Rating`, `Verdict`, `FileKind`, `StudentProfile`, `ExorcismErrorInfo`, ...). Do not export test helpers.
     - In `packages/core/src/index.ts` add `export * from "./exorcism/index.js";` (keep the existing ghost-detection export). Check that no exported name clashes with a ghost-detection export (the design prefixes the names for this reason).
     - Extend `packages/core/src/index.test.ts`: importing from `./index.js` gives the exported functions, and a short session started from a report built with `buildReport` runs one `advance` step.
