@@ -80,7 +80,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add question sets for each file kind`
     - _Requirements: 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.11_
 
-  - [ ] 2.3 Add `classifyFileKind`
+  - [x] 2.3 Add `classifyFileKind`
     - Create `exorcism/fileKind.ts` with `classifyFileKind(text, language)` following the design "File kind": uses `measureFactors` for `lines` and `branches`, scans code lines itself (comment rule as in `measureFactors`, lines cut to 500 characters), rules in the given order, one pattern table per language. For TypeScript, `type ...` lines and property signatures with function types do not count as function-likes.
     - Write `fileKind.test.ts`: one example per kind and per language; the two spike fixtures written as small inline strings (a types file from `docs/spike-explicacion.md` gives `data-shape`; a file with loops and conditions from the 11 Nov spike gives `logic`); empty and comment-only files give `general`; a barrel (`export ... from`) gives `entry-point`; a Java class with only fields and getters gives `logic` (the documented limit, as a test).
     - Verify: `npm run check` exits `0`.
