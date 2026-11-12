@@ -38,7 +38,7 @@ Rules for running these tasks:
     - Commit message: `refactor(core): make Result generic in the error type`
     - _Requirements: 7.5, 10.9, 11.5 (design: "Decisions")_
 
-  - [ ] 1.3 Write the new `reasonFor` sentences and update the tests
+  - [x] 1.3 Write the new `reasonFor` sentences and update the tests
     - In `ghost-detection/factors.ts` change `reasonFor` to the sentence table of the design ("Ghost_Sentence", sentences 1 to 13). Keep the signature, the tie order (`lines`, `branches`, `maxIndent`, `imports`) and compute `floor = floorOf(difficultyScore(f))`, importing `floorOf` from `./floor.js`. Sentence 12 is implemented but has no example test (unreachable with the current weights).
     - In `factors.test.ts`, `describe("reasonFor")`: the 4 "names ... when it wins" tests use the new sentences 1 to 4 with N = 200, 30, 4, 10; the "all points are 0" test expects sentence 13; the tie-order test (`all = { lines: 100, branches: 20, maxIndent: 4, imports: 20 }`, then `lines: 0`, then `lines: 0, branches: 0`) now compares exact strings (sentence 5, 2, 3) so the floor is checked too.
     - Add the example tests of the design table (checked with the real `difficultyScore` and `floorOf`): `{200,0,0,0}`, `{0,30,0,0}`, `{0,0,4,0}`, `{0,0,0,10}`, `{400,0,0,0}`, `{50,60,0,0}`, `{100,20,8,0}`, `{99,19,3,20}`, `{400,60,0,0}`, `{290,60,4,0}`, `{199,39,8,20}` and the zero case `{0,0,0,0}` (the order of Factors is lines, branches, maxIndent, imports).

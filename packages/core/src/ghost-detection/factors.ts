@@ -1,3 +1,4 @@
+import { floorOf } from "./floor.js";
 import type { Factors } from "./types.js";
 
 const MAX_LINE_LENGTH = 500;
@@ -59,28 +60,56 @@ export function difficultyScore(f: Factors): number {
   );
 }
 
+type Winner = "lines" | "branches" | "maxIndent" | "imports";
+
+const DECISIONS = "if/elif/for/while/switch/case/catch";
+
+type FloorName = "attic" | "middle floor" | "basement";
+
+const SENTENCES: Record<FloorName, Record<Winner, (f: Factors) => string>> = {
+  attic: {
+    lines: (f) =>
+      `It is easy to read; the part that weighs most is its length (${f.lines} lines of code).`,
+    branches: (f) =>
+      `It is easy to read; the part that weighs most is the number of decisions it makes (${f.branches} ${DECISIONS}).`,
+    maxIndent: (f) =>
+      `It is easy to read; the part that weighs most is how nested the code is (${f.maxIndent} levels).`,
+    imports: (f) =>
+      `It is easy to read; the part that weighs most is the number of other files it depends on (${f.imports} imports).`,
+  },
+  "middle floor": {
+    lines: (f) =>
+      `It is of medium difficulty, mostly because it is fairly long (${f.lines} lines of code).`,
+    branches: (f) =>
+      `It is of medium difficulty, mostly because it makes several decisions (${f.branches} ${DECISIONS}).`,
+    maxIndent: (f) =>
+      `It is of medium difficulty, mostly because the code is nested (${f.maxIndent} levels).`,
+    imports: (f) =>
+      `It is of medium difficulty, mostly because it depends on several other files (${f.imports} imports).`,
+  },
+  basement: {
+    lines: (f) =>
+      `It is hard, mostly because it is long (${f.lines} lines of code).`,
+    branches: (f) =>
+      `It is hard, mostly because it makes many decisions (${f.branches} ${DECISIONS}).`,
+    maxIndent: (f) =>
+      `It is hard, mostly because the code is deeply nested (${f.maxIndent} levels).`,
+    imports: (f) =>
+      `It is hard, mostly because it depends on many other files (${f.imports} imports).`,
+  },
+};
 export function reasonFor(f: Factors): string {
-  const candidates: { points: number; sentence: string }[] = [
-    {
-      points: part(f.lines, 400, 40),
-      sentence: `It is hard mostly because it is long (${f.lines} lines of code).`,
-    },
-    {
-      points: part(f.branches, 60, 30),
-      sentence: `It is hard mostly because it makes many decisions (${f.branches} if/elif/for/while/switch/case/catch).`,
-    },
-    {
-      points: part(f.maxIndent, 8, 20),
-      sentence: `It is hard mostly because the code is deeply nested (${f.maxIndent} levels).`,
-    },
-    {
-      points: part(f.imports, 20, 10),
-      sentence: `It is hard mostly because it depends on many other files (${f.imports} imports).`,
-    },
+  const candidates: { points: number; winner: Winner }[] = [
+    { points: part(f.lines, 400, 40), winner: "lines" },
+    { points: part(f.branches, 60, 30), winner: "branches" },
+    { points: part(f.maxIndent, 8, 20), winner: "maxIndent" },
+    { points: part(f.imports, 20, 10), winner: "imports" },
   ];
   let best = candidates[0]!;
   for (const c of candidates) {
     if (c.points > best.points) best = c;
   }
-  return best.points === 0 ? "It is very short and simple." : best.sentence;
+  if (best.points === 0)
+    return "It is easy to read; it is very short and simple.";
+  return SENTENCES[floorOf(difficultyScore(f))][best.winner](f);
 }
