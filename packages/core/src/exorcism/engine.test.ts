@@ -1,7 +1,14 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { Ghost, HauntedReport } from "../ghost-detection/types.js";
 import { advance, decide, startSession } from "./engine.js";
 import { ALLOWED_EVENTS } from "./event.js";
+import {
+  choicesArb,
+  driverReportArb,
+  driveSession,
+  profileArb,
+} from "./sessionArb.testutil.js";
 import type {
   ExorcismEvent,
   ExorcismProgress,
@@ -573,5 +580,66 @@ describe("advance: decision, self-check, failed, retry and leave", () => {
       expect(r.error.code).toBe("INVALID_EVENT");
       expect(r.state).toBe(s);
     }
+  });
+});
+
+describe("bounded question loop", () => {
+  const ACTIVE = ["explaining", "asking", "simplifying", "model-answer"];
+  it("never loops: bounded questions, simplifications and events per attempt", () => {
+    // Feature: exorcism, Property 5: Bounded loop
+    // **Validates: Requirements 5.7, 5.8**
+    fc.assert(
+      fc.property(
+        driverReportArb,
+        profileArb,
+        choicesArb,
+        (report, profile, choices) => {
+          const { states, events } = driveSession(report, profile, choices);
+          let active = false;
+          let count = 0;
+          let simplifications = 0;
+          let askings: number[] = [];
+          let simplified: number[] = [];
+          events.forEach((event, k) => {
+            const before = states[k];
+            const after = states[k + 1];
+            if (before === undefined || after === undefined) return;
+            if (event.type === "pick-ghost" || event.type === "retry-ghost") {
+              active = true;
+              count = 0;
+              simplifications = 0;
+              askings = [0, 0, 0];
+              simplified = [0, 0, 0];
+              return;
+            }
+            if (!active) return;
+            count += 1;
+            const index = before.current?.questionIndex ?? 0;
+            if (
+              before.step === "asking" &&
+              (event.type === "answer-rated" || event.type === "dont-know")
+            ) {
+              askings[index] = (askings[index] ?? 0) + 1;
+              expect(askings[index]).toBeLessThanOrEqual(2);
+              if (
+                event.type === "dont-know" &&
+                before.current?.dontKnowCount === 0
+              ) {
+                simplified[index] = (simplified[index] ?? 0) + 1;
+                simplifications += 1;
+                expect(simplified[index]).toBeLessThanOrEqual(1);
+                expect(simplifications).toBeLessThanOrEqual(3);
+              }
+            }
+            if (!ACTIVE.includes(after.step)) {
+              expect(count).toBeLessThanOrEqual(14);
+              active = false;
+            }
+            expect(count).toBeLessThanOrEqual(14);
+          });
+        },
+      ),
+      { numRuns: 100 },
+    );
   });
 });

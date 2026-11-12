@@ -214,7 +214,7 @@ Rules for running these tasks:
     - Commit message: `test(core): add the session driver for property tests`
     - _Requirements: 10.2, 10.4, 10.6_
 
-  - [ ] 4.7 Property test for the bounded loop
+  - [x] 4.7 Property test for the bounded loop
     - **Property 5: Bounded loop**
     - **Validates: Requirements 5.7, 5.8**
     - Generator: `fc.array(fc.nat(), { maxLength: 200 })` into `driveSession`; counts computed from the trace. Checks per attempt: each question is asked at most twice; at most one simplification per question; at most 3 simplifications per attempt; the attempt leaves `explaining`, `asking`, `simplifying` and `model-answer` after at most 14 events.
