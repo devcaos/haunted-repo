@@ -169,7 +169,7 @@ Rules for running these tasks:
     - _Requirements: 10.3, 10.4, 10.5, 11.8_
 
 - [ ] 4. Engine and the mandatory properties
-  - [ ] 4.1 Add `startSession`
+  - [x] 4.1 Add `startSession`
     - Create `exorcism/engine.ts` with `StartOptions` and `startSession(report, options)` as in the design "Start": drop later ghosts that repeat a path (keep the first), copy the ghosts, `normaliseProgress`, `profile = { knowsJava: options?.profile?.knowsJava ?? false }`, step `house-clean` when `suggestGhost` is `null` (including 0 ghosts), otherwise `choosing`, `current = null`, `asked = {}`; return the state and `buildInstructions(state)`. Never throws.
     - Write `engine.test.ts` (first tests): start with and without progress and profile; start in `house-clean` when every ghost is exorcised and when the report has 0 ghosts; a repeated path keeps the first ghost; `fewFiles` and `partial` reports start normally; unknown paths in the given progress are dropped.
     - Verify: `npm run check` exits `0`.
