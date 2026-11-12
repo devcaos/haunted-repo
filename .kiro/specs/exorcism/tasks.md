@@ -94,7 +94,7 @@ Rules for running these tasks:
     - Commit message: `feat(core): add the fixed rules for the tutor`
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.8, 2.11, 3.1, 3.2, 3.3, 3.4, 4.9, 4.10, 4.12, 5.1, 5.4, 5.5, 5.6, 6.1, 6.2, 6.5, 10.9, 10.13_
 
-  - [ ] 2.5 Add progress normalising, parsing and formatting
+  - [x] 2.5 Add progress normalising, parsing and formatting
     - Create `exorcism/progress.ts` with `normaliseProgress(ghosts, progress)` (exactly one entry per ghost in report order, unknown paths dropped, missing ghosts `haunted` with no ratings and `selfCheck: null`), `parseProgress(jsonText)` (hand-written type guard as in the design: `ghosts` array; `path` string; `state` in the two values; `ratings` of length 0 or 3 of valid ratings; `selfCheck` in `yes | half | no | null`; no duplicate paths; `INVALID_PROGRESS` with an English message on any failure; never throws) and `formatProgress` (`JSON.stringify`). Export the type guard inside the package (not from the public index) for `parseRecording`.
     - Write `progress.test.ts` (unit tests): unknown path dropped, missing ghost becomes haunted, report order kept; `INVALID_PROGRESS` for invalid JSON, wrong types, ratings of length 2, a state not in the union, duplicate paths; a valid progress parses back equal.
     - Verify: `npm run check` exits `0`.
