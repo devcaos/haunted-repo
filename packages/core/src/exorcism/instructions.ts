@@ -97,16 +97,15 @@ function buildExplaining(state: SessionState): TutorInstructions {
     "separate-what-why",
     "admit-unknown",
   ];
-  const blocks = [
-    ghostBlock(current),
-    "Task: explain this file to the student.",
-  ];
+  const blocks = [ghostBlock(current)];
   if (retry) {
     blocks.push(
       `Explanation given before:\n${fenced(current.explanation)}`,
-      "Task: write another explanation of the same file.",
+      "Task: write another explanation of the same file, different from the one given before.",
     );
     rules.push("new-analogy");
+  } else {
+    blocks.push("Task: explain this file to the student.");
   }
   return render("explaining", "Step: explaining the ghost", blocks, rules);
 }

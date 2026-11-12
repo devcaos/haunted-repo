@@ -101,6 +101,19 @@ describe("buildInstructions (steps without questions)", () => {
     expect(ins.rules).toContain("no-question");
   });
 
+  it.each([
+    ["first explanation", ""],
+    ["retry", "Old explanation here."],
+  ])("explaining (%s): exactly one line starts with Task:", (_name, old) => {
+    const ins = buildInstructions(
+      stateOf("explaining", currentOf("code", old)),
+    );
+    const taskLines = ins.text
+      .split("\n")
+      .filter((line) => line.startsWith("Task:"));
+    expect(taskLines).toHaveLength(1);
+  });
+
   it("explaining has exactly one Java rule, from the profile", () => {
     const yes = buildInstructions(
       stateOf("explaining", currentOf("c"), { knowsJava: true }),
