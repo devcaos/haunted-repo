@@ -240,9 +240,11 @@ export type Result<T, E = DetectErrorInfo> =
 
 ### Start
 
+Ghost paths of a report are unique (detection takes them from the git tree). If a report still repeats a path, `startSession` drops the later ghosts that repeat it (keeps the first) and never throws.
+
 `startSession(report, options)`:
 
-1. `ghosts = report.ghosts.map(copy)`.
+1. `ghosts = dedupeByPath(report.ghosts).map(copy)` (first ghost of each path kept, report order).
 2. `progress = normaliseProgress(ghosts, options?.progress ?? null)`.
 3. `profile = { knowsJava: options?.profile?.knowsJava ?? false }` (Requirement 2.9).
 4. If `suggestGhost(ghosts, progress)` is `null` the step is `house-clean`, otherwise `choosing`.
@@ -333,6 +335,7 @@ Every instruction is the list of rule ids plus a fixed layout. The text is built
 | `reason-then-verdict` | 6.1 | Give a short reason in plain language, and then the verdict. | asking |
 | `verdict-format` | 10.9 | End your judgement with one last line that is exactly `VERDICT: right`, `VERDICT: half-right`, `VERDICT: wrong` or `VERDICT: dont-know`. | asking |
 | `one-verdict` | 10.9 | Give exactly one verdict per message and per question, never the verdicts of several questions in one message. | asking |
+| `ask-then-wait` | 4.9, 6.1, 10.9 | First write only the question and stop. Wait for the student's answer. Only then write your judgement: a short reason and the VERDICT line. Never answer the question yourself, and never put the question and the verdict in the same message. | asking (new question and re-ask) |
 | `dont-know-verdict` | 5.1 | If the answer means "I don't know" in any language, or is empty, or does not try to answer, the verdict is `dont-know`. | asking |
 | `self-check-options` | 6.5 | Ask the student whether the file is now understood, with the options "yes", "half" and "no". | self-check |
 
@@ -344,7 +347,7 @@ The Java rule is present in the four steps where the Tutor writes prose (explain
 | --- | --- |
 | `choosing` | Short English message for the student: which ghost is suggested (path, floor, ghost sentence), and that any `haunted` ghost can be picked. Lists the haunted ghosts. No Ghost_Text yet. Rules: `probable-reasons`. |
 | `explaining` | Path and Ghost_Text. After `retry-ghost`, also the previous explanation text (`current.explanation` is not empty) and the rule `new-analogy`; the rules 2.2 to 2.5, 2.8 and 2.11 stay (Requirement 10.13). No question. |
-| `asking` | Path, Ghost_Text, and **only the objective of the current question** (`QUESTION_SETS[kind][questionIndex]`), never another objective. New question: `one-question`, `concrete-file`, `different-questions` (only with texts from `asked[path].slice(0, attemptStart)`). Re-ask: `pendingQuestion` and `same-question`. Then the judging rules. |
+| `asking` | Path, Ghost_Text, and **only the objective of the current question** (`QUESTION_SETS[kind][questionIndex]`), never another objective. New question: `one-question`, `concrete-file`, `different-questions` (only with texts from `asked[path].slice(0, attemptStart)`). Re-ask: `pendingQuestion` and `same-question`. Both: `ask-then-wait`. Then the judging rules. |
 | `simplifying` | Path, Ghost_Text, the question (`pendingQuestion`), the explanation given before and the earlier simpler ones. Asks for a Simpler_Explanation of that part only. |
 | `model-answer` | Path, Ghost_Text, the question and a request for a short model answer. |
 | `self-check` | Message with the result (exorcised) and the fixed question with "yes", "half", "no". |
@@ -469,7 +472,7 @@ Otherwise it returns `INVALID_VERDICT` with an English message ("The last line m
 2. For event `i` (1-based) it calls `advance`. On `ok: false` it returns `INVALID_SESSION` with the message `Event <i> (<type>) is not accepted in the step "<step>".` and the engine's own message appended.
 3. `sampleAnswer` is never read: `parseEvent` copies only known fields (Requirement 11.8).
 
-`parseRecording(jsonText)` checks the structure by hand. It validates the report with `parseReport(JSON.stringify(report))` (the object is stringified again so ghost detection's validation is reused and not copied), the progress with the guard of `parseProgress`, the profile (`{ knowsJava: boolean }` or `null`), and each event with `parseEvent` plus the `sampleAnswer` check: present only on `answer-rated` and `dont-know`, and a string; a non-string value returns `INVALID_SESSION`. Any failure is `INVALID_SESSION` with an English message. `parseRecording` returns events that keep `sampleAnswer` (so the round trip is strict); `replay` ignores it.
+`parseRecording(jsonText)` checks the structure by hand. It validates the report with `parseReport(JSON.stringify(report))` (the object is stringified again so ghost detection's validation is reused and not copied), then rejects a report whose ghosts repeat a path with `INVALID_SESSION`, the progress with the guard of `parseProgress`, the profile (`{ knowsJava: boolean }` or `null`), and each event with `parseEvent` plus the `sampleAnswer` check: present only on `answer-rated` and `dont-know`, and a string; a non-string value returns `INVALID_SESSION`. Any failure is `INVALID_SESSION` with an English message. `parseRecording` returns events that keep `sampleAnswer` (so the round trip is strict); `replay` ignores it.
 
 ### Ghost_Sentence (Requirement 8)
 
@@ -488,8 +491,10 @@ Otherwise it returns `INVALID_VERDICT` with an English message ("The last line m
 | 9 | basement | lines | `It is hard, mostly because it is long (N lines of code).` |
 | 10 | basement | branches | `It is hard, mostly because it makes many decisions (N if/elif/for/while/switch/case/catch).` |
 | 11 | basement | maxIndent | `It is hard, mostly because the code is deeply nested (N levels).` |
-| 12 | basement | imports | `It is hard, mostly because it depends on many other files (N imports).` |
+| 12 | basement | imports | `It is hard, mostly because it depends on many other files (N imports).` (unreachable with the current weights; kept as a safe default) |
 | 13 | attic | all points 0 | `It is easy to read; it is very short and simple.` |
+
+Sentence 12 is unreachable: `imports` gives at most 10 points and wins only when each of the other three factors gives less than 10, so the total stays below 40 and never reaches the basement (which needs a score of at least 67). It stays in the table so that `reasonFor` has a defined answer if the weights change later.
 
 Word rules (Requirements 8.2 to 8.5): attic sentences never contain the word "hard"; middle floor sentences contain neither the whole words "hard" nor "easy"; basement sentences say "hard"; the first three words are `It is easy`, `It is of`, `It is hard`, which are different. The sentence stays a plain string, `parseReport` is not changed, and a report saved with the old sentence (`It is hard mostly because…`) still parses (Requirement 8.8).
 
@@ -500,7 +505,24 @@ Word rules (Requirements 8.2 to 8.5): attic sentences never contain the word "ha
 - The 4 tests "names lines/branches/maxIndent/imports when it wins" use `{lines: 200}`, `{branches: 30}`, `{maxIndent: 4}`, `{imports: 10}`. Each gets 20, 15, 10 and 5 points, so all are on the attic floor. Their expected strings become sentences 1 to 4 with N = 200, 30, 4 and 10.
 - "says the file is simple when all points are 0" expects sentence 13.
 - The tie-order test uses `all = { lines: 100, branches: 20, maxIndent: 4, imports: 20 }` (10 points each, score 40, **middle floor**). `reasonFor(all)` is sentence 5 and contains "long" (as "fairly long"), so that assertion still passes. With `lines: 0` the score is 30 (**attic**) and the sentence is sentence 2, which contains "decisions"; with `lines: 0, branches: 0` the score is 20 (attic) and the sentence is sentence 3, which contains "nested". So the three `toContain` assertions still pass without a change; the task tightens them to exact strings so that the floor is also checked.
-- New tests: one per floor × factor (12) plus the zero case, using factors that reach each floor (for example lines 400 / branches 60 / maxIndent 8 / imports 20 for basement).
+- New tests: 11 example tests plus the zero case (sentence 13), with these Factors (checked with the real `difficultyScore` and `floorOf`):
+
+  | Factors {lines, branches, maxIndent, imports} | Score | Floor | Winner | Sentence |
+  | --- | --- | --- | --- | --- |
+  | {200, 0, 0, 0} | 20 | attic | lines | 1 |
+  | {0, 30, 0, 0} | 15 | attic | branches | 2 |
+  | {0, 0, 4, 0} | 10 | attic | maxIndent | 3 |
+  | {0, 0, 0, 10} | 5 | attic | imports | 4 |
+  | {400, 0, 0, 0} | 40 | middle floor | lines | 5 |
+  | {50, 60, 0, 0} | 35 | middle floor | branches | 6 |
+  | {100, 20, 8, 0} | 40 | middle floor | maxIndent | 7 |
+  | {99, 19, 3, 20} | 37 | middle floor | imports | 8 |
+  | {400, 60, 0, 0} | 70 | basement | lines | 9 |
+  | {290, 60, 4, 0} | 69 | basement | branches | 10 |
+  | {199, 39, 8, 20} | 69 | basement | maxIndent | 11 |
+  | {0, 0, 0, 0} | 0 | attic | none | 13 |
+
+  Sentence 12 has no example test because no Factors reach it, and the floor-wording property cannot exercise it either.
 - Two property tests: determinism (P10) and floor wording (P11) over `Factors`.
 
 The "Reason sentence" table in `.kiro/specs/ghost-detection/design.md` becomes outdated. A task of this spec adds a one-line pointer there (to this section); this design step does not edit that file. Ghost-detection Requirement 5.4 stays valid, because it only says that the sentence names the factor with the highest share.
@@ -541,7 +563,7 @@ Generator: `textArb` (existing) and `fc.constantFrom` of the four languages. Lab
 
 ### Property 4: Instruction rules for a new question
 
-For any ghost and any attempt reached by the driver, the instruction for a new question (step `asking`, `pendingQuestion` is `null`) has the rules `one-question`, `concrete-file` and `no-lines`; its `text` contains the path and the objective of the current question and none of the other two objectives; it has `different-questions` if and only if `asked[path].slice(0, attemptStart)` is not empty, and then its `text` contains every one of those question texts. No objective of any file kind contains a line number.
+For any ghost and any attempt reached by the driver, the instruction for a new question (step `asking`, `pendingQuestion` is `null`) has the rules `one-question`, `concrete-file`, `ask-then-wait` and `no-lines`; its `text` contains the path and the objective of the current question and none of the other two objectives; it has `different-questions` if and only if `asked[path].slice(0, attemptStart)` is not empty, and then its `text` contains every one of those question texts. No objective of any file kind contains a line number.
 
 **Validates: Requirements 4.9, 4.10, 4.11, 4.12, 4.13, 3.1**
 
@@ -597,11 +619,11 @@ Generator: `fc.record` of four non-negative integers (some above the caps). Labe
 
 ### Property 11: Ghost sentence follows the floor wording
 
-For any `Factors`, with `floor = floorOf(difficultyScore(f))`: the sentence names the winner factor and contains its value as a whole number; on `attic` it starts with `It is easy` and has no whole word "hard"; on `middle floor` it starts with `It is of` and has neither whole word "hard" nor "easy"; on `basement` it starts with `It is hard`; the three starts are different.
+For any `Factors` whose four points are not all 0, with `floor = floorOf(difficultyScore(f))`: the sentence names the winner factor and contains its value as a whole number; on `attic` it starts with `It is easy` and has no whole word "hard"; on `middle floor` it starts with `It is of` and has neither whole word "hard" nor "easy"; on `basement` it starts with `It is hard`; the three starts are different. When all four points are 0 (empty file), the sentence is exactly sentence 13, `It is easy to read; it is very short and simple.`, names no factor and carries no number.
 
 **Validates: Requirements 8.1, 8.2, 8.3, 8.4, 8.5, 8.7**
 
-Generator: `fc.record` of four integers in 0..1000. Label: **mínimo**. It protects the fix of a known wrong behaviour (easy files called "hard").
+Generator: `fc.oneof(fc.constant({ lines: 0, branches: 0, maxIndent: 0, imports: 0 }), fc.record(...))` with four integers in 0..1000, so the all-zero case is always exercised. Label: **mínimo**. It protects the fix of a known wrong behaviour (easy files called "hard").
 
 ### Property 12: Invalid events leave the state unchanged
 
@@ -682,7 +704,7 @@ Why this split. The **mínimo** group protects the decision logic (P1, P6), the 
 | Event not accepted in the step, fields missing or of the wrong type, blank text, `pick-ghost` of a non-haunted or unknown path | `INVALID_EVENT` | `advance` (`ok: false`, same state) | `This event is not accepted in the step "asking".` / `The ghost "x.ts" is not haunted or is not in the report.` |
 | Verdict line missing, wrong, or more than one `VERDICT:` line | `INVALID_VERDICT` | `parseVerdict` | `The last line must be exactly one of: VERDICT: right, VERDICT: half-right, VERDICT: wrong, VERDICT: dont-know.` |
 | Progress JSON invalid or has a duplicate path | `INVALID_PROGRESS` | `parseProgress` | `This text is not a valid exorcism progress.` |
-| Recording JSON invalid, bad report, bad event, non-string `sampleAnswer`, or an event not accepted during replay | `INVALID_SESSION` | `parseRecording`, `replay` | `Event 7 (answer-rated) is not accepted in the step "simplifying".` |
+| Recording JSON invalid, bad report, report with repeated ghost paths, bad event, non-string `sampleAnswer`, or an event not accepted during replay | `INVALID_SESSION` | `parseRecording`, `replay` | `Event 7 (answer-rated) is not accepted in the step "simplifying".` |
 
 Not errors:
 
@@ -720,6 +742,7 @@ export function driveSession(
 
 - `validEventsFor` lists, per step: `choosing` → `pick-ghost` for each haunted ghost (with a fixed generated text); `explaining` → `explanation-done` with a text, `leave-ghost`; `asking` → `answer-rated` with each of the 3 ratings, `dont-know`, `leave-ghost` (with the pending question when there is one, else a new question text); `simplifying` and `model-answer` → `explanation-done`, `leave-ghost`; `self-check` → 3 answers; `failed` → `retry-ghost`, `pick-ghost`; `house-clean` → none. This is an independent oracle of Requirement 10.4.
 - Choices come from `fc.array(fc.nat())`, so failing cases shrink.
+- The reports used by the driver (and by every driver-based property) have unique, non-empty ghost paths; the generator enforces it (for example by building paths from the index).
 - The driver stops when `validEventsFor` is empty (`house-clean`) or the choices run out.
 - Used by P2, P4, P5, P6, P12 (with `fc.anything()` and wrong-step events), P13, P15, P16, P17, and by the check that every state survives `JSON.parse(JSON.stringify(s))` with `toStrictEqual` (Requirement 10.2).
 - The input state and event of `advance` are deep-frozen in the property tests, so an accidental mutation fails with a `TypeError` in strict mode.
@@ -730,17 +753,17 @@ Existing generators are reused: `reportArb.testutil.ts` and `textArb.testutil.ts
 
 - `fileKind.test.ts`: one example per kind and language, the two spike fixtures (types file → `data-shape`, logic file → `logic`), empty and comment-only files → `general`, a barrel → `entry-point`, the Java getter limit documented as a test.
 - `questions.test.ts`: **exhaustive** (not random): every kind has exactly 3 objectives, none contains a digit or a line number, and `data-shape` does not contain "what goes in and what comes out".
-- `instructions.test.ts`: for fixed inputs, the rendered text contains the sentence of every rule in `rules` and the path and the Ghost_Text; `explaining` contains no question rule; after `retry-ghost` it contains the previous explanation and `new-analogy`; the fence is longer than any backtick run in the Ghost_Text; `probable-reasons` is in every step.
+- `instructions.test.ts`: for fixed inputs, the rendered text contains the sentence of every rule in `rules` and the path and the Ghost_Text; `explaining` contains no question rule; the rules of `asking` (new question and re-ask) include `ask-then-wait` and its sentence appears in the text; after `retry-ghost` it contains the previous explanation and `new-analogy`; the fence is longer than any backtick run in the Ghost_Text; `probable-reasons` is in every step.
 - `verdict.test.ts`: accepted and rejected forms (no last line, two verdict lines, trailing `\r`, text after the verdict).
 - `progress.test.ts`: normalisation (unknown path dropped, missing ghost haunted), invalid shapes and duplicate paths → `INVALID_PROGRESS`, share for 0 ghosts.
-- `engine.test.ts`: each row of the transition table; each edge case of `requirements.md` (empty answer path, `dont-know` twice, `dont-know` twice on the last question, 2 good ratings with a `wrong` Core_Question, leave halfway, pick of an exorcised or unknown ghost, missing profile, `fewFiles` and `partial` reports, all exorcised, 0 ghosts, last self-check → `house-clean`); `INVALID_EVENT` for each wrong step; `asked` kept across `leave-ghost` and across attempts.
-- `recording.test.ts`: the end-to-end **fixture replay**: the committed recording walks through a pass, `dont-know` twice, a fail and a retry; the expected steps are checked at fixed positions; a recording with an event in the wrong step gives `INVALID_SESSION` with the position; a non-string `sampleAnswer` is rejected.
-- `ghost-detection/factors.test.ts`: the changes listed in "Ghost_Sentence", one test per floor × factor, an old-style report with the old sentence still parses with `parseReport` (Requirement 8.8).
+- `engine.test.ts`: `startSession` with a repeated path keeps the first ghost and does not throw; each row of the transition table; each edge case of `requirements.md` (empty answer path, `dont-know` twice, `dont-know` twice on the last question, 2 good ratings with a `wrong` Core_Question, leave halfway, pick of an exorcised or unknown ghost, missing profile, `fewFiles` and `partial` reports, all exorcised, 0 ghosts, last self-check → `house-clean`); `INVALID_EVENT` for each wrong step; `asked` kept across `leave-ghost` and across attempts.
+- `recording.test.ts`: the end-to-end **fixture replay**: the committed recording walks through a pass, `dont-know` twice, a fail and a retry; the expected steps are checked at fixed positions; a recording with an event in the wrong step gives `INVALID_SESSION` with the position; a non-string `sampleAnswer` is rejected; `parseRecording` rejects a report with repeated ghost paths with `INVALID_SESSION`.
+- `ghost-detection/factors.test.ts`: the changes listed in "Ghost_Sentence", the 11 example tests plus the zero case of the table, an old-style report with the old sentence still parses with `parseReport` (Requirement 8.8).
 - `ghost-detection/types` change: no new test; the build (`tsc`) proves the default type parameter keeps the old uses valid.
 
 ### Static purity test
 
-`purity.test.ts` reads the non-test source files of `packages/core/src/exorcism/` as text and fails if any imports a `node:` module or uses `Date`, `Math.random`, `process`, `fetch` or `require` (Requirements 9.2, 9.3, 10.1). It must not import `node:fs` (core has no Node types), so it uses the Vite feature `import.meta.glob("./*.ts", { query: "?raw", import: "default", eager: true })` and excludes `*.test.ts` and `*.testutil.ts` by file name. The file starts with `/// <reference types="vite/client" />` to type `import.meta.glob`; `vite` is already installed in the workspace (`node_modules/vite/client.d.ts` exists), so no new dependency is added, and `types: []` only disables automatic inclusion and does not block this reference. The first task that writes this file checks that `npm run build` still passes; if it does not, the file is excluded from the `core` `tsconfig` build and still runs in Vitest.
+`purity.test.ts` reads the non-test source files of `packages/core/src/exorcism/` as text and fails if any imports a `node:` module or uses `Date`, `Math.random`, `process`, `fetch` or `require` (Requirements 9.2, 9.3, 10.1). The test looks for real uses (`new Date`, `Date.now`, `Math.random`, `process.`, `fetch(`, `require(` and imports from `node:`), not loose words, so the English rule sentences do not give false alarms. It must not import `node:fs` (core has no Node types), so it uses the Vite feature `import.meta.glob("./*.ts", { query: "?raw", import: "default", eager: true })` and excludes `*.test.ts` and `*.testutil.ts` by file name. The file starts with `/// <reference types="vite/client" />` to type `import.meta.glob`; `vite` is already installed in the workspace (`node_modules/vite/client.d.ts` exists), so no new dependency is added, and `types: []` only disables automatic inclusion and does not block this reference. The first task that writes this file checks that `npm run build` still passes; if it does not, the file is excluded from the `core` `tsconfig` build and still runs in Vitest.
 
 ### Property test configuration
 
