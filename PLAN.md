@@ -6,14 +6,15 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## En curso
 - Spec de detección de fantasmas: terminada (tareas 1 a 15). PR #11 y PR #12 fusionadas: las tareas 10 a 15 ya están en main.
-- Spec de despliegue en GitHub Pages (`pages-deploy`): tareas 1 a 5 hechas en la rama `feat/pages-deploy`; PR abierta al terminar. Siguiente: spec de exorcismo.
+- Spec de despliegue en GitHub Pages (`pages-deploy`): tareas 1 a 5 hechas en la rama `feat/pages-deploy`; PR abierta al terminar.
+- Spec de exorcismo (`exorcism`): tareas 1 a 6 hechas en la rama `feat/exorcism`; faltan las tareas 7.2 y 7.3 (registro de uso y PR). El grupo 8 (propiedades opcionales) queda para después.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
 2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea)
 3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
-5. [ ] Spec: exorcismo (explicación + preguntas + corrección)
+5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR abierta al terminar la tarea 7.3)
 6. [ ] Spec: web de demostración con repo de ejemplo encantado
 7. [ ] Spec: empaquetar como Kiro Power
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
@@ -36,6 +37,13 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Medium (auditoría 11 nov): la línea .kiro/specs/*/tasks.meta.json de .gitignore puede chocar con las bases; decidir si se quita
 - Medium (auditoría 11 nov): la demo debe mostrar el aviso de licencia MIT de lukeed/sirv
 - Low: npm install avisa de 10 vulnerabilidades moderadas en dependencias de desarrollo; revisar con npm audit
+- Low (spec exorcism): siete propiedades opcionales aplazadas (grupo 8 de `tasks.md`): P3 tipo de archivo estable, P7 ida y vuelta del progreso, P8 rango de `hauntedShare`, P9 `hauntedShare` monótono, P10 frase del fantasma determinista, P15 ida y vuelta de la grabación, P17 las `sampleAnswer` se ignoran. Se hacen como commits extra en la misma rama, solo si hay tiempo.
+- Low (revisión exorcism): `buildInstructions` lanza un Error si el estado no trae `current` o `pendingQuestion` (solo pasa con un estado imposible; el motor no lo produce).
+- Low (revisión exorcism): las instrucciones no tienen una sección aparte de "formato de salida": el formato del VERDICT va como regla `verdict-format`.
+- Low (revisión exorcism): `classifyFileKind` no reconoce como barrel un import de TypeScript escrito en varias líneas.
+- Low (revisión exorcism): al repetir una pregunta tras simplificar, el motor acepta `answer-rated` aunque el texto de la pregunta no sea el de `pendingQuestion` (el Power debe mandar el mismo texto).
+- Low (revisión exorcism): en la propiedad P4 el texto del driver siempre da el tipo general, así que solo se comprueban los objetivos de ese tipo.
+- Low (revisión exorcism): `advance` comparte con el estado de entrada los arrays que no cambian (`ghosts`, `asked`): quien lo use no debe modificar estados antiguos.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
@@ -46,6 +54,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - [x] Esqueleto del proyecto: workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check (PR #4)
 - [x] Hook de tests con acción de comando y de agente (PR #5; confirmado en real: se dispara al completar una tarea)
 - [x] Spec de detección de fantasmas: `packages/core` con `detectGhosts`, cliente de GitHub, GitHub falso estricto y test en vivo (PR #11 y siguiente)
+- [x] Spec de exorcismo: motor puro en `packages/core/src/exorcism/` (sesión, eventos, preguntas, veredicto, progreso, grabación y repetición) y nueva frase del fantasma según la planta (rama `feat/exorcism`)
 
 ## Para retomar (traspaso)
 
@@ -55,4 +64,11 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - `power` y `web` todavía NO dependen de `core`. Cada spec posterior que lo use debe añadir `"@haunted-repo/core": "0.0.0"` en su `package.json` y actualizar `package-lock.json`. El script `build` de la raíz lista `core`, `power` y `web` en ese orden; un paquete nuevo se añade en el sitio correcto.
 - Qué estaba a medias: el hook está confirmado que se dispara al completar una tarea (tarea 2.1). Falta que Luis Miguel haga la prueba manual del test que falla (ver "Pendientes") y decidir si se deja el hook de comando o el de agente.
 - Lo próximo: fusionar la PR de `pages-deploy` (antes, en Settings > Pages > Source elegir "GitHub Actions"). Después, spec de exorcismo (punto 5) y el punto 3 de "Siguientes" (spike, `docs/spike-preguntas.md`) si sigue pendiente.
+- Spec de exorcismo (rama `feat/exorcism`, tareas 1 a 6 hechas):
+  - Qué existe en `packages/core/src/exorcism/`: funciones puras, sin red, sin `Date` ni `Math.random` (lo vigila `purity.test.ts`). `startSession`, `advance` (devuelve un `Result` con el nuevo estado y las instrucciones), `decide`, `buildInstructions`, `parseEvent`, `ALLOWED_EVENTS`, `formatVerdict`/`parseVerdict`, `classifyFileKind`, `QUESTION_SETS`, `suggestGhost`, `isPickable`, progreso (`normaliseProgress`, `parseProgress`, `formatProgress`, `hauntedShare`) y grabación (`parseRecording`, `formatRecording`, `replay`). Todo se exporta desde `src/index.ts`.
+  - Cómo empezar una sesión: `startSession(report, { progress, profile })` y después `advance(state, event)` con cada evento (`pick-ghost`, `explanation-done`, `answer-rated`, `dont-know`, ...). El estado y las instrucciones son JSON puro, así que se pueden guardar.
+  - Cómo repetir una grabación: `parseRecording(jsonText)` y `replay(recording)` devuelve todos los pasos; los `sampleAnswer` se ignoran. La grabación de ejemplo está en `exorcism/tinySession.testutil.ts` (JSON incluido).
+  - El texto del Tutor (explicaciones, preguntas, corrección) solo se comprueba con los spikes manuales (`docs/spike-explicacion.md` y el spike del 11 nov); ningún test automático puede llamar a Kiro.
+  - Las specs siguientes (Power y web) usarán este motor y la grabación del fixture. La web puede enseñar la grabación sin Kiro; el Power conecta el motor con el Kiro del usuario (debe enviar la misma pregunta al repetirla; ver "Pendientes").
+  - `.kiro/specs/ghost-detection/design.md` tiene un puntero a la sección "Ghost_Sentence" del diseño de exorcismo, que sustituye a su tabla de frases.
 - Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) npm ci comprobado en Linux con el lockfile de Windows (11 nov)

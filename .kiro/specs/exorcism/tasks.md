@@ -317,7 +317,7 @@ Rules for running these tasks:
     - _Requirements: 9.2, 9.3, 10.1_
 
 - [ ] 7. Docs and pull request
-  - [ ] 7.1 Update `PLAN.md`
+  - [x] 7.1 Update `PLAN.md`
     - Mark the exorcism spec as done in "Siguientes" and "Hecho"; add "Para retomar" notes: what exists in `packages/core/src/exorcism/`, how to start a session and replay a recording, that the Tutor text is only checked by manual spikes (`docs/spike-explicacion.md` and the 11 Nov spike), and that the next specs (Power, web) will use the engine and the committed fixture. Record the seven optional properties still pending in "Pendientes" (Low), and that `.kiro/specs/ghost-detection/design.md` has a pointer to the new Ghost_Sentence section. `PLAN.md` may stay in Spanish.
     - Verify: `npm run check` exits `0` and `git status --short` shows only `PLAN.md` and `tasks.md`.
     - Commit message: `docs: mark exorcism spec as done in the plan`
