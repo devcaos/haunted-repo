@@ -36,7 +36,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
 
-- [ ] 5. Update `PLAN.md`
+- [x] 5. Update `PLAN.md`
   - "En curso" and "Para retomar": state that PR #12 is merged and tasks 10-15 are in `main`
   - "Siguientes": list this spec (mark it when done)
   - Note (c) in "Para retomar" reads "npm ci comprobado en Linux con el lockfile de Windows (11 nov)"

@@ -5,7 +5,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Spec de detección de fantasmas: terminada (tareas 1 a 15). PR #11 (tareas 1 a 9) ya fusionada en main. Las tareas 10 a 15 están en la rama `feat/ghost-detection-fetch`, pendientes de PR. Siguiente: spec de exorcismo.
+- Spec de detección de fantasmas: terminada (tareas 1 a 15). PR #11 y PR #12 fusionadas: las tareas 10 a 15 ya están en main.
+- Spec de despliegue en GitHub Pages (`pages-deploy`): tareas 1 a 5 hechas en la rama `feat/pages-deploy`; PR abierta al terminar. Siguiente: spec de exorcismo.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
@@ -16,6 +17,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 6. [ ] Spec: web de demostración con repo de ejemplo encantado
 7. [ ] Spec: empaquetar como Kiro Power
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
+9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR abierta en `feat/pages-deploy`)
 
 ## Pendientes (Low, ideas, "después si da tiempo")
 - Decidir la categoría definitiva (Costume Contest u otra con menos competencia)
@@ -31,6 +33,9 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
 - Medium (PR #11, revisión): la frase de cada fantasma empieza siempre por "It is hard mostly because…", también en archivos fáciles. Resolver en la spec de la web o del exorcismo.
 - Low (PR #11, revisión): `parseReport` acepta campos desconocidos sin quitarlos.
+- Medium (auditoría 11 nov): la línea .kiro/specs/*/tasks.meta.json de .gitignore puede chocar con las bases; decidir si se quita
+- Medium (auditoría 11 nov): la demo debe mostrar el aviso de licencia MIT de lukeed/sirv
+- Low: npm install avisa de 10 vulnerabilidades moderadas en dependencias de desarrollo; revisar con npm audit
 
 ## Hecho
 - [x] Elegir idea (6 nov)
@@ -44,10 +49,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé: spec de detección de fantasmas terminada (tareas 1 a 15). PR #11 (tareas 1 a 9) fusionada en main; las tareas 10 a 15 están en la rama `feat/ghost-detection-fetch` y falta crear su PR (se prevé más de 500 líneas sin lockfile: valorar dividirla).
+- Dónde lo dejé: spec de detección de fantasmas terminada (tareas 1 a 15). PR #11 (tareas 1 a 9) y PR #12 (tareas 10 a 15) fusionadas: todo está en main. La spec `pages-deploy` está en la rama `feat/pages-deploy`.
 - Qué existe en `packages/core` (`@haunted-repo/core`, carpeta `src/ghost-detection/`): `detectGhosts(url, opts)` devuelve un `Result` con un `HauntedReport`; `parseReport`, `parseRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport` y `createGitHubClient`, todo exportado desde `src/index.ts`. Solo usa `fetch`, `TextDecoder` y `AbortSignal` (sin APIs de Node), para que funcione en el navegador.
 - Test en vivo: `npm run test:live` llama al GitHub real (`lukeed/sirv`, sin token) y gasta hasta 8 de las 60 peticiones por hora. No forma parte de `npm run check` ni de `npm test`. Si falla por límite de peticiones, esperar a que se reinicie y repetir.
 - `power` y `web` todavía NO dependen de `core`. Cada spec posterior que lo use debe añadir `"@haunted-repo/core": "0.0.0"` en su `package.json` y actualizar `package-lock.json`. El script `build` de la raíz lista `core`, `power` y `web` en ese orden; un paquete nuevo se añade en el sitio correcto.
 - Qué estaba a medias: el hook está confirmado que se dispara al completar una tarea (tarea 2.1). Falta que Luis Miguel haga la prueba manual del test que falla (ver "Pendientes") y decidir si se deja el hook de comando o el de agente.
-- Lo próximo: crear la PR de las tareas 10 a 15 (con el visto bueno de Luis Miguel). Después, spec de exorcismo (punto 5) y el punto 3 de "Siguientes" (spike, `docs/spike-preguntas.md`) si sigue pendiente.
-- Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) GitHub Pages: comprobar que `npm ci` funciona en Linux con un lockfile creado en Windows.
+- Lo próximo: fusionar la PR de `pages-deploy` (antes, en Settings > Pages > Source elegir "GitHub Actions"). Después, spec de exorcismo (punto 5) y el punto 3 de "Siguientes" (spike, `docs/spike-preguntas.md`) si sigue pendiente.
+- Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (b) web: cambiar `types: ["node"]` de `tsconfig.base.json` por tipos DOM; (c) npm ci comprobado en Linux con el lockfile de Windows (11 nov)
