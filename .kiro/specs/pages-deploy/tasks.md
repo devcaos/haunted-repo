@@ -15,7 +15,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.6_
 
-- [ ] 2. Implement the check button logic, page and tests
+- [x] 2. Implement the check button logic, page and tests
   - Create `src/checkButton.ts` with `DetectFn`, `CheckView`, `SAMPLE_REPO_URL`, `formatResult` and `createCheckHandler` as in the design
   - Write the real `src/main.ts` (uses `textContent`, passes `detectGhosts` directly) and the final `index.html` (title, under-construction sentence, `#check-button`, `#status` with `role="status"` and `aria-live="polite"`)
   - Create `src/checkButton.test.ts` with `vi.stubGlobal("fetch", ...)` no-network guard
