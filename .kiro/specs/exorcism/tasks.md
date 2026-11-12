@@ -323,7 +323,7 @@ Rules for running these tasks:
     - Commit message: `docs: mark exorcism spec as done in the plan`
     - _Requirements: 9.4, 9.5_
 
-  - [ ] 7.2 Add the line to `docs/kiro-usage-log.md`
+  - [x] 7.2 Add the line to `docs/kiro-usage-log.md`
     - Append one line about the exorcism spec, in the same style as the previous lines of that file (`docs/*.md` may stay in Spanish).
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: log Kiro usage for the exorcism spec`
