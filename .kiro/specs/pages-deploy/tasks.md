@@ -49,7 +49,7 @@ Seven small tasks, in order. Each task ends in its own commit on branch `feat/pa
   - Run `npm run check`; then mark this task `[x]` in `tasks.md` and commit everything together (including `tasks.md`)
   - _Requirements: 6.6_
 
-- [ ] 7. Final verification and pull request
+- [x] 7. Final verification and pull request
   - Run `npm run check` from a build-first state (`npm run build` before `npm test` on a clean clone)
   - Read `packages/web/dist/index.html` and confirm every asset path starts with `/haunted-repo/`
   - Mark this task `[x]` in `tasks.md` and commit it (including `tasks.md`); push the branch with `-u`
