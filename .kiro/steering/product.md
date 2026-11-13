@@ -14,9 +14,9 @@ Haunted Repo finds the AI-written code in a repository that its owner does not y
 - Origin: the author's previous project (Duly) was written by an AI and nobody read the code.
 
 ## Who it is for
-1. **Students** who program with AI (vocational training, bootcamps, university). Main audience.
-2. **Teachers**, who need to know whether a student understands the code they hand in. The student delivers the project with an "exorcism certificate" (idea only, not in the first version).
-3. Secondary: anyone who programs by directing agents ("vibe coding").
+1. Main audience: beginners who build projects by directing an AI without understanding the code (for example first-year vocational students like the author). Explanations come first, in plain words, and questions are about behaviour.
+2. Secondary: anyone who programs by directing agents ("vibe coding").
+3. Later idea, not in this version: teachers who want to know whether a student understands the code, through the "exorcism certificate".
 
 ## How it works
 - The repository is a **haunted house**: it has three floors: attic (easy), middle floor and basement (hard).
