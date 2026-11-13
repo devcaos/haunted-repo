@@ -12,5 +12,3 @@ dist/
 build/
 target/
 
-# Kiro local task state (the rest of .kiro/ must stay tracked)
-.kiro/specs/*/tasks.meta.json
