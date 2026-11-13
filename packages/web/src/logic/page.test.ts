@@ -1,7 +1,8 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
+import { isDeepStrictEqual } from "node:util";
 import fc from "fast-check";
-import { advance, startSession } from "@haunted-repo/core";
+import { advance, detectGhosts, startSession } from "@haunted-repo/core";
 import type {
   ErrorCode,
   Floor,
@@ -15,6 +16,7 @@ import { choicesArb } from "../../../core/src/exorcism/sessionArb.testutil.js";
 import { reportArb } from "../../../core/src/ghost-detection/reportArb.testutil.js";
 import { loadSample } from "../sample/sampleData.js";
 import { isAvailable } from "./actions.js";
+import { createFakeFetch } from "./fakeDetect.testutil.js";
 import type { UserAction } from "./actions.js";
 import { buildSampleHouse } from "./houseView.js";
 import { outcomeOf } from "./outcome.js";
@@ -324,6 +326,90 @@ describe("page controller properties (PR 1)", () => {
               ((result: Result<HauntedReport>) => void) | null;
             finish?.({ ok: true, value: sampleReport });
             await pending;
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  it("renders plain data with consistent scenes in the list scenes", async () => {
+    // Feature: web-demo, Property 11: The View_Model is plain data and scenes are consistent
+    // **Validates: Requirements 11.7, 11.8, 18.1, 18.2, 18.4**
+    // URLs for submit-live: ok, show-message (missing repo, invalid URL).
+    // The fake answers 403 rate limit after 12 requests, so later runs fall back.
+    const liveUrls = [
+      LIVE_URL,
+      "https://github.com/o/missing",
+      "not a url",
+    ] as const;
+    const line = "const a = 1;\n";
+    await fc.assert(
+      fc.asyncProperty(
+        choicesArb, // the path: each choice picks from model.available
+        async (choices) => {
+          const fake = createFakeFetch(
+            [
+              {
+                owner: "o",
+                repo: "r",
+                truncated: false,
+                files: {
+                  "src/a.ts": line.repeat(30),
+                  "src/b.ts": line.repeat(60),
+                  "lib/c.ts": line.repeat(90),
+                },
+              },
+            ],
+            { rateLimitAfter: 12 },
+          );
+          const detect = vi.fn<DetectFn>((url) =>
+            detectGhosts(url, { fetch: fake.fetch }),
+          );
+          const renderer = createRecordingRenderer();
+          const page = createPage({ detect, sample: committed }, renderer);
+          page.start();
+
+          for (const choice of choices) {
+            const options = page.current().available;
+            const picked = options[choice % Math.max(options.length, 1)];
+            if (picked === undefined) break;
+            if (picked.type === "submit-live") {
+              const pick = Math.floor(choice / options.length);
+              const url = liveUrls[pick % liveUrls.length] ?? LIVE_URL;
+              await page.dispatch({ type: "submit-live", url });
+            } else {
+              await page.dispatch(picked);
+            }
+          }
+
+          let previous: (typeof renderer.models)[number] | null = null;
+          for (const model of renderer.models) {
+            expect(model).toStrictEqual(JSON.parse(JSON.stringify(model)));
+            const inGhost = model.scene.kind === "ghost";
+            expect(model.ghost === null).toBe(!inGhost);
+            if (model.scene.kind === "ghost") {
+              expect(model.ghost?.path).toBe(model.scene.path);
+              expect(model.ghost?.floor).toBe(model.scene.floor);
+            }
+            expect(model.live.formVisible).toBe(!inGhost);
+            if (previous === null) {
+              expect(model.transition).toBeNull();
+            } else if (isDeepStrictEqual(model.scene, previous.scene)) {
+              expect(model.transition).toBeNull();
+            } else {
+              expect(model.transition).toStrictEqual({
+                from: previous.scene,
+                to: model.scene,
+              });
+            }
+            if (model.scene.kind === "floor") {
+              expect(model.available).not.toContainEqual({
+                type: "go-to-floor",
+                floor: model.scene.floor,
+              });
+            }
+            previous = model;
           }
         },
       ),

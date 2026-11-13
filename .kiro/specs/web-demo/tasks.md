@@ -181,7 +181,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check unavailable actions change nothing`
     - _Requirements: 4.3, 4.9, 18.3_
 
-  - [ ] 3.6 Property test for plain data and scenes (list scenes)
+  - [x] 3.6 Property test for plain data and scenes (list scenes)
     - **Property 11: The View_Model is plain data and scenes are consistent**
     - **Validates: Requirements 11.7, 11.8, 18.1, 18.2, 18.4**
     - Generator: `choicesArb` mapped to `model.available`, using `go-to-floor`, `go-to-house`, `show-sample` and `submit-live` with the strict fake. Checks every rendered model: equals `JSON.parse(JSON.stringify(model))`; `ghost` null iff scene is not `ghost`; `live.formVisible` false iff scene is `ghost`; `transition` rule; no `go-to-floor` for the floor in focus. PR 2 extends it to the ghost scene (task 10.7).

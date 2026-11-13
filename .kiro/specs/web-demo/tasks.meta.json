@@ -19,6 +19,10 @@
     "3.5 Property test for unavailable actions (list scenes)": {
       "status": "passed",
       "lastRunTimestamp": 1794613987463
+    },
+    "3.6 Property test for plain data and scenes (list scenes)": {
+      "status": "passed",
+      "lastRunTimestamp": 1794614192417
     }
   },
   "executionHistory": {
@@ -137,6 +141,13 @@
         "executionId": "cc483733-57fc-4705-a745-69e42d2653c4",
         "chatSessionId": "sess_9f809be7-e94b-4ae0-8a23-24d0fe03f87b",
         "timestamp": 1794613801838
+      }
+    ],
+    "3.6 Property test for plain data and scenes (list scenes)": [
+      {
+        "executionId": "cc483733-57fc-4705-a745-69e42d2653c4",
+        "chatSessionId": "sess_9f809be7-e94b-4ae0-8a23-24d0fe03f87b",
+        "timestamp": 1794614054075
       }
     ]
   }
