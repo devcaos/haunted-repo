@@ -35,6 +35,13 @@
         "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
         "timestamp": 1794608900101
       }
+    ],
+    "1.5 Add `sampleData.ts` and the committed-data test": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794609152485
+      }
     ]
   }
 }

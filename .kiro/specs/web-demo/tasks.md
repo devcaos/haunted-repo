@@ -94,7 +94,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 1.3, 1.5, 1.6, 1.7, 15.1_
     - Run result: `Wrote packages\web\src\sample\report.json`, `Wrote packages\web\src\sample\files.json`, `Wrote packages\web\public\sirv-license.txt`, `Requests by the detection client: 7`, `Requests by the download client: 6`. `overview.ref` is `1135207e92c40354543cbd15c763c7a61d79d432`. The first run fetched the data but could not write it because `packages/web/public/` did not exist yet (ENOENT, no temp file left); the second run, after creating that folder, succeeded.
 
-  - [ ] 1.5 Add `sampleData.ts` and the committed-data test
+  - [x] 1.5 Add `sampleData.ts` and the committed-data test
     - Create `packages/web/src/vite-env.d.ts` with `/// <reference types="vite/client" />` (types for `?raw`, `import.meta.glob` and CSS imports).
     - Create `packages/web/src/sample/sampleData.ts`: re-exports `SAMPLE_REPO_URL` and `SAMPLE_SHA` from `./makeSample.js`; `SampleData`; `parseSampleFiles(jsonText)` (strict, never throws); `loadSample(reportJson, filesJson)` (uses `parseReport`; rejects when the text keys are not exactly the ghost paths; never throws).
     - Create `packages/web/src/sample/sampleData.test.ts` (reads the committed files with `node:fs`, starts with `/// <reference types="node" />`): `parseReport` ok on the committed report; `overview.ref === SAMPLE_SHA`; text keys equal the ghost paths; `copyright` equals `copyrightLineOf` of `public/sirv-license.txt`; `loadSample` ok on the committed data; `loadSample` rejects a missing key, an extra key, invalid JSON and a wrong shape.
