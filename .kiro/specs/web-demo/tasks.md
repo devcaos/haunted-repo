@@ -111,7 +111,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add the view model and user actions`
     - _Requirements: 6.23, 11.8, 18.1, 18.2, 18.3_
 
-  - [ ] 2.2 Add the page texts and the house view
+  - [x] 2.2 Add the page texts and the house view
     - Create `packages/web/src/logic/powerTexts.ts` (`POWER_TEXTS.liveReport`, `POWER_TEXTS.lockedGhost`) and `packages/web/src/logic/texts.ts` (`TEXTS` of the design: floor titles, empty floor, busy, `liveDone`, fallback, partial, truncated, skipped title and reasons, sample broken, form label, action labels). PR 2 lines are added in PR 2.
     - Create `packages/web/src/logic/houseView.ts`: `buildWarnings(overview)`, `buildLiveHouse(report)` (every card `haunted`, `canStart` false, Power line from `POWER_TEXTS`, no progress) and `buildSampleHouse(report, null)` (every card `haunted`, `canStart` false, no Power line). Floors always in the order attic, middle floor, basement; report order inside each floor; `emptyLine` when a floor has no cards.
     - Create `packages/web/src/logic/houseView.test.ts` with examples: one ghost per floor; every ghost on one floor (two empty lines); warnings for each of `partial`, `message`, `truncated`, `skipped` (`TOO_LARGE` → "too large", `NOT_TEXT` → "not text"); no warning when all are clear; live house has the Power line, sample house has none.
