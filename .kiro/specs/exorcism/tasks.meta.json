@@ -1,0 +1,278 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Move `floorOf` to `ghost-detection/floor.ts`": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794502527298
+      }
+    ],
+    "1.2 Make `Result` generic": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794502683751
+      }
+    ],
+    "1.3 Write the new `reasonFor` sentences and update the tests": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794502784275
+      }
+    ],
+    "1.4 Property test for the Ghost_Sentence floor wording": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794503015782
+      }
+    ],
+    "1.5 Add the pointer in the ghost-detection design": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794504768015
+      }
+    ],
+    "2.1 Add the exorcism types and error helpers": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794504968384
+      }
+    ],
+    "2.2 Add `QUESTION_SETS`": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794505226463
+      }
+    ],
+    "2.3 Add `classifyFileKind`": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506025338
+      }
+    ],
+    "2.4 Add the Tutor rules": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506142033
+      }
+    ],
+    "2.5 Add progress normalising, parsing and formatting": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506258734
+      }
+    ],
+    "2.6 Add `hauntedShare`": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506370298
+      }
+    ],
+    "2.7 Add `suggestGhost` and `isPickable`": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506489748
+      }
+    ],
+    "2.8 Property test for the suggestion": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506599540
+      }
+    ],
+    "2.9 Build the instructions for the steps without questions": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506678843
+      }
+    ],
+    "2.10 Build the instructions for asking, simplifying and model answer": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794506886466
+      }
+    ],
+    "2.11 Add `formatVerdict` and `parseVerdict`": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794507005677
+      }
+    ],
+    "2.12 Property test for the verdict round trip": [
+      {
+        "executionId": "16f20687-bc5b-4ba9-ba68-0c569dd7841e",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794507111133
+      }
+    ],
+    "3.1 Add `parseEvent` and `ALLOWED_EVENTS`": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794507524633
+      }
+    ],
+    "4.1 Add `startSession`": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794507665901
+      }
+    ],
+    "4.2 Add `decide`": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794508053353
+      }
+    ],
+    "4.3 Add `advance`: validation, `pick-ghost` and the explanation": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794508344803
+      }
+    ],
+    "4.4 Add `advance`: asking, \"I don't know\", simplifying and model answer": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794508493531
+      }
+    ],
+    "4.5 Add `advance`: decision, self-check, failed, retry and leave": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794508771519
+      }
+    ],
+    "4.6 Add the model-based test driver": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794509398170
+      }
+    ],
+    "4.7 Property test for the bounded loop": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794509672264
+      }
+    ],
+    "4.8 Property test for the decision": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794509815772
+      }
+    ],
+    "4.9 Property test for the Java rule": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794510091760
+      }
+    ],
+    "4.10 Property test for the instruction rules of a new question": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794510247920
+      }
+    ],
+    "4.11 Property test for invalid events": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794510406523
+      }
+    ],
+    "4.12 Property test for determinism and JSON-safe state": [
+      {
+        "executionId": "ef9c5728-a924-4110-a014-a579715ba30b",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794510732620
+      }
+    ],
+    "5.1 Add `parseRecording` and `formatRecording`": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794510962372
+      }
+    ],
+    "5.2 Add `replay`": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794511161859
+      }
+    ],
+    "5.3 Add the committed fixture and its end-to-end replay test": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794511280821
+      }
+    ],
+    "5.4 Property test for replay": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794511406099
+      }
+    ],
+    "6.1 Export the public API": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794511561780
+      }
+    ],
+    "6.2 Add the static purity test": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794511681961
+      }
+    ],
+    "7.1 Update `PLAN.md`": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794511853963
+      }
+    ],
+    "7.2 Add the line to `docs/kiro-usage-log.md`": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794512001895
+      }
+    ],
+    "7.3 Final check and pull request": [
+      {
+        "executionId": "c93e3851-8a87-44d1-98b4-046d2f987eca",
+        "chatSessionId": "sess_634e5d35-d25f-42bc-81ba-662d66f24f23",
+        "timestamp": 1794512127032
+      }
+    ]
+  }
+}
