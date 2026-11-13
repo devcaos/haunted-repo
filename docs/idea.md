@@ -1,5 +1,11 @@
 # Haunted Repo: la idea
 
+## Cambios desde la idea inicial (13 nov)
+- Los fantasmas ya no los marca un hook: Haunted Repo elige hasta 5 archivos clave de un repo público de GitHub y los ordena de fácil a difícil.
+- La casa tiene tres plantas (desván, planta media y sótano); se quitaron las habitaciones por carpeta.
+- La demo usa el repo público lukeed/sirv (licencia MIT, hay que mostrar su aviso), no un repo nuevo.
+- El certificado de exorcismo sigue fuera de alcance (ver "Pendientes" de PLAN.md).
+
 Documento de partida. Lo usa Kiro para generar `.kiro/steering/product.md` y `tech.md`, y lo lee el coordinador de Claude.
 
 ## En una frase

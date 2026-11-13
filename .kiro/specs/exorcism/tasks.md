@@ -340,7 +340,7 @@ Rules for running these tasks:
     - _Requirements: 9.4, 9.5, 9.6_
 
 - [ ] 8. Optional: deferred properties (only if time allows)
-  - These are done after the pull request is opened, and only if time allows. Each one is a normal commit on the same branch `feat/exorcism` and is added to the same pull request. They are not needed for the 20 Nov minimum. Their example-based unit tests are already part of the mandatory tasks above.
+  - These are done after the pull request is opened, and only if time allows. Pull request #14 is already merged: if they are done, they go on a new branch feat/exorcism-properties created from an up-to-date main, one commit each, and a new pull request. They are not needed for the 20 Nov minimum. Their example-based unit tests are already part of the mandatory tasks above.
   - [ ]* 8.1 Property test for the file kind
     - **Property 3: File kind is a single stable label**
     - **Validates: Requirements 4.1, 4.2**

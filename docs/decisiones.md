@@ -16,6 +16,12 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-06 | Excepción a la regla de test con servicio real para la IA del usuario | Un test automático no puede llamar al Kiro del usuario; se cubre con el spike manual (punto 3 de PLAN.md) | — |
 | 2026-11-06 | "Certificado de exorcismo" fuera de alcance por ahora | No cabe antes de la versión mínima del 20 nov. Sigue en "Pendientes" de `PLAN.md` | — |
 | 2026-11-06 | Las fricciones se anotan en `docs/frictions.md` el mismo día que ocurren | Si se escriben al final de memoria, el texto de Devpost sale genérico. `frictions.md` es para fallos y rodeos al usar Kiro; `kiro-usage-log.md` es para qué se construyó con Kiro y cómo | Reconstruirlas al final del proyecto |
+| 2026-11-11 | Fantasmas = hasta 5 archivos clave de un repo público de GitHub, de fácil a difícil, en tres plantas | Enfoque aprobado el 11 nov: sirve para cualquier repo público sin instalar nada y empieza por lo fácil | Hook de Kiro que marca cada archivo escrito por el agente (.haunted/ghosts.json); una habitación por carpeta |
+| 2026-11-11 | Repo de la demo: lukeed/sirv (licencia MIT) | Ya lo usan el spike 3 y el test en vivo, con un commit fijado | Repo de ejemplo nuevo hecho para la demo |
+| 2026-11-11 | Publicar la web en GitHub Pages (spec pages-deploy) antes del exorcismo | Auditoría del 11 nov: el enlace público es obligatorio y aún no existía | Dejar el despliegue para el final |
+| 2026-11-12 | Motor del exorcismo = funciones puras en packages/core, sin red, disco ni IA | Lo reutilizan la web (grabación) y el Power, y se prueba sin red | — |
+| 2026-11-12 | Un fantasma queda exorcizado con al menos 2 de 3 respuestas buenas, si la primera (pregunta central) no está mal | Requisitos aprobados de la spec exorcism | — |
+| 2026-11-12 | La spec del exorcismo va en una sola PR (#14) | Decisión de Luis Miguel: partirla al final era inviable para él | Partir la PR en varias |
 
 ## Rechazado (no volver a proponer sin evidencia nueva)
 

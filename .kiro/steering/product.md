@@ -19,15 +19,14 @@ Haunted Repo finds the AI-written code in a repository that its owner does not y
 3. Secondary: anyone who programs by directing agents ("vibe coding").
 
 ## How it works
-- The repository is a **haunted house**: each folder is a room.
-- AI-written code that the user has not validated is a **ghost**. Minimum version: one ghost per file, not per line.
-- To exorcise a ghost, the user gets a beginner-friendly explanation and **questions that make them think** (open questions, or "what does this code return?"). The AI corrects the answers. If the user passes, the ghost disappears.
+- The repository is a **haunted house**: it has three floors: attic (easy), middle floor and basement (hard).
+- Ghost detection (done, packages/core/src/ghost-detection/): from a public GitHub repository URL it picks up to 5 key source files (TypeScript, JavaScript, Java or Python). Each one is a ghost with a difficulty score from 0 to 100, a floor and one plain sentence that says why. Ghosts are ordered from easy to hard.
+- Exorcism (done, packages/core/src/exorcism/): a pure engine guides the user's own Kiro (the Tutor). The Tutor explains the file in plain words and asks 3 questions about its behaviour, one at a time; the first one is the core question. "I don't know" gets a simpler explanation and the same question again; a second one gets a short model answer. The ghost is exorcised with at least 2 good answers out of 3 when the core question is not wrong.
 - A map shows how much of the project is still haunted.
 
 ## Deliverables
-- **Kiro Power**: the real tool. The AI that explains and corrects is the user's own Kiro, so there are no paid APIs.
-- **Kiro hook**: marks as a ghost every file the agent creates or changes.
-- **Static demo website**: an example repository already haunted, with pre-generated questions, so judges can try it without installing anything. Must stay online and free until 29 January 2027.
+- **Kiro Power**: the real tool, built on packages/core. The AI that explains and judges is the user's own Kiro, so there are no paid APIs. Exact format to confirm in the Power spec.
+- **Static demo website** on GitHub Pages (https://devcaos.github.io/haunted-repo/): the ghosts and a recorded exorcism of the public repository lukeed/sirv (MIT licence; its notice must be shown), so judges can try it without installing anything. What the judge can do on the page is decided in the web demo spec. It must stay online and free until 29 January 2027.
 
 ## Out of scope (for now)
 - One ghost per line of code (version 1 is per file).
@@ -35,10 +34,12 @@ Haunted Repo finds the AI-written code in a repository that its owner does not y
 - Calling a paid or external AI API. All AI work happens in the user's Kiro.
 - Exorcism certificate (listed in `PLAN.md` under "Pendientes").
 - Support for IDEs other than Kiro.
-- Using code from Duly in public. The demo repository is new and made for the demo.
+- Using code from Duly in public.
+- A Kiro hook that marks every file the agent writes (replaced by ghost detection from a repository URL).
+- One room per folder.
 - Third-party brands or music in the demo video.
 
 ## Known risks
 - Questions may not really measure understanding. A spike tests this first.
 - Existing "explain this code" modes exist. The difference is measuring and tracking what the user understands.
-- Open design questions: what counts as a ghost, and what happens when the code changes.
+- Open design question: what happens when the code of an exorcised ghost changes.
