@@ -102,8 +102,8 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): load the committed sample data`
     - _Requirements: 1.11, 1.12, 1.13, 2.1, 2.3, 10.3_
 
-- [ ] 2. View model, user actions and house view
-  - [ ] 2.1 Add the View_Model types and the user actions
+- [~] 2. View model, user actions and house view
+  - [x] 2.1 Add the View_Model types and the user actions
     - Create `packages/web/src/logic/viewModel.ts` with the types of the design (`Scene`, `SceneTransition`, `GhostState`, `GhostCardView`, `FloorView`, `WarningsView`, `ProgressView`, `HouseView`, `ReadingKind`, `GhostView`, `LicenceView`, `StatusKind`, `ViewModel`, `Renderer`). All types are defined now; in PR 1 `ghost` is always `null`, `progress` and `houseClean` are `null`, `lockedLine` is `null`.
     - Create `packages/web/src/logic/actions.ts`: the full `UserAction` union (13 types, ghost actions included), `AvailableAction`, `ActionSink`, `isAvailable(model, action)` (same type and same parameters; the URL of `submit-live` is free). No action carries the Answer_Box text.
     - Create `packages/web/src/logic/actions.test.ts`: `isAvailable` examples (URL is free for `submit-live`; floor, path, rating and answer must match; an empty `available` rejects everything).
