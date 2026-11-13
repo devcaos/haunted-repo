@@ -84,7 +84,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `chore(web): add the hand-run sample script`
     - _Requirements: 1.6, 1.7, 1.8, 1.9, 1.10_
 
-  - [ ] 1.4 Run the sample script against real GitHub and commit the data
+  - [x] 1.4 Run the sample script against real GitHub and commit the data
     - This is the real-service check of detection and download (Requirement 15.1). Run `npm run sample:make` once, with no token. One run makes at most 14 requests to `api.github.com` (limit 60 per hour without an account).
     - If it fails, read the error. Try at most a second time, and only if the error can be fixed without changing Core or the design (for example a network blip). If it fails twice, stop: write an entry in `docs/frictions.md` (own `docs:` commit) and report to the director. Never loop.
     - On success check `git status --short`: only `packages/web/src/sample/report.json`, `packages/web/src/sample/files.json` and `packages/web/public/sirv-license.txt` are new, and `overview.ref` in `report.json` equals the Sample_SHA.
@@ -92,6 +92,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Verify: `npm run check` exits `0`.
     - Commit message: `chore(web): add the lukeed/sirv sample data`
     - _Requirements: 1.3, 1.5, 1.6, 1.7, 15.1_
+    - Run result: `Wrote packages\web\src\sample\report.json`, `Wrote packages\web\src\sample\files.json`, `Wrote packages\web\public\sirv-license.txt`, `Requests by the detection client: 7`, `Requests by the download client: 6`. `overview.ref` is `1135207e92c40354543cbd15c763c7a61d79d432`. The first run fetched the data but could not write it because `packages/web/public/` did not exist yet (ENOENT, no temp file left); the second run, after creating that folder, succeeded.
 
   - [ ] 1.5 Add `sampleData.ts` and the committed-data test
     - Create `packages/web/src/vite-env.d.ts` with `/// <reference types="vite/client" />` (types for `?raw`, `import.meta.glob` and CSS imports).
