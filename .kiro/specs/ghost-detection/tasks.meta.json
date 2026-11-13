@@ -1,0 +1,250 @@
+{
+  "pbtResults": {
+    "4.1 Add `isEligible`": {
+      "status": "passed",
+      "lastRunTimestamp": 1794416947819
+    },
+    "8.1 Add `buildReport`": {
+      "status": "passed",
+      "lastRunTimestamp": 1794418068330
+    }
+  },
+  "executionHistory": {
+    "1.1 Create `packages/core` and verify the build order": [
+      {
+        "executionId": "a9c4bef0-2a8e-43e7-a3da-af67d1259be9",
+        "chatSessionId": "sess_7f4ad841-9684-405e-883f-006627525a68",
+        "timestamp": 1794415367994
+      },
+      {
+        "executionId": "a9c4bef0-2a8e-43e7-a3da-af67d1259be9",
+        "chatSessionId": "sess_7f4ad841-9684-405e-883f-006627525a68",
+        "timestamp": 1794415629258
+      }
+    ],
+    "2.1 Add types, `DetectError` and Result helpers": [
+      {
+        "executionId": "1beb299b-0767-434b-889b-68ff349fcc6a",
+        "chatSessionId": "sess_ed00e332-a647-4fbb-854b-47a03ce6f719",
+        "timestamp": 1794416040279
+      },
+      {
+        "executionId": "842c8f0d-4e3c-4cd8-a5f7-ec454b3d6ba5",
+        "chatSessionId": "sess_ed00e332-a647-4fbb-854b-47a03ce6f719",
+        "timestamp": 1794416295467
+      }
+    ],
+    "2. Shared types and errors": [
+      {
+        "executionId": "842c8f0d-4e3c-4cd8-a5f7-ec454b3d6ba5",
+        "chatSessionId": "sess_ed00e332-a647-4fbb-854b-47a03ce6f719",
+        "timestamp": 1794416295644
+      }
+    ],
+    "1.2 Manual check of the PostTaskExec hook (project owner, no commit)": [
+      {
+        "executionId": "ecc1a6a9-87c9-4396-b9fb-4fb53be8f435",
+        "chatSessionId": "sess_ed00e332-a647-4fbb-854b-47a03ce6f719",
+        "timestamp": 1794416379273
+      }
+    ],
+    "1. Core package skeleton": [
+      {
+        "executionId": "ecc1a6a9-87c9-4396-b9fb-4fb53be8f435",
+        "chatSessionId": "sess_ed00e332-a647-4fbb-854b-47a03ce6f719",
+        "timestamp": 1794416379412
+      }
+    ],
+    "3.1 Add `parseRepoUrl` and `formatRepoUrl`": [
+      {
+        "executionId": "cd7ec2a6-f6fd-4853-99b0-284ca71bdabf",
+        "chatSessionId": "sess_1599fedb-2110-4dea-b003-fe78ecf95c9d",
+        "timestamp": 1794416633232
+      },
+      {
+        "executionId": "cd7ec2a6-f6fd-4853-99b0-284ca71bdabf",
+        "chatSessionId": "sess_1599fedb-2110-4dea-b003-fe78ecf95c9d",
+        "timestamp": 1794416726788
+      }
+    ],
+    "3. Repository URL": [
+      {
+        "executionId": "cd7ec2a6-f6fd-4853-99b0-284ca71bdabf",
+        "chatSessionId": "sess_1599fedb-2110-4dea-b003-fe78ecf95c9d",
+        "timestamp": 1794416726982
+      }
+    ],
+    "4.1 Add `isEligible`": [
+      {
+        "executionId": "ef6f575a-9a83-46fc-9e8d-e750145f997b",
+        "chatSessionId": "sess_b5877c8d-aa94-4bed-b2b1-74f8f490720b",
+        "timestamp": 1794416881866
+      },
+      {
+        "executionId": "ef6f575a-9a83-46fc-9e8d-e750145f997b",
+        "chatSessionId": "sess_b5877c8d-aa94-4bed-b2b1-74f8f490720b",
+        "timestamp": 1794416957488
+      }
+    ],
+    "4. Eligibility": [
+      {
+        "executionId": "ef6f575a-9a83-46fc-9e8d-e750145f997b",
+        "chatSessionId": "sess_b5877c8d-aa94-4bed-b2b1-74f8f490720b",
+        "timestamp": 1794416957639
+      }
+    ],
+    "5.1 Add `keyScore` and `rankKeyFiles`": [
+      {
+        "executionId": "909db2a3-b17d-47d8-9fe6-6769f5489b64",
+        "chatSessionId": "sess_986fc7c2-dee6-4b25-af57-79ffead75b08",
+        "timestamp": 1794417160941
+      },
+      {
+        "executionId": "909db2a3-b17d-47d8-9fe6-6769f5489b64",
+        "chatSessionId": "sess_986fc7c2-dee6-4b25-af57-79ffead75b08",
+        "timestamp": 1794417276404
+      }
+    ],
+    "5.2 Add `pickKeyFiles` and its property test": [
+      {
+        "executionId": "3e2e22ea-2163-4dee-8d17-76dc48e5f58c",
+        "chatSessionId": "sess_ffd2e851-5675-42cc-bb3c-10d2c5e9159a",
+        "timestamp": 1794417340314
+      }
+    ],
+    "6.1 Add `measureFactors`": [
+      {
+        "executionId": "121ca14f-1759-4dbe-8c0e-5b8971e25039",
+        "chatSessionId": "sess_cab7084d-d5e5-4c58-acab-af2a20feb732",
+        "timestamp": 1794417524152
+      }
+    ],
+    "7.1 Add `difficultyScore` and its property tests": [
+      {
+        "executionId": "e933ce33-5e85-4803-9c90-125ea78cd10c",
+        "chatSessionId": "sess_ddbb1e04-7513-4afb-ae40-6d21e4eb81f5",
+        "timestamp": 1794417673273
+      }
+    ],
+    "7.2 Add `floorOf` and `reasonFor`": [
+      {
+        "executionId": "885083cc-6f4a-4ff6-8cf8-8a377d96ad12",
+        "chatSessionId": "sess_d4e720bb-9ba6-407f-8c3f-ade9f806ac46",
+        "timestamp": 1794417839481
+      },
+      {
+        "executionId": "885083cc-6f4a-4ff6-8cf8-8a377d96ad12",
+        "chatSessionId": "sess_d4e720bb-9ba6-407f-8c3f-ade9f806ac46",
+        "timestamp": 1794417950366
+      }
+    ],
+    "7. Difficulty score": [
+      {
+        "executionId": "885083cc-6f4a-4ff6-8cf8-8a377d96ad12",
+        "chatSessionId": "sess_d4e720bb-9ba6-407f-8c3f-ade9f806ac46",
+        "timestamp": 1794417950612
+      }
+    ],
+    "8.1 Add `buildReport`": [
+      {
+        "executionId": "64303dd7-b932-4f8d-88b3-6cc815d34aed",
+        "chatSessionId": "sess_2549ea48-ac93-4d4b-b9fa-547761cdcc8e",
+        "timestamp": 1794418010645
+      },
+      {
+        "executionId": "64303dd7-b932-4f8d-88b3-6cc815d34aed",
+        "chatSessionId": "sess_2549ea48-ac93-4d4b-b9fa-547761cdcc8e",
+        "timestamp": 1794418092787
+      }
+    ],
+    "8. Report builder": [
+      {
+        "executionId": "64303dd7-b932-4f8d-88b3-6cc815d34aed",
+        "chatSessionId": "sess_2549ea48-ac93-4d4b-b9fa-547761cdcc8e",
+        "timestamp": 1794418092947
+      }
+    ],
+    "9.1 Add `parseReport` and its round-trip property": [
+      {
+        "executionId": "45745983-6bee-4c19-a99c-8c2958b400e0",
+        "chatSessionId": "sess_2d9dc610-1e1c-4fc0-93c5-576fbdfb3c39",
+        "timestamp": 1794418146960
+      }
+    ],
+    "10.1 Add the strict fake GitHub": [
+      {
+        "executionId": "3193ffb3-4d03-466d-ab49-83fe6f85314a",
+        "chatSessionId": "sess_1d41dd5f-1131-41bc-a6ef-ecff17bb06ba",
+        "timestamp": 1794418780951
+      }
+    ],
+    "10.2 Add `createGitHubClient` with `getRepo` and `getTree`": [
+      {
+        "executionId": "e6bce91d-0fd9-4d87-a6cd-1dda5110937e",
+        "chatSessionId": "sess_ef928607-d088-447e-871d-916b3d4ad4b4",
+        "timestamp": 1794419052964
+      }
+    ],
+    "10.3 Add `getFileText` with the UTF-8 check": [
+      {
+        "executionId": "a543587b-56c1-4f0b-abf1-3a56a309297e",
+        "chatSessionId": "sess_d036e0a7-a00c-478e-ac81-e3865bd7d946",
+        "timestamp": 1794420201346
+      }
+    ],
+    "11.1 Add `detectGhosts` for the normal path and the simple errors": [
+      {
+        "executionId": "6cab5f30-31d5-400c-b7d9-4c1cdf2d20f7",
+        "chatSessionId": "sess_68773d39-e781-4bce-b659-a4e0736c0de3",
+        "timestamp": 1794420661650
+      }
+    ],
+    "11.2 Add skips, partial reports and the request budget": [
+      {
+        "executionId": "c6447173-25e0-41be-b562-b0ad98130671",
+        "chatSessionId": "sess_195b7370-479e-4537-b0f0-227027ecd981",
+        "timestamp": 1794421376471
+      }
+    ],
+    "12.1 Split live tests from `npm test`": [
+      {
+        "executionId": "05a4acea-c9d6-4091-9c99-f802fb5b35e8",
+        "chatSessionId": "sess_419c8301-a832-4da1-979f-c86934c03f00",
+        "timestamp": 1794421534762
+      }
+    ],
+    "13. Checkpoint before the live test": [
+      {
+        "executionId": "f387754c-768b-476e-a356-59745daa991d",
+        "chatSessionId": "sess_713289f4-afdc-465d-9aae-60b7d40b9b7f",
+        "timestamp": 1794421718052
+      },
+      {
+        "executionId": "f387754c-768b-476e-a356-59745daa991d",
+        "chatSessionId": "sess_713289f4-afdc-465d-9aae-60b7d40b9b7f",
+        "timestamp": 1794421778757
+      }
+    ],
+    "14.1 Add the live test for `lukeed/sirv`": [
+      {
+        "executionId": "2d3a68f2-a84c-4468-95a0-5325447bbfbd",
+        "chatSessionId": "sess_cdbfd35d-d3d2-4f77-8634-80932aac4792",
+        "timestamp": 1794421892066
+      }
+    ],
+    "15.1 Export the public API and check browser safety": [
+      {
+        "executionId": "59cccb78-123c-4127-84f4-2429f441b76a",
+        "chatSessionId": "sess_e4ea6f7b-85b4-4763-8a4f-5b3ef9c26d80",
+        "timestamp": 1794422326190
+      }
+    ],
+    "15.2 Update `PLAN.md` and hand off": [
+      {
+        "executionId": "ba9a29a6-f145-485c-a87f-67e39cb198c7",
+        "chatSessionId": "sess_52d3084f-23d3-454e-aef7-a59b93361dde",
+        "timestamp": 1794422870089
+      }
+    ]
+  }
+}
