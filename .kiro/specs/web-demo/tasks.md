@@ -163,7 +163,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check every error code has one outcome`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 3.4 Property test for single flight
+  - [x] 3.4 Property test for single flight
     - **Property 7: Only one live analysis runs at a time**
     - **Validates: Requirements 4.3, 4.4, 4.5**
     - Generator: `fc.integer({ min: 0, max: 20 })` extra submits while pending, and an outcome from `fc.oneof` (ok report from `reportArb`, error result, throw). Checks: `detect` called once; the model before the call has `busy` true and no `submit-live`; the last model has `busy` false and `submit-live`; a submit after the end calls `detect` again.

@@ -133,4 +133,81 @@ describe("page controller properties (PR 1)", () => {
       { numRuns: 100 },
     );
   });
+
+  it("runs only one live analysis at a time", async () => {
+    // Feature: web-demo, Property 7: Only one live analysis runs at a time
+    // **Validates: Requirements 4.3, 4.4, 4.5**
+    await fc.assert(
+      fc.asyncProperty(
+        fc.integer({ min: 0, max: 20 }), // extra submits while pending
+        fc.oneof(
+          fc.record({ kind: fc.constant("ok" as const), report: reportArb }),
+          fc.record({
+            kind: fc.constant("error" as const),
+            code: fc.constantFrom(...ALL_CODES),
+            message: fc.string(),
+          }),
+          fc.record({
+            kind: fc.constant("throw" as const),
+            thrown: fc.anything(),
+          }),
+        ),
+        async (extra, outcome) => {
+          let settle: (
+            result: Result<HauntedReport> | { thrown: unknown },
+          ) => void = () => {
+            throw new Error("detect was not called");
+          };
+          const renderer = createRecordingRenderer();
+          const modelsAtCall: ReturnType<typeof renderer.last>[] = [];
+          const detect = vi.fn<DetectFn>(() => {
+            modelsAtCall.push(renderer.last());
+            return new Promise<Result<HauntedReport>>((resolve, reject) => {
+              settle = (result) => {
+                if ("thrown" in result) reject(result.thrown);
+                else resolve(result);
+              };
+            });
+          });
+          const page = createPage({ detect, sample: committed }, renderer);
+          page.start();
+
+          const first = page.dispatch({ type: "submit-live", url: LIVE_URL });
+          for (let i = 0; i < extra; i++) {
+            await page.dispatch({ type: "submit-live", url: LIVE_URL });
+          }
+          expect(detect).toHaveBeenCalledTimes(1);
+
+          const atCall = modelsAtCall[0];
+          expect(atCall?.live.busy).toBe(true);
+          expect(atCall?.available).not.toContainEqual({
+            type: "submit-live",
+          });
+
+          if (outcome.kind === "ok") {
+            settle({ ok: true, value: outcome.report });
+          } else if (outcome.kind === "error") {
+            settle({
+              ok: false,
+              error: { code: outcome.code, message: outcome.message },
+            });
+          } else {
+            settle({ thrown: outcome.thrown });
+          }
+          await first;
+          expect(detect).toHaveBeenCalledTimes(1);
+
+          const last = renderer.last();
+          expect(last.live.busy).toBe(false);
+          expect(last.available).toContainEqual({ type: "submit-live" });
+
+          const again = page.dispatch({ type: "submit-live", url: LIVE_URL });
+          expect(detect).toHaveBeenCalledTimes(2);
+          settle({ ok: true, value: sampleReport });
+          await again;
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
 });
