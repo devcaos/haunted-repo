@@ -8,6 +8,7 @@ import type { SampleData } from "../sample/sampleData.js";
 import { isAvailable } from "./actions.js";
 import type { AvailableAction, UserAction } from "./actions.js";
 import { buildLiveHouse, buildSampleHouse } from "./houseView.js";
+import { outcomeOf } from "./outcome.js";
 import { TEXTS } from "./texts.js";
 import type {
   HouseView,
@@ -122,6 +123,42 @@ export function createPage(deps: PageDeps, renderer: Renderer): PageController {
     renderer.render(model); // never awaited: render returns void
   }
 
+  function showSample(kind: StatusKind, text: string): void {
+    state.shown = "sample";
+    state.scene = { kind: "house" };
+    state.status = { kind, text };
+  }
+
+  // Single flight: submit-live is not available while busy, so a second submit
+  // is ignored by dispatch. busy is set before the first await and reset in finally.
+  async function submitLive(url: string): Promise<void> {
+    state.busy = true;
+    state.status = { kind: "busy", text: TEXTS.busy };
+    render();
+    try {
+      const result = await deps.detect(url); // as typed: Core trims and validates
+      if (result.ok) {
+        const { owner, repo } = result.value.overview;
+        state.live = result.value;
+        state.shown = "live";
+        state.scene = { kind: "house" };
+        state.status = {
+          kind: "done",
+          text: TEXTS.liveDone(owner, repo, result.value.ghosts.length),
+        };
+      } else if (outcomeOf(result.error.code) === "show-message") {
+        state.status = { kind: "error", text: result.error.message };
+      } else {
+        showSample("fallback", TEXTS.fallback);
+      }
+    } catch {
+      showSample("fallback", TEXTS.fallback); // a throw is treated as "fallback"
+    } finally {
+      state.busy = false;
+      render();
+    }
+  }
+
   return {
     start: render,
     current() {
@@ -141,8 +178,14 @@ export function createPage(deps: PageDeps, renderer: Renderer): PageController {
           state.scene = { kind: "house" };
           render();
           break;
+        case "show-sample":
+          showSample("none", "");
+          render();
+          break;
+        case "submit-live":
+          return submitLive(action.url);
         default:
-          // submit-live and show-sample are handled in task 3.2.
+          // Ghost actions arrive in PR 2; they are never available in PR 1.
           break;
       }
       return Promise.resolve();

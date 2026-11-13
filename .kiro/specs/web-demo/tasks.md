@@ -146,7 +146,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add the page controller with scenes`
     - _Requirements: 2.1, 2.2, 2.3, 9.1, 10.1, 10.4, 18.1, 18.2, 18.3, 18.4, 18.6_
 
-  - [ ] 3.2 Add the live analysis, the outcome table and the fallback
+  - [x] 3.2 Add the live analysis, the outcome table and the fallback
     - Create `packages/web/src/logic/outcome.ts`: `Outcome`, `OUTCOME_BY_CODE: Readonly<Record<ErrorCode, Outcome>>` and `outcomeOf(code)` exactly as in the design.
     - In `page.ts` handle `submit-live` (single flight: `busy = true` and status busy before the first `await`, render; `await deps.detect(url)` with the URL as typed; ok → live house, scene `house`, status `TEXTS.liveDone`; `show-message` → status error with Core's message, house and scene unchanged; `fallback` or thrown → sample house, scene `house`, status `TEXTS.fallback`; `finally` → `busy = false`, render) and `show-sample` (sample house, scene `house`, status none). This replaces the busy pattern of `checkButton.ts` (same `finally` idea).
     - Extend `states.test.ts` with "Live analysis running" (controlled promise), "Live list" (3 ghosts and 1 ghost wording), "Message error" (`REPO_NOT_FOUND` from the fake), "Fallback" (rate limit from the fake), "Show the sample again" and "Report warnings" (fake repository with a skipped file and truncation). `detect` is `(url) => detectGhosts(url, { fetch: fakeFetch })` through `fakeDetect.testutil.ts`; global `fetch` stubbed to throw.
