@@ -102,7 +102,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): load the committed sample data`
     - _Requirements: 1.11, 1.12, 1.13, 2.1, 2.3, 10.3_
 
-- [~] 2. View model, user actions and house view
+- [x] 2. View model, user actions and house view
   - [x] 2.1 Add the View_Model types and the user actions
     - Create `packages/web/src/logic/viewModel.ts` with the types of the design (`Scene`, `SceneTransition`, `GhostState`, `GhostCardView`, `FloorView`, `WarningsView`, `ProgressView`, `HouseView`, `ReadingKind`, `GhostView`, `LicenceView`, `StatusKind`, `ViewModel`, `Renderer`). All types are defined now; in PR 1 `ghost` is always `null`, `progress` and `houseClean` are `null`, `lockedLine` is `null`.
     - Create `packages/web/src/logic/actions.ts`: the full `UserAction` union (13 types, ghost actions included), `AvailableAction`, `ActionSink`, `isAvailable(model, action)` (same type and same parameters; the URL of `submit-live` is free). No action carries the Answer_Box text.
@@ -137,8 +137,8 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check report warnings match the overview`
     - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
 
-- [ ] 3. Page controller
-  - [ ] 3.1 Add the controller with scenes and navigation
+- [~] 3. Page controller
+  - [x] 3.1 Add the controller with scenes and navigation
     - Create `packages/web/src/logic/page.ts`: `DetectFn`, `EngineFns`, `PageDeps` (in PR 1 without `script`), `PageController`, `createPage(deps, renderer)`. State in the closure only. `start()` renders the first model: scene `house`, transition `null`, sample house, `ghost` null, form visible, not busy, status none, licence (`copyright` from the sample, `href: "sirv-license.txt"`, link text of the design), `available` as in the design table. `dispatch(action)`: step 1 ignores unavailable actions (no state change, no render, no Core call); `go-to-floor` and `go-to-house` change the scene; every render computes `transition`. If `deps.sample` is not ok: `house` and `licence` null, `available` empty, status error `TEXTS.sampleBroken`. The controller never awaits the renderer (`render` returns `void`). In this task `submit-live` and `show-sample` are listed as in the table but their handling arrives in task 3.2 (they render nothing yet); ghost actions are never available in PR 1.
     - Create `packages/web/src/logic/recordingRenderer.testutil.ts` (stores a deep copy of every model).
     - Create `packages/web/src/logic/states.test.ts` with the PR 1 states "Opening on the sample" (including: `detect` and `fetch` not called, no `show-sample`), "Floor navigation" and "Sample broken", checking named fields only.
