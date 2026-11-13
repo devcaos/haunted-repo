@@ -77,6 +77,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** no hizo falta.
 
 - **Estado:** resuelto.
+
 ## 2026-11-11 — tasks.md de ghost-detection apuntaba a la rama equivocada (anotada con retraso el 2026-11-13)
 
 - **Qué intentaba:** seguir las tareas de la spec de detección de fantasmas tras fusionar la PR #11.
