@@ -119,7 +119,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): group ghosts by floor with report warnings`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.7, 4.9, 4.13, 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
 
-  - [ ] 2.3 Property test for the grouping by floor
+  - [x] 2.3 Property test for the grouping by floor
     - **Property 4: Ghosts are grouped by floor in report order**
     - **Validates: Requirements 3.1, 3.2, 3.3, 3.4**
     - Generator: `reportArb` (relative import from Core test utilities). Checks on `buildLiveHouse` and on `buildSampleHouse(report, null)`: titles in order, cards of each floor exactly the report ghosts of that floor in report order with the same path, floor, score and reason, `emptyLine` iff the floor has no cards.

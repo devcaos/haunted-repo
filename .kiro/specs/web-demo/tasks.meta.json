@@ -1,5 +1,10 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "2.3 Property test for the grouping by floor": {
+      "status": "passed",
+      "lastRunTimestamp": 1794609908217
+    }
+  },
   "executionHistory": {
     "0. Commit the spec": [
       {
@@ -55,6 +60,13 @@
         "executionId": "c789eed5-523b-42e1-b2e9-f837cf8e1709",
         "chatSessionId": "sess_c989bc7b-4ec8-466b-8ca3-4fcd0cfff1d9",
         "timestamp": 1794609525463
+      }
+    ],
+    "2.3 Property test for the grouping by floor": [
+      {
+        "executionId": "c789eed5-523b-42e1-b2e9-f837cf8e1709",
+        "chatSessionId": "sess_c989bc7b-4ec8-466b-8ca3-4fcd0cfff1d9",
+        "timestamp": 1794609824549
       }
     ]
   }

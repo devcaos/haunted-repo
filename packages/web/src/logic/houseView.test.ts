@@ -1,5 +1,7 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { Floor, Ghost, HauntedReport, Overview } from "@haunted-repo/core";
+import { reportArb } from "../../../core/src/ghost-detection/reportArb.testutil.js";
 import {
   buildLiveHouse,
   buildSampleHouse,
@@ -103,6 +105,52 @@ describe("buildSampleHouse", () => {
     expect(house.progress).toBeNull();
     const cards = house.floors.flatMap((f) => f.ghosts);
     expect(cards.every((c) => c.state === "haunted" && !c.canStart)).toBe(true);
+  });
+});
+
+describe("grouping by floor", () => {
+  const FLOORS: readonly Floor[] = ["attic", "middle floor", "basement"];
+
+  it("groups ghosts by floor in report order", () => {
+    // Feature: web-demo, Property 4: Ghosts are grouped by floor in report order
+    // **Validates: Requirements 3.1, 3.2, 3.3, 3.4**
+    fc.assert(
+      fc.property(reportArb, (value) => {
+        for (const house of [
+          buildLiveHouse(value),
+          buildSampleHouse(value, null),
+        ]) {
+          expect(house.floors.map((f) => f.title)).toEqual([
+            "Attic",
+            "Middle floor",
+            "Basement",
+          ]);
+          house.floors.forEach((floorView, i) => {
+            const floor = FLOORS[i];
+            expect(floorView.floor).toBe(floor);
+            const expected = value.ghosts
+              .filter((g) => g.floor === floor)
+              .map((g) => ({
+                path: g.path,
+                floor: g.floor,
+                score: g.difficultyScore,
+                reason: g.reason,
+              }));
+            const actual = floorView.ghosts.map((c) => ({
+              path: c.path,
+              floor: c.floor,
+              score: c.score,
+              reason: c.reason,
+            }));
+            expect(actual).toEqual(expected);
+            expect(floorView.emptyLine).toBe(
+              expected.length === 0 ? TEXTS.emptyFloor : null,
+            );
+          });
+        }
+      }),
+      { numRuns: 100 },
+    );
   });
 });
 
