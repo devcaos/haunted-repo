@@ -7,6 +7,10 @@
     "2.4 Property test for the report warnings": {
       "status": "passed",
       "lastRunTimestamp": 1794610126049
+    },
+    "3.3 Property test for the outcome table": {
+      "status": "passed",
+      "lastRunTimestamp": 1794613554734
     }
   },
   "executionHistory": {
@@ -104,6 +108,13 @@
         "executionId": "cc483733-57fc-4705-a745-69e42d2653c4",
         "chatSessionId": "sess_9f809be7-e94b-4ae0-8a23-24d0fe03f87b",
         "timestamp": 1794613301837
+      }
+    ],
+    "3.3 Property test for the outcome table": [
+      {
+        "executionId": "cc483733-57fc-4705-a745-69e42d2653c4",
+        "chatSessionId": "sess_9f809be7-e94b-4ae0-8a23-24d0fe03f87b",
+        "timestamp": 1794613392952
       }
     ]
   }

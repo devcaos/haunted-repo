@@ -154,7 +154,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): run a live analysis with fallback`
     - _Requirements: 4.2, 4.3, 4.6, 4.7, 4.8, 4.9, 5.1, 5.2, 5.3, 5.4, 5.6, 14.2, 15.4, 17.5, 18.6_
 
-  - [ ] 3.3 Property test for the outcome table
+  - [x] 3.3 Property test for the outcome table
     - **Property 3: Every error code has exactly one outcome**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
     - Generator: `fc.constantFrom` over an independent list of the 7 codes, typed so a new Core code is a compile error; `fc.string()` for the message; `fc.anything()` for a thrown value. Checks `outcomeOf` and the last View_Model after `submit-live` with a `detect` stub that returns that error or throws.
