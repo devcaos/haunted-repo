@@ -67,6 +67,9 @@ describe("makeSample with the strict fake GitHub", () => {
     expect(treeUrls).toHaveLength(1);
     expect(treeUrls[0]).toContain(`/git/trees/${SAMPLE_SHA}`);
     expect(fake.requestCount()).toBeLessThanOrEqual(14);
+    const { detection, downloads } = result.value.requests;
+    expect(downloads).toBe(6);
+    expect(detection + downloads).toBe(fake.requestCount());
   });
 
   it("gives an error when the repository is not found", async () => {

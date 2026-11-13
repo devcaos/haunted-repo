@@ -74,7 +74,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): build the sample data from a core run`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.8, 5.6, 15.4_
 
-  - [ ] 1.3 Add the hand-run `npm run sample:make` script
+  - [x] 1.3 Add the hand-run `npm run sample:make` script
     - Create `packages/web/scripts/make-sample.ts` as in the design: calls `makeSample({})`; on error prints it, sets `process.exitCode = 1` and writes nothing; otherwise writes `report.json.tmp`, `files.json.tmp`, `sirv-license.txt.tmp` next to `src/sample/report.json`, `src/sample/files.json`, `public/sirv-license.txt`, and renames them over the targets only when all three temp writes succeeded; on a temp-write failure deletes the temp files and exits `1`. Prints the paths written and the request count of each client. Only `node:fs/promises`, `node:path`, `node:url`.
     - Create `packages/web/scripts/tsconfig.json` (extends the base, NodeNext, `types: ["node"]`, `noEmit`, `allowImportingTsExtensions`, `erasableSyntaxOnly`).
     - Root `package.json`: add `"sample:make": "npm run build -w @haunted-repo/core && node packages/web/scripts/make-sample.ts"`. `packages/web/package.json`: `build` becomes `tsc --noEmit && tsc -p scripts && vite build`. `check` and `test` do not run the script.

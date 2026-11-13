@@ -13,6 +13,7 @@ export interface SampleOutput {
   reportJson: string; // JSON.stringify(report, null, 2) + "\n"
   filesJson: string; // JSON.stringify({ copyright, texts }, null, 2) + "\n"
   licenceText: string; // the Licence_Text, unchanged
+  requests: { detection: number; downloads: number }; // per Core client
 }
 
 /** First line whose trimmed text starts with "Copyright" (any case), trimmed; null if none. */
@@ -32,11 +33,17 @@ export async function makeSample(opts: {
   fetch?: typeof fetch;
 }): Promise<Result<SampleOutput, string>> {
   try {
+    // detectGhosts does not expose its client, so its requests are counted here.
+    let detection = 0;
+    const countingFetch: typeof fetch = (input, init) => {
+      detection++;
+      return (opts.fetch ?? fetch)(input, init);
+    };
     // `ref` is documented in Core as TEST ONLY. This hand-run script needs a fixed
     // commit so the committed sample never changes; Core is not changed.
     const detected = await detectGhosts(SAMPLE_REPO_URL, {
       ref: SAMPLE_SHA,
-      fetch: opts.fetch,
+      fetch: countingFetch,
     });
     if (!detected.ok) {
       return {
@@ -76,6 +83,7 @@ export async function makeSample(opts: {
         reportJson: JSON.stringify(report, null, 2) + "\n",
         filesJson: JSON.stringify({ copyright, texts }, null, 2) + "\n",
         licenceText,
+        requests: { detection, downloads: client.requestCount },
       },
     };
   } catch (error) {
