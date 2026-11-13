@@ -17,14 +17,16 @@ inclusion: always
 | Language | TypeScript 6.0 (strict mode) on Node.js v24 |
 | Package manager | npm, with workspaces |
 | Kiro Power | `POWER.md` + steering files + a small MCP server in TypeScript (`@modelcontextprotocol/sdk`). Exact format to confirm in the Power spec against kiro.dev/docs/powers |
-| Kiro hook | JSON file in `.kiro/hooks/`, running a Node command that marks the file as a ghost. Exact trigger to be decided in the ghost-detection spec. It must mark files written by the agent, not files edited by the user. |
-| Ghost state | A plain JSON file inside the user's repo (for example `.haunted/ghosts.json`). Final format decided in the ghost-detection spec |
+| Test hook | `.kiro/hooks/test-after-task.json` runs `npm run check` after each spec task (PostTaskExec) |
+| Ghost report and progress | Plain JSON values (HauntedReport, ExorcismProgress) read with parseReport and parseProgress. Where the Power keeps them is decided in the Power spec |
+| Core logic | `packages/core` (@haunted-repo/core): ghost detection and the exorcism engine, pure TypeScript that also runs in the browser (only fetch, TextDecoder and AbortSignal) |
 | Demo website | Vite + TypeScript, no framework, built to static files |
 | Hosting | GitHub Pages (public repo) |
 | Lint / format | ESLint + Prettier |
 | Tests | Vitest, plus fast-check for property-based tests |
 
 ## Layout
+- `packages/core/`: ghost detection and the exorcism engine, used by the web and the Power
 - `packages/power/`: the Kiro Power and its MCP server
 - `packages/web/`: the static demo website
 - `.kiro/`: steering, specs, agents, hooks
@@ -44,7 +46,7 @@ inclusion: always
 
 ## Testing strategy
 - Unit tests with Vitest.
-- Property-based tests (fast-check) for rules that must always hold, for example "a file marked as ghost is never marked twice" or "the ghost file always parses back to the same data".
+- Property-based tests (fast-check) for rules that must always hold, for example "replaying a recording always gives the same steps" or "the ghost file always parses back to the same data".
 - External services: the only AI is the user's Kiro, which an automated test cannot call. The real-service check is the manual spike (see `PLAN.md`, point 3). Any future RSS, API or cloud service must have at least one test against the real service.
 - Mocks must never be more permissive than the real service.
 
