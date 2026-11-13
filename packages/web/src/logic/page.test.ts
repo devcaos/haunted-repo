@@ -1,20 +1,26 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
 import fc from "fast-check";
+import { advance, startSession } from "@haunted-repo/core";
 import type {
   ErrorCode,
   Floor,
   HauntedReport,
+  Rating,
   Result,
+  SelfCheck,
 } from "@haunted-repo/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { choicesArb } from "../../../core/src/exorcism/sessionArb.testutil.js";
 import { reportArb } from "../../../core/src/ghost-detection/reportArb.testutil.js";
 import { loadSample } from "../sample/sampleData.js";
+import { isAvailable } from "./actions.js";
+import type { UserAction } from "./actions.js";
 import { buildSampleHouse } from "./houseView.js";
 import { outcomeOf } from "./outcome.js";
 import type { Outcome } from "./outcome.js";
 import { createPage } from "./page.js";
-import type { DetectFn } from "./page.js";
+import type { DetectFn, EngineFns } from "./page.js";
 import { createRecordingRenderer } from "./recordingRenderer.testutil.js";
 import { TEXTS } from "./texts.js";
 
@@ -43,6 +49,38 @@ const ALL_CODES = Object.keys(EXPECTED_OUTCOME) as ErrorCode[];
 
 const FLOORS: readonly Floor[] = ["attic", "middle floor", "basement"];
 const LIVE_URL = "https://github.com/o/r";
+const RATINGS: readonly Rating[] = ["right", "half-right", "wrong"];
+const SELF_CHECKS: readonly SelfCheck[] = ["yes", "half", "no"];
+
+// All 13 action types, with parameters from the design (P10).
+const pathArb = fc.oneof(
+  fc.constantFrom(...sampleReport.ghosts.map((ghost) => ghost.path)),
+  fc.string(),
+);
+const userActionArb: fc.Arbitrary<UserAction> = fc.oneof(
+  fc.record({ type: fc.constant("submit-live" as const), url: fc.string() }),
+  fc.constant({ type: "show-sample" as const }),
+  fc.constant({ type: "go-to-house" as const }),
+  fc.record({
+    type: fc.constant("go-to-floor" as const),
+    floor: fc.constantFrom(...FLOORS),
+  }),
+  fc.record({ type: fc.constant("start-ghost" as const), path: pathArb }),
+  fc.constant({ type: "explanation-continue" as const }),
+  fc.constant({ type: "show-model-answer" as const }),
+  fc.record({
+    type: fc.constant("rate" as const),
+    rating: fc.constantFrom(...RATINGS),
+  }),
+  fc.constant({ type: "dont-know" as const }),
+  fc.record({
+    type: fc.constant("self-check" as const),
+    answer: fc.constantFrom(...SELF_CHECKS),
+  }),
+  fc.constant({ type: "retry" as const }),
+  fc.constant({ type: "back-to-list" as const }),
+  fc.constant({ type: "leave-ghost" as const }),
+);
 
 beforeEach(() => {
   vi.stubGlobal("fetch", () => {
@@ -205,6 +243,88 @@ describe("page controller properties (PR 1)", () => {
           expect(detect).toHaveBeenCalledTimes(2);
           settle({ ok: true, value: sampleReport });
           await again;
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
+  it("ignores every unavailable action in the list scenes", async () => {
+    // Feature: web-demo, Property 10: Unavailable actions change nothing
+    // **Validates: Requirements 4.3, 4.9, 18.3**
+    await fc.assert(
+      fc.asyncProperty(
+        choicesArb, // the path: each choice picks from model.available
+        fc.array(userActionArb, { minLength: 1, maxLength: 10 }),
+        async (choices, candidates) => {
+          let settle: ((result: Result<HauntedReport>) => void) | null = null;
+          const detect = vi.fn<DetectFn>(
+            () =>
+              new Promise<Result<HauntedReport>>((resolve) => {
+                settle = resolve;
+              }),
+          );
+          const engine = {
+            startSession: vi.fn<EngineFns["startSession"]>(startSession),
+            advance: vi.fn<EngineFns["advance"]>(advance),
+          };
+          const renderer = createRecordingRenderer();
+          const page = createPage(
+            { detect, sample: committed, engine },
+            renderer,
+          );
+          page.start();
+
+          // Walk a random path of available actions. A live analysis ends ok,
+          // ends in fallback, or stays pending (busy) for the rest of the run.
+          let pending: Promise<void> | null = null;
+          for (const choice of choices) {
+            const options = page.current().available;
+            const picked = options[choice % Math.max(options.length, 1)];
+            if (picked === undefined) break;
+            if (picked.type !== "submit-live") {
+              await page.dispatch(picked);
+              continue;
+            }
+            const run = page.dispatch({ type: "submit-live", url: LIVE_URL });
+            const mode = Math.floor(choice / options.length) % 3;
+            const finish = settle as
+              ((result: Result<HauntedReport>) => void) | null;
+            if (mode === 2 || finish === null) {
+              pending = run; // busy: submit-live is no longer available
+              continue;
+            }
+            finish(
+              mode === 0
+                ? { ok: true, value: sampleReport }
+                : {
+                    ok: false,
+                    error: { code: "NETWORK_ERROR", message: "offline" },
+                  },
+            );
+            await run;
+          }
+
+          for (const action of candidates) {
+            if (isAvailable(page.current(), action)) continue;
+            const before = structuredClone(page.current());
+            const renders = renderer.models.length;
+            const detectCalls = detect.mock.calls.length;
+
+            await page.dispatch(action);
+
+            expect(page.current()).toEqual(before);
+            expect(renderer.models.length).toBe(renders);
+            expect(detect.mock.calls.length).toBe(detectCalls);
+            expect(engine.advance).not.toHaveBeenCalled();
+          }
+
+          if (pending !== null) {
+            const finish = settle as
+              ((result: Result<HauntedReport>) => void) | null;
+            finish?.({ ok: true, value: sampleReport });
+            await pending;
+          }
         },
       ),
       { numRuns: 100 },

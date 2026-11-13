@@ -172,7 +172,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check only one live analysis runs`
     - _Requirements: 4.3, 4.4, 4.5_
 
-  - [ ] 3.5 Property test for unavailable actions (list scenes)
+  - [x] 3.5 Property test for unavailable actions (list scenes)
     - **Property 10: Unavailable actions change nothing**
     - **Validates: Requirements 4.3, 4.9, 18.3**
     - Generator: a random path of available actions in the list scenes (`choicesArb` mapped to `model.available`, including pending live analyses), then `fc.oneof` over all 13 action types with the parameters of the design; only the actions that `isAvailable` rejects are dispatched. Checks: same model (deep equal), no render, no `detect` call, no `engine.advance` call (injected counting `EngineFns`). PR 2 extends it to the ghost scene (task 10.7).
