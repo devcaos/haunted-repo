@@ -7,6 +7,13 @@
         "chatSessionId": "sess_8e23d326-4723-478f-a44d-9e21d3b745fe",
         "timestamp": 1794608069037
       }
+    ],
+    "1.1 Add the Vitest alias for Core": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794608271978
+      }
     ]
   }
 }

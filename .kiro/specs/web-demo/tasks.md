@@ -59,8 +59,8 @@ These open doubts of the design are settled by the approved design and are not r
   - One commit. Commit message: `docs: add web-demo spec`
   - _Requirements: none (git workflow)_
 
-- [ ] 1. Test setup and sample data
-  - [ ] 1.1 Add the Vitest alias for Core
+- [~] 1. Test setup and sample data
+  - [x] 1.1 Add the Vitest alias for Core
     - In `vitest.config.ts` add `resolve.alias` mapping `@haunted-repo/core` to `packages/core/src/index.ts` (with `fileURLToPath(new URL(...))`), as in the design "Vitest alias". `vitest.live.config.ts` stays unchanged.
     - Verify the "no build" case: `node -e "require('node:fs').rmSync('packages/core/dist',{recursive:true,force:true})"`, then `npm test` passes (the current `checkButton.test.ts` now runs against Core source). Then `npm run check`.
     - Commit message: `chore: run web tests against core source`
