@@ -204,4 +204,37 @@ describe("buildWarnings", () => {
       { path: "bin.js", reason: "not text" },
     ]);
   });
+
+  it("matches the overview exactly", () => {
+    // Feature: web-demo, Property 5: Report warnings match the overview exactly
+    // **Validates: Requirements 17.1, 17.2, 17.3, 17.4, 17.5, 17.6**
+    const plainReason = {
+      TOO_LARGE: "too large",
+      NOT_TEXT: "not text",
+    } as const;
+    fc.assert(
+      fc.property(
+        reportArb.map((value) => value.overview),
+        (value) => {
+          const warnings = buildWarnings(value);
+          const expected = [
+            ...(value.partial ? [TEXTS.partial] : []),
+            ...(value.message !== null ? [value.message] : []),
+            ...(value.truncated ? [TEXTS.truncated] : []),
+          ];
+          expect(warnings.lines).toEqual(expected);
+          expect(warnings.skipped).toEqual(
+            value.skipped.map((file) => ({
+              path: file.path,
+              reason: plainReason[file.reason],
+            })),
+          );
+          expect(warnings.skippedTitle).toBe(
+            value.skipped.length > 0 ? TEXTS.skippedTitle : null,
+          );
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
 });

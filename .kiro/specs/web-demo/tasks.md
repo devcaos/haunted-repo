@@ -128,7 +128,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check ghosts are grouped by floor`
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 2.4 Property test for the report warnings
+  - [x] 2.4 Property test for the report warnings
     - **Property 5: Report warnings match the overview exactly**
     - **Validates: Requirements 17.1, 17.2, 17.3, 17.4, 17.5, 17.6**
     - Generator: the `overview` of `reportArb`. Checks: lines in the order partial, message, truncated, each present iff it applies and nothing else; one skipped entry per skipped file with the right reason; `skippedTitle` iff `skipped` is not empty.
