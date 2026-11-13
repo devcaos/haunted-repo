@@ -36,7 +36,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** no fijar el disparador todavía; se decide en la spec de detección de fantasmas.
 
-- **Estado:** abierto.
+- **Estado:** resuelto por el cambio de enfoque del 11 nov: ya no hay un hook que marque archivos.
 
 ## 2026-11-06 — PowerShell rompió el cuerpo del PR por el carácter `#`
 
@@ -56,7 +56,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** añadí un segundo hook de tipo agente (opción B) que ejecuta `npm run check` y corrige fallos. La prueba real queda pendiente en la próxima spec (ver `PLAN.md`).
 
-- **Estado:** abierto.
+- **Estado:** resuelto: confirmado en la tarea 2.1 de ghost-detection (commit 6ed8f75, 11 nov); queda decidir cuál de los dos hooks se deja.
 
 ## 2026-11-11 — `timeout` dentro de `action` daba error de formato
 
@@ -77,3 +77,76 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** no hizo falta.
 
 - **Estado:** resuelto.
+## 2026-11-11 — tasks.md de ghost-detection apuntaba a la rama equivocada (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** seguir las tareas de la spec de detección de fantasmas tras fusionar la PR #11.
+
+- **Qué pasó:** `tasks.md` seguía apuntando a la rama vieja; había que redirigir las tareas restantes a la rama `feat/ghost-detection-fetch`.
+
+- **Cómo lo rodeé:** corregir la rama en `tasks.md` (commit f3f877b).
+
+- **Estado:** resuelto.
+
+## 2026-11-11 — estado de las tareas desordenado (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** marcar las tareas como hechas en `tasks.md`.
+
+- **Qué pasó:** las tareas se marcaron en commits aparte (77aa29c, c803487, 81c1fcf) y se olvidaron las tareas padre (7d5194f).
+
+- **Cómo lo rodeé:** de ahí salió la regla de marcar `[x]` en el mismo commit que la tarea (commit 23adca4).
+
+- **Estado:** resuelto.
+
+## 2026-11-11 — spike 1: Kiro añadió una pista y rellenó un documento que dice "a mano" (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** hacer el spike 1 de preguntas sobre un archivo real.
+
+- **Qué pasó:** Kiro añadió una pista a la pregunta 2 que no estaba en el prompt, y rellenó un documento que dice que se rellena a mano (cuerpo de la PR #8).
+
+- **Cómo lo rodeé:** se anotó en el documento; el veredicto quedó provisional hasta que Luis Miguel respondiera.
+
+- **Estado:** resuelto.
+
+## 2026-11-11 — cuerpo de la PR #8 en español y con acentos rotos (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** abrir la PR #8 con su cuerpo.
+
+- **Qué pasó:** el cuerpo salió en español y con los acentos rotos.
+
+- **Cómo lo rodeé:** se tradujo a mano en GitHub (PR #10).
+
+- **Estado:** resuelto. Causa: to confirm with Luis Miguel.
+
+## 2026-11-12 — tasks.md de exorcism mandaba crear una rama que ya existía (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** empezar las tareas de la spec de exorcismo.
+
+- **Qué pasó:** `tasks.md` mandaba crear con `git checkout -b` una rama (`feat/exorcism`) que ya existía y traía la spec.
+
+- **Cómo lo rodeé:** cambiar el paso para usar `git checkout` + `git pull` en vez de crear la rama (commit eff8408).
+
+- **Estado:** resuelto.
+
+## 2026-11-12 — orden de tareas de exorcism corregido (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** seguir el orden de tareas de la spec de exorcismo.
+
+- **Qué pasó:** hubo que mover progreso y sugerencia antes de las instrucciones (commit eff8408).
+
+- **Cómo lo rodeé:** reordenar las tareas en `tasks.md`.
+
+- **Estado:** resuelto. Causa probable: las instrucciones del paso "choosing" necesitan `suggestGhost`; to confirm with Luis Miguel.
+
+## 2026-11-12 — el navegador no deja fijar la cabecera User-Agent (anotada con retraso el 2026-11-13)
+
+- **Qué intentaba:** probar la llamada real a GitHub desde la web.
+
+- **Qué pasó:** el navegador no deja fijar la cabecera `User-Agent`, que la llamada real necesita.
+
+- **Cómo lo rodeé:** la llamada real a GitHub desde la web solo se comprueba a mano en el sitio desplegado (cuerpo de la PR #13).
+
+- **Estado:** resuelto con comprobación manual.
+
+## Aviso del validador de specs (anotada con retraso el 2026-11-13)
+
+- Sin rastro en el repo (commits, PR ni archivos). Fecha, qué pasó y cómo se rodeó: to confirm with Luis Miguel.
