@@ -66,7 +66,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `chore: run web tests against core source`
     - _Requirements: 13.1, 13.2_
 
-  - [ ] 1.2 Add `makeSample.ts` and its tests with the strict fake
+  - [x] 1.2 Add `makeSample.ts` and its tests with the strict fake
     - Create `packages/web/src/sample/makeSample.ts`: `SAMPLE_REPO_URL`, `SAMPLE_SHA` (the single definition), `SampleOutput`, `copyrightLineOf(licenceText)` and `makeSample({ fetch })` exactly as in the design. Step 1 calls `detectGhosts(SAMPLE_REPO_URL, { ref: SAMPLE_SHA, fetch })` with the comment about the "TEST ONLY" `ref`; step 2 uses a second `createGitHubClient` for every Ghost_Text and the `license` file; a missing copyright line, any Core error or any thrown error gives `{ ok: false, error }` and no output. It imports only `@haunted-repo/core` (no relative import). It writes no file.
     - Create `packages/web/src/logic/fakeDetect.testutil.ts`: wraps the strict fake of Core (relative import of `fakeGitHub.testutil.ts`) and adds `User-Agent: vitest`, the way Node and browsers do. The fake itself is not changed or loosened.
     - Create `packages/web/src/sample/makeSample.test.ts`: with the fake (`shas: [SAMPLE_SHA]`, 5 ghost files plus `license`) success gives one text per ghost and the copyright line, the tree request uses the SHA, total requests ≤ 14; errors give no output: repo not found, rate limit after k requests, missing `license`, licence with no copyright line; `copyrightLineOf` examples (first match, any case, trimmed, `null` when absent). `fetch` stubbed to throw in `beforeEach`.

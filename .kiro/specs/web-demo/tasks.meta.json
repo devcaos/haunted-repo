@@ -14,6 +14,13 @@
         "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
         "timestamp": 1794608271978
       }
+    ],
+    "1.2 Add `makeSample.ts` and its tests with the strict fake": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794608406645
+      }
     ]
   }
 }
