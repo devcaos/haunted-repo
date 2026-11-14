@@ -190,25 +190,25 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the view model is plain data`
     - _Requirements: 11.7, 11.8, 18.1, 18.2, 18.4_
 
-- [ ] 4. Checkpoint - logic of PR 1
+- [x] 4. Checkpoint - logic of PR 1
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Presentation layer and wiring
-  - [ ] 5.1 Add the asset manifest with empty slots
+- [~] 5. Presentation layer and wiring
+  - [x] 5.1 Add the asset manifest with empty slots
     - Create `packages/web/src/view/assets/manifest.ts` (`AssetSlotId` with the 10 ids, `AssetLayer`, `AssetFallback`, `AssetSlot`, `ASSET_SLOTS` with every `layers` list `[]` and a fallback and purpose for each), `packages/web/src/view/assets/resolve.ts` (`resolveSlot(id)` with one literal `import.meta.glob("./files/*", { query: "?url", import: "default", eager: true })`; never throws) and `packages/web/src/view/assets/files/.gitkeep`.
     - Create `packages/web/src/view/assets/manifest.test.ts` (`node:fs`): every id once; fallback and non-blank purpose; every layer has a non-blank `source`; every listed file exists; every file in `files/` except `.gitkeep` is listed; no layer file is an address; every `layers` list is empty in this spec.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the asset manifest with empty slots`
     - _Requirements: 11.5, 18.5_
 
-  - [ ] 5.2 Add the design tokens and the base CSS
+  - [x] 5.2 Add the design tokens and the base CSS
     - Create `packages/web/src/view/simple/tokens.css` with the 8 colours of Requirement 11.1 and every font (system stacks, a serif stack such as Georgia for titles), spacing and size used by the CSS. Create `packages/web/src/view/simple/simple.css` using only `var(...)` for colours, fonts and sizes; code block with max height and its own scroll; no page-wide horizontal scroll at 360 px. Create `packages/web/src/view/simple/dom.ts` with `el(tag, attrs, children)` (text with `textContent` only).
     - No drawing, image or external resource.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add design tokens and base styles`
     - _Requirements: 11.1, 11.2, 11.4, 11.5, 11.6, 12.3_
 
-  - [ ] 5.3 Add the Simple_Renderer for the house, the live form and the licence
+  - [x] 5.3 Add the Simple_Renderer for the house, the live form and the licence
     - Create `packages/web/src/view/simple/house.ts` (`renderHouse`: three sections with `data-floor`, cards with path, score, reason, `data-ghost-state`, empty lines, warnings, Power line), `licence.ts` (`renderLicence`: copyright line plus relative link `sirv-license.txt`) and `renderer.ts` (`createSimpleRenderer(root, onAction)`: builds the shell once with header, Live_Form with a labelled URL field, Status_Region with `aria-live`, main, footer with the licence; the form is never replaced so the URL text stays; `form.hidden = !model.live.formVisible`; submit button disabled when `submit-live` is not available; on submit `preventDefault()` and `onAction({ type: "submit-live", url })`; one button per available action that this renderer shows, labelled from `TEXTS.actionLabels`; ignores `transition`; asks `resolveSlot` and uses the fallbacks).
     - Imports from `@haunted-repo/core` are `import type` only. No `innerHTML`. No test file: covered by the build and the manual checks of the PR body.
     - Verify: `npm run check` exits `0`.

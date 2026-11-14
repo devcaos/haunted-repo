@@ -1,6 +1,15 @@
 // Every page text except the ones in powerTexts.ts, in one object,
 // so wording changes in one place. All texts are English.
 export const TEXTS = {
+  pageTitle: "Haunted Repo",
+  houseHeading: (repoName: string) => `Ghosts of ${repoName}`,
+  scoreLine: (score: number) => `Difficulty: ${score} of 100`,
+  // Shown by a renderer when the ghost picture slot is empty.
+  ghostStateLabels: {
+    haunted: "Haunted",
+    exorcised: "Exorcised",
+    locked: "Locked",
+  },
   floorTitles: {
     attic: "Attic",
     "middle floor": "Middle floor",
