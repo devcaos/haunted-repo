@@ -102,7 +102,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): load the committed sample data`
     - _Requirements: 1.11, 1.12, 1.13, 2.1, 2.3, 10.3_
 
-- [~] 2. View model, user actions and house view
+- [x] 2. View model, user actions and house view
   - [x] 2.1 Add the View_Model types and the user actions
     - Create `packages/web/src/logic/viewModel.ts` with the types of the design (`Scene`, `SceneTransition`, `GhostState`, `GhostCardView`, `FloorView`, `WarningsView`, `ProgressView`, `HouseView`, `ReadingKind`, `GhostView`, `LicenceView`, `StatusKind`, `ViewModel`, `Renderer`). All types are defined now; in PR 1 `ghost` is always `null`, `progress` and `houseClean` are `null`, `lockedLine` is `null`.
     - Create `packages/web/src/logic/actions.ts`: the full `UserAction` union (13 types, ghost actions included), `AvailableAction`, `ActionSink`, `isAvailable(model, action)` (same type and same parameters; the URL of `submit-live` is free). No action carries the Answer_Box text.
@@ -137,8 +137,8 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check report warnings match the overview`
     - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
 
-- [ ] 3. Page controller
-  - [ ] 3.1 Add the controller with scenes and navigation
+- [~] 3. Page controller
+  - [x] 3.1 Add the controller with scenes and navigation
     - Create `packages/web/src/logic/page.ts`: `DetectFn`, `EngineFns`, `PageDeps` (in PR 1 without `script`), `PageController`, `createPage(deps, renderer)`. State in the closure only. `start()` renders the first model: scene `house`, transition `null`, sample house, `ghost` null, form visible, not busy, status none, licence (`copyright` from the sample, `href: "sirv-license.txt"`, link text of the design), `available` as in the design table. `dispatch(action)`: step 1 ignores unavailable actions (no state change, no render, no Core call); `go-to-floor` and `go-to-house` change the scene; every render computes `transition`. If `deps.sample` is not ok: `house` and `licence` null, `available` empty, status error `TEXTS.sampleBroken`. The controller never awaits the renderer (`render` returns `void`). In this task `submit-live` and `show-sample` are listed as in the table but their handling arrives in task 3.2 (they render nothing yet); ghost actions are never available in PR 1.
     - Create `packages/web/src/logic/recordingRenderer.testutil.ts` (stores a deep copy of every model).
     - Create `packages/web/src/logic/states.test.ts` with the PR 1 states "Opening on the sample" (including: `detect` and `fetch` not called, no `show-sample`), "Floor navigation" and "Sample broken", checking named fields only.
@@ -146,7 +146,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add the page controller with scenes`
     - _Requirements: 2.1, 2.2, 2.3, 9.1, 10.1, 10.4, 18.1, 18.2, 18.3, 18.4, 18.6_
 
-  - [ ] 3.2 Add the live analysis, the outcome table and the fallback
+  - [x] 3.2 Add the live analysis, the outcome table and the fallback
     - Create `packages/web/src/logic/outcome.ts`: `Outcome`, `OUTCOME_BY_CODE: Readonly<Record<ErrorCode, Outcome>>` and `outcomeOf(code)` exactly as in the design.
     - In `page.ts` handle `submit-live` (single flight: `busy = true` and status busy before the first `await`, render; `await deps.detect(url)` with the URL as typed; ok → live house, scene `house`, status `TEXTS.liveDone`; `show-message` → status error with Core's message, house and scene unchanged; `fallback` or thrown → sample house, scene `house`, status `TEXTS.fallback`; `finally` → `busy = false`, render) and `show-sample` (sample house, scene `house`, status none). This replaces the busy pattern of `checkButton.ts` (same `finally` idea).
     - Extend `states.test.ts` with "Live analysis running" (controlled promise), "Live list" (3 ghosts and 1 ghost wording), "Message error" (`REPO_NOT_FOUND` from the fake), "Fallback" (rate limit from the fake), "Show the sample again" and "Report warnings" (fake repository with a skipped file and truncation). `detect` is `(url) => detectGhosts(url, { fetch: fakeFetch })` through `fakeDetect.testutil.ts`; global `fetch` stubbed to throw.
@@ -154,7 +154,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): run a live analysis with fallback`
     - _Requirements: 4.2, 4.3, 4.6, 4.7, 4.8, 4.9, 5.1, 5.2, 5.3, 5.4, 5.6, 14.2, 15.4, 17.5, 18.6_
 
-  - [ ] 3.3 Property test for the outcome table
+  - [x] 3.3 Property test for the outcome table
     - **Property 3: Every error code has exactly one outcome**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
     - Generator: `fc.constantFrom` over an independent list of the 7 codes, typed so a new Core code is a compile error; `fc.string()` for the message; `fc.anything()` for a thrown value. Checks `outcomeOf` and the last View_Model after `submit-live` with a `detect` stub that returns that error or throws.
@@ -163,7 +163,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check every error code has one outcome`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 3.4 Property test for single flight
+  - [x] 3.4 Property test for single flight
     - **Property 7: Only one live analysis runs at a time**
     - **Validates: Requirements 4.3, 4.4, 4.5**
     - Generator: `fc.integer({ min: 0, max: 20 })` extra submits while pending, and an outcome from `fc.oneof` (ok report from `reportArb`, error result, throw). Checks: `detect` called once; the model before the call has `busy` true and no `submit-live`; the last model has `busy` false and `submit-live`; a submit after the end calls `detect` again.
@@ -172,7 +172,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check only one live analysis runs`
     - _Requirements: 4.3, 4.4, 4.5_
 
-  - [ ] 3.5 Property test for unavailable actions (list scenes)
+  - [x] 3.5 Property test for unavailable actions (list scenes)
     - **Property 10: Unavailable actions change nothing**
     - **Validates: Requirements 4.3, 4.9, 18.3**
     - Generator: a random path of available actions in the list scenes (`choicesArb` mapped to `model.available`, including pending live analyses), then `fc.oneof` over all 13 action types with the parameters of the design; only the actions that `isAvailable` rejects are dispatched. Checks: same model (deep equal), no render, no `detect` call, no `engine.advance` call (injected counting `EngineFns`). PR 2 extends it to the ghost scene (task 10.7).
@@ -181,7 +181,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check unavailable actions change nothing`
     - _Requirements: 4.3, 4.9, 18.3_
 
-  - [ ] 3.6 Property test for plain data and scenes (list scenes)
+  - [x] 3.6 Property test for plain data and scenes (list scenes)
     - **Property 11: The View_Model is plain data and scenes are consistent**
     - **Validates: Requirements 11.7, 11.8, 18.1, 18.2, 18.4**
     - Generator: `choicesArb` mapped to `model.available`, using `go-to-floor`, `go-to-house`, `show-sample` and `submit-live` with the strict fake. Checks every rendered model: equals `JSON.parse(JSON.stringify(model))`; `ghost` null iff scene is not `ghost`; `live.formVisible` false iff scene is `ghost`; `transition` rule; no `go-to-floor` for the floor in focus. PR 2 extends it to the ghost scene (task 10.7).
