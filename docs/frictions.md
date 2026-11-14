@@ -181,3 +181,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** se restauró a mano la marca `[x]` de la tarea 7.1.
 
 - **Estado:** resuelto.
+
+## 2026-11-14 — la revisión de la PR #20 comparó tamaños medidos con reglas distintas
+
+- **Qué intentaba:** revisar la PR #20 (pieza 2 de 4 de web-demo) y comprobar su tamaño.
+
+- **Qué pasó:** la revisión contó 1.037 líneas añadidas frente a las 959 anunciadas y dio un reparto de 311 de código y 726 de tests. Las 1.037 incluían `.kiro/specs/web-demo/` (78 líneas de marcas de tareas), que el cuerpo de la PR excluía a propósito; el reparto también estaba mal: lo real es 213 de código (`page.ts` 194, `outcome.ts` 19) y 746 de tests. La cifra de la PR era correcta.
+
+- **Cómo lo rodeé:** Kiro lo detectó al ir a anotar la fricción y Luis Miguel eligió anotarla corregida, con las cifras de `git diff --numstat`. Al revisar tamaños, medir con la misma regla que el cuerpo de la PR (qué carpetas se excluyen).
+
+- **Estado:** resuelto.
