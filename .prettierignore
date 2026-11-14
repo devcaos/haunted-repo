@@ -3,3 +3,5 @@ package-lock.json
 dist/
 node_modules/
 .kiro/specs/*/tasks.meta.json
+packages/web/src/sample/report.json
+packages/web/src/sample/files.json

@@ -1,0 +1,81 @@
+{
+  "overview": {
+    "owner": "lukeed",
+    "repo": "sirv",
+    "ref": "1135207e92c40354543cbd15c763c7a61d79d432",
+    "analysed": 7,
+    "picked": 5,
+    "truncated": false,
+    "fewFiles": false,
+    "partial": false,
+    "skipped": [],
+    "message": null
+  },
+  "ghosts": [
+    {
+      "path": "bench/static.js",
+      "language": "JavaScript",
+      "difficultyScore": 7,
+      "floor": "attic",
+      "factors": {
+        "lines": 10,
+        "branches": 0,
+        "maxIndent": 2,
+        "imports": 2
+      },
+      "reason": "It is easy to read; the part that weighs most is how nested the code is (2 levels)."
+    },
+    {
+      "path": "builder.js",
+      "language": "JavaScript",
+      "difficultyScore": 9,
+      "floor": "attic",
+      "factors": {
+        "lines": 15,
+        "branches": 1,
+        "maxIndent": 2,
+        "imports": 3
+      },
+      "reason": "It is easy to read; the part that weighs most is how nested the code is (2 levels)."
+    },
+    {
+      "path": "packages/sirv-cli/bin.js",
+      "language": "JavaScript",
+      "difficultyScore": 15,
+      "floor": "attic",
+      "factors": {
+        "lines": 42,
+        "branches": 3,
+        "maxIndent": 3,
+        "imports": 3
+      },
+      "reason": "It is easy to read; the part that weighs most is how nested the code is (3 levels)."
+    },
+    {
+      "path": "packages/sirv-cli/index.js",
+      "language": "JavaScript",
+      "difficultyScore": 30,
+      "floor": "attic",
+      "factors": {
+        "lines": 85,
+        "branches": 11,
+        "maxIndent": 4,
+        "imports": 11
+      },
+      "reason": "It is easy to read; the part that weighs most is how nested the code is (4 levels)."
+    },
+    {
+      "path": "packages/sirv/index.mjs",
+      "language": "JavaScript",
+      "difficultyScore": 44,
+      "floor": "middle floor",
+      "factors": {
+        "lines": 157,
+        "branches": 36,
+        "maxIndent": 3,
+        "imports": 5
+      },
+      "reason": "It is of medium difficulty, mostly because it makes several decisions (36 if/elif/for/while/switch/case/catch)."
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "pbtResults": {
+    "2.3 Property test for the grouping by floor": {
+      "status": "passed",
+      "lastRunTimestamp": 1794609908217
+    },
+    "2.4 Property test for the report warnings": {
+      "status": "passed",
+      "lastRunTimestamp": 1794610126049
+    }
+  },
+  "executionHistory": {
+    "0. Commit the spec": [
+      {
+        "executionId": "d1241a05-cef7-4965-9cb0-e3b839dc48fb",
+        "chatSessionId": "sess_8e23d326-4723-478f-a44d-9e21d3b745fe",
+        "timestamp": 1794608069037
+      }
+    ],
+    "1.1 Add the Vitest alias for Core": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794608271978
+      }
+    ],
+    "1.2 Add `makeSample.ts` and its tests with the strict fake": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794608406645
+      }
+    ],
+    "1.3 Add the hand-run `npm run sample:make` script": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794608686511
+      }
+    ],
+    "1.4 Run the sample script against real GitHub and commit the data": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794608900101
+      }
+    ],
+    "1.5 Add `sampleData.ts` and the committed-data test": [
+      {
+        "executionId": "ef11d035-9466-4e7e-aeca-e2d56c0a16df",
+        "chatSessionId": "sess_935b7f49-8720-4fa2-b83b-ccf6e10d6d47",
+        "timestamp": 1794609152485
+      }
+    ],
+    "2.1 Add the View_Model types and the user actions": [
+      {
+        "executionId": "c789eed5-523b-42e1-b2e9-f837cf8e1709",
+        "chatSessionId": "sess_c989bc7b-4ec8-466b-8ca3-4fcd0cfff1d9",
+        "timestamp": 1794609391702
+      }
+    ],
+    "2.2 Add the page texts and the house view": [
+      {
+        "executionId": "c789eed5-523b-42e1-b2e9-f837cf8e1709",
+        "chatSessionId": "sess_c989bc7b-4ec8-466b-8ca3-4fcd0cfff1d9",
+        "timestamp": 1794609525463
+      }
+    ],
+    "2.3 Property test for the grouping by floor": [
+      {
+        "executionId": "c789eed5-523b-42e1-b2e9-f837cf8e1709",
+        "chatSessionId": "sess_c989bc7b-4ec8-466b-8ca3-4fcd0cfff1d9",
+        "timestamp": 1794609824549
+      }
+    ],
+    "2.4 Property test for the report warnings": [
+      {
+        "executionId": "c789eed5-523b-42e1-b2e9-f837cf8e1709",
+        "chatSessionId": "sess_c989bc7b-4ec8-466b-8ca3-4fcd0cfff1d9",
+        "timestamp": 1794610049450
+      }
+    ]
+  }
+}

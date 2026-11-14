@@ -15,6 +15,7 @@
     "build": "npm run build -w @haunted-repo/core && npm run build -w @haunted-repo/power && npm run build -w @haunted-repo/web",
     "test": "vitest run",
     "test:live": "vitest run --config vitest.live.config.ts",
+    "sample:make": "npm run build -w @haunted-repo/core && node packages/web/scripts/make-sample.ts",
     "check": "npm run lint && npm run format:check && npm run build && npm test"
   },
   "devDependencies": {

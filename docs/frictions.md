@@ -151,3 +151,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 ## Aviso del validador de specs (anotada con retraso el 2026-11-13)
 
 - Sin rastro en el repo (commits, PR ni archivos). Fecha, qué pasó y cómo se rodeó: to confirm with Luis Miguel.
+
+## 2026-11-13 — el chat no puede poner una tarea de la spec en curso
+
+- **Qué intentaba:** empezar la tarea 0 de la spec web-demo desde el chat.
+
+- **Qué pasó:** el ejecutor de tareas de la spec necesita que la tarea esté marcada como en curso. El chat no pudo poner ese estado editando `tasks.md` (cambiar `[ ]` por `[-]` no funcionó) y el ejecutor rechazó la tarea dos veces.
+
+- **Cómo lo rodeé:** Luis Miguel empieza cada tarea con el botón Start task de `tasks.md`, una a una.
+
+- **Estado:** resuelto.
