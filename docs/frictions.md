@@ -171,3 +171,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** Luis Miguel aprobó partirla en 4 pull requests apilados (`feat/web-demo-1` a `feat/web-demo-4`), creados como ramas sobre commits que ya existían, sin reescribir la historia (tarea 7.2 de `tasks.md`).
 
 - **Estado:** resuelto.
+
+## 2026-11-14 — la herramienta de tareas cambió `tasks.md` sin commit y desmarcó la tarea 7.1
+
+- **Qué intentaba:** seguir con las tareas de la PR 1 de la spec web-demo.
+
+- **Qué pasó:** la herramienta de tareas de Kiro cambió `tasks.md` sin hacer commit y dejó la tarea 7.1 sin marcar, aunque ya estaba hecha.
+
+- **Cómo lo rodeé:** se restauró a mano la marca `[x]` de la tarea 7.1.
+
+- **Estado:** resuelto.
