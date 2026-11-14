@@ -45,6 +45,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión 13 nov): cualquier respuesta 403 de GitHub se trata como límite de peticiones, aunque la causa sea otra.
 - Low (revisión 13 nov): parseReport no comprueba que el informe sea coherente (picked igual al número de fantasmas, planta según la puntuación, rutas sin repetir). El fixture tinySession no lo es (fewFiles: true con 3 fantasmas).
 - Low (revisión PR #19, web-demo pieza 1): el test de la Propiedad 5 en `houseView.test.ts` recalcula el resultado con la misma lógica que `buildWarnings`, así que un fallo en esa lógica no lo detectaría. Los tests de ejemplo con valores fijos sí lo cubren. Sin acción por ahora.
+- Medium (revisión PR #20, web-demo pieza 2): `page.test.ts` (líneas 15-16) importa `sessionArb.testutil` y `reportArb.testutil` con rutas relativas dentro de `packages/core/src`; se rompe si Core los mueve. Arreglo mínimo: exportarlos desde un único punto de entrada de Core solo para tests.
+- Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 90-103): `go-to-floor` sigue disponible durante un análisis en vivo y, al terminar, la escena vuelve a la planta principal. Arreglo: no ofrecer navegación mientras `busy`, o no reiniciar la escena.
+- Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 94-100): el estado "Live report ready" o el de error se queda al cambiar de planta (cosmético).
+- Low (revisión PR #20, web-demo pieza 2): `page.ts` (línea 93): `submit-live` se ofrece en la escena del fantasma aunque el formulario está oculto; cerrarlo en la pieza 3 cuando existan las acciones del fantasma.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
