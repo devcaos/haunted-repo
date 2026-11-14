@@ -201,7 +201,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add the asset manifest with empty slots`
     - _Requirements: 11.5, 18.5_
 
-  - [ ] 5.2 Add the design tokens and the base CSS
+  - [x] 5.2 Add the design tokens and the base CSS
     - Create `packages/web/src/view/simple/tokens.css` with the 8 colours of Requirement 11.1 and every font (system stacks, a serif stack such as Georgia for titles), spacing and size used by the CSS. Create `packages/web/src/view/simple/simple.css` using only `var(...)` for colours, fonts and sizes; code block with max height and its own scroll; no page-wide horizontal scroll at 360 px. Create `packages/web/src/view/simple/dom.ts` with `el(tag, attrs, children)` (text with `textContent` only).
     - No drawing, image or external resource.
     - Verify: `npm run check` exits `0`.
