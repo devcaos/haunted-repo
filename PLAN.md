@@ -44,6 +44,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión 13 nov): si falla por red la lectura de un solo archivo, detectGhosts devuelve error y descarta los ya leídos; solo el límite de peticiones da informe parcial (así lo pide la spec).
 - Low (revisión 13 nov): cualquier respuesta 403 de GitHub se trata como límite de peticiones, aunque la causa sea otra.
 - Low (revisión 13 nov): parseReport no comprueba que el informe sea coherente (picked igual al número de fantasmas, planta según la puntuación, rutas sin repetir). El fixture tinySession no lo es (fewFiles: true con 3 fantasmas).
+- Low (revisión PR #19, web-demo pieza 1): el test de la Propiedad 5 en `houseView.test.ts` recalcula el resultado con la misma lógica que `buildWarnings`, así que un fallo en esa lógica no lo detectaría. Los tests de ejemplo con valores fijos sí lo cubren. Sin acción por ahora.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
