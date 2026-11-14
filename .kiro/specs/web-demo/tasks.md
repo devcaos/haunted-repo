@@ -253,8 +253,8 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `docs: log Kiro usage for web demo PR 1`
     - _Requirements: 16.4_
 
-- [ ] 7. Final checkpoint and PR 1
-  - [ ] 7.1 Final check of PR 1
+- [~] 7. Final checkpoint and PR 1
+  - [x] 7.1 Final check of PR 1
     - Ensure all tests pass, ask the user if questions arise.
     - Run `npm run check` (exit `0`, no network needed); `git status --short` prints nothing.
     - Count the changed lines with `git diff --stat main...HEAD`, excluding `package-lock.json` and the JSON data (`report.json`, `files.json`); the licence text counts as data too.
