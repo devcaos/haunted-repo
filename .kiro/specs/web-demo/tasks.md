@@ -222,7 +222,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): wire the demo page`
     - _Requirements: 2.1, 2.2, 2.3, 4.2, 10.4, 11.5, 18.5_
 
-  - [ ] 5.5 Delete the check button
+  - [x] 5.5 Delete the check button
     - Delete `packages/web/src/checkButton.ts` and `packages/web/src/checkButton.test.ts`. Its single-flight idea lives on in task 3.2 and P7.
     - Verify: `npm run check` exits `0`; a search for `checkButton` under `packages/web` finds nothing.
     - Commit message: `chore(web): remove the check button`
