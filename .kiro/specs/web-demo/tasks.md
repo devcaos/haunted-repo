@@ -228,7 +228,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `chore(web): remove the check button`
     - _Requirements: 14.1, 14.3_
 
-  - [ ] 5.6 Add the source rules for storage, HTML, texts and layers
+  - [x] 5.6 Add the source rules for storage, HTML, texts and layers
     - Create `packages/web/src/source.test.ts` (`node:fs`, `/// <reference types="node" />`), scanning non-test files under `src/` and `index.html`: no `localStorage`, `sessionStorage`, `indexedDB`, `document.cookie` (the test skips itself); no `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`; the word `Power` only in `powerTexts.ts`; the text `Check GitHub connection` nowhere; no `style` attribute or `<style>` in `index.html`; Logic_Layer (`src/logic/**`, `src/sample/**`) has no `document`, `window`, `HTMLElement` and no import from `src/view`; `makeSample.ts` has no relative import; `src/view/**` imports Core only with `import type`. Add one negative self-check per rule group (an inline string that the pattern must match), so a rule cannot pass by matching nothing.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check source rules for storage and layers`

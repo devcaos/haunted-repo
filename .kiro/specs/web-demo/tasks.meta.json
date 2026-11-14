@@ -196,6 +196,13 @@
         "chatSessionId": "sess_7e92932c-3c2a-4c66-8a58-47834e41acf1",
         "timestamp": 1794616020187
       }
+    ],
+    "5.6 Add the source rules for storage, HTML, texts and layers": [
+      {
+        "executionId": "6e40a996-22a1-409d-a8c2-353d395b4be9",
+        "chatSessionId": "sess_7e92932c-3c2a-4c66-8a58-47834e41acf1",
+        "timestamp": 1794616193125
+      }
     ]
   }
 }

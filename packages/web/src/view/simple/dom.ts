@@ -1,6 +1,6 @@
 /**
  * Creates an element. Attributes are set with setAttribute.
- * Text is set with textContent only; never innerHTML.
+ * Text is set with textContent only; it is never parsed as HTML.
  */
 export function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
