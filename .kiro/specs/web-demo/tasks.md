@@ -262,21 +262,31 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `docs: close the web demo PR 1 tasks`
     - _Requirements: 15.4_
 
-  - [ ] 7.2 Open PR 1
-    - Push with `git push -u origin feat/web-demo`.
-    - Write the body to a file outside the repository (for example `$env:TEMP\pr1-body.md`), filling `.github/pull_request_template.md`, and run `gh pr create --base main --head feat/web-demo --title "feat: add the web demo ghost list and live form" --body-file <that file>`. Title under 70 characters.
-    - The body includes:
-      - What was built and what PR 2 adds.
-      - **Size warning**: the real changed-line count of task 7.1, that it is over about 500 lines, that the director accepted this size in the design, and that tests were not cut.
-      - The real-service check: the "Run result" of task 1.4.
+  - [-] 7.2 Open PR 1
+    - **Split into 4 stacked pull requests.** Task 7.1 measured 3,492 changed lines for PR 1 (without `package-lock.json`, `report.json`, `files.json`, `sirv-license.txt` and `.kiro/`). The director accepted splitting it into 4 stacked pull requests instead of the single ~3,492-line PR. Each piece is a branch created with `git branch <name> <commit>` on an existing commit of `feat/web-demo` (no rebase, no cherry-pick, no history rewrite); `feat/web-demo` stays as it is. Sizes below exclude the same files and `.kiro/`:
+
+      | Piece | Branch | Commits | Title | Size (code / tests / docs) |
+      |---|---|---|---|---|
+      | 1 | `feat/web-demo-1` | `f6d70df..91e519c` | `feat: add the web demo sample data and view model` | 1,111 (526 / 575 / 10) |
+      | 2 | `feat/web-demo-2` | `9fcbab7..729a340` | `feat: add the web demo page controller and live analysis` | 965 (215 / 750 / 0) |
+      | 3 | `feat/web-demo-3` | `bb0f3fb..62983a0` | `feat: add the web demo styles and house renderer` | 772 (699 / 73 / 0) |
+      | 4 | `feat/web-demo-4` | `245cd40..bd2bf6b` plus the docs commits of the split | `feat: wire the web demo page and add source checks` | 656 before the split docs commits (90 / 556 / 10; 241 of the 656 are deletions) |
+
+    - Stacked: piece 2 is based on piece 1, piece 3 on piece 2, piece 4 on piece 3. Piece 1 targets `main`; pieces 2 to 4 target the previous piece's branch until it is merged.
+    - Push and open one pull request at a time: piece 1 now (`git push -u origin feat/web-demo-1`), and each next piece only after the previous one is reviewed, when the director decides. Never push `feat/web-demo`.
+    - For each piece, write the body to a file outside the repository (for example `$env:TEMP\pr-web-demo-<n>-body.md`), filling `.github/pull_request_template.md`, and run `gh pr create --base <main or previous piece branch> --head feat/web-demo-<n> --title "<title of the table>" --body-file <that file>`. Titles are under 70 characters.
+    - Every body includes: which piece of 4 it is and the stacking; what it adds (its commits); its real size from `git diff --numstat` against its base (code / tests / docs apart, data and licence sizes apart); what a reviewer can check by hand; the merge order; that nothing was merged.
+    - Merge order 1, 2, 3, 4, each with "Create a merge commit" (no squash, no rebase merge), done by the director. After each merge, retarget the next pull request to `main` with `gh pr edit <number> --base main`.
+    - Piece 1 body (sample data commits) also includes the real-service check: the "Run result" of task 1.4.
+    - Piece 4 body (the page is wired here) also includes:
       - **Manual check of the live form after deploy (done by the director, not by Kiro)**, per Requirement 15.3:
         1. Open `https://devcaos.github.io/haunted-repo/` in a clean browser window.
         2. Paste `https://github.com/lukeed/sirv` in the form and submit.
         3. Success: the Ghost_List of the live report and the line "To exorcise the ghosts of this repository, use your own Kiro with the Haunted Repo Power."
         4. Fallback: the Sample_Report and the message "GitHub allows only 60 requests per hour without an account…".
       - Manual page checklist: keyboard only reaches every control; 360 px wide shows no page-wide horizontal scroll; the licence link opens the text; no request in the Network tab on load; changing one colour in `tokens.css` changes the page.
-      - That nothing was merged.
-    - Never merge. No commit in this task (the PR is opened from the commits above); mark it `[x]` in the first commit of PR 2.
+    - Never merge. No code commit in this task (the pull requests are opened from the commits above); mark it `[x]` in the first commit of PR 2.
+    - PR 2 (`feat/web-exorcism`) starts from `main` only after piece 4 is merged.
     - _Requirements: 15.2, 15.3_
 
 ### PR 2 — feat/web-exorcism
