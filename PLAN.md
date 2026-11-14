@@ -13,7 +13,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
-6. [ ] Spec: web de demostración con repo de ejemplo encantado
+6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`; PR 1 en curso en `feat/web-demo`: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia; la PR 2 añade el exorcismo grabado)
 7. [ ] Spec: empaquetar como Kiro Power
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
 9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR #13 fusionada)
@@ -32,7 +32,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Cerrado (13 nov, docs/pre-web-cleanup): Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
 - Low (PR #11, revisión): `parseReport` acepta campos desconocidos sin quitarlos.
 - Cerrado (13 nov, docs/pre-web-cleanup): Medium (auditoría 11 nov): la línea .kiro/specs/*/tasks.meta.json de .gitignore puede chocar con las bases; decidir si se quita
-- Medium (auditoría 11 nov): la demo debe mostrar el aviso de licencia MIT de lukeed/sirv
+- Cerrado (web-demo PR 1): Medium (auditoría 11 nov): la demo debe mostrar el aviso de licencia MIT de lukeed/sirv. El pie de la página muestra la línea de copyright y enlaza a `sirv-license.txt`.
 - Low (spec exorcism): siete propiedades opcionales aplazadas (grupo 8 de `tasks.md`): P3 tipo de archivo estable, P7 ida y vuelta del progreso, P8 rango de `hauntedShare`, P9 `hauntedShare` monótono, P10 frase del fantasma determinista, P15 ida y vuelta de la grabación, P17 las `sampleAnswer` se ignoran. Si se hacen, van en una rama nueva (feat/exorcism-properties) y una PR nueva, solo si hay tiempo (la PR #14 ya está fusionada).
 - Low (revisión exorcism): `buildInstructions` lanza un Error si el estado no trae `current` o `pendingQuestion` (solo pasa con un estado imposible; el motor no lo produce).
 - Low (revisión exorcism): las instrucciones no tienen una sección aparte de "formato de salida": el formato del VERDICT va como regla `verdict-format`.
@@ -74,7 +74,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
   - `.kiro/specs/ghost-detection/design.md` tiene un puntero a la sección "Ghost_Sentence" del diseño de exorcismo, que sustituye a su tabla de frases.
 - Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (c) npm ci comprobado en Linux con el lockfile de Windows (11 nov)
   - (d) web: el informe guardado de la demo sale de una ejecución real de detectGhosts sobre el commit fijado de lukeed/sirv, no escrito a mano, y se carga con parseReport; la página no llama a GitHub al arrancar.
-  - (e) web: en el navegador se guarda solo el progreso (formatProgress/parseProgress), nunca el SessionState entero (no hay validador de estado).
+  - (e) web: en el navegador no se guarda nada (ni progreso ni SessionState); lo vigila `packages/web/src/source.test.ts`.
   - (f) web: la grabación no guarda el texto del "por qué" de cada veredicto; si la demo lo enseña, necesita un campo propio, y una grabación más rica que tinySession.
-  - (g) web: npm test sin npm run build antes usa el dist/ compilado de core (falla si no existe y prueba código viejo si está desfasado); en el diseño, valorar un alias de @haunted-repo/core a packages/core/src en vitest.config.ts.
+  - (g) web: npm test sin npm run build antes usa el dist/ compilado de core (falla si no existe y prueba código viejo si está desfasado); en el diseño, valorar un alias de @haunted-repo/core a packages/core/src en vitest.config.ts. Usada: el alias está en `vitest.config.ts` (web-demo, tarea 1.1).
   - (h) Power: parseVerdict rechaza "**VERDICT: right**", un espacio delante o un punto final; el Power debe volver a pedir el veredicto si recibe INVALID_VERDICT.
+- Web de demostración (spec `web-demo`): la PR 2 (rama `feat/web-exorcism`) se crea desde `main` actualizado solo después de que Luis Miguel fusione la PR 1, y empieza por la tarea 8.1 de `.kiro/specs/web-demo/tasks.md`.
