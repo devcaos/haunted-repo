@@ -161,3 +161,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** Luis Miguel empieza cada tarea con el botón Start task de `tasks.md`, una a una.
 
 - **Estado:** resuelto.
+
+## 2026-11-14 — la PR 1 de web-demo salió mucho más grande que la estimación del diseño
+
+- **Qué intentaba:** abrir la PR 1 de la spec web-demo (tarea 7.2) con el tamaño que estimaba el diseño, unas 2.350 líneas cambiadas.
+
+- **Qué pasó:** al contar las líneas en la tarea 7.1 salieron 3.492 (sin los datos JSON, el texto de la licencia ni `.kiro/`), unas 1.752 de ellas de tests.
+
+- **Cómo lo rodeé:** Luis Miguel aprobó partirla en 4 pull requests apilados (`feat/web-demo-1` a `feat/web-demo-4`), creados como ramas sobre commits que ya existían, sin reescribir la historia (tarea 7.2 de `tasks.md`).
+
+- **Estado:** resuelto.
