@@ -234,7 +234,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check source rules for storage and layers`
     - _Requirements: 4.13, 9.2, 11.7, 14.1, 18.7_
 
-  - [ ] 5.7 Add the source rules for CSS and external addresses
+  - [x] 5.7 Add the source rules for CSS and external addresses
     - Extend `source.test.ts`: in `index.html` and every `.ts`, `.css` and `.svg` under `src/view/`, no `http://` or `https://` and no protocol-relative `//` at the start of a `url(...)`, `@import`, `src` or `href` value (the two SVG namespace values are exempt). In `src/view/simple/**/*.css` except `tokens.css`: no literal colour (the list of the design, CSS named colours included), no size unit and no `font-family` without `var(` (units and exemptions exactly as in the design). Negative self-checks as in task 5.6.
     - Verify: `npm run check` exits `0`; changing one colour in `simple.css` to a hex value makes `npm test` fail (then undo).
     - Commit message: `test(web): check styles use tokens and local files only`
