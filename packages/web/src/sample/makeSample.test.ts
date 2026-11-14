@@ -72,6 +72,20 @@ describe("makeSample with the strict fake GitHub", () => {
     expect(detection + downloads).toBe(fake.requestCount());
   });
 
+  it("downloads every file at the Sample_SHA", async () => {
+    // The fake also answers a download with no ref or with "master", like
+    // real GitHub, so only this check catches a download from the branch.
+    const fake = createFakeFetch([sirv()]);
+    const result = await makeSample({ fetch: fake.fetch });
+    if (!result.ok) throw new Error(result.error);
+
+    const contentUrls = fake.urls.filter((u) => u.includes("/contents/"));
+    expect(contentUrls.length).toBeGreaterThan(0);
+    for (const url of contentUrls) {
+      expect(new URL(url).searchParams.get("ref"), url).toBe(SAMPLE_SHA);
+    }
+  });
+
   it("gives an error when the repository is not found", async () => {
     const result = await makeSample({ fetch: createFakeFetch([]).fetch });
     expect(result.ok).toBe(false);
