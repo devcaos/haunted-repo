@@ -190,11 +190,11 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the view model is plain data`
     - _Requirements: 11.7, 11.8, 18.1, 18.2, 18.4_
 
-- [ ] 4. Checkpoint - logic of PR 1
+- [x] 4. Checkpoint - logic of PR 1
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Presentation layer and wiring
-  - [ ] 5.1 Add the asset manifest with empty slots
+- [~] 5. Presentation layer and wiring
+  - [x] 5.1 Add the asset manifest with empty slots
     - Create `packages/web/src/view/assets/manifest.ts` (`AssetSlotId` with the 10 ids, `AssetLayer`, `AssetFallback`, `AssetSlot`, `ASSET_SLOTS` with every `layers` list `[]` and a fallback and purpose for each), `packages/web/src/view/assets/resolve.ts` (`resolveSlot(id)` with one literal `import.meta.glob("./files/*", { query: "?url", import: "default", eager: true })`; never throws) and `packages/web/src/view/assets/files/.gitkeep`.
     - Create `packages/web/src/view/assets/manifest.test.ts` (`node:fs`): every id once; fallback and non-blank purpose; every layer has a non-blank `source`; every listed file exists; every file in `files/` except `.gitkeep` is listed; no layer file is an address; every `layers` list is empty in this spec.
     - Verify: `npm run check` exits `0`.

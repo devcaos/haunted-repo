@@ -149,6 +149,25 @@
         "chatSessionId": "sess_9f809be7-e94b-4ae0-8a23-24d0fe03f87b",
         "timestamp": 1794614054075
       }
+    ],
+    "4. Checkpoint - logic of PR 1": [
+      {
+        "executionId": "a1d81b17-ae98-4396-a171-2a6cc75a39c8",
+        "chatSessionId": "sess_674e7bd1-4c89-48ca-b6a0-ff2085bfa404",
+        "timestamp": 1794614332657
+      },
+      {
+        "executionId": "a1d81b17-ae98-4396-a171-2a6cc75a39c8",
+        "chatSessionId": "sess_674e7bd1-4c89-48ca-b6a0-ff2085bfa404",
+        "timestamp": 1794614391484
+      }
+    ],
+    "5.1 Add the asset manifest with empty slots": [
+      {
+        "executionId": "6e40a996-22a1-409d-a8c2-353d395b4be9",
+        "chatSessionId": "sess_7e92932c-3c2a-4c66-8a58-47834e41acf1",
+        "timestamp": 1794614448339
+      }
     ]
   }
 }
