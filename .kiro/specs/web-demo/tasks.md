@@ -208,7 +208,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add design tokens and base styles`
     - _Requirements: 11.1, 11.2, 11.4, 11.5, 11.6, 12.3_
 
-  - [ ] 5.3 Add the Simple_Renderer for the house, the live form and the licence
+  - [x] 5.3 Add the Simple_Renderer for the house, the live form and the licence
     - Create `packages/web/src/view/simple/house.ts` (`renderHouse`: three sections with `data-floor`, cards with path, score, reason, `data-ghost-state`, empty lines, warnings, Power line), `licence.ts` (`renderLicence`: copyright line plus relative link `sirv-license.txt`) and `renderer.ts` (`createSimpleRenderer(root, onAction)`: builds the shell once with header, Live_Form with a labelled URL field, Status_Region with `aria-live`, main, footer with the licence; the form is never replaced so the URL text stays; `form.hidden = !model.live.formVisible`; submit button disabled when `submit-live` is not available; on submit `preventDefault()` and `onAction({ type: "submit-live", url })`; one button per available action that this renderer shows, labelled from `TEXTS.actionLabels`; ignores `transition`; asks `resolveSlot` and uses the fallbacks).
     - Imports from `@haunted-repo/core` are `import type` only. No `innerHTML`. No test file: covered by the build and the manual checks of the PR body.
     - Verify: `npm run check` exits `0`.
