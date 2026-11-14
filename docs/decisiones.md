@@ -27,6 +27,7 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-12 | Motor del exorcismo = funciones puras en packages/core, sin red, disco ni IA | Lo reutilizan la web (grabación) y el Power, y se prueba sin red | — |
 | 2026-11-12 | Un fantasma queda exorcizado con al menos 2 de 3 respuestas buenas, si la primera (pregunta central) no está mal | Requisitos aprobados de la spec exorcism | — |
 | 2026-11-12 | La spec del exorcismo va en una sola PR (#14) | Decisión de Luis Miguel: partirla al final era inviable para él | Partir la PR en varias |
+| 2026-11-14 | La PR 1 de la spec web-demo se parte en 4 PR apiladas (`feat/web-demo-1` a `feat/web-demo-4`), que se fusionan en orden 1, 2, 3, 4 con "Create a merge commit" | Decisión de Luis Miguel. La tarea 7.1 midió 3.492 líneas cambiadas frente a las 2.350 que estimaba el diseño; las 4 piezas tienen de 656 a 1.111 líneas (tabla de la tarea 7.2 de `tasks.md`) | Una sola PR de unas 3.492 líneas |
 
 ## Rechazado (no volver a proponer sin evidencia nueva)
 

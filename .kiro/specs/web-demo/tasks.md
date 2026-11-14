@@ -6,8 +6,8 @@
 
 ## Pull requests
 
-- **PR 1** on branch `feat/web-demo` (already created). Tasks 0 to 7.
-- **PR 2** on branch `feat/web-exorcism`, created from an up-to-date `main` only AFTER the project director merges PR 1. Tasks 8 to 16.
+- **PR 1**: tasks 0 to 7, built on branch `feat/web-demo`. It was split into 4 stacked pull requests, one per branch `feat/web-demo-1` to `feat/web-demo-4`, because its real size was 3,492 changed lines (see task 7.2). Each piece is merged in order 1, 2, 3, 4 with a merge commit. Branch `feat/web-demo` is never pushed.
+- **PR 2** on branch `feat/web-exorcism`, created from an up-to-date `main` only AFTER the project director merges piece 4 (`feat/web-demo-4`) of PR 1. Tasks 8 to 16.
 - Kiro never merges. Luis Miguel merges on GitHub.
 - Size per design: PR 1 about 2,350 changed lines, PR 2 about 1,250 changed lines, not counting JSON data and `package-lock.json`. The director (Luis Miguel) accepted these new sizes: he saw them and approved the design. Each PR body carries a size warning with the real count. Tests are never cut to fit the size.
 
@@ -22,7 +22,7 @@ Cut in this order, and only as far as needed:
 ## Working rules for every task
 
 - Kiro runs a task only when the director says so, and asks permission before modifying code.
-- Run every command from the repository root, in PowerShell. Before the first commit of a session, check the branch with `git branch --show-current` (PR 1: `feat/web-demo`; PR 2: `feat/web-exorcism`; never `main`).
+- Run every command from the repository root, in PowerShell. Before the first commit of a session, check the branch with `git branch --show-current` (PR 1: `feat/web-demo`, or `feat/web-demo-1` to `feat/web-demo-4` after the split; PR 2: `feat/web-exorcism`; never `main`).
 - One task = one commit. The commit message is in English, conventional style like the repo history (`feat(web):`, `test(web):`, `chore:`, `docs:`). If a message needs an "and", it is two commits.
 - Before each commit run `npm run check` (lint, format check, build, tests) and fix what fails. A task is done only when it exits `0`.
 - Mark the task `[x]` in this file and include `tasks.md` AND `.kiro/specs/web-demo/tasks.meta.json` (when it exists) in that same commit.
@@ -50,7 +50,7 @@ These open doubts of the design are settled by the approved design and are not r
 
 ## Tasks
 
-### PR 1 — feat/web-demo
+### PR 1 — feat/web-demo (split into feat/web-demo-1 to feat/web-demo-4)
 
 - [x] 0. Commit the spec
   - On branch `feat/web-demo` (check with `git branch --show-current`), commit the spec itself so that "`git status --short` prints nothing" holds for the later tasks: `.kiro/specs/web-demo/requirements.md`, `design.md`, `tasks.md`, `.config.kiro`, and `tasks.meta.json` if it exists.
@@ -59,7 +59,7 @@ These open doubts of the design are settled by the approved design and are not r
   - One commit. Commit message: `docs: add web-demo spec`
   - _Requirements: none (git workflow)_
 
-- [~] 1. Test setup and sample data
+- [x] 1. Test setup and sample data
   - [x] 1.1 Add the Vitest alias for Core
     - In `vitest.config.ts` add `resolve.alias` mapping `@haunted-repo/core` to `packages/core/src/index.ts` (with `fileURLToPath(new URL(...))`), as in the design "Vitest alias". `vitest.live.config.ts` stays unchanged.
     - Verify the "no build" case: `node -e "require('node:fs').rmSync('packages/core/dist',{recursive:true,force:true})"`, then `npm test` passes (the current `checkButton.test.ts` now runs against Core source). Then `npm run check`.
@@ -293,7 +293,7 @@ These open doubts of the design are settled by the approved design and are not r
 
 - [ ] 8. Branch and Demo_Script
   - [ ] 8.1 Create the branch `feat/web-exorcism`
-    - Only after the director confirms that PR 1 is merged. Run `git checkout main`, `git pull`, then `git checkout -b feat/web-exorcism`. Check that `main` contains the PR 1 commits.
+    - Only after the director confirms that piece 4 of PR 1 (`feat/web-demo-4`, the last of the 4 stacked pull requests) is merged. Run `git checkout main`, `git pull`, then `git checkout -b feat/web-exorcism`. Check that `main` contains the commits of the 4 pieces.
     - No commit of its own; mark this task and task 7.2 `[x]` in the commit of task 8.2.
     - _Requirements: none (git workflow)_
 
