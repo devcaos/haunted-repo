@@ -215,7 +215,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): draw the house with the simple renderer`
     - _Requirements: 3.1, 3.3, 3.4, 4.1, 4.4, 4.5, 4.8, 5.4, 10.1, 10.4, 11.8, 11.9, 12.1, 12.2, 12.3, 18.5_
 
-  - [ ] 5.4 Wire the page in `main.ts` and `index.html`
+  - [x] 5.4 Wire the page in `main.ts` and `index.html`
     - Rewrite `packages/web/index.html`: head (title, meta, charset) and `<body><div id="root"></div><script type="module" src="/src/main.ts"></script></body>`; no inline style, no external resource.
     - Rewrite `packages/web/src/main.ts`: import `report.json?raw` and `files.json?raw`, `loadSample`, `createSimpleRenderer` and its CSS, `createPage` with `detect: (url) => detectGhosts(url)` (no `ref`), then `page.start()`. It no longer imports `checkButton.ts`.
     - Verify: `npm run check` exits `0`; `npm run build` output in `packages/web/dist` contains `sirv-license.txt` at its root.
