@@ -240,14 +240,14 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check styles use tokens and local files only`
     - _Requirements: 11.2, 11.3, 11.5_
 
-- [ ] 6. Project documents for PR 1
+- [x] 6. Project documents for PR 1
   - [x] 6.1 Update `PLAN.md`
     - Item 6 ("Spec: web de demostración"): PR 1 in progress (list, live form, fallback, licence). "Pendientes": mark the MIT notice line of lukeed/sirv as closed. Note (g): mark it used. Note (e) ("en el navegador se guarda solo el progreso"): replace it with "nothing is saved". Add a short "Para retomar" note: PR 2 starts from `main` after the merge, task 8.1. `PLAN.md` may stay in Spanish.
     - Verify: `npm run check` exits `0`; `git status --short` shows only `PLAN.md`, `tasks.md` (and `tasks.meta.json`).
     - Commit message: `docs: update the plan for web demo PR 1`
     - _Requirements: 16.2, 16.3, 16.6_
 
-  - [ ] 6.2 Add the line to `docs/kiro-usage-log.md`
+  - [x] 6.2 Add the line to `docs/kiro-usage-log.md`
     - One new line about PR 1 of this spec, in the style and order of the file.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: log Kiro usage for web demo PR 1`
