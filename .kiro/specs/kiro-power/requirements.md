@@ -26,8 +26,9 @@ This spec does not change `packages/core`.
 - **Tutor_Skill**: the Agent Skill (`skills/<name>/SKILL.md`) that tells the user's Kiro how to act as the Tutor and in which order to call the Power_Tools.
 - **Tutor**: the user's own Kiro, acting under the Tutor_Skill and the Tutor_Instructions.
 - **Student**: the user of the Power.
-- **Workspace**: the folder that the Student has open in Kiro.
-- **Power_Data_Folder**: the single folder inside the Workspace where the Power keeps its files. Its name is decided in the design.
+- **Workspace**: the folder that the Student has open in Kiro. Kiro does not tell the Power_Server which folder this is (Kiro does not declare the MCP `roots` capability, `docs/spike-power.md`), and the Power_Server does not try to find it.
+- **Power_Data_Folder**: the folder whose path Kiro gives the Power_Server in the `PLUGIN_DATA` environment variable (in the spike, `C:\Users\<user>\.kiro\powers\data\power`). It is outside the Workspace. The Power keeps all its files there and nowhere else.
+- **Repository_Data_File**: the one file in the Power_Data_Folder that holds the Haunted_Report and the Exorcism_Progress of one repository. There is one Repository_Data_File per repository, and its name includes the repository (Requirement 7.11). Its exact name and layout are decided in the design.
 - **Engine**: the exorcism engine of `@haunted-repo/core` (`startSession`, `advance`, `buildInstructions`, `parseVerdict`, `parseEvent`, `parseProgress`, `formatProgress`, `hauntedShare`).
 - **Detection**: `detectGhosts` of `@haunted-repo/core`, which builds a Haunted_Report from a public GitHub repository URL.
 - **Haunted_Report**, **Ghost**, **Ghost_Text**, **Session_State**, **Step**, **Event**, **Tutor_Instructions**, **Verdict**, **Rating**, **Exorcism_Progress**, **Haunted_Share**, **Core_Question**: as defined in the glossary of `.kiro/specs/exorcism/requirements.md`.
