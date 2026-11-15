@@ -40,6 +40,20 @@ This spec does not change `packages/core`.
 
 ## Requirements
 
+### Requirement 0: Tracer spike before the design
+
+**User Story:** As the project director, I want a tiny Power installed and called in my real Kiro before the design is written, so that the design is based on how Kiro really runs a Power and not on guesses.
+
+#### Acceptance Criteria
+
+1. BEFORE `design.md` is written, a minimal Power SHALL be built in `packages/power/` with a `plugin.json`, one skill (`skills/<name>/SKILL.md`), an `mcp.json`, and an MCP server with one tool that returns its own working directory and the Workspace path it can see.
+2. THE minimal Power SHALL be installed in Kiro IDE with "Import power from GitHub" from the `packages/power/` folder of this repository.
+3. WHEN the minimal Power is installed, one call of its tool from the Kiro chat SHALL succeed.
+4. THE result SHALL be written in `docs/spike-power.md`: the steps followed, whether the tool call succeeded, the working directory and the Workspace path the tool returned, and how Kiro started the server.
+5. `design.md` SHALL NOT be written until the spike passes (criterion 3).
+6. `design.md` SHALL use the result of the spike to answer Open Questions 2 (how the installed Power runs its server) and 5 (the Power_Data_Folder).
+7. THE spike SHALL NOT replace the manual end-to-end check of Requirement 11.7, which stays as the final check.
+
 ### Requirement 1: Package the Power in the current Kiro format
 
 **User Story:** As a student, I want to install Haunted Repo in my Kiro from a folder or from the GitHub repository, so that I can exorcise ghosts without installing anything else by hand.
