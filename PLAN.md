@@ -53,6 +53,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión PR #21, web-demo pieza 3): `resolve.ts` y `house.ts` no tienen tests; el caso "hueco con capas y un archivo que falta" no se ejecuta. Arreglo: pasar el mapa de URL a `resolveSlot` como parámetro y probarlo en Node.
 - Low (revisión PR #21, web-demo pieza 3): en `house.ts`, `ghostStateNodes` repite el `map` de `img` de `slotImages`; que llame a `slotImages`.
 - Piezas 3 y 4 de la PR 2 de web-demo: sin abrir. Ramas locales `feat/web-exorcism-3` (685 líneas, tests de los estados finales y propiedades) y `feat/web-exorcism-4` (678 líneas más el commit de docs del reparto, panel del exorcismo y progreso). Se abren de una en una cuando Luis Miguel lo decida.
+- Low (revisión PR #25, web-demo PR 2 pieza 2): la lista de pasos del fantasma está duplicada en `page.ts` y en `exorcism.ts`; dejar una sola fuente.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
