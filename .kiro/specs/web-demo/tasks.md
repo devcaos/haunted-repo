@@ -413,56 +413,64 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): extend view model checks to the ghost scene`
     - _Requirements: 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4_
 
-- [~] 11. Checkpoint - logic of PR 2
+- [x] 11. Checkpoint - logic of PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Presentation of the exorcism
-  - [~] 12.1 Draw progress, locked ghosts and the house-clean line
+- [x] 12. Presentation of the exorcism
+  - [x] 12.1 Draw progress, locked ghosts and the house-clean line
     - In `view/simple/house.ts`: the Progress_Indicator (line plus native `<progress max="1">` with `share`), the locked line on locked cards (from the model, which takes it from `POWER_TEXTS`), the start button on cards with `canStart`, the `exorcised` state label, the house-clean line. Extend `simple.css` with tokens only.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw progress and ghost states`
     - _Requirements: 4.13, 6.1, 6.2, 6.21, 8.1, 8.2, 8.3, 8.4, 11.9_
 
-  - [~] 12.2 Draw the Exorcism_Panel and wire the Demo_Script
+  - [x] 12.2 Draw the Exorcism_Panel and wire the Demo_Script
     - Create `packages/web/src/view/simple/ghost.ts` (`renderGhost`): heading with `tabindex="-1"`, reading text, Code_Block `<pre class="code-block" tabindex="0"><code>` with the full Ghost_Text, Licence_Notice next to the code, judge line, question, Answer_Box `<textarea>` with a label and no event listener, revealed model answer, one button per available ghost action (labels from `TEXTS.actionLabels`), self-check prompt and buttons, failed prompt with "Try again" and "Back to the list". In `renderer.ts` show the panel when `model.ghost` is not null and move focus to its heading when the scene or the step changed. Extend `simple.css` (tokens only).
     - In `main.ts` import `demo-script.json?raw`, parse it with `parseDemoScript` and pass the script (or `null` when the parse fails).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the exorcism panel`
     - _Requirements: 4.10, 6.4, 6.5, 6.6, 6.7, 6.9, 6.10, 6.14, 6.15, 6.16, 6.17, 6.18, 6.19, 6.20, 6.22, 6.23, 10.2, 12.1, 12.2_
 
-  - [~] 12.3 Extend the source rules for the Answer_Box
+  - [x] 12.3 Extend the source rules for the Answer_Box
     - Check that the rules of tasks 5.6 and 5.7 already scan the new files (`ghost.ts`, `demoScript.ts`, `exorcism.ts`, `demo-script.json` is data and not scanned). Add one rule to `source.test.ts`: `src/view/simple/ghost.ts` reads no `.value` and adds no `input` or `change` listener, so the Answer_Box text never leaves the DOM field. Negative self-check as in task 5.6.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the answer box text is never read`
     - _Requirements: 6.23, 9.2_
 
-- [ ] 13. Project documents for PR 2
-  - [~] 13.1 Update `PLAN.md`
+- [x] 13. Project documents for PR 2
+  - [x] 13.1 Update `PLAN.md`
     - Mark item 6 ("Spec: web de demostración") done, with the numbers of PR 1 and PR 2. Add a "Para retomar" note: the optional Tutor texts of group 16, and that the scenic renderer is a later spec.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: mark the web demo spec as done in the plan`
     - _Requirements: 16.1_
 
-  - [~] 13.2 Add the line to `docs/kiro-usage-log.md`
+  - [x] 13.2 Add the line to `docs/kiro-usage-log.md`
     - One new line about PR 2 of this spec, in the style and order of the file.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: log Kiro usage for web demo PR 2`
     - _Requirements: 16.4_
 
-- [~] 14. Final checkpoint - PR 2
+- [x] 14. Final checkpoint - PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. Open PR 2
-  - [~] 15.1 Final check and pull request
-    - Run `npm run check` (exit `0`); `git status --short` prints nothing. Count the changed lines with `git diff --stat main...HEAD`, excluding `package-lock.json` and JSON data (`demo-script.json` is hand-written; say its size apart).
-    - Mark this task `[x]`, commit `tasks.md` (and `tasks.meta.json`) with message `docs: close the web demo PR 2 tasks`, then `git push -u origin feat/web-exorcism`.
-    - Write the body to a file outside the repository and run `gh pr create --base main --head feat/web-exorcism --title "feat: add the sample exorcism to the web demo" --body-file <that file>`, filling `.github/pull_request_template.md`. The body includes:
-      - What was built; that only the 2 easiest ghosts have Tutor texts and the others are locked (unless group 16 was done).
-      - **Size warning**: the real count, over about 500 lines, accepted by the director in the design, tests not cut.
-      - **Manual checks after deploy (done by the director, not by Kiro)** on `https://devcaos.github.io/haunted-repo/`: exorcise the 2 easiest ghosts from start to end (including one "I don't know", one retry and the self-check); the progress line and bar change when a ghost is exorcised; keyboard focus moves into the panel at each step; changing only `tokens.css` changes the colours of the whole page.
-      - That nothing was merged.
-    - Never merge.
-    - Commit message: `docs: close the web demo PR 2 tasks`
+- [x] 15. Open PR 2
+  - [x] 15.1 Final check and pull request
+    - **Split into 4 stacked pull requests.** The final check measured 2,973 changed lines for PR 2 (code 1,000 / tests 1,960 / docs 13, without `package-lock.json` and `.kiro/`; `demo-script.json`, 46 lines, apart). The director's limit is 900, so he chose to split it into 4 stacked pull requests, the same way as PR 1 in task 7.2. Each piece is a branch created with `git branch <name> <commit>` on an existing commit of `feat/web-exorcism` (no rebase, no cherry-pick, no history rewrite); `feat/web-exorcism` stays as it is and is never pushed. Sizes below exclude the same files and `.kiro/`:
+
+      | Piece | Branch | Commits | Title | Size (code / tests / docs) |
+      |---|---|---|---|---|
+      | 1 | `feat/web-exorcism-1` | `9222d8b..28c3970` | `feat: add the demo script and sample ghost states` | 787 (197 / 590 / 0), plus 46 JSON |
+      | 2 | `feat/web-exorcism-2` | `5f250dc..77d3c60` | `feat: drive the sample exorcism from the page` | 859 (357 / 500 / 2) |
+      | 3 | `feat/web-exorcism-3` | `c8b7fcd..2e3edf6` | `test: check the exorcism end states and properties` | 685 (0 / 685 / 0) |
+      | 4 | `feat/web-exorcism-4` | `0d517b8..ccfa713` plus the docs commit of the split | `feat: draw the exorcism panel and progress` | 678 (450 / 217 / 11) before the split docs commit |
+
+    - Stacked: piece 2 is based on piece 1, piece 3 on piece 2, piece 4 on piece 3. Piece 1 targets `main`; pieces 2 to 4 target the previous piece's branch until it is merged. After each merge, retarget the next pull request to `main` with `gh pr edit <number> --base main`.
+    - Push and open one pull request at a time: piece 1 now (`git push -u origin feat/web-exorcism-1`), and each next piece only when the director decides.
+    - For each piece, write the body to a file outside the repository (for example `$env:TEMP\pr-web-exorcism-<n>-body.md`), filling `.github/pull_request_template.md`, and run `gh pr create --base <main or previous piece branch> --head feat/web-exorcism-<n> --title "<title of the table>" --body-file <that file>`.
+    - Every body includes: which piece of 4 it is and the stacking; what it adds (its commits); its real size from `git diff --numstat` against its base (code / tests / docs apart, `demo-script.json` apart); the size warning (PR 2 was 2,973 lines in total, split because of the director's 900-line limit, tests not cut); what a reviewer can check by hand; the merge order; that nothing was merged.
+    - Piece 1 body also says that only the 2 easiest ghosts have Tutor texts (the others are locked), that the director reviews those texts in `demo-script.json` there, and that this piece does not change the visible page yet.
+    - Piece 4 body (the panel is drawn here) also includes **Manual checks after deploy (done by the director, not by Kiro)** on `https://devcaos.github.io/haunted-repo/`: exorcise the 2 easiest ghosts from start to end (including one "I don't know", one retry and the self-check); the progress line and bar change when a ghost is exorcised; keyboard focus moves into the panel at each step; changing only `tokens.css` changes the colours of the whole page.
+    - Merge order 1, 2, 3, 4, each with "Create a merge commit" (no squash, no rebase merge), done by the director.
+    - Never merge. This task is marked `[x]` only when the 4 pull requests are opened, in a later commit.
     - _Requirements: 16.1_
 
 - [ ] 16. Optional: Tutor texts for the other sirv ghosts

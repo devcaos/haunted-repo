@@ -200,4 +200,14 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** partirla en 4 pull requests apiladas (`feat/web-exorcism-1` a `feat/web-exorcism-4`), creadas como ramas sobre commits que ya existían, sin reescribir la historia. Tamaños medidos con `git diff --numstat` contra la pieza anterior, con la misma regla: 787 (más 46 de JSON), 859, 685 y 678. Suman 3.009, más que 2.973, porque algunas líneas cambian en más de una pieza.
 
-- **Estado:** en curso: piezas 1 (#24) y 2 (#25) fusionadas, piezas 3 y 4 pendientes.
+- **Estado:** resuelto: las 4 piezas están fusionadas (#24, #25, #27 y #29).
+
+## 2026-11-15 — `git checkout main` se bloqueó por un cambio de `README.md` sin commit
+
+- **Qué intentaba:** cambiar a `main` para abrir la pieza 4 de la PR 2 de web-demo, después de fusionar la PR #28 (README v2).
+
+- **Qué pasó:** la rama `docs/readme-v2` tenía `README.md` modificado sin commit, y git no dejaba cambiar de rama. El archivo era idéntico al README de antes de la PR #28 (el mismo blob `132e2d7`), así que deshacía el README nuevo. No sé qué lo cambió.
+
+- **Cómo lo rodeé:** guardarlo con `git stash` (sin borrarlo; está en `stash@{0}`, con un mensaje que lo explica) y seguir desde `main`.
+
+- **Estado:** abierto: falta saber la causa y decidir si se borra el stash.

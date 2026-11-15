@@ -465,6 +465,16 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758774593
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794762898792
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763012307
       }
     ],
     "12.1 Draw progress, locked ghosts and the house-clean line": [
@@ -472,6 +482,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758774696
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763012558
       }
     ],
     "12.2 Draw the Exorcism_Panel and wire the Demo_Script": [
@@ -479,6 +494,21 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758774798
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763199698
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763536884
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763798566
       }
     ],
     "12.3 Extend the source rules for the Answer_Box": [
@@ -486,6 +516,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758774892
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763798744
       }
     ],
     "13.1 Update `PLAN.md`": [
@@ -493,6 +528,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758775003
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794763973654
       }
     ],
     "13.2 Add the line to `docs/kiro-usage-log.md`": [
@@ -500,6 +540,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758775105
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794764094025
       }
     ],
     "14. Final checkpoint - PR 2": [
@@ -507,6 +552,16 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758775202
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794764307527
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794764510171
       }
     ],
     "15.1 Final check and pull request": [
@@ -514,6 +569,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758775299
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794764635731
       }
     ]
   }

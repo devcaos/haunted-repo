@@ -60,6 +60,16 @@ const CORE_SPECIFIER = /["']@haunted-repo\/core(?:\/[^"']*)?["']/g;
 const CORE_TYPE_IMPORT =
   /\bimport\s+type\s[^;]*?\bfrom\s*["']@haunted-repo\/core(?:\/[^"']*)?["']/g;
 
+// The Answer_Box text never leaves its DOM field (Requirement 6.23).
+const GHOST_TS = "src/view/simple/ghost.ts";
+const RENDERER_TS = "src/view/simple/renderer.ts";
+const READS_VALUE = /\.value\b/;
+const INPUT_LISTENER =
+  /\baddEventListener\(\s*["'`](?:input|change)["'`]|\bon(?:input|change)\b/i;
+// renderer.ts reads the URL field, so there only the Answer_Box is checked.
+const ANSWER_BOX_READ =
+  /\banswerBox\s*\??\.\s*(?:value|addEventListener|oninput|onchange)\b/;
+
 // External addresses (Requirement 11.5), in index.html and src/view/.
 const SVG_NAMESPACES = [
   "http://www.w3.org/2000/svg",
@@ -174,6 +184,15 @@ describe("source scan", () => {
     expect(paths).toContain("src/logic/powerTexts.ts");
     expect(paths).toContain("src/sample/makeSample.ts");
     expect(paths).toContain("src/view/simple/simple.css");
+    for (const added of [
+      GHOST_TS,
+      RENDERER_TS,
+      "src/view/simple/focus.ts",
+      "src/logic/demoScript.ts",
+      "src/logic/exorcism.ts",
+    ]) {
+      expect(paths).toContain(added);
+    }
     expect(
       paths.filter((p) => TEST_FILE.test(p) || p.endsWith(".json")),
     ).toEqual([]);
@@ -187,6 +206,34 @@ describe("storage (Requirement 9.2)", () => {
   it("self-check: the pattern catches storage", () => {
     expect(STORAGE.test('localStorage.setItem("a", "b")')).toBe(true);
     expect(STORAGE.test("document.cookie = x")).toBe(true);
+  });
+});
+
+describe("Answer_Box (Requirements 6.23, 9.2)", () => {
+  it("ghost.ts reads no .value and adds no input or change listener", () => {
+    const ghost = viewFiles.filter((f) => f.path === GHOST_TS);
+    expect(ghost).toHaveLength(1);
+    expect(offenders(ghost, READS_VALUE)).toEqual([]);
+    expect(offenders(ghost, INPUT_LISTENER)).toEqual([]);
+  });
+  it("renderer.ts never reads the Answer_Box or listens to it", () => {
+    const renderer = viewFiles.filter((f) => f.path === RENDERER_TS);
+    expect(renderer).toHaveLength(1);
+    expect(offenders(renderer, ANSWER_BOX_READ)).toEqual([]);
+  });
+  it("self-check: the patterns catch reads and listeners", () => {
+    expect(READS_VALUE.test("const text = box.value;")).toBe(true);
+    expect(INPUT_LISTENER.test('box.addEventListener("input", f)')).toBe(true);
+    expect(INPUT_LISTENER.test("box.addEventListener('change', f)")).toBe(true);
+    expect(INPUT_LISTENER.test("box.oninput = f;")).toBe(true);
+    expect(INPUT_LISTENER.test('button.addEventListener("click", f)')).toBe(
+      false,
+    );
+    expect(ANSWER_BOX_READ.test("send(answerBox.value)")).toBe(true);
+    expect(ANSWER_BOX_READ.test("answerBox?.addEventListener('x', f)")).toBe(
+      true,
+    );
+    expect(ANSWER_BOX_READ.test("url: input.value")).toBe(false);
   });
 });
 

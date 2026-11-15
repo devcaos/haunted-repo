@@ -36,7 +36,7 @@ The Tutor is the user's own Kiro, guided by the exorcism engine. This project ne
 |---|---|---|
 | Ghost detection (`packages/core/src/ghost-detection/`) | Picks up to 5 key files from a public GitHub repository URL and gives each one a score, a floor and a reason. Runs in the browser too. | Done |
 | Exorcism engine (`packages/core/src/exorcism/`) | A pure engine that guides the Tutor: explanation first, then 3 behaviour questions, one at a time; the first one is the core question. A second "I don't know" gets a short model answer. | Done (engine only) |
-| Web demo (`packages/web/`) | A static page that opens on a report of lukeed/sirv saved from a real run, with a form that analyses any public GitHub repository live from the browser. | Ghost list and live form done. The recorded exorcism of the sample is in progress |
+| Web demo (`packages/web/`) | A static page that opens on a report of lukeed/sirv saved from a real run, with a form that analyses any public GitHub repository live from the browser. | Done: ghost list, live form and the recorded exorcism of the sample (the 2 easiest ghosts) |
 | Kiro Power (`packages/power/`) | The real tool: it will connect the exorcism engine to the user's own Kiro. | Not started (placeholder package). Comes after the web demo |
 
 ## What works today
@@ -49,9 +49,9 @@ Done:
 
 - The public demo page: the ghosts of lukeed/sirv by floor, the live form and the fallback to the sample. The page makes no network call when it opens and saves nothing in the browser.
 
-Not done yet:
+- The exorcism on the demo page, for the 2 easiest ghosts of lukeed/sirv.
 
-- The exorcism on the demo page (in progress).
+Not done yet:
 
 - The Kiro Power (not started).
 
