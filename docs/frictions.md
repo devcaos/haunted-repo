@@ -200,4 +200,4 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** partirla en 4 pull requests apiladas (`feat/web-exorcism-1` a `feat/web-exorcism-4`), creadas como ramas sobre commits que ya existían, sin reescribir la historia. Tamaños medidos con `git diff --numstat` contra la pieza anterior, con la misma regla: 787 (más 46 de JSON), 859, 685 y 678. Suman 3.009, más que 2.973, porque algunas líneas cambian en más de una pieza.
 
-- **Estado:** en curso: piezas 1 (#24) y 2 (#25) fusionadas, piezas 3 y 4 pendientes.
+- **Estado:** resuelto: las 4 piezas están fusionadas (#24, #25, #27 y la pieza 4).
