@@ -23,6 +23,10 @@
     "3.6 Property test for plain data and scenes (list scenes)": {
       "status": "passed",
       "lastRunTimestamp": 1794614192417
+    },
+    "8.3 Property test for the Demo_Script parser": {
+      "status": "passed",
+      "lastRunTimestamp": 1794759042493
     }
   },
   "executionHistory": {
@@ -285,6 +289,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758773214
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758965151
       }
     ],
     "8.4 Confirm the 2 easiest ghosts with the director": [

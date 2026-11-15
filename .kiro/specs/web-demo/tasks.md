@@ -304,7 +304,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): parse the demo script`
     - _Requirements: 7.4, 7.5, 7.6, 7.8_
 
-  - [~] 8.3 Property test for the Demo_Script parser
+  - [x] 8.3 Property test for the Demo_Script parser
     - **Property 2: The Demo_Script parser accepts only complete content**
     - **Validates: Requirements 7.4, 7.5, 7.8**
     - Generator: valid Ghost_Content records from `fc.string()` with non-blank filters, mutated by one of the mutations of the design. Checks: `ok` iff the content is complete; never throws. (The "committed file returns ok" part is added in task 8.5, when the file exists.)
