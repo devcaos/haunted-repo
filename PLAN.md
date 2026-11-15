@@ -54,6 +54,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión PR #21, web-demo pieza 3): en `house.ts`, `ghostStateNodes` repite el `map` de `img` de `slotImages`; que llame a `slotImages`.
 - Pieza 4 de la PR 2 de web-demo: sin abrir. Rama local `feat/web-exorcism-4` (678 líneas más el commit de docs del reparto, panel del exorcismo y progreso). Se abre cuando Luis Miguel lo decida.
 - Low (revisión PR #25, web-demo PR 2 pieza 2): la lista de pasos del fantasma está duplicada en `page.ts` y en `exorcism.ts`; dejar una sola fuente.
+- Low (revisión PR #27, web-demo PR 2 pieza 3): el test "Reload" crea una página nueva desde cero, así que casi nunca puede fallar (solo detecta estado compartido en una variable, no datos guardados en el navegador).
+- Low (revisión PR #27, web-demo PR 2 pieza 3): del juicio final "yes", "half" y "no", solo "yes" tiene un test sobre el estado de la tarjeta; "half" y "no" solo se comprueban como acciones que el motor acepta.
 - Low (web-demo PR 2, fix de foco): durante un análisis en vivo se desactiva el botón de enviar del formulario y algunos navegadores sueltan el foco de un botón desactivado; el formulario está fuera de `main` y `focusAfterRender` no lo trata.
 
 ## Hecho
