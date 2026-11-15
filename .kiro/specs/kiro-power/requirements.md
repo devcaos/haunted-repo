@@ -82,7 +82,7 @@ This spec does not change `packages/core`.
 4. IF the repository is private or does not exist (GitHub answers `REPO_NOT_FOUND`), THEN THE message SHALL say that Haunted Repo only works with public repositories and that the URL may be wrong, and SHALL NOT ask the Student for a token or password.
 5. IF Detection returns a Haunted_Report with `partial` set to `true` (rate limit reached halfway), THEN THE Power_Server SHALL return the report with an English warning that the list is incomplete.
 6. IF Detection returns a Haunted_Report with `fewFiles` set to `true`, THEN THE Power_Server SHALL return the `message` of the report together with the Ghosts.
-7. WHEN a Haunted_Report is already saved for a different repository, THE Power_Server SHALL replace it and its Exorcism_Progress only if the detection Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse with an English message and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
+7. WHEN a Repository_Data_File already exists for the same repository, THE Power_Server SHALL replace its Haunted_Report and Exorcism_Progress only if the detection Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse with an English message and SHALL NOT change any file. Detecting the ghosts of one repository SHALL NOT change the Repository_Data_File of any other repository. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
 
 ### Requirement 3: Get the Ghost_Text for the exorcism
 
@@ -225,7 +225,7 @@ This spec does not change `packages/core`.
 - **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
 - **The Workspace folder cannot be found:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
 - **Another Power shares the Power_Data_Folder** (it was imported from a URL that ends in the same folder name): the Power_Server touches only its own Repository_Data_Files and leaves every other file alone (Requirement 7.11).
-- **A new repository URL while another report is saved:** the Tutor asks the Student, and the old report is replaced only with an explicit `replace: true` input (Requirement 2.7).
+- **Detecting a repository that already has a Repository_Data_File:** the Tutor asks the Student, and the saved report and progress of that repository are replaced only with an explicit `replace: true` input; the files of other repositories do not change (Requirement 2.7).
 - **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
 - **The repeated question after a Simpler_Explanation has a different text:** the Power_Server sends the `pendingQuestion` text (Requirement 4.6).
 - **All Ghosts are `exorcised`:** Step `house-clean` and Haunted_Share 0 (Requirement 4.12).
