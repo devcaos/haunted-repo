@@ -77,7 +77,7 @@ This spec does not change `packages/core`.
 #### Acceptance Criteria
 
 1. WHEN the Tutor calls the detection Power_Tool with a repository URL, THE Power_Server SHALL call Detection with that URL and return the Haunted_Report: for each Ghost its path, Floor, Difficulty_Score and reason, in the order of the report (easy to hard).
-2. WHEN Detection succeeds, THE Power_Server SHALL save the Haunted_Report in the Power_Data_Folder (Requirement 7) and SHALL return the Haunted_Share and the suggested Ghost (exorcism Requirement 1.1).
+2. WHEN Detection succeeds, THE Power_Server SHALL save the Haunted_Report in the Repository_Data_File of that repository, inside the Power_Data_Folder (Requirement 7) and SHALL return the Haunted_Share and the suggested Ghost (exorcism Requirement 1.1).
 3. IF Detection returns an error (`INVALID_URL`, `REPO_NOT_FOUND`, `RATE_LIMITED`, `NETWORK_ERROR`, `EMPTY_REPO` or `NO_SUPPORTED_FILES`), THEN THE Power_Server SHALL return the error code and an English message that says what happened and what the Student can do, and SHALL NOT change any saved file.
 4. IF the repository is private or does not exist (GitHub answers `REPO_NOT_FOUND`), THEN THE message SHALL say that Haunted Repo only works with public repositories and that the URL may be wrong, and SHALL NOT ask the Student for a token or password.
 5. IF Detection returns a Haunted_Report with `partial` set to `true` (rate limit reached halfway), THEN THE Power_Server SHALL return the report with an English warning that the list is incomplete.
