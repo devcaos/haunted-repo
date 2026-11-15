@@ -374,7 +374,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): drive the sample exorcism from the page`
     - _Requirements: 4.10, 4.11, 4.12, 6.3, 6.8, 6.19, 6.20, 6.23, 6.26, 9.1_
 
-  - [~] 10.3 State tests for the reading and asking states
+  - [x] 10.3 State tests for the reading and asking states
     - Extend `states.test.ts`: "Ghost explaining", "Asking, not revealed", "Asking, revealed" (no engine call for the reveal), "Simplifying", "Model answer", "Leave", "Locked ghost", and the PR 2 check of "Live analysis running" (every sample `canStart` false). Built with the committed data and the committed `demo-script.json`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the exorcism reading and asking states`
