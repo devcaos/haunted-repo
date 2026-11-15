@@ -156,6 +156,7 @@ This spec does not change `packages/core`.
 7. THE Power_Server SHALL NOT send the Haunted_Report, the Exorcism_Progress or any usage data to any server, and SHALL NOT collect telemetry.
 8. FOR ALL valid Exorcism_Progress values, saving them to the Power_Data_Folder and reading them back SHALL give an equal value (save round-trip property).
 9. THE Power_Server SHALL keep the Session_State of an unfinished attempt only in memory; an unfinished attempt SHALL NOT be resumed after the Power_Server stops (exorcism Requirement 10.8: the Ghost stays `haunted`).
+10. IF the Power_Server cannot find the Workspace folder, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
 
 ### Requirement 8: Use no network except GitHub
 
@@ -219,6 +220,7 @@ This spec does not change `packages/core`.
 - **A Ghost file removed or renamed after detection:** the Ghost_Text cannot be read; English message; the Ghost stays `haunted` (Requirement 3.2).
 - **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without confirmation (Requirement 7.5).
 - **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
+- **The Workspace folder cannot be found:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
 - **A new repository URL while another report is saved:** the Tutor asks the Student before replacing it (Requirement 2.7).
 - **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
 - **The repeated question after a Simpler_Explanation has a different text:** the Power_Server sends the `pendingQuestion` text (Requirement 4.6).
