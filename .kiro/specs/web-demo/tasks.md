@@ -359,7 +359,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 4.9, 6.1, 6.2, 8.4, 11.9_
 
 - [ ] 10. Exorcism logic in the page
-  - [~] 10.1 Add the ghost view, the step actions and the event mapping
+  - [x] 10.1 Add the ghost view, the step actions and the event mapping
     - Create `packages/web/src/logic/exorcism.ts`: `readingText`, `buildGhostView` (the table of the design by step: code, licence next to code, judge line, reading, question number, question, revealed answer, Answer_Box, prompt), `ghostActions(step, revealed)` (the rows of the design table) and `eventFor(action, state, content, text)`.
     - Create `packages/web/src/logic/exorcism.test.ts` with examples: rating map `right` / `half-right` / `wrong`; self-check map `yes` / `half` / `no`; the `explanation-done` text equals `readingText`; retry explanation when `current.explanation !== ""`.
     - Extend `actions.test.ts`: for every step and both `revealed` values, every action of `ghostActions` maps to an event type in `ALLOWED_EVENTS[step]` or to `null`.

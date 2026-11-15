@@ -1,6 +1,10 @@
+import { ALLOWED_EVENTS } from "@haunted-repo/core";
+import type { ExorcismStep, SessionState } from "@haunted-repo/core";
 import { describe, expect, it } from "vitest";
 import { isAvailable } from "./actions.js";
 import type { AvailableAction } from "./actions.js";
+import type { GhostContent } from "./demoScript.js";
+import { eventFor, ghostActions } from "./exorcism.js";
 import type { ViewModel } from "./viewModel.js";
 
 function modelWith(available: AvailableAction[]): ViewModel {
@@ -79,5 +83,75 @@ describe("isAvailable", () => {
     );
     expect(isAvailable(model, { type: "start-ghost", path: "a" })).toBe(false);
     expect(isAvailable(model, { type: "leave-ghost" })).toBe(false);
+  });
+});
+
+describe("ghostActions", () => {
+  const STEPS: readonly ExorcismStep[] = [
+    "choosing",
+    "explaining",
+    "asking",
+    "simplifying",
+    "model-answer",
+    "self-check",
+    "failed",
+    "house-clean",
+  ];
+  const content: GhostContent = {
+    path: "a.js",
+    kind: "logic",
+    explanation: "First explanation.",
+    retryExplanation: "Retry explanation.",
+    questions: ["Q1?", "Q2?", "Q3?"],
+    simpler: ["S1.", "S2.", "S3."],
+    modelAnswers: ["A1.", "A2.", "A3."],
+  };
+
+  function stateAt(step: ExorcismStep): SessionState {
+    return {
+      step,
+      profile: { knowsJava: false },
+      ghosts: [],
+      progress: { ghosts: [] },
+      asked: {},
+      current: {
+        path: "a.js",
+        text: "code",
+        kind: "logic",
+        explanation: "",
+        simpler: [],
+        attemptStart: 0,
+        questionIndex: 0,
+        dontKnowCount: 0,
+        pendingQuestion: null,
+        ratings: [],
+      },
+    };
+  }
+
+  it("maps every action of every step to an allowed event or to null", () => {
+    for (const step of STEPS) {
+      for (const revealed of [false, true]) {
+        for (const available of ghostActions(step, revealed)) {
+          const action = available as Exclude<
+            AvailableAction,
+            { type: "submit-live" }
+          >;
+          const event = eventFor(action, stateAt(step), content, "code");
+          if (event !== null) {
+            expect(ALLOWED_EVENTS[step]).toContain(event.type);
+          } else {
+            expect(["show-model-answer", "back-to-list"]).toContain(
+              action.type,
+            );
+          }
+        }
+      }
+    }
+  });
+
+  it("offers no ghost action outside a ghost", () => {
+    expect(ghostActions("choosing", false)).toEqual([]);
+    expect(ghostActions("house-clean", true)).toEqual([]);
   });
 });
