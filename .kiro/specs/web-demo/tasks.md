@@ -437,7 +437,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 6.23, 9.2_
 
 - [ ] 13. Project documents for PR 2
-  - [~] 13.1 Update `PLAN.md`
+  - [x] 13.1 Update `PLAN.md`
     - Mark item 6 ("Spec: web de demostración") done, with the numbers of PR 1 and PR 2. Add a "Para retomar" note: the optional Tutor texts of group 16, and that the scenic renderer is a later spec.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: mark the web demo spec as done in the plan`
