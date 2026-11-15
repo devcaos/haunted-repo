@@ -39,6 +39,8 @@ Explain to Luis Miguel, in Spanish and briefly:
 
 Before committing each task of a spec, mark it yourself as completed (`[x]`) in `tasks.md` and include `tasks.md` in that same commit.
 
+Every block of work that closes spec tasks must also update `PLAN.md` ("En curso", "Pendientes" and "Para retomar").
+
 If something got stuck, add an entry to `docs/frictions.md` the same day (own docs commit).
 
 ## Reviews
