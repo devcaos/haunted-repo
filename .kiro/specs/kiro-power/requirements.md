@@ -91,7 +91,7 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. WHEN the Student picks a Ghost, THE Power_Server SHALL read the Ghost_Text from GitHub with the owner, repository and `ref` of the saved Haunted_Report, through `@haunted-repo/core`, and SHALL send the Event `pick-ghost` with that path and text to the Engine.
+1. WHEN the Student picks a Ghost, THE Power_Server SHALL read the Ghost_Text from GitHub with the owner, repository and `ref` of the Haunted_Report of the current session, through `@haunted-repo/core`, and SHALL send the Event `pick-ghost` with that path and text to the Engine.
 2. IF reading the Ghost_Text throws any error (including a 404, which the core client reports as `NETWORK_ERROR`, the internal `NOT_TEXT` code, or the plain `Error` of the 8-request budget), THEN THE Power_Server SHALL return an English message (the core message when there is one), SHALL NOT crash, SHALL NOT send `pick-ghost`, and SHALL keep the Session_State unchanged. THE Power_Server SHALL use a new GitHub client for each read.
 3. THE Power_Server SHALL give the Engine the Ghost_Text unchanged.
 4. THE `ref` of the Haunted_Report is the branch name, so the Ghost_Text is the current version of the file on that branch, which may differ from the one Detection scored. This is accepted.
@@ -102,7 +102,7 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. THE Power_Server SHALL create the Session_State with `startSession` from the saved Haunted_Report, the saved Exorcism_Progress (if any) and the Student_Profile, and SHALL change it only with `advance`.
+1. THE Power_Server SHALL create the Session_State with `startSession` from the Haunted_Report and the Exorcism_Progress (if any) of the chosen repository (from its Repository_Data_File, or from memory under Requirement 7.10), and the Student_Profile, and SHALL change it only with `advance`.
 2. WHEN the Engine returns Tutor_Instructions, THE Power_Server SHALL give the Tutor their `text` unchanged, together with the current Step and the Events the Tutor may send next (`ALLOWED_EVENTS`).
 3. THE Tutor_Skill SHALL tell the Tutor to follow the Tutor_Instructions exactly, to write to the Student only in English, to show one question per message, and to wait for the Student's answer before judging it.
 4. THE Tutor_Skill SHALL tell the Tutor to call a Power_Tool after each explanation, Simpler_Explanation and model answer, with the text it wrote, so that the Power_Server sends `explanation-done`.
@@ -190,7 +190,7 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. WHEN the Tutor asks for the status, THE Power_Server SHALL return, for each Ghost of the saved Haunted_Report, its path, Floor and state (`haunted` or `exorcised`), and the Haunted_Share as a number from 0 to 1 and as English text (for example, "3 of 5 ghosts still haunt this house").
+1. WHEN the Tutor asks for the status, THE Power_Server SHALL return, for each Ghost of the Haunted_Report of the current session, its path, Floor and state (`haunted` or `exorcised`), and the Haunted_Share as a number from 0 to 1 and as English text (for example, "3 of 5 ghosts still haunt this house").
 2. THE Power_Server SHALL calculate the Haunted_Share only with `hauntedShare` of the Engine.
 
 ### Requirement 11: Tests, platform and limits of the change
