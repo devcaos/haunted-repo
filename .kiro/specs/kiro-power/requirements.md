@@ -222,8 +222,8 @@ This spec does not change `packages/core`.
 - **Rate limit (60 requests per hour without a token):** `RATE_LIMITED`, or a `partial` report with a warning (Requirements 2.3 and 2.5).
 - **A Ghost file removed or renamed after detection:** the Ghost_Text cannot be read; English message; the Ghost stays `haunted` (Requirement 3.2).
 - **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without an explicit `replace: true` input (Requirement 7.5).
-- **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
-- **The Workspace folder cannot be found:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
+- **The Power_Data_Folder or one of its files cannot be written** (for example, no permission or a read-only folder): progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
+- **`PLUGIN_DATA` is missing or not writable:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
 - **Another Power shares the Power_Data_Folder** (it was imported from a URL that ends in the same folder name): the Power_Server touches only its own Repository_Data_Files and leaves every other file alone (Requirement 7.11).
 - **Detecting a repository that already has a Repository_Data_File:** the Tutor asks the Student, and the saved report and progress of that repository are replaced only with an explicit `replace: true` input; the files of other repositories do not change (Requirement 2.7).
 - **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
