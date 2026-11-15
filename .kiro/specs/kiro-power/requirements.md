@@ -179,7 +179,7 @@ This spec does not change `packages/core`.
 #### Acceptance Criteria
 
 1. IF the Tutor stops answering, the Kiro session ends or the Power_Server stops during an attempt, THEN THE Ghost SHALL stay `haunted`, and THE Repository_Data_Files saved in the Power_Data_Folder before that moment SHALL stay valid and unchanged.
-2. WHEN the Power_Server starts and finds a saved Haunted_Report and Exorcism_Progress, THE Power_Server SHALL start a new session from them with `startSession`, so that `exorcised` Ghosts stay `exorcised`. THE Power_Server SHALL NOT save `knowsJava`; after a restart, THE Tutor_Skill SHALL tell the Tutor to ask the Student again whether they know Java (Requirement 4.8).
+2. WHEN the Tutor asks to work on a repository that has a Repository_Data_File in the Power_Data_Folder (for example, after a restart), THE Power_Server SHALL read its Haunted_Report and Exorcism_Progress and start a new session from them with `startSession`, so that `exorcised` Ghosts stay `exorcised`. THE Power_Server SHALL NOT save `knowsJava`; after a restart, THE Tutor_Skill SHALL tell the Tutor to ask the Student again whether they know Java (Requirement 4.8).
 3. IF the Tutor calls a Power_Tool that needs a session and no session exists (for example, after a restart), THEN THE Power_Server SHALL return an English message that says how to start or continue, and SHALL NOT change any saved file.
 4. IF the Tutor sends a Judgement or an Event when the Step does not expect it, THEN THE Power_Server SHALL follow Requirement 4.5 and SHALL NOT change Invalid_Judgement_Count.
 
