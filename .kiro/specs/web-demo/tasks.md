@@ -452,8 +452,8 @@ These open doubts of the design are settled by the approved design and are not r
 - [x] 14. Final checkpoint - PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 15. Open PR 2
-  - [-] 15.1 Final check and pull request
+- [x] 15. Open PR 2
+  - [x] 15.1 Final check and pull request
     - **Split into 4 stacked pull requests.** The final check measured 2,973 changed lines for PR 2 (code 1,000 / tests 1,960 / docs 13, without `package-lock.json` and `.kiro/`; `demo-script.json`, 46 lines, apart). The director's limit is 900, so he chose to split it into 4 stacked pull requests, the same way as PR 1 in task 7.2. Each piece is a branch created with `git branch <name> <commit>` on an existing commit of `feat/web-exorcism` (no rebase, no cherry-pick, no history rewrite); `feat/web-exorcism` stays as it is and is never pushed. Sizes below exclude the same files and `.kiro/`:
 
       | Piece | Branch | Commits | Title | Size (code / tests / docs) |
