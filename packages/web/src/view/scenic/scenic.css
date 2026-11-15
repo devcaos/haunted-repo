@@ -202,21 +202,6 @@
   background: radial-gradient(ellipse at center, #0006, #000c);
 }
 
-.scroll[open] {
-  animation: scroll-unroll 0.5s ease-out;
-}
-
-@keyframes scroll-unroll {
-  from {
-    opacity: 0;
-    transform: scaleY(0.2);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 .scroll-paper {
   position: relative;
   max-height: 86dvh;
@@ -340,8 +325,7 @@
 @media (prefers-reduced-motion: reduce) {
   .scenic-lit,
   .scenic-fog,
-  .scenic-fog::after,
-  .scroll[open] {
+  .scenic-fog::after {
     animation: none;
   }
   .scenic-rain {
