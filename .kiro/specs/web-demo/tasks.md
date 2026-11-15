@@ -331,7 +331,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 7.1, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.10_
 
 - [ ] 9. Sample card state and progress
-  - [~] 9.1 Extend the sample house with card states and progress
+  - [x] 9.1 Extend the sample house with card states and progress
     - In `houseView.ts`, `buildSampleHouse(report, exorcism)` with the `exorcism` argument of the design: card state (`exorcised` / `locked` / `haunted`), `canStart` (haunted cards, step `choosing` or `failed`, `startAllowed`), `lockedLine` from `POWER_TEXTS.lockedGhost`, `progress` (`TEXTS.progress`, `haunted`, `total`, `share = hauntedShare`), `houseClean` on `house-clean`.
     - In `texts.ts` add the PR 2 lines (`judgeLine`, `selfCheck`, `stillHaunted`, `houseClean`, `progress`, `engineError`).
     - Create `packages/web/src/logic/uniquePathReportArb.testutil.ts` (maps `reportArb` through a dedupe that keeps the first ghost of each path).

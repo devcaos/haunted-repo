@@ -1,12 +1,20 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import type { Floor, Ghost, HauntedReport, Overview } from "@haunted-repo/core";
+import type {
+  ExorcismProgress,
+  Floor,
+  Ghost,
+  HauntedReport,
+  Overview,
+} from "@haunted-repo/core";
 import { reportArb } from "../../../core/src/ghost-detection/reportArb.testutil.js";
 import {
   buildLiveHouse,
   buildSampleHouse,
   buildWarnings,
+  type SampleExorcism,
 } from "./houseView.js";
+import type { HouseView } from "./viewModel.js";
 import { POWER_TEXTS } from "./powerTexts.js";
 import { TEXTS } from "./texts.js";
 
@@ -105,6 +113,125 @@ describe("buildSampleHouse", () => {
     expect(house.progress).toBeNull();
     const cards = house.floors.flatMap((f) => f.ghosts);
     expect(cards.every((c) => c.state === "haunted" && !c.canStart)).toBe(true);
+  });
+});
+
+describe("buildSampleHouse with an exorcism", () => {
+  const sample = report([
+    ghost("a.ts", "attic", 1),
+    ghost("b.ts", "attic", 2),
+    ghost("c.ts", "basement", 99),
+  ]);
+
+  function exorcised(...paths: string[]): ExorcismProgress {
+    return {
+      ghosts: paths.map((path) => ({
+        path,
+        state: "exorcised",
+        ratings: ["right", "right", "right"],
+        selfCheck: "yes",
+      })),
+    };
+  }
+
+  function exorcism(changes: Partial<SampleExorcism> = {}): SampleExorcism {
+    return {
+      progress: { ghosts: [] },
+      step: "choosing",
+      scripted: new Set(["a.ts", "b.ts"]),
+      startAllowed: true,
+      ...changes,
+    };
+  }
+
+  function card(house: HouseView, path: string) {
+    const found = house.floors
+      .flatMap((f) => f.ghosts)
+      .find((c) => c.path === path);
+    if (found === undefined) throw new Error(`no card ${path}`);
+    return found;
+  }
+
+  it("lets a scripted haunted ghost start while choosing", () => {
+    const house = buildSampleHouse(sample, exorcism());
+    expect(card(house, "a.ts")).toMatchObject({
+      state: "haunted",
+      canStart: true,
+      lockedLine: null,
+    });
+  });
+
+  it("shows an exorcised card that cannot start", () => {
+    const house = buildSampleHouse(
+      sample,
+      exorcism({ progress: exorcised("a.ts") }),
+    );
+    expect(card(house, "a.ts")).toMatchObject({
+      state: "exorcised",
+      canStart: false,
+      lockedLine: null,
+    });
+  });
+
+  it("shows a locked card with its line and no start", () => {
+    const house = buildSampleHouse(sample, exorcism());
+    expect(card(house, "c.ts")).toMatchObject({
+      state: "locked",
+      canStart: false,
+      lockedLine: POWER_TEXTS.lockedGhost,
+    });
+  });
+
+  it("allows a start in the failed step", () => {
+    const house = buildSampleHouse(sample, exorcism({ step: "failed" }));
+    expect(card(house, "b.ts").canStart).toBe(true);
+  });
+
+  it("does not allow a start while asking", () => {
+    const house = buildSampleHouse(sample, exorcism({ step: "asking" }));
+    expect(card(house, "a.ts")).toMatchObject({
+      state: "haunted",
+      canStart: false,
+    });
+  });
+
+  it("does not allow a start when startAllowed is false", () => {
+    const house = buildSampleHouse(sample, exorcism({ startAllowed: false }));
+    expect(card(house, "a.ts")).toMatchObject({
+      state: "haunted",
+      canStart: false,
+    });
+  });
+
+  it("shows the progress line and share", () => {
+    const house = buildSampleHouse(
+      sample,
+      exorcism({ progress: exorcised("a.ts") }),
+    );
+    expect(house.progress).toEqual({
+      line: "2 of 3 ghosts still haunting",
+      haunted: 2,
+      total: 3,
+      share: 2 / 3,
+    });
+    expect(house.houseClean).toBeNull();
+    expect(house.powerLine).toBeNull();
+  });
+
+  it("shows the house-clean line when every ghost is exorcised", () => {
+    const house = buildSampleHouse(
+      sample,
+      exorcism({
+        step: "house-clean",
+        progress: exorcised("a.ts", "b.ts", "c.ts"),
+      }),
+    );
+    expect(house.houseClean).toBe(TEXTS.houseClean);
+    expect(house.progress).toMatchObject({
+      line: "0 of 3 ghosts still haunting",
+      haunted: 0,
+      share: 0,
+    });
   });
 });
 
