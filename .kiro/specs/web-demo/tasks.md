@@ -137,7 +137,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check report warnings match the overview`
     - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5, 17.6_
 
-- [~] 3. Page controller
+- [x] 3. Page controller
   - [x] 3.1 Add the controller with scenes and navigation
     - Create `packages/web/src/logic/page.ts`: `DetectFn`, `EngineFns`, `PageDeps` (in PR 1 without `script`), `PageController`, `createPage(deps, renderer)`. State in the closure only. `start()` renders the first model: scene `house`, transition `null`, sample house, `ghost` null, form visible, not busy, status none, licence (`copyright` from the sample, `href: "sirv-license.txt"`, link text of the design), `available` as in the design table. `dispatch(action)`: step 1 ignores unavailable actions (no state change, no render, no Core call); `go-to-floor` and `go-to-house` change the scene; every render computes `transition`. If `deps.sample` is not ok: `house` and `licence` null, `available` empty, status error `TEXTS.sampleBroken`. The controller never awaits the renderer (`render` returns `void`). In this task `submit-live` and `show-sample` are listed as in the table but their handling arrives in task 3.2 (they render nothing yet); ghost actions are never available in PR 1.
     - Create `packages/web/src/logic/recordingRenderer.testutil.ts` (stores a deep copy of every model).
@@ -193,7 +193,7 @@ These open doubts of the design are settled by the approved design and are not r
 - [x] 4. Checkpoint - logic of PR 1
   - Ensure all tests pass, ask the user if questions arise.
 
-- [~] 5. Presentation layer and wiring
+- [x] 5. Presentation layer and wiring
   - [x] 5.1 Add the asset manifest with empty slots
     - Create `packages/web/src/view/assets/manifest.ts` (`AssetSlotId` with the 10 ids, `AssetLayer`, `AssetFallback`, `AssetSlot`, `ASSET_SLOTS` with every `layers` list `[]` and a fallback and purpose for each), `packages/web/src/view/assets/resolve.ts` (`resolveSlot(id)` with one literal `import.meta.glob("./files/*", { query: "?url", import: "default", eager: true })`; never throws) and `packages/web/src/view/assets/files/.gitkeep`.
     - Create `packages/web/src/view/assets/manifest.test.ts` (`node:fs`): every id once; fallback and non-blank purpose; every layer has a non-blank `source`; every listed file exists; every file in `files/` except `.gitkeep` is listed; no layer file is an address; every `layers` list is empty in this spec.
@@ -253,7 +253,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `docs: log Kiro usage for web demo PR 1`
     - _Requirements: 16.4_
 
-- [~] 7. Final checkpoint and PR 1
+- [x] 7. Final checkpoint and PR 1
   - [x] 7.1 Final check of PR 1
     - Ensure all tests pass, ask the user if questions arise.
     - Run `npm run check` (exit `0`, no network needed); `git status --short` prints nothing.
@@ -262,7 +262,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `docs: close the web demo PR 1 tasks`
     - _Requirements: 15.4_
 
-  - [-] 7.2 Open PR 1
+  - [x] 7.2 Open PR 1
     - **Split into 4 stacked pull requests.** Task 7.1 measured 3,492 changed lines for PR 1 (without `package-lock.json`, `report.json`, `files.json`, `sirv-license.txt` and `.kiro/`). The director accepted splitting it into 4 stacked pull requests instead of the single ~3,492-line PR. Each piece is a branch created with `git branch <name> <commit>` on an existing commit of `feat/web-demo` (no rebase, no cherry-pick, no history rewrite); `feat/web-demo` stays as it is. Sizes below exclude the same files and `.kiro/`:
 
       | Piece | Branch | Commits | Title | Size (code / tests / docs) |
@@ -292,19 +292,19 @@ These open doubts of the design are settled by the approved design and are not r
 ### PR 2 — feat/web-exorcism
 
 - [ ] 8. Branch and Demo_Script
-  - [ ] 8.1 Create the branch `feat/web-exorcism`
+  - [x] 8.1 Create the branch `feat/web-exorcism`
     - Only after the director confirms that piece 4 of PR 1 (`feat/web-demo-4`, the last of the 4 stacked pull requests) is merged. Run `git checkout main`, `git pull`, then `git checkout -b feat/web-exorcism`. Check that `main` contains the commits of the 4 pieces.
     - No commit of its own; mark this task and task 7.2 `[x]` in the commit of task 8.2.
     - _Requirements: none (git workflow)_
 
-  - [ ] 8.2 Add the Demo_Script parser
+  - [x] 8.2 Add the Demo_Script parser
     - Create `packages/web/src/logic/demoScript.ts`: `GhostContent`, `DemoScript`, `parseDemoScript(jsonText)` (strict, never throws: every text non-blank, exactly 3 questions, 3 simpler explanations and 3 model answers, the 3 questions different, `kind` one of the 4 `FileKind` values, no repeated path) and `contentOf(script, path)`.
     - Create `packages/web/src/logic/demoScript.test.ts` with examples: a valid script; each rejection (blank text, repeated question, 2 or 4 items, repeated path, unknown kind, wrong type, invalid JSON); `contentOf` with a missing path and a `null` script.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): parse the demo script`
     - _Requirements: 7.4, 7.5, 7.6, 7.8_
 
-  - [ ] 8.3 Property test for the Demo_Script parser
+  - [~] 8.3 Property test for the Demo_Script parser
     - **Property 2: The Demo_Script parser accepts only complete content**
     - **Validates: Requirements 7.4, 7.5, 7.8**
     - Generator: valid Ghost_Content records from `fc.string()` with non-blank filters, mutated by one of the mutations of the design. Checks: `ok` iff the content is complete; never throws. (The "committed file returns ok" part is added in task 8.5, when the file exists.)
@@ -313,14 +313,14 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the demo script parser`
     - _Requirements: 7.4, 7.5, 7.8_
 
-  - [ ] 8.4 Confirm the 2 easiest ghosts with the director
+  - [~] 8.4 Confirm the 2 easiest ghosts with the director
     - From the committed `packages/web/src/sample/report.json`, sort the ghosts by `difficultyScore` ascending, then by path with `a < b` (the order of `suggestGhost`). Tell the director, in Spanish, the 2 first paths with their score and floor, and the kind that `classifyFileKind` gives on each Ghost_Text.
     - WAIT for an explicit "yes". Write no Ghost_Content text before it.
     - After the "yes", write the 2 paths under this task in `tasks.md` as a sub-bullet "Approved ghosts: ...", mark it `[x]` and commit.
     - Commit message: `docs: record the two demo ghosts`
     - _Requirements: 7.1, 7.11_
 
-  - [ ] 8.5 Write the Tutor texts for the 2 easiest ghosts
+  - [~] 8.5 Write the Tutor texts for the 2 easiest ghosts
     - Act as the Tutor. For each approved ghost, get the instruction text of every step (`explaining`, `asking` for each question, `simplifying` for each question, `model-answer`, retry explanation after `retry-ghost`) by driving `startSession` and `advance` with the default profile (for example with a temporary local script that is not committed), and follow it: plain beginner words, an everyday analogy, behaviour questions, no line numbers, no comparison with Java (`java-forbidden`), explanation, retry explanation and each simpler explanation at most 150 words. The 3 questions follow, in order, the 3 objectives of `QUESTION_SETS` for the kind of that file; each simpler explanation is about the part of the file its question is about.
     - Create `packages/web/src/sample/demo-script.json` (hand-written, formatted by Prettier) with the 2 Ghost_Contents.
     - Extend `demoScript.test.ts` (committed content): the committed file parses `ok` (the last part of P2); it holds the 2 easiest ghosts by (score, path); every path is a sample ghost; `kind` equals `classifyFileKind(text, ghost.language)`; each reading text is at most 150 words; no line numbers (regex of the design).
@@ -330,7 +330,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 7.1, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.10_
 
 - [ ] 9. Sample card state and progress
-  - [ ] 9.1 Extend the sample house with card states and progress
+  - [~] 9.1 Extend the sample house with card states and progress
     - In `houseView.ts`, `buildSampleHouse(report, exorcism)` with the `exorcism` argument of the design: card state (`exorcised` / `locked` / `haunted`), `canStart` (haunted cards, step `choosing` or `failed`, `startAllowed`), `lockedLine` from `POWER_TEXTS.lockedGhost`, `progress` (`TEXTS.progress`, `haunted`, `total`, `share = hauntedShare`), `houseClean` on `house-clean`.
     - In `texts.ts` add the PR 2 lines (`judgeLine`, `selfCheck`, `stillHaunted`, `houseClean`, `progress`, `engineError`).
     - Create `packages/web/src/logic/uniquePathReportArb.testutil.ts` (maps `reportArb` through a dedupe that keeps the first ghost of each path).
@@ -339,7 +339,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): show ghost states and progress in the sample`
     - _Requirements: 4.13, 6.1, 6.2, 6.21, 8.1, 8.2, 8.4, 11.9_
 
-  - [ ] 9.2 Property test for the progress view
+  - [~] 9.2 Property test for the progress view
     - **Property 6: The progress view follows the progress**
     - **Validates: Requirements 8.1, 8.2, 8.3**
     - Generator: `uniquePathReportArb` and `progressArb(report.ghosts)`. Checks `total`, `haunted`, `share = hauntedShare(report, progress)` and `line = TEXTS.progress(haunted, total)`.
@@ -348,7 +348,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the progress view`
     - _Requirements: 8.1, 8.2, 8.3_
 
-  - [ ] 9.3 Property test for the card state
+  - [~] 9.3 Property test for the card state
     - **Property 8: Card state follows progress and content**
     - **Validates: Requirements 4.9, 6.1, 6.2, 8.4, 11.9**
     - Generator: `uniquePathReportArb`, `progressArb`, `fc.subarray` of the paths, `fc.constantFrom` of the 8 steps, `fc.boolean()` for `startAllowed`. Checks the state rule, that it does not depend on `startAllowed`, the locked line, the `canStart` rule, and that every live card is `haunted` with `canStart` false and no locked line. The part "canStart iff `start-ghost` is available" is checked inside P1, P10 and P11 (tasks 10.5 and 10.7).
@@ -358,7 +358,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 4.9, 6.1, 6.2, 8.4, 11.9_
 
 - [ ] 10. Exorcism logic in the page
-  - [ ] 10.1 Add the ghost view, the step actions and the event mapping
+  - [~] 10.1 Add the ghost view, the step actions and the event mapping
     - Create `packages/web/src/logic/exorcism.ts`: `readingText`, `buildGhostView` (the table of the design by step: code, licence next to code, judge line, reading, question number, question, revealed answer, Answer_Box, prompt), `ghostActions(step, revealed)` (the rows of the design table) and `eventFor(action, state, content, text)`.
     - Create `packages/web/src/logic/exorcism.test.ts` with examples: rating map `right` / `half-right` / `wrong`; self-check map `yes` / `half` / `no`; the `explanation-done` text equals `readingText`; retry explanation when `current.explanation !== ""`.
     - Extend `actions.test.ts`: for every step and both `revealed` values, every action of `ghostActions` maps to an event type in `ALLOWED_EVENTS[step]` or to `null`.
@@ -366,26 +366,26 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): map exorcism steps to views and events`
     - _Requirements: 6.4, 6.5, 6.6, 6.8, 6.9, 6.10, 6.11, 6.12, 6.13, 6.14, 6.15, 6.16, 6.17, 6.18, 6.19, 6.20, 6.22, 6.24, 10.2_
 
-  - [ ] 10.2 Drive the Sample_Session from the controller
+  - [~] 10.2 Drive the Sample_Session from the controller
     - In `page.ts`: `PageDeps.script` and `engine` (defaults to Core's); the Sample_Session from `startSession(sample.report)`; `revealed`; `start-ghost` (`pick-ghost` with the full Ghost_Text, scene `ghost`); ghost actions through `eventFor`, checked against `ALLOWED_EVENTS[step]` before `advance`; `show-model-answer` (local, no event) and `back-to-list` (no event); scenes after leave, back and self-check (floor of that ghost), `house` on `house-clean`; form hidden in the `ghost` scene; `start-ghost` not available while busy; engine error → status `TEXTS.engineError`, session restarted from its progress, scene `house`. `submit-live` never touches the Sample_Session; `show-sample` shows it with its progress.
     - In `main.ts` pass `script: null` for now (the real script is wired in task 12.2, together with the panel renderer).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): drive the sample exorcism from the page`
     - _Requirements: 4.10, 4.11, 4.12, 6.3, 6.8, 6.19, 6.20, 6.23, 6.26, 9.1_
 
-  - [ ] 10.3 State tests for the reading and asking states
+  - [~] 10.3 State tests for the reading and asking states
     - Extend `states.test.ts`: "Ghost explaining", "Asking, not revealed", "Asking, revealed" (no engine call for the reveal), "Simplifying", "Model answer", "Leave", "Locked ghost", and the PR 2 check of "Live analysis running" (every sample `canStart` false). Built with the committed data and the committed `demo-script.json`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the exorcism reading and asking states`
     - _Requirements: 6.2, 6.3, 6.4, 6.6, 6.9, 6.10, 6.12, 6.13, 6.14, 6.15, 6.20, 6.22, 10.2, 18.6_
 
-  - [ ] 10.4 State tests for the end states
+  - [~] 10.4 State tests for the end states
     - Extend `states.test.ts`: "Self-check", "Exorcised", "Failed", "Retry", "Back to the list", "House clean" (generated script for every ghost), "Engine error" (injected `advance` that returns an error), "Reload" (a second controller from the same data).
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the exorcism end states`
     - _Requirements: 6.16, 6.17, 6.18, 6.19, 6.21, 6.24, 6.26, 8.3, 8.4, 9.3, 18.6_
 
-  - [ ] 10.5 Property test for the engine walk
+  - [~] 10.5 Property test for the engine walk
     - **Property 1: Every available action is accepted by the engine**
     - **Validates: Requirements 6.5, 6.6, 6.8, 6.9, 6.15, 6.17, 6.20, 6.25, 4.10, 18.3**
     - Generator: `choicesArb` (up to 200 numbers), each taken modulo `model.available` (skipping `submit-live`). Two runs: the committed data and script, and a generated script with content for every sample ghost (to reach `house-clean`). `engine.advance` is wrapped to record every call. Checks of the design, plus: `canStart` of each card is true iff `start-ghost` for its path is available (P8 link); and one example that the `pick-ghost` text equals the `files.json` text (6.3).
@@ -394,7 +394,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check every available action is accepted`
     - _Requirements: 4.10, 6.3, 6.5, 6.6, 6.8, 6.9, 6.15, 6.17, 6.20, 6.25, 18.3_
 
-  - [ ] 10.6 Property test for the Sample_Session isolation
+  - [~] 10.6 Property test for the Sample_Session isolation
     - **Property 9: A live analysis never changes the Sample_Session**
     - **Validates: Requirements 4.11, 4.12**
     - Generator: `choicesArb` for a judge path stopped in a `house` or `floor` scene, plus the outcome generator of P7. Checks: after `submit-live` and then `show-sample` (when available), the session is the same object and the sample house has the same card states and progress.
@@ -403,7 +403,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check live runs keep the sample session`
     - _Requirements: 4.11, 4.12_
 
-  - [ ] 10.7 Extend P10 and P11 to the ghost scene
+  - [~] 10.7 Extend P10 and P11 to the ghost scene
     - **Property 10: Unavailable actions change nothing** and **Property 11: The View_Model is plain data and scenes are consistent**
     - **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     - In the two properties of tasks 3.5 and 3.6, let the path include ghost actions with the committed script. P10 also checks that the session object is the same; P11 also checks `ghost.path` and `ghost.floor` equal the scene's. Both check `canStart` iff `start-ghost` is available (P8 link).
@@ -412,47 +412,47 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): extend view model checks to the ghost scene`
     - _Requirements: 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4_
 
-- [ ] 11. Checkpoint - logic of PR 2
+- [~] 11. Checkpoint - logic of PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Presentation of the exorcism
-  - [ ] 12.1 Draw progress, locked ghosts and the house-clean line
+  - [~] 12.1 Draw progress, locked ghosts and the house-clean line
     - In `view/simple/house.ts`: the Progress_Indicator (line plus native `<progress max="1">` with `share`), the locked line on locked cards (from the model, which takes it from `POWER_TEXTS`), the start button on cards with `canStart`, the `exorcised` state label, the house-clean line. Extend `simple.css` with tokens only.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw progress and ghost states`
     - _Requirements: 4.13, 6.1, 6.2, 6.21, 8.1, 8.2, 8.3, 8.4, 11.9_
 
-  - [ ] 12.2 Draw the Exorcism_Panel and wire the Demo_Script
+  - [~] 12.2 Draw the Exorcism_Panel and wire the Demo_Script
     - Create `packages/web/src/view/simple/ghost.ts` (`renderGhost`): heading with `tabindex="-1"`, reading text, Code_Block `<pre class="code-block" tabindex="0"><code>` with the full Ghost_Text, Licence_Notice next to the code, judge line, question, Answer_Box `<textarea>` with a label and no event listener, revealed model answer, one button per available ghost action (labels from `TEXTS.actionLabels`), self-check prompt and buttons, failed prompt with "Try again" and "Back to the list". In `renderer.ts` show the panel when `model.ghost` is not null and move focus to its heading when the scene or the step changed. Extend `simple.css` (tokens only).
     - In `main.ts` import `demo-script.json?raw`, parse it with `parseDemoScript` and pass the script (or `null` when the parse fails).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the exorcism panel`
     - _Requirements: 4.10, 6.4, 6.5, 6.6, 6.7, 6.9, 6.10, 6.14, 6.15, 6.16, 6.17, 6.18, 6.19, 6.20, 6.22, 6.23, 10.2, 12.1, 12.2_
 
-  - [ ] 12.3 Extend the source rules for the Answer_Box
+  - [~] 12.3 Extend the source rules for the Answer_Box
     - Check that the rules of tasks 5.6 and 5.7 already scan the new files (`ghost.ts`, `demoScript.ts`, `exorcism.ts`, `demo-script.json` is data and not scanned). Add one rule to `source.test.ts`: `src/view/simple/ghost.ts` reads no `.value` and adds no `input` or `change` listener, so the Answer_Box text never leaves the DOM field. Negative self-check as in task 5.6.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the answer box text is never read`
     - _Requirements: 6.23, 9.2_
 
 - [ ] 13. Project documents for PR 2
-  - [ ] 13.1 Update `PLAN.md`
+  - [~] 13.1 Update `PLAN.md`
     - Mark item 6 ("Spec: web de demostración") done, with the numbers of PR 1 and PR 2. Add a "Para retomar" note: the optional Tutor texts of group 16, and that the scenic renderer is a later spec.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: mark the web demo spec as done in the plan`
     - _Requirements: 16.1_
 
-  - [ ] 13.2 Add the line to `docs/kiro-usage-log.md`
+  - [~] 13.2 Add the line to `docs/kiro-usage-log.md`
     - One new line about PR 2 of this spec, in the style and order of the file.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: log Kiro usage for web demo PR 2`
     - _Requirements: 16.4_
 
-- [ ] 14. Final checkpoint - PR 2
+- [~] 14. Final checkpoint - PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 15. Open PR 2
-  - [ ] 15.1 Final check and pull request
+  - [~] 15.1 Final check and pull request
     - Run `npm run check` (exit `0`); `git status --short` prints nothing. Count the changed lines with `git diff --stat main...HEAD`, excluding `package-lock.json` and JSON data (`demo-script.json` is hand-written; say its size apart).
     - Mark this task `[x]`, commit `tasks.md` (and `tasks.meta.json`) with message `docs: close the web demo PR 2 tasks`, then `git push -u origin feat/web-exorcism`.
     - Write the body to a file outside the repository and run `gh pr create --base main --head feat/web-exorcism --title "feat: add the sample exorcism to the web demo" --body-file <that file>`, filling `.github/pull_request_template.md`. The body includes:
