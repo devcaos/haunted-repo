@@ -10,6 +10,7 @@ import type {
   Rating,
   Result,
   SelfCheck,
+  SessionState,
 } from "@haunted-repo/core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { choicesArb } from "../../../core/src/exorcism/sessionArb.testutil.js";
@@ -18,12 +19,31 @@ import { loadSample } from "../sample/sampleData.js";
 import { isAvailable } from "./actions.js";
 import { createFakeFetch } from "./fakeDetect.testutil.js";
 import type { UserAction } from "./actions.js";
+import { parseDemoScript } from "./demoScript.js";
+import { fullScriptFor } from "./demoScript.testutil.js";
 import { outcomeOf } from "./outcome.js";
 import type { Outcome } from "./outcome.js";
 import { createPage } from "./page.js";
 import type { DetectFn, EngineFns } from "./page.js";
 import { createRecordingRenderer } from "./recordingRenderer.testutil.js";
 import { TEXTS } from "./texts.js";
+import type { ViewModel } from "./viewModel.js";
+
+/** P8 link: a card can start exactly when start-ghost for its path is available. */
+function expectCanStartMatchesAvailable(model: ViewModel): void {
+  const cards = model.house?.floors.flatMap((floor) => floor.ghosts) ?? [];
+  for (const card of cards) {
+    expect(card.canStart).toBe(
+      model.available.some(
+        (a) => a.type === "start-ghost" && a.path === card.path,
+      ),
+    );
+  }
+  for (const action of model.available) {
+    if (action.type !== "start-ghost") continue;
+    expect(cards.some((card) => card.path === action.path)).toBe(true);
+  }
+}
 
 function readCommitted(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -35,6 +55,10 @@ const committed = loadSample(
 );
 if (!committed.ok) throw new Error(committed.error);
 const sampleReport = committed.value.report;
+const committedScript = parseDemoScript(
+  readCommitted("../sample/demo-script.json"),
+);
+if (!committedScript.ok) throw new Error(committedScript.error);
 
 // Independent of outcome.ts. The Record type makes a new Core code a compile error here.
 const EXPECTED_OUTCOME: Readonly<Record<ErrorCode, Outcome>> = {
@@ -81,6 +105,20 @@ const userActionArb: fc.Arbitrary<UserAction> = fc.oneof(
   fc.constant({ type: "retry" as const }),
   fc.constant({ type: "back-to-list" as const }),
   fc.constant({ type: "leave-ghost" as const }),
+);
+
+// Outcome of a live analysis (P7, P9): an ok report, an error result, or a throw.
+const liveOutcomeArb = fc.oneof(
+  fc.record({ kind: fc.constant("ok" as const), report: reportArb }),
+  fc.record({
+    kind: fc.constant("error" as const),
+    code: fc.constantFrom(...ALL_CODES),
+    message: fc.string(),
+  }),
+  fc.record({
+    kind: fc.constant("throw" as const),
+    thrown: fc.anything(),
+  }),
 );
 
 beforeEach(() => {
@@ -183,18 +221,7 @@ describe("page controller properties (PR 1)", () => {
     await fc.assert(
       fc.asyncProperty(
         fc.integer({ min: 0, max: 20 }), // extra submits while pending
-        fc.oneof(
-          fc.record({ kind: fc.constant("ok" as const), report: reportArb }),
-          fc.record({
-            kind: fc.constant("error" as const),
-            code: fc.constantFrom(...ALL_CODES),
-            message: fc.string(),
-          }),
-          fc.record({
-            kind: fc.constant("throw" as const),
-            thrown: fc.anything(),
-          }),
-        ),
+        liveOutcomeArb,
         async (extra, outcome) => {
           let settle: (
             result: Result<HauntedReport> | { thrown: unknown },
@@ -257,9 +284,9 @@ describe("page controller properties (PR 1)", () => {
     );
   });
 
-  it("ignores every unavailable action in the list scenes", async () => {
+  it("ignores every unavailable action in every scene", async () => {
     // Feature: web-demo, Property 10: Unavailable actions change nothing
-    // **Validates: Requirements 4.3, 4.9, 18.3**
+    // **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     await fc.assert(
       fc.asyncProperty(
         choicesArb, // the path: each choice picks from model.available
@@ -272,18 +299,35 @@ describe("page controller properties (PR 1)", () => {
                 settle = resolve;
               }),
           );
+          // The engine is wrapped so the test sees the session object the
+          // controller holds: the one from startSession and each ok advance.
+          let session: SessionState | null = null;
           const engine = {
-            startSession: vi.fn<EngineFns["startSession"]>(startSession),
-            advance: vi.fn<EngineFns["advance"]>(advance),
+            startSession: vi.fn<EngineFns["startSession"]>((report, opts) => {
+              const started = startSession(report, opts);
+              session = started.state;
+              return started;
+            }),
+            advance: vi.fn<EngineFns["advance"]>((state, event) => {
+              const result = advance(state, event);
+              if (result.ok) session = result.state;
+              return result;
+            }),
           };
           const renderer = createRecordingRenderer();
           const page = createPage(
-            { detect, sample: committed, script: null, engine },
+            {
+              detect,
+              sample: committed,
+              script: committedScript.value,
+              engine,
+            },
             renderer,
           );
           page.start();
 
-          // Walk a random path of available actions. A live analysis ends ok,
+          // Walk a random path of available actions, ghost actions included.
+          // A live analysis ends ok,
           // ends in fallback, or stays pending (busy) for the rest of the run.
           let pending: Promise<void> | null = null;
           for (const choice of choices) {
@@ -313,18 +357,26 @@ describe("page controller properties (PR 1)", () => {
             await run;
           }
 
+          expectCanStartMatchesAvailable(page.current());
           for (const action of candidates) {
             if (isAvailable(page.current(), action)) continue;
             const before = structuredClone(page.current());
             const renders = renderer.models.length;
             const detectCalls = detect.mock.calls.length;
+            const startCalls = engine.startSession.mock.calls.length;
+            const advanceCalls = engine.advance.mock.calls.length;
+            const kept = session as SessionState | null;
+            const keptCopy = structuredClone(kept);
 
             await page.dispatch(action);
 
             expect(page.current()).toEqual(before);
             expect(renderer.models.length).toBe(renders);
             expect(detect.mock.calls.length).toBe(detectCalls);
-            expect(engine.advance).not.toHaveBeenCalled();
+            expect(engine.startSession.mock.calls.length).toBe(startCalls);
+            expect(engine.advance.mock.calls.length).toBe(advanceCalls);
+            expect(session).toBe(kept);
+            expect(kept).toStrictEqual(keptCopy);
           }
 
           if (pending !== null) {
@@ -339,9 +391,9 @@ describe("page controller properties (PR 1)", () => {
     );
   });
 
-  it("renders plain data with consistent scenes in the list scenes", async () => {
+  it("renders plain data with consistent scenes in every scene", async () => {
     // Feature: web-demo, Property 11: The View_Model is plain data and scenes are consistent
-    // **Validates: Requirements 11.7, 11.8, 18.1, 18.2, 18.4**
+    // **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     // URLs for submit-live: ok, show-message (missing repo, invalid URL).
     // The fake answers 403 rate limit after 12 requests, so later runs fall back.
     const liveUrls = [
@@ -374,11 +426,12 @@ describe("page controller properties (PR 1)", () => {
           );
           const renderer = createRecordingRenderer();
           const page = createPage(
-            { detect, sample: committed, script: null },
+            { detect, sample: committed, script: committedScript.value },
             renderer,
           );
           page.start();
 
+          // The path includes ghost actions with the committed script.
           for (const choice of choices) {
             const options = page.current().available;
             const picked = options[choice % Math.max(options.length, 1)];
@@ -402,6 +455,7 @@ describe("page controller properties (PR 1)", () => {
               expect(model.ghost?.floor).toBe(model.scene.floor);
             }
             expect(model.live.formVisible).toBe(!inGhost);
+            expectCanStartMatchesAvailable(model);
             if (previous === null) {
               expect(model.transition).toBeNull();
             } else if (isDeepStrictEqual(model.scene, previous.scene)) {
@@ -419,6 +473,117 @@ describe("page controller properties (PR 1)", () => {
               });
             }
             previous = model;
+          }
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+});
+
+describe("page controller properties (PR 2)", () => {
+  it("keeps the Sample_Session through a live analysis", async () => {
+    // Feature: web-demo, Property 9: A live analysis never changes the Sample_Session
+    // **Validates: Requirements 4.11, 4.12**
+    const scripts = [committedScript.value, fullScriptFor(sampleReport)];
+    await fc.assert(
+      fc.asyncProperty(
+        choicesArb, // the judge path: each choice picks from model.available
+        fc.constantFrom(...scripts),
+        liveOutcomeArb,
+        async (choices, script, outcome) => {
+          // The engine is wrapped so the test sees every session object the
+          // controller can hold: the one from startSession and each ok advance.
+          let session: SessionState | null = null;
+          const engine = {
+            startSession: vi.fn<EngineFns["startSession"]>((report, opts) => {
+              const started = startSession(report, opts);
+              session = started.state;
+              return started;
+            }),
+            advance: vi.fn<EngineFns["advance"]>((state, event) => {
+              const result = advance(state, event);
+              if (result.ok) session = result.state;
+              return result;
+            }),
+          };
+          const detect = vi.fn<DetectFn>(() => {
+            if (outcome.kind === "ok") {
+              return Promise.resolve({ ok: true, value: outcome.report });
+            }
+            if (outcome.kind === "error") {
+              return Promise.resolve({
+                ok: false,
+                error: { code: outcome.code, message: outcome.message },
+              });
+            }
+            return Promise.reject(outcome.thrown);
+          });
+          const renderer = createRecordingRenderer();
+          const page = createPage(
+            { detect, sample: committed, script, engine },
+            renderer,
+          );
+          page.start();
+
+          // Judge path on the sample, without live analyses.
+          for (const choice of choices) {
+            const options = page
+              .current()
+              .available.filter((a) => a.type !== "submit-live");
+            const picked = options[choice % Math.max(options.length, 1)];
+            if (picked === undefined) break;
+            await page.dispatch(picked);
+          }
+          // Stop in a house or floor scene: leave the open ghost, if any.
+          if (page.current().scene.kind === "ghost") {
+            const exit = page
+              .current()
+              .available.find(
+                (a) =>
+                  a.type === "leave-ghost" ||
+                  a.type === "back-to-list" ||
+                  a.type === "self-check",
+              );
+            if (exit === undefined) {
+              throw new Error("no way out of the ghost scene");
+            }
+            await page.dispatch(exit);
+          }
+          expect(page.current().scene.kind).not.toBe("ghost");
+
+          const before = page.current().house;
+          const kept = session as SessionState | null;
+          if (kept === null) throw new Error("no session was started");
+          const keptCopy = structuredClone(kept);
+          const startCalls = engine.startSession.mock.calls.length;
+          const advanceCalls = engine.advance.mock.calls.length;
+
+          await page.dispatch({ type: "submit-live", url: LIVE_URL });
+          if (isAvailable(page.current(), { type: "show-sample" })) {
+            await page.dispatch({ type: "show-sample" });
+          }
+
+          // No new session, and the kept one is not changed in place.
+          expect(engine.startSession.mock.calls.length).toBe(startCalls);
+          expect(engine.advance.mock.calls.length).toBe(advanceCalls);
+          expect(session).toBe(kept);
+          expect(kept).toStrictEqual(keptCopy);
+
+          // The sample house has the same card states and progress.
+          const after = page.current().house;
+          expect(after?.source).toBe("sample");
+          expect(after?.floors).toStrictEqual(before?.floors);
+          expect(after?.progress).toStrictEqual(before?.progress);
+
+          // The controller still holds that same object: the next engine
+          // call receives it.
+          const start = page
+            .current()
+            .available.find((a) => a.type === "start-ghost");
+          if (start !== undefined) {
+            await page.dispatch(start);
+            expect(engine.advance.mock.calls.at(-1)?.[0]).toBe(kept);
           }
         },
       ),

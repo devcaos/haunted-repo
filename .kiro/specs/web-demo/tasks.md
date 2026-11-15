@@ -358,7 +358,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the ghost card state rule`
     - _Requirements: 4.9, 6.1, 6.2, 8.4, 11.9_
 
-- [ ] 10. Exorcism logic in the page
+- [x] 10. Exorcism logic in the page
   - [x] 10.1 Add the ghost view, the step actions and the event mapping
     - Create `packages/web/src/logic/exorcism.ts`: `readingText`, `buildGhostView` (the table of the design by step: code, licence next to code, judge line, reading, question number, question, revealed answer, Answer_Box, prompt), `ghostActions(step, revealed)` (the rows of the design table) and `eventFor(action, state, content, text)`.
     - Create `packages/web/src/logic/exorcism.test.ts` with examples: rating map `right` / `half-right` / `wrong`; self-check map `yes` / `half` / `no`; the `explanation-done` text equals `readingText`; retry explanation when `current.explanation !== ""`.
@@ -380,13 +380,13 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the exorcism reading and asking states`
     - _Requirements: 6.2, 6.3, 6.4, 6.6, 6.9, 6.10, 6.12, 6.13, 6.14, 6.15, 6.20, 6.22, 10.2, 18.6_
 
-  - [~] 10.4 State tests for the end states
+  - [x] 10.4 State tests for the end states
     - Extend `states.test.ts`: "Self-check", "Exorcised", "Failed", "Retry", "Back to the list", "House clean" (generated script for every ghost), "Engine error" (injected `advance` that returns an error), "Reload" (a second controller from the same data).
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the exorcism end states`
     - _Requirements: 6.16, 6.17, 6.18, 6.19, 6.21, 6.24, 6.26, 8.3, 8.4, 9.3, 18.6_
 
-  - [~] 10.5 Property test for the engine walk
+  - [x] 10.5 Property test for the engine walk
     - **Property 1: Every available action is accepted by the engine**
     - **Validates: Requirements 6.5, 6.6, 6.8, 6.9, 6.15, 6.17, 6.20, 6.25, 4.10, 18.3**
     - Generator: `choicesArb` (up to 200 numbers), each taken modulo `model.available` (skipping `submit-live`). Two runs: the committed data and script, and a generated script with content for every sample ghost (to reach `house-clean`). `engine.advance` is wrapped to record every call. Checks of the design, plus: `canStart` of each card is true iff `start-ghost` for its path is available (P8 link); and one example that the `pick-ghost` text equals the `files.json` text (6.3).
@@ -395,7 +395,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check every available action is accepted`
     - _Requirements: 4.10, 6.3, 6.5, 6.6, 6.8, 6.9, 6.15, 6.17, 6.20, 6.25, 18.3_
 
-  - [~] 10.6 Property test for the Sample_Session isolation
+  - [x] 10.6 Property test for the Sample_Session isolation
     - **Property 9: A live analysis never changes the Sample_Session**
     - **Validates: Requirements 4.11, 4.12**
     - Generator: `choicesArb` for a judge path stopped in a `house` or `floor` scene, plus the outcome generator of P7. Checks: after `submit-live` and then `show-sample` (when available), the session is the same object and the sample house has the same card states and progress.
@@ -404,7 +404,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check live runs keep the sample session`
     - _Requirements: 4.11, 4.12_
 
-  - [~] 10.7 Extend P10 and P11 to the ghost scene
+  - [x] 10.7 Extend P10 and P11 to the ghost scene
     - **Property 10: Unavailable actions change nothing** and **Property 11: The View_Model is plain data and scenes are consistent**
     - **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     - In the two properties of tasks 3.5 and 3.6, let the path include ghost actions with the committed script. P10 also checks that the session object is the same; P11 also checks `ghost.path` and `ghost.floor` equal the scene's. Both check `canStart` iff `start-ghost` is available (P8 link).
