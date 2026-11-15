@@ -1,0 +1,46 @@
+{
+  "ghosts": [
+    {
+      "path": "bench/static.js",
+      "kind": "entry-point",
+      "explanation": "This file starts a small web server that hands out files from a folder called public. A web server is a program that waits for requests from browsers and answers them, like a shop assistant behind a counter. It takes the built-in server tool of Node and a helper package called serve-static, which knows how to find a file and send it. It reads the port from the PORT setting, or uses 3000 if nobody set one. A port is like a door number where the server waits. For every request, serve-static looks in the public folder first. If it finds nothing, a small fallback answers with the code 404, which means \"not found\", and an empty reply. The file sits in a folder called bench, so it is probably used to measure speed against sirv, but the file itself does not say so.",
+      "retryExplanation": "Think of a library desk. A visitor asks for a book, a librarian looks for it on the shelves, and if the book is not there, a second person at the desk simply says \"we don't have it\". This file sets up that desk for a computer. When you run it, it opens a web server, a program that waits for browsers to ask for things. The server waits at a port, a numbered door: the one in the PORT setting, or 3000 by default. Each request goes first to serve-static, a helper package that plays the librarian and searches the public folder. Only when serve-static gives up does the second person answer: code 404, which means \"not found\", with nothing inside. Why it exists is a guess: it lives in a bench folder, so most likely it is a speed test.",
+      "questions": [
+        "When you run bench/static.js, what does it start, and at which port does it wait if nobody sets PORT?",
+        "When a browser asks this server for a file, which part tries to answer first, and what runs only if that part gives up?",
+        "If serve-static cannot find the file that a browser asks for, what does the browser get back?"
+      ],
+      "simpler": [
+        "Picture opening a food stall. Before you can sell anything, you must put up the stall and tell people where it is. This file does the same for a web server, a program that waits for browsers and answers them. It builds the server with the server tool that comes with Node. Then it tells the server where to wait: a port, which is a numbered door on the computer. The number comes from the PORT setting. If nobody set PORT, the file uses 3000. The very last step, listen, opens the door and the server starts waiting. Until that step runs, nobody can reach it.",
+        "Think of a phone call to a company. First a machine tries to help you. Only if the machine cannot help do you reach a person. In this file every request goes first to the handler, which is serve-static set up to look in the public folder. serve-static tries to find the file and send it. The handler gets one more thing: a small function to call when it gives up. That function is the person at the end of the line. It only runs when serve-static found nothing to send, so for a file that exists, it never runs.",
+        "Imagine asking a vending machine for a snack it does not have. It does not break; it just shows \"sold out\" and gives you nothing. This file behaves the same way for missing files. serve-static looks in the public folder. When the file is not there, it calls the small fallback function it was given. That function sets the status code to 404, a number that means \"not found\", and ends the reply with an empty text. So the browser gets a 404 answer with no content. The server keeps running and waits for the next request."
+      ],
+      "modelAnswers": [
+        "It starts a web server that hands out files from the public folder. It waits at the port in the PORT setting, or at port 3000 when PORT is not set.",
+        "serve-static tries first: it looks for the file in the public folder and sends it. Only when it finds nothing does the small fallback function run.",
+        "The browser gets the status code 404, which means \"not found\", and an empty reply. The server keeps running for the next request."
+      ]
+    },
+    {
+      "path": "builder.js",
+      "kind": "logic",
+      "explanation": "This file builds the sirv package by running another tool for you. Building means turning the source code into the files that get published. First it finds where a tool called bundt is installed. bundt is a build tool, a program that reads source code and writes the finished files. Then it runs bundt as a separate program, like asking a helper to do a job in another room. It gives bundt the file index.mjs and makes it work inside the packages/sirv folder. It also passes along all current settings, plus one that keeps the coloured text on. When bundt finishes, the file prints what bundt wrote on screen, without its first character. If anything goes wrong, it prints ERROR with the details and stops with the code 1. Why it cuts the first character is not clear from the file; probably it is an extra empty line.",
+      "retryExplanation": "Think of sending clothes to a laundry. You do not wash them yourself: you hand over the bag, wait, and then get the clean clothes and a receipt back. This file works like that. It does not build sirv itself; it hands the job to bundt, a build tool that turns source code into the files that get published. It first looks up where bundt is installed. Then it starts bundt as a separate program, giving it the file index.mjs and telling it to work in the packages/sirv folder. It keeps all current settings and adds one so the text stays coloured. When bundt is done, the file shows bundt's report on screen, minus its first character. If the job fails, it prints ERROR and the details, and ends with the code 1, which most likely tells whoever ran it that the build failed.",
+      "questions": [
+        "In your own words, what does builder.js do when you run it?",
+        "What does builder.js hand to bundt before it starts, and what does it show on screen when bundt finishes?",
+        "If bundt fails while it builds, what does builder.js print, and how does the program end?"
+      ],
+      "simpler": [
+        "Think of a manager who does not cook but tells the chef to start. This file is the manager. Its whole job is to start another program, bundt, which builds sirv. Building means turning the source code into the files that get published. The file does three things in order. It finds where bundt is installed. It runs bundt and waits until bundt is done. Then it shows bundt's report on screen. The real building work happens inside bundt, not in this file. So if you ask what builder.js does, the short answer is: it runs the build of sirv for you.",
+        "Picture giving a taxi driver a note before the trip: the address and how you want the ride. Before bundt starts, this file gives it a similar note. It passes one input file, index.mjs. It sets the working folder to packages/sirv, so bundt works there. It passes all current settings, plus FORCE_COLOR set to 1, which asks for coloured text. When bundt finishes, what bundt printed comes back to this file. The file then writes that text on screen, but it drops the very first character first. The file does not say why; most likely that character is an empty line.",
+        "Imagine a smoke alarm. When something burns, it does not try to fix the fire; it makes a loud noise and that is all. This file has a part that acts like that alarm. If running bundt fails, the work stops and the catch part runs. Catch means \"if something goes wrong, do this instead\". It prints the word ERROR followed by the details of the error, the stack, which shows where it broke. Then it ends the program with the exit code 1. An exit code is a number a program leaves when it ends; 0 means fine, other numbers mean a problem."
+      ],
+      "modelAnswers": [
+        "It runs the bundt build tool on sirv's index.mjs, inside the packages/sirv folder, and then shows bundt's report on screen. bundt does the real building.",
+        "It hands bundt the file index.mjs, the folder packages/sirv to work in, and all current settings plus FORCE_COLOR set to 1. When bundt finishes, it shows bundt's report without its first character.",
+        "It prints ERROR followed by the details of the error. Then it ends the program with the exit code 1, which means the build failed."
+      ]
+    }
+  ]
+}

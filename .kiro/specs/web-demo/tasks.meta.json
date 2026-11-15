@@ -23,6 +23,18 @@
     "3.6 Property test for plain data and scenes (list scenes)": {
       "status": "passed",
       "lastRunTimestamp": 1794614192417
+    },
+    "8.3 Property test for the Demo_Script parser": {
+      "status": "passed",
+      "lastRunTimestamp": 1794759042493
+    },
+    "9.2 Property test for the progress view": {
+      "status": "passed",
+      "lastRunTimestamp": 1794759885265
+    },
+    "9.3 Property test for the card state": {
+      "status": "passed",
+      "lastRunTimestamp": 1794759995372
     }
   },
   "executionHistory": {
@@ -237,6 +249,224 @@
         "executionId": "9a72cde6-a0e1-4740-bf28-54f42150ff17",
         "chatSessionId": "sess_50e72c10-f73b-4e36-a235-e06c65a0cb3f",
         "timestamp": 1794617938853
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758746631
+      }
+    ],
+    "8.1 Create the branch `feat/web-exorcism`": [
+      {
+        "executionId": "4b3ec05f-8080-4df6-b633-e5ca855ca92f",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758585082
+      },
+      {
+        "executionId": "8f26faa9-aebe-4634-bd55-9e6b91525de7",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758615917
+      },
+      {
+        "executionId": "8f26faa9-aebe-4634-bd55-9e6b91525de7",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758669723
+      }
+    ],
+    "7. Final checkpoint and PR 1": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758746787
+      }
+    ],
+    "8.2 Add the Demo_Script parser": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773056
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758781509
+      }
+    ],
+    "8.3 Property test for the Demo_Script parser": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773214
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758965151
+      }
+    ],
+    "8.4 Confirm the 2 easiest ghosts with the director": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773351
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794759126363
+      }
+    ],
+    "8.5 Write the Tutor texts for the 2 easiest ghosts": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773454
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794759265049
+      }
+    ],
+    "9.1 Extend the sample house with card states and progress": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773562
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794759601461
+      }
+    ],
+    "9.2 Property test for the progress view": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773697
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794759803714
+      }
+    ],
+    "9.3 Property test for the card state": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773798
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794759919939
+      }
+    ],
+    "10.1 Add the ghost view, the step actions and the event mapping": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773893
+      }
+    ],
+    "10.2 Drive the Sample_Session from the controller": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758773995
+      }
+    ],
+    "10.3 State tests for the reading and asking states": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774092
+      }
+    ],
+    "10.4 State tests for the end states": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774197
+      }
+    ],
+    "10.5 Property test for the engine walk": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774293
+      }
+    ],
+    "10.6 Property test for the Sample_Session isolation": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774389
+      }
+    ],
+    "10.7 Extend P10 and P11 to the ghost scene": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774487
+      }
+    ],
+    "11. Checkpoint - logic of PR 2": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774593
+      }
+    ],
+    "12.1 Draw progress, locked ghosts and the house-clean line": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774696
+      }
+    ],
+    "12.2 Draw the Exorcism_Panel and wire the Demo_Script": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774798
+      }
+    ],
+    "12.3 Extend the source rules for the Answer_Box": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758774892
+      }
+    ],
+    "13.1 Update `PLAN.md`": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758775003
+      }
+    ],
+    "13.2 Add the line to `docs/kiro-usage-log.md`": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758775105
+      }
+    ],
+    "14. Final checkpoint - PR 2": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758775202
+      }
+    ],
+    "15.1 Final check and pull request": [
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794758775299
       }
     ]
   }

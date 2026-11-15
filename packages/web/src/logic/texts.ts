@@ -37,4 +37,13 @@ export const TEXTS = {
     "go-to-house": "Back to the house",
     "go-to-floor": "Go to this floor",
   },
+  // PR 2: the sample exorcism.
+  judgeLine:
+    "In the real tool, your own Kiro reads your answer and judges it. Here you judge it yourself.",
+  selfCheck: "Do you feel you understand this file now?",
+  stillHaunted: "This ghost is still here. You can try again.",
+  houseClean: "Every ghost is exorcised. The house is clean.",
+  progress: (haunted: number, total: number) =>
+    `${haunted} of ${total} ghosts still haunting`,
+  engineError: "Something went wrong in the demo. You are back at the list.",
 } as const;

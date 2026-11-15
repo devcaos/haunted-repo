@@ -1,3 +1,4 @@
+import { hauntedShare, normaliseProgress } from "@haunted-repo/core";
 import type {
   ExorcismProgress,
   ExorcismStep,
@@ -10,11 +11,13 @@ import { TEXTS } from "./texts.js";
 import type {
   FloorView,
   GhostCardView,
+  GhostState,
   HouseView,
+  ProgressView,
   WarningsView,
 } from "./viewModel.js";
 
-/** The exorcism state of the sample. Only null is handled in PR 1. */
+/** The exorcism state of the sample, used for card states and progress. */
 export interface SampleExorcism {
   progress: ExorcismProgress;
   step: ExorcismStep;
@@ -49,6 +52,51 @@ function hauntedCards(report: HauntedReport): GhostCardView[] {
     canStart: false,
     lockedLine: null,
   }));
+}
+
+/** Steps that accept pick-ghost, so a haunted card can be started. */
+const START_STEPS: readonly ExorcismStep[] = ["choosing", "failed"];
+
+/**
+ * Card state rule: exorcised if its progress is exorcised; else locked if the
+ * path has no Ghost_Content; else haunted. The busy flag never changes it.
+ */
+function sampleCards(
+  report: HauntedReport,
+  exorcism: SampleExorcism,
+  exorcised: ReadonlySet<string>,
+): GhostCardView[] {
+  const stepAllowsStart =
+    exorcism.startAllowed && START_STEPS.includes(exorcism.step);
+  return hauntedCards(report).map((card): GhostCardView => {
+    const state: GhostState = exorcised.has(card.path)
+      ? "exorcised"
+      : exorcism.scripted.has(card.path)
+        ? "haunted"
+        : "locked";
+    return {
+      ...card,
+      state,
+      canStart: state === "haunted" && stepAllowsStart,
+      lockedLine: state === "locked" ? POWER_TEXTS.lockedGhost : null,
+    };
+  });
+}
+
+function buildProgress(
+  report: HauntedReport,
+  progress: ExorcismProgress,
+  exorcised: ReadonlySet<string>,
+): ProgressView {
+  const paths = new Set(report.ghosts.map((ghost) => ghost.path));
+  const total = paths.size;
+  const haunted = [...paths].filter((path) => !exorcised.has(path)).length;
+  return {
+    line: TEXTS.progress(haunted, total),
+    haunted,
+    total,
+    share: hauntedShare(report, progress),
+  };
 }
 
 function buildFloors(
@@ -87,11 +135,27 @@ export function buildLiveHouse(report: HauntedReport): HouseView {
   return buildHouse(report, "live");
 }
 
-/** Sample report. In PR 1 `exorcism` is null: every card "haunted", canStart false. */
+/**
+ * Sample report. With `exorcism` null every card is "haunted" with canStart
+ * false and there is no progress. Otherwise the cards follow the progress and
+ * the Demo_Script, and the house carries the progress and the house-clean line.
+ */
 export function buildSampleHouse(
   report: HauntedReport,
   exorcism: SampleExorcism | null,
 ): HouseView {
-  void exorcism; // PR 2 uses it for card states and progress
-  return buildHouse(report, "sample");
+  const house = buildHouse(report, "sample");
+  if (exorcism === null) return house;
+  const normalised = normaliseProgress(report.ghosts, exorcism.progress);
+  const exorcised = new Set(
+    normalised.ghosts
+      .filter((entry) => entry.state === "exorcised")
+      .map((entry) => entry.path),
+  );
+  return {
+    ...house,
+    floors: buildFloors(sampleCards(report, exorcism, exorcised)),
+    progress: buildProgress(report, exorcism.progress, exorcised),
+    houseClean: exorcism.step === "house-clean" ? TEXTS.houseClean : null,
+  };
 }
