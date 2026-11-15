@@ -26,8 +26,9 @@ This spec does not change `packages/core`.
 - **Tutor_Skill**: the Agent Skill (`skills/<name>/SKILL.md`) that tells the user's Kiro how to act as the Tutor and in which order to call the Power_Tools.
 - **Tutor**: the user's own Kiro, acting under the Tutor_Skill and the Tutor_Instructions.
 - **Student**: the user of the Power.
-- **Workspace**: the folder that the Student has open in Kiro.
-- **Power_Data_Folder**: the single folder inside the Workspace where the Power keeps its files. Its name is decided in the design.
+- **Workspace**: the folder that the Student has open in Kiro. Kiro does not tell the Power_Server which folder this is (Kiro does not declare the MCP `roots` capability, `docs/spike-power.md`), and the Power_Server does not try to find it.
+- **Power_Data_Folder**: the folder whose path Kiro gives the Power_Server in the `PLUGIN_DATA` environment variable (in the spike, `C:\Users\<user>\.kiro\powers\data\power`). It is outside the Workspace. The Power keeps all its files there and nowhere else.
+- **Repository_Data_File**: the one file in the Power_Data_Folder that holds the Haunted_Report and the Exorcism_Progress of one repository. There is one Repository_Data_File per repository, and its name includes the repository (Requirement 7.11). Its exact name and layout are decided in the design.
 - **Engine**: the exorcism engine of `@haunted-repo/core` (`startSession`, `advance`, `buildInstructions`, `parseVerdict`, `parseEvent`, `parseProgress`, `formatProgress`, `hauntedShare`).
 - **Detection**: `detectGhosts` of `@haunted-repo/core`, which builds a Haunted_Report from a public GitHub repository URL.
 - **Haunted_Report**, **Ghost**, **Ghost_Text**, **Session_State**, **Step**, **Event**, **Tutor_Instructions**, **Verdict**, **Rating**, **Exorcism_Progress**, **Haunted_Share**, **Core_Question**: as defined in the glossary of `.kiro/specs/exorcism/requirements.md`.
@@ -68,6 +69,7 @@ This spec does not change `packages/core`.
 6. THE Power SHALL NOT include the compiled test files (`*.test.js`, `*.testutil.js`) in what the Power_Server runs (`PLAN.md`, note a).
 7. THE Power_Server SHALL run on Node.js 24 on Windows, macOS and Linux.
 8. THE Tutor_Skill SHALL contain this instruction: IF the Power_Tools are not available, THEN the Tutor SHALL tell the Student in English to check that Node.js 24 is installed and to restart Kiro, and SHALL NOT run an exorcism. This criterion is checked by the manual spike (Requirement 11.7), not by an automated test.
+9. THE Power_Server that Kiro runs SHALL be a single bundled file, committed to git inside `packages/power/`, with `@modelcontextprotocol/sdk` and `@haunted-repo/core` inside it, because Kiro copies the Power folder as it is and installs no dependencies (no `node_modules/`, no `npm ci`, no build; `docs/spike-power.md`). The bundling tool and how CI checks that the committed file is up to date are decided in the design.
 
 ### Requirement 2: Find the ghosts of a public GitHub repository
 
@@ -76,12 +78,12 @@ This spec does not change `packages/core`.
 #### Acceptance Criteria
 
 1. WHEN the Tutor calls the detection Power_Tool with a repository URL, THE Power_Server SHALL call Detection with that URL and return the Haunted_Report: for each Ghost its path, Floor, Difficulty_Score and reason, in the order of the report (easy to hard).
-2. WHEN Detection succeeds, THE Power_Server SHALL save the Haunted_Report in the Power_Data_Folder (Requirement 7) and SHALL return the Haunted_Share and the suggested Ghost (exorcism Requirement 1.1).
+2. WHEN Detection succeeds, THE Power_Server SHALL save the Haunted_Report in the Repository_Data_File of that repository, inside the Power_Data_Folder (Requirement 7) and SHALL return the Haunted_Share and the suggested Ghost (exorcism Requirement 1.1).
 3. IF Detection returns an error (`INVALID_URL`, `REPO_NOT_FOUND`, `RATE_LIMITED`, `NETWORK_ERROR`, `EMPTY_REPO` or `NO_SUPPORTED_FILES`), THEN THE Power_Server SHALL return the error code and an English message that says what happened and what the Student can do, and SHALL NOT change any saved file.
 4. IF the repository is private or does not exist (GitHub answers `REPO_NOT_FOUND`), THEN THE message SHALL say that Haunted Repo only works with public repositories and that the URL may be wrong, and SHALL NOT ask the Student for a token or password.
 5. IF Detection returns a Haunted_Report with `partial` set to `true` (rate limit reached halfway), THEN THE Power_Server SHALL return the report with an English warning that the list is incomplete.
 6. IF Detection returns a Haunted_Report with `fewFiles` set to `true`, THEN THE Power_Server SHALL return the `message` of the report together with the Ghosts.
-7. WHEN a Haunted_Report is already saved for a different repository, THE Power_Server SHALL replace it and its Exorcism_Progress only if the detection Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse with an English message and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
+7. WHEN a Repository_Data_File already exists for the same repository, THE Power_Server SHALL replace its Haunted_Report and Exorcism_Progress only if the detection Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse with an English message and SHALL NOT change any file. Detecting the ghosts of one repository SHALL NOT change the Repository_Data_File of any other repository. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
 
 ### Requirement 3: Get the Ghost_Text for the exorcism
 
@@ -89,7 +91,7 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. WHEN the Student picks a Ghost, THE Power_Server SHALL read the Ghost_Text from GitHub with the owner, repository and `ref` of the saved Haunted_Report, through `@haunted-repo/core`, and SHALL send the Event `pick-ghost` with that path and text to the Engine.
+1. WHEN the Student picks a Ghost, THE Power_Server SHALL read the Ghost_Text from GitHub with the owner, repository and `ref` of the Haunted_Report of the current session, through `@haunted-repo/core`, and SHALL send the Event `pick-ghost` with that path and text to the Engine.
 2. IF reading the Ghost_Text throws any error (including a 404, which the core client reports as `NETWORK_ERROR`, the internal `NOT_TEXT` code, or the plain `Error` of the 8-request budget), THEN THE Power_Server SHALL return an English message (the core message when there is one), SHALL NOT crash, SHALL NOT send `pick-ghost`, and SHALL keep the Session_State unchanged. THE Power_Server SHALL use a new GitHub client for each read.
 3. THE Power_Server SHALL give the Engine the Ghost_Text unchanged.
 4. THE `ref` of the Haunted_Report is the branch name, so the Ghost_Text is the current version of the file on that branch, which may differ from the one Detection scored. This is accepted.
@@ -100,7 +102,7 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. THE Power_Server SHALL create the Session_State with `startSession` from the saved Haunted_Report, the saved Exorcism_Progress (if any) and the Student_Profile, and SHALL change it only with `advance`.
+1. THE Power_Server SHALL create the Session_State with `startSession` from the Haunted_Report and the Exorcism_Progress (if any) of the chosen repository (from its Repository_Data_File, or from memory under Requirement 7.10), and the Student_Profile, and SHALL change it only with `advance`.
 2. WHEN the Engine returns Tutor_Instructions, THE Power_Server SHALL give the Tutor their `text` unchanged, together with the current Step and the Events the Tutor may send next (`ALLOWED_EVENTS`).
 3. THE Tutor_Skill SHALL tell the Tutor to follow the Tutor_Instructions exactly, to write to the Student only in English, to show one question per message, and to wait for the Student's answer before judging it.
 4. THE Tutor_Skill SHALL tell the Tutor to call a Power_Tool after each explanation, Simpler_Explanation and model answer, with the text it wrote, so that the Power_Server sends `explanation-done`.
@@ -142,22 +144,23 @@ This spec does not change `packages/core`.
 3. WHEN the first `dont-know` for a question is accepted, THE Power_Server SHALL return the Engine's Tutor_Instructions for a Simpler_Explanation, and then the same question again (exorcism Requirements 5.3 to 5.5).
 4. WHEN the second `dont-know` for the same question is accepted, THE Power_Server SHALL return the Engine's Tutor_Instructions for a short model answer, and then the next question or the final decision (exorcism Requirement 5.6).
 
-### Requirement 7: Keep the data only in the user's own files
+### Requirement 7: Keep the data only on the user's own computer
 
-**User Story:** As a student, I want my report and my progress saved only in my own project folder, so that nothing about me or my code goes anywhere else.
+**User Story:** As a student, I want my report and my progress saved only on my own computer, in the folder that Kiro gives the Power, so that nothing about me or my code goes anywhere else.
 
 #### Acceptance Criteria
 
-1. THE Power_Server SHALL save the Haunted_Report and the Exorcism_Progress as JSON files inside the Power_Data_Folder of the Workspace, and SHALL NOT write any file outside the Power_Data_Folder.
-2. THE Power_Server SHALL write the Haunted_Report with `JSON.stringify` and the Exorcism_Progress with `formatProgress`, and SHALL read them back with `parseReport` and `parseProgress`.
+1. THE Power_Server SHALL save the Haunted_Report and the Exorcism_Progress of each repository as JSON in the Repository_Data_File of that repository, inside the Power_Data_Folder (one file per repository), and SHALL NOT write any file outside the Power_Data_Folder. THE Power_Server SHALL NOT try to find the Workspace and SHALL NOT need the MCP `roots` capability.
+2. THE Power_Server SHALL write the Haunted_Report with `JSON.stringify` and the Exorcism_Progress with `formatProgress`, and SHALL read them back with `parseReport` and `parseProgress`. How both values sit in one Repository_Data_File is decided in the design.
 3. WHEN a Ghost becomes `exorcised` or stays `haunted` after a full attempt, or the Student answers the self-check, THE Power_Server SHALL save the Exorcism_Progress before it returns the next Tutor_Instructions.
 4. THE Power_Server SHALL NOT save the text of the Student's answers, the Ghost_Text or the texts the Tutor wrote.
-5. IF a saved file is not a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL overwrite or delete that file only if the Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
+5. IF a Repository_Data_File does not hold a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL overwrite or delete that file only if the Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
 6. IF the Power_Data_Folder or one of its files cannot be written (for example, no permission or a read-only folder), THEN THE Power_Server SHALL return an English message that says the progress was not saved, and SHALL keep the Session_State in memory.
 7. THE Power_Server SHALL NOT send the Haunted_Report, the Exorcism_Progress or any usage data to any server, and SHALL NOT collect telemetry.
-8. FOR ALL valid Exorcism_Progress values, saving them to the Power_Data_Folder and reading them back SHALL give an equal value (save round-trip property).
+8. FOR ALL valid Exorcism_Progress values, saving them in a Repository_Data_File and reading them back SHALL give an equal value (save round-trip property).
 9. THE Power_Server SHALL keep the Session_State of an unfinished attempt only in memory; an unfinished attempt SHALL NOT be resumed after the Power_Server stops (exorcism Requirement 10.8: the Ghost stays `haunted`).
-10. IF the Power_Server cannot find the Workspace folder, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
+10. IF the `PLUGIN_DATA` environment variable is missing, or the folder it names cannot be written, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
+11. THE Power_Data_Folder may be shared with another Power: Kiro names it after the last part of the import URL (`power` in the spike), not after the `name` in `plugin.json`, so another Power imported from a URL that ends in the same folder name may get the same folder. THEREFORE THE Power_Server SHALL use for each Repository_Data_File a name that includes the repository (owner and name) and marks it as a Haunted Repo file, and SHALL NOT read, change or delete any file in the Power_Data_Folder that does not have that kind of name. THE design SHALL check this naming against how Kiro really names the folder.
 
 ### Requirement 8: Use no network except GitHub
 
@@ -176,8 +179,8 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. IF the Tutor stops answering, the Kiro session ends or the Power_Server stops during an attempt, THEN THE Ghost SHALL stay `haunted`, and THE Exorcism_Progress saved before that moment SHALL stay valid and unchanged.
-2. WHEN the Power_Server starts and finds a saved Haunted_Report and Exorcism_Progress, THE Power_Server SHALL start a new session from them with `startSession`, so that `exorcised` Ghosts stay `exorcised`. THE Power_Server SHALL NOT save `knowsJava`; after a restart, THE Tutor_Skill SHALL tell the Tutor to ask the Student again whether they know Java (Requirement 4.8).
+1. IF the Tutor stops answering, the Kiro session ends or the Power_Server stops during an attempt, THEN THE Ghost SHALL stay `haunted`, and THE Repository_Data_Files saved in the Power_Data_Folder before that moment SHALL stay valid and unchanged.
+2. WHEN the Tutor asks to work on a repository that has a Repository_Data_File in the Power_Data_Folder (for example, after a restart), THE Power_Server SHALL read its Haunted_Report and Exorcism_Progress and start a new session from them with `startSession`, so that `exorcised` Ghosts stay `exorcised`. THE Power_Server SHALL NOT save `knowsJava`; after a restart, THE Tutor_Skill SHALL tell the Tutor to ask the Student again whether they know Java (Requirement 4.8).
 3. IF the Tutor calls a Power_Tool that needs a session and no session exists (for example, after a restart), THEN THE Power_Server SHALL return an English message that says how to start or continue, and SHALL NOT change any saved file.
 4. IF the Tutor sends a Judgement or an Event when the Step does not expect it, THEN THE Power_Server SHALL follow Requirement 4.5 and SHALL NOT change Invalid_Judgement_Count.
 
@@ -187,7 +190,7 @@ This spec does not change `packages/core`.
 
 #### Acceptance Criteria
 
-1. WHEN the Tutor asks for the status, THE Power_Server SHALL return, for each Ghost of the saved Haunted_Report, its path, Floor and state (`haunted` or `exorcised`), and the Haunted_Share as a number from 0 to 1 and as English text (for example, "3 of 5 ghosts still haunt this house").
+1. WHEN the Tutor asks for the status, THE Power_Server SHALL return, for each Ghost of the Haunted_Report of the current session, its path, Floor and state (`haunted` or `exorcised`), and the Haunted_Share as a number from 0 to 1 and as English text (for example, "3 of 5 ghosts still haunt this house").
 2. THE Power_Server SHALL calculate the Haunted_Share only with `hauntedShare` of the Engine.
 
 ### Requirement 11: Tests, platform and limits of the change
@@ -220,9 +223,10 @@ This spec does not change `packages/core`.
 - **Rate limit (60 requests per hour without a token):** `RATE_LIMITED`, or a `partial` report with a warning (Requirements 2.3 and 2.5).
 - **A Ghost file removed or renamed after detection:** the Ghost_Text cannot be read; English message; the Ghost stays `haunted` (Requirement 3.2).
 - **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without an explicit `replace: true` input (Requirement 7.5).
-- **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
-- **The Workspace folder cannot be found:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
-- **A new repository URL while another report is saved:** the Tutor asks the Student, and the old report is replaced only with an explicit `replace: true` input (Requirement 2.7).
+- **The Power_Data_Folder or one of its files cannot be written** (for example, no permission or a read-only folder): progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
+- **`PLUGIN_DATA` is missing or not writable:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
+- **Another Power shares the Power_Data_Folder** (it was imported from a URL that ends in the same folder name): the Power_Server touches only its own Repository_Data_Files and leaves every other file alone (Requirement 7.11).
+- **Detecting a repository that already has a Repository_Data_File:** the Tutor asks the Student, and the saved report and progress of that repository are replaced only with an explicit `replace: true` input; the files of other repositories do not change (Requirement 2.7).
 - **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
 - **The repeated question after a Simpler_Explanation has a different text:** the Power_Server sends the `pendingQuestion` text (Requirement 4.6).
 - **All Ghosts are `exorcised`:** Step `house-clean` and Haunted_Share 0 (Requirement 4.12).
@@ -234,6 +238,7 @@ This spec does not change `packages/core`.
 - Private repositories, GitHub tokens and any login.
 - Resuming an unfinished attempt after a restart (only whole Ghosts are saved).
 - Saving the Student's answers, the Ghost_Text or the Tutor's texts.
+- Saving any file in the Student's project (the Workspace), or finding where it is (option A, Open Question 5).
 - Reading the Ghost_Text from the local disk or from a local clone (decided in Open Questions, item 1).
 - Publishing the Power in the Kiro powers registry (kiro.dev/powers).
 - The exorcism certificate and any teacher feature (`PLAN.md`, "Pendientes").
@@ -247,7 +252,7 @@ This spec does not change `packages/core`.
 
 If the work runs late, this is what stays and what goes first.
 
-- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 8 and 11. Requirement 0 is the gate before the design, so it is always done first.
+- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 7.10, 7.11, 8 and 11. Saving in `PLUGIN_DATA` (7.1) needs the safe file names of 7.11 and the in-memory fallback of 7.10. Requirement 0 is the gate before the design, so it is always done first.
 - **Cut first if late:** 2.7, 7.5, 9.2 and 10.
 
 ## Open Questions
@@ -255,8 +260,8 @@ If the work runs late, this is what stays and what goes first.
 These points need a decision by the project director or the reviewer before the design.
 
 1. **Source of the Ghost_Text. Decided (15 Nov 2026, Luis Miguel): GitHub.** The Ghost_Text comes from GitHub, as Detection does, not from the local disk (Requirement 3), through `getFileText` of the existing GitHub client. This replaces the note "the Power reads the local disk" of the exorcism spec (Decision 4 and "Out of Scope").
-2. **How the installed Power runs its server.** `dist/` is ignored by git, so a Power imported from GitHub would have no compiled server. Options for the design: commit one bundled server file, publish an npm package and start it with `npx`, or ask the Student to run `npm ci` and `npm run build`. Requirement 1.5 asks for no manual step beyond what the Tutor_Skill explains.
+2. **How the installed Power runs its server. Answered by the spike (15 Nov 2026): one bundled server file committed to git** (Requirement 1.9). Kiro copies `packages/power/` as it is, with no `node_modules/`, no `npm ci` and no build, and runs `node ${PLUGIN_ROOT}/<file>` (`docs/spike-power.md`). The other options (an npm package started with `npx`, or asking the Student to run `npm ci` and `npm run build`) are not used.
 3. **`tech.md` is out of date.** It says "`POWER.md` + steering files + MCP server"; the current Kiro docs say `plugin.json` + `skills/` + `mcp.json`. `tech.md` should be fixed in a separate docs change.
 4. **The value of Max_Verdict_Retries.** These requirements fix it at 2 (3 Judgements in total for one answer).
-5. **The Power_Data_Folder.** Its name, and whether the Power should suggest adding it to `.gitignore` of the Student's project, are left to the design.
+5. **The Power_Data_Folder. Decided (15 Nov 2026, Luis Miguel, after the spike): option A of `docs/spike-power.md`.** The Power_Data_Folder is the folder in `PLUGIN_DATA`, outside the Student's project, with one Repository_Data_File per repository (Requirement 7). The Power_Server does not try to find the Workspace, so the question about the Student's `.gitignore` no longer applies. The file names are decided in the design (Requirement 7.11).
 6. **"Kiro unavailable".** These requirements read it as "the Kiro session, the Tutor or the Power_Server stops". If it also means "the Kiro model returns an error", the Power cannot see that, because the Power_Server only receives tool calls.
