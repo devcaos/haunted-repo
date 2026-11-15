@@ -234,7 +234,7 @@ This spec does not change `packages/core`.
 - Private repositories, GitHub tokens and any login.
 - Resuming an unfinished attempt after a restart (only whole Ghosts are saved).
 - Saving the Student's answers, the Ghost_Text or the Tutor's texts.
-- Reading the Ghost_Text from the local disk or from a local clone (see Open Questions, item 1).
+- Reading the Ghost_Text from the local disk or from a local clone (decided in Open Questions, item 1).
 - Publishing the Power in the Kiro powers registry (kiro.dev/powers).
 - The exorcism certificate and any teacher feature (`PLAN.md`, "Pendientes").
 - One ghost per line, folders as rooms, a visual map inside Kiro (the Power shows the status as text).
@@ -254,7 +254,7 @@ If the work runs late, this is what stays and what goes first.
 
 These points need a decision by the project director or the reviewer before the design.
 
-1. **Source of the Ghost_Text.** The exorcism spec (Decision 4 and "Out of Scope") says "the Power reads the local disk". Detection works from a public GitHub URL and does not keep the file texts, and the Student may not have a clone open. These requirements read the Ghost_Text from GitHub with the report's `ref` (Requirement 3), through `getFileText` of the existing GitHub client. This contradicts the exorcism spec's note and needs an explicit decision.
+1. **Source of the Ghost_Text. Decided (15 Nov 2026, Luis Miguel): GitHub.** The Ghost_Text comes from GitHub, as Detection does, not from the local disk (Requirement 3), through `getFileText` of the existing GitHub client. This replaces the note "the Power reads the local disk" of the exorcism spec (Decision 4 and "Out of Scope").
 2. **How the installed Power runs its server.** `dist/` is ignored by git, so a Power imported from GitHub would have no compiled server. Options for the design: commit one bundled server file, publish an npm package and start it with `npx`, or ask the Student to run `npm ci` and `npm run build`. Requirement 1.5 asks for no manual step beyond what the Tutor_Skill explains.
 3. **`tech.md` is out of date.** It says "`POWER.md` + steering files + MCP server"; the current Kiro docs say `plugin.json` + `skills/` + `mcp.json`. `tech.md` should be fixed in a separate docs change.
 4. **The value of Max_Verdict_Retries.** These requirements fix it at 2 (3 Judgements in total for one answer).
