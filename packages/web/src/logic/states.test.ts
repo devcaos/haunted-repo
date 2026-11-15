@@ -46,7 +46,7 @@ function setup(sample: PageDeps["sample"] = committed) {
     throw new Error("detect must not be called");
   });
   const renderer = createRecordingRenderer();
-  const page = createPage({ detect, sample }, renderer);
+  const page = createPage({ detect, sample, script: null }, renderer);
   page.start();
   return { page, renderer, detect };
 }
@@ -58,7 +58,10 @@ function setupLive(repos: FakeRepo[], options: FakeGitHubOptions = {}) {
     detectGhosts(url, { fetch: fake.fetch }),
   );
   const renderer = createRecordingRenderer();
-  const page = createPage({ detect, sample: committed }, renderer);
+  const page = createPage(
+    { detect, sample: committed, script: null },
+    renderer,
+  );
   page.start();
   return { page, renderer, detect, fake };
 }
@@ -162,7 +165,10 @@ describe("page states (PR 1)", () => {
     });
     const detect = vi.fn<DetectFn>(() => pending);
     const renderer = createRecordingRenderer();
-    const page = createPage({ detect, sample: committed }, renderer);
+    const page = createPage(
+      { detect, sample: committed, script: null },
+      renderer,
+    );
     page.start();
     await page.dispatch({ type: "go-to-floor", floor: "attic" });
 

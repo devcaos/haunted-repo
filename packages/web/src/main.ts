@@ -18,7 +18,8 @@ const renderer = createSimpleRenderer(root, (action) => {
   void page.dispatch(action);
 });
 const page: PageController = createPage(
-  { detect: (url) => detectGhosts(url), sample },
+  // The Demo_Script is wired together with the Exorcism_Panel (task 12.2).
+  { detect: (url) => detectGhosts(url), sample, script: null },
   renderer,
 );
 page.start();

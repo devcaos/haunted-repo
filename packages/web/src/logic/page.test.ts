@@ -18,7 +18,6 @@ import { loadSample } from "../sample/sampleData.js";
 import { isAvailable } from "./actions.js";
 import { createFakeFetch } from "./fakeDetect.testutil.js";
 import type { UserAction } from "./actions.js";
-import { buildSampleHouse } from "./houseView.js";
 import { outcomeOf } from "./outcome.js";
 import type { Outcome } from "./outcome.js";
 import { createPage } from "./page.js";
@@ -125,8 +124,12 @@ describe("page controller properties (PR 1)", () => {
           };
           const detect = vi.fn<DetectFn>(() => next());
           const renderer = createRecordingRenderer();
-          const page = createPage({ detect, sample: committed }, renderer);
+          const page = createPage(
+            { detect, sample: committed, script: null },
+            renderer,
+          );
           page.start();
+          const openingHouse = page.current().house; // the sample with its progress
 
           if (earlier !== null) {
             next = () => Promise.resolve({ ok: true, value: earlier });
@@ -155,7 +158,7 @@ describe("page controller properties (PR 1)", () => {
               : "fallback";
           if (outcome === "fallback") {
             expect(last.scene).toEqual({ kind: "house" });
-            expect(last.house).toEqual(buildSampleHouse(sampleReport, null));
+            expect(last.house).toEqual(openingHouse);
             expect(last.status).toEqual({
               kind: "fallback",
               text: TEXTS.fallback,
@@ -209,7 +212,10 @@ describe("page controller properties (PR 1)", () => {
               };
             });
           });
-          const page = createPage({ detect, sample: committed }, renderer);
+          const page = createPage(
+            { detect, sample: committed, script: null },
+            renderer,
+          );
           page.start();
 
           const first = page.dispatch({ type: "submit-live", url: LIVE_URL });
@@ -272,7 +278,7 @@ describe("page controller properties (PR 1)", () => {
           };
           const renderer = createRecordingRenderer();
           const page = createPage(
-            { detect, sample: committed, engine },
+            { detect, sample: committed, script: null, engine },
             renderer,
           );
           page.start();
@@ -367,7 +373,10 @@ describe("page controller properties (PR 1)", () => {
             detectGhosts(url, { fetch: fake.fetch }),
           );
           const renderer = createRecordingRenderer();
-          const page = createPage({ detect, sample: committed }, renderer);
+          const page = createPage(
+            { detect, sample: committed, script: null },
+            renderer,
+          );
           page.start();
 
           for (const choice of choices) {

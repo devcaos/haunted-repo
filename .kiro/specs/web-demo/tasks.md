@@ -367,7 +367,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): map exorcism steps to views and events`
     - _Requirements: 6.4, 6.5, 6.6, 6.8, 6.9, 6.10, 6.11, 6.12, 6.13, 6.14, 6.15, 6.16, 6.17, 6.18, 6.19, 6.20, 6.22, 6.24, 10.2_
 
-  - [~] 10.2 Drive the Sample_Session from the controller
+  - [x] 10.2 Drive the Sample_Session from the controller
     - In `page.ts`: `PageDeps.script` and `engine` (defaults to Core's); the Sample_Session from `startSession(sample.report)`; `revealed`; `start-ghost` (`pick-ghost` with the full Ghost_Text, scene `ghost`); ghost actions through `eventFor`, checked against `ALLOWED_EVENTS[step]` before `advance`; `show-model-answer` (local, no event) and `back-to-list` (no event); scenes after leave, back and self-check (floor of that ghost), `house` on `house-clean`; form hidden in the `ghost` scene; `start-ghost` not available while busy; engine error → status `TEXTS.engineError`, session restarted from its progress, scene `house`. `submit-live` never touches the Sample_Session; `show-sample` shows it with its progress.
     - In `main.ts` pass `script: null` for now (the real script is wired in task 12.2, together with the panel renderer).
     - Verify: `npm run check` exits `0`.
