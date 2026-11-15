@@ -54,12 +54,13 @@ packages/power/
     dataFile.ts          pure: file name, serialise and parse the Repository_Data_File
     store.ts             IO: folder store (temp file + rename) and memory store
     messages.ts          every English text the Power_Server writes
+    guardFetch.ts        pure: guardFetch(fetch) refuses any URL whose origin is not https://api.github.com
     *.test.ts            tests next to the code (same style as the other packages)
 ```
 
 Rules for the layout:
 
-- `power.ts`, `verdictGate.ts` and `dataFile.ts` do not import the MCP SDK and do not touch the disk. `power.ts` receives its helpers (`fetch`, a store) as arguments. So every rule can be tested without Kiro (Requirement 11.5).
+- `power.ts`, `verdictGate.ts`, `dataFile.ts` and `guardFetch.ts` do not import the MCP SDK and do not touch the disk. `power.ts` receives its helpers (`fetch`, a store) as arguments. So every rule can be tested without Kiro (Requirement 11.5).
 - `store.ts` is the only module that uses `node:fs`. `register.ts` and `server.ts` are the only modules that use the SDK.
 - The committed bundle is `packages/power/bundle/server.mjs`. It cannot go in `dist/`, because `dist/` is in `.gitignore`. It is a single file, as Requirement 1.9 asks.
 - `mcp.json` declares the server once, with `"args": ["${PLUGIN_ROOT}/bundle/server.mjs"]`, no `env`, no keys (1.3). The `${PLUGIN_ROOT}` form is the one proven by the spike; the relative form was never tested, so it is not used.
@@ -157,7 +158,7 @@ Notes on the choices:
 - **`replace: true`:** it exists only on `find_ghosts`. Without it, an existing file is never changed. With it, both the report and the progress of **that** repository are replaced (2.7) or a broken file is overwritten (7.5). Files of other repositories are never touched. The refusal text says what the file is (valid or broken), names the file, and says that the Tutor must ask the Student before sending `replace: true`.
 - **Where the question is kept (4.6).** `judge_answer` receives the question text from the Tutor. If `state.current.pendingQuestion` is not `null` (a question repeated after a Simpler_Explanation), the Power_Server sends **that** text to the Engine and ignores the one the Tutor sent. Otherwise it sends the Tutor's text. A blank question is refused by `parseEvent` (`INVALID_EVENT`).
 - **Save rule (7.3).** After every accepted `advance`, the Power compares `formatProgress(state.progress)` with the saved one. If it changed, it saves before it answers. The Engine only changes the progress when a ghost becomes `exorcised`, stays `haunted` after a full attempt, or the self-check is answered, so this is exactly 7.3.
-- **Network:** `fetch` is a constructor argument. In `server.ts` it is `globalThis.fetch` wrapped by a guard that throws if the URL does not start with `https://api.github.com/`. No `Authorization` header is ever added (8.2); the core client does not add one.
+- **Network:** `fetch` is a constructor argument. In `server.ts` it is `guardFetch(globalThis.fetch)`. `guardFetch` is a pure exported function in its own module `src/guardFetch.ts`: it parses the request URL with `new URL()` and throws, without calling the inner `fetch`, if the URL does not parse or its origin is not exactly `https://api.github.com`. A prefix check is not used, because `https://api.github.com.evil.example/` would pass it. No `Authorization` header is ever added (8.2); the core client does not add one.
 
 Example of `find_ghosts` answer (shortened):
 
@@ -282,7 +283,7 @@ One rule, in two moments:
 
 ### Property 1: Strict verdict
 
-*For any* text sent as `judgement` in a session whose step is `asking`, the Power_Server sends an Event to the Engine if and only if `parseVerdict(text)` accepts the text, and the Rating (or `dont-know`) of that Event is exactly the Verdict that `parseVerdict` returned. Texts that contain "I don't know", a bold verdict, extra spaces, a full stop, or two `VERDICT:` lines but no valid last line never produce an Event.
+*For any* text sent as `judgement` in a session whose step is `asking`, the Power_Server sends an Event to the Engine if and only if `parseVerdict(text)` accepts the text, and the Rating (or `dont-know`) of that Event is exactly the Verdict that `parseVerdict` returned. Texts that contain "I don't know", a bold verdict, extra spaces, a full stop, or two `VERDICT:` lines but no valid last line never produce an Event. The check looks at the step and the ratings of the Session_State after the call, not only at the code returned.
 
 **Validates: Requirements 5.1, 5.2, 5.3, 5.8, 6.2**
 
@@ -300,7 +301,7 @@ One rule, in two moments:
 
 ### Property 4: Network allowlist
 
-*For any* sequence of tool calls, including URLs and paths made of arbitrary text, every URL that the Power_Server requests starts with `https://api.github.com/`, and no request carries an `Authorization` header.
+*For any* sequence of tool calls, including URLs and paths made of arbitrary text, every URL that reaches the inner `fetch` through `guardFetch` parses with `new URL()` and has origin exactly `https://api.github.com`, and no request carries an `Authorization` header.
 
 **Validates: Requirements 4.9, 7.7, 8.1, 8.2, 8.3, 8.4**
 
@@ -382,8 +383,11 @@ The Power has pure logic with large input spaces (judgement texts, owner and rep
   - Examples for each tool: a full exorcism walk with the `tinyRecording` report; each detection error code; `partial` and `fewFiles`; `DATA_EXISTS` and `replace: true`; broken files (invalid JSON, wrong `format`, invalid report, invalid progress, owner mismatch); Ghost_Text 404 and not text; first and second "I don't know" with the `pendingQuestion` check (4.6); `failed` and `house-clean`; a second `HauntedPower` on the same folder (restart, 9.1, 9.2, 7.9); no `PLUGIN_DATA`, a `PLUGIN_DATA` that is a file, and a save that fails after start-up (7.6, 7.10, warning only once).
   - Unit test with an injected rename that fails twice with EPERM and then works: the save succeeds and no warning is returned.
   - A table-driven test of the invalid judgements of 5.10.
+  - `guardFetch` examples: a URL with another origin (for example `https://example.com/repos/a/b`) and `https://api.github.com.evil.example/` are refused, and the inner `fetch` is never called; a URL under `https://api.github.com/` reaches it unchanged.
   - Queue test: start pick_ghost with a slow fake fetch, call send_event before it resolves, and check that the final state equals the state of the same two calls run one after the other.
-- **Property tests:** Properties 1 to 7 above. Property 1 and 2 drive `HauntedPower` directly and take a report from `tinyRecording`. Property 3 uses `reportArb` and `progressArb` with a real temporary folder. Property 4 wraps the fake `fetch` in a recorder and feeds URL-like strings.
+- **Property tests:** Properties 1 to 7 above. Property 1 and 2 drive `HauntedPower` directly and take a report from `tinyRecording`. Property 3 uses `reportArb` and `progressArb` with a real temporary folder. Property 4 wraps the fake `fetch` in a recorder, puts `guardFetch` in front of it, and feeds URL-like strings; it checks every request the recorder saw after passing through `guardFetch`.
+  - **Generator of Property 1:** it mixes valid judgements (a random reason, then one of the four `VERDICT:` lines, with optional trailing spaces and optional CRLF line endings) with near misses (a leading space before `VERDICT:`, bold `**VERDICT: right**`, a full stop at the end, lowercase `verdict: right`, two `VERDICT:` lines where the last one is not valid, an empty text, only spaces). The check reads the step and the ratings of the Session_State after the call, and compares them with what `parseVerdict` returns for the same text; the return code alone is not enough.
+  - **Each of Properties 1 and 2 must be seen failing once.** In the implementation task, temporarily add `.trim()` before `parseVerdict` (Property 1 must then fail on a leading-space near miss) and remove the count reset after a Verdict_Failure (Property 2 must then fail). Run the test, see it fail, revert the change, and write one line for each result in `docs/kiro-usage-log.md`.
 - **Handlers called directly:** the tests call the methods of `HauntedPower`, not the MCP layer. This is simpler and covers all rules.
 - **Stdio smoke test (one test, cheap):** `bundle.smoke.test.ts` starts `bundle/server.mjs` with the SDK `Client` and `StdioClientTransport` (with `PLUGIN_DATA` set to a temporary folder), lists the six tools, and calls `house_status` expecting `NO_SESSION`. It proves that the committed file starts on Node 24, includes the SDK and zod, and does not contain test file names (1.6). It makes no network call.
 - **Manifest test (one test):** reads `plugin.json`, `mcp.json` and the front matter of `SKILL.md` and checks the fields of 1.1 to 1.4 (no `env` in `mcp.json`, `${PLUGIN_ROOT}` used).
