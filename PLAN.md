@@ -5,7 +5,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Spec del Kiro Power (`.kiro/specs/kiro-power/`, rama `feat/kiro-power-spec`, PR #31): requisitos corregidos tras la primera revisión (12 puntos, un commit por punto), esperando la segunda revisión. Aún no hay `design.md`, `tasks.md` ni código. Decidido por Luis Miguel: el texto del fantasma sale de GitHub, como la detección. Nuevo requisito 0: un spike con un Power mínimo instalado desde GitHub, antes de escribir `design.md`. Después: (2) diseño visual de la web, (3) vídeo, textos de Devpost y posts bonus.
+- Spec del Kiro Power (.kiro/specs/kiro-power/): requisitos aprobados por Luis Miguel (PR #31, fusionada). Spike del requisito 0 (Power mínimo en packages/power/) en la rama eat/power-spike, PR #32 abierta: falta que Luis Miguel lo instale con "Import power from GitHub" siguiendo docs/spike-power.md. design.md NO se empieza hasta que el spike pase. Después: (2) diseño visual de la web, (3) vídeo, textos de Devpost y posts bonus.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
