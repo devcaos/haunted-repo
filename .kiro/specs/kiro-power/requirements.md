@@ -159,6 +159,7 @@ This spec does not change `packages/core`.
 8. FOR ALL valid Exorcism_Progress values, saving them in a Repository_Data_File and reading them back SHALL give an equal value (save round-trip property).
 9. THE Power_Server SHALL keep the Session_State of an unfinished attempt only in memory; an unfinished attempt SHALL NOT be resumed after the Power_Server stops (exorcism Requirement 10.8: the Ghost stays `haunted`).
 10. IF the `PLUGIN_DATA` environment variable is missing, or the folder it names cannot be written, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
+11. THE Power_Data_Folder may be shared with another Power: Kiro names it after the last part of the import URL (`power` in the spike), not after the `name` in `plugin.json`, so another Power imported from a URL that ends in the same folder name may get the same folder. THEREFORE THE Power_Server SHALL use for each Repository_Data_File a name that includes the repository (owner and name) and marks it as a Haunted Repo file, and SHALL NOT read, change or delete any file in the Power_Data_Folder that does not have that kind of name. THE design SHALL check this naming against how Kiro really names the folder.
 
 ### Requirement 8: Use no network except GitHub
 
@@ -223,6 +224,7 @@ This spec does not change `packages/core`.
 - **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without an explicit `replace: true` input (Requirement 7.5).
 - **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
 - **The Workspace folder cannot be found:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
+- **Another Power shares the Power_Data_Folder** (it was imported from a URL that ends in the same folder name): the Power_Server touches only its own Repository_Data_Files and leaves every other file alone (Requirement 7.11).
 - **A new repository URL while another report is saved:** the Tutor asks the Student, and the old report is replaced only with an explicit `replace: true` input (Requirement 2.7).
 - **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
 - **The repeated question after a Simpler_Explanation has a different text:** the Power_Server sends the `pendingQuestion` text (Requirement 4.6).
