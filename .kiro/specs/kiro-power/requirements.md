@@ -243,6 +243,13 @@ This spec does not change `packages/core`.
 - Kiro hooks. The Power does not install any hook.
 - The visual design of the demo website (its own spec, after this one).
 
+## Cut line
+
+If the work runs late, this is what stays and what goes first.
+
+- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 8 and 11. Requirement 0 is the gate before the design, so it is always done first.
+- **Cut first if late:** 2.7, 7.5, 9.2 and 10.
+
 ## Open Questions
 
 These points need a decision by the project director or the reviewer before the design.
