@@ -252,7 +252,7 @@ This spec does not change `packages/core`.
 
 If the work runs late, this is what stays and what goes first.
 
-- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 8 and 11. Requirement 0 is the gate before the design, so it is always done first.
+- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 7.10, 7.11, 8 and 11. Saving in `PLUGIN_DATA` (7.1) needs the safe file names of 7.11 and the in-memory fallback of 7.10. Requirement 0 is the gate before the design, so it is always done first.
 - **Cut first if late:** 2.7, 7.5, 9.2 and 10.
 
 ## Open Questions
