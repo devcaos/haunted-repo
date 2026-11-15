@@ -9,7 +9,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
-2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea)
+2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea; desde el 15 nov solo queda el hook de comando)
 3. [x] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo; hechos los 3 spikes del 2026-11-11)
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
@@ -27,7 +27,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
 - Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
 - Cerrado (hook de tests, historial): en la sesión de la PR de `feat/test-hook` no se pudo disparar PostTaskExec editando `tasks.md`. Se añadió la opción B (segundo hook de tipo agente que ejecuta `npm run check`). La prueba real en la spec de detección confirmó que el hook se dispara al completar una tarea (ver la siguiente línea).
-- Cerrado (hook de tests, prueba real en la tarea 2.1): el hook PostTaskExec está confirmado. Se dispara al marcar una tarea como completada, no al pulsar Start task. Al completar la 2.1 llegó al agente la instrucción de ejecutar `npm run check`. Queda decidir cuál de los dos hooks (comando o agente) se deja.
+- Cerrado (hook de tests, prueba real en la tarea 2.1): el hook PostTaskExec está confirmado. Se dispara al marcar una tarea como completada, no al pulsar Start task. Al completar la 2.1 llegó al agente la instrucción de ejecutar `npm run check`. Decidido el 15 nov: solo queda el hook de comando; el de agente se borró.
 - Cerrado (hook de tests): 'Agent Hooks v2' no obliga a migrar. La documentación actual (kiro.dev/docs/hooks, actualizada oct 2026) usa `"version": "v1"` con `trigger` y `action`, igual que nuestro archivo. `timeout` va al nivel del hook, no dentro de `action`. Solo cambió el formato de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`. La documentación no dice que la salida de un hook PostTaskExec llegue al agente.
 - Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
 - Cerrado (13 nov, docs/pre-web-cleanup): Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
@@ -62,7 +62,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - [x] Generar `product.md` y `tech.md` con Kiro a partir de `docs/idea.md` (PR #1, 6 nov)
 - [x] Crear `docs/frictions.md` y su recordatorio en el plan (PR #2, 6 nov)
 - [x] Esqueleto del proyecto: workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check (PR #4)
-- [x] Hook de tests con acción de comando y de agente (PR #5; confirmado en real: se dispara al completar una tarea)
+- [x] Hook de tests (PR #5; confirmado en real: se dispara al completar una tarea). Desde el 15 nov solo queda el hook de comando; el de agente se borró
 - [x] Spec de detección de fantasmas: `packages/core` con `detectGhosts`, cliente de GitHub, GitHub falso estricto y test en vivo (PR #11 y #12)
 - [x] Spec de exorcismo: motor puro en `packages/core/src/exorcism/` (sesión, eventos, preguntas, veredicto, progreso, grabación y repetición) y nueva frase del fantasma según la planta (PR #14, 12 nov)
 - [x] Despliegue en GitHub Pages: web pública, CI en cada PR y despliegue al fusionar (PR #13, 12 nov)
@@ -73,7 +73,6 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Qué existe en `packages/core` (`@haunted-repo/core`, carpeta `src/ghost-detection/`): `detectGhosts(url, opts)` devuelve un `Result` con un `HauntedReport`; `parseReport`, `parseRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport` y `createGitHubClient`, todo exportado desde `src/index.ts`. Solo usa `fetch`, `TextDecoder` y `AbortSignal` (sin APIs de Node), para que funcione en el navegador.
 - Test en vivo: `npm run test:live` llama al GitHub real (`lukeed/sirv`, sin token) y gasta hasta 8 de las 60 peticiones por hora. No forma parte de `npm run check` ni de `npm test`. Si falla por límite de peticiones, esperar a que se reinicie y repetir.
 - `web` ya depende de `@haunted-repo/core`; `power` todavía NO. Cada spec posterior que use `core` en un paquete que aún no lo tenga debe añadir `"@haunted-repo/core": "0.0.0"` en su `package.json` y actualizar `package-lock.json`. El script `build` de la raíz lista `core`, `power` y `web` en ese orden; un paquete nuevo se añade en el sitio correcto.
-- Qué estaba a medias: queda decidir qué hook se deja, el de comando o el de agente (.kiro/hooks/test-after-task.json), y si la salida del hook de comando llega al agente.
 - Lo próximo: terminar la web de demostración (punto 6 de "Siguientes": pieza 4 y después la PR 2); después, la spec del Power (punto 7).
 - Categoría: Costume Contest (decidida).
 - Spec de exorcismo (fusionada, PR #14):

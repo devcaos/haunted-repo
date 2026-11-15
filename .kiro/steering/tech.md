@@ -17,7 +17,7 @@ inclusion: always
 | Language | TypeScript 6.0 (strict mode) on Node.js v24 |
 | Package manager | npm, with workspaces |
 | Kiro Power | `POWER.md` + steering files + a small MCP server in TypeScript (`@modelcontextprotocol/sdk`). Exact format to confirm in the Power spec against kiro.dev/docs/powers |
-| Test hook | `.kiro/hooks/test-after-task.json` runs `npm run check` after each spec task (PostTaskExec) |
+| Test hook | `.kiro/hooks/test-after-task.json`: a single command hook that runs `npm run check` after each spec task (PostTaskExec). There is no agent hook |
 | Ghost report and progress | Plain JSON values (HauntedReport, ExorcismProgress) read with parseReport and parseProgress. Where the Power keeps them is decided in the Power spec |
 | Core logic | `packages/core` (@haunted-repo/core): ghost detection and the exorcism engine, pure TypeScript that also runs in the browser (only fetch, TextDecoder and AbortSignal) |
 | Demo website | Vite + TypeScript, no framework, built to static files |
