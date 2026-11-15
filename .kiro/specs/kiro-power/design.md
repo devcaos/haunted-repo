@@ -9,7 +9,7 @@ Main decisions (each one is explained in its section):
 | Decision | Choice | Why this and not another |
 |---|---|---|
 | Bundler | esbuild 0.28.2 (one ESM file, `bundle/server.mjs`) | Smallest tool that does the job. One function call, no config file, same output on every OS. Rolldown comes with Vite but is not a direct dependency of this repo. |
-| Bundle up to date | CI step `git diff --exit-code` after `npm run check` | Works without extra tools and says exactly which file is stale. |
+| Bundle up to date | CI step `git status --porcelain` after `npm run check` | Works without extra tools, says exactly which file is stale, and also fails for a bundle that was never committed. |
 | Tools | 6 tools (find, continue, pick, send event, judge, status) | Fewest tools that cover Requirements 2 to 10 without making the Tutor build engine events by hand where the Power can do it. |
 | Data file | `haunted-repo--<owner>@<repo>.json`, lowercase | `@` is not allowed in owner or repo, so two repositories can never give the same name. |
 | Writability | Checked once at start-up (7.10), and at every save (7.6) | One rule. The Student is told once per change of state, not on every call. |
@@ -78,7 +78,7 @@ Rules for the layout:
   - No separate `bundle` script is needed; `build` does both.
 - **Root `build` script:** unchanged. It runs core, then power, then web. Power's `tsc --noEmit` needs the types of core, which come from `packages/core/dist/` (built first); the bundle itself does not need `dist/`.
 - **How `npm run check` fits in:** `build` rewrites `bundle/server.mjs` and the next step (`npm test`) runs the smoke test against the fresh file. If the Student forgets to commit it, `git status` shows the file as changed.
-- **How CI checks that the committed file is up to date:** one new step in `.github/workflows/ci.yml`, after `npm run check`: `git diff --exit-code -- packages/power/bundle`. `check` has just rebuilt the file in the CI checkout, so any difference from the committed file fails the job. This step runs on Ubuntu, so no PowerShell rule applies to it.
+- **How CI checks that the committed file is up to date:** one new step in `.github/workflows/ci.yml`, after `npm run check`: `test -z "$(git status --porcelain -- packages/power/bundle)" || { git status --porcelain -- packages/power/bundle; exit 1; }`. `check` has just rebuilt the file in the CI checkout, so any difference from the committed file fails the job. git diff does not see an untracked file, so a bundle that was never committed would pass; git status --porcelain fails for both a changed and an untracked bundle. This step runs on Ubuntu, so no PowerShell rule applies to it.
 - **Determinism and line endings:** esbuild writes the same text for the same input and always uses `\n`; `.gitattributes` has `* text=auto eol=lf`, so Windows and Linux agree. One risk remains: the comments esbuild writes with module paths. They are relative and use `/`, so Windows and Linux should match. If the first CI run shows a difference, the first fix is to set `charset: "utf8"`; if it still differs, the file is built only in CI (open doubt 12.4).
 - **Tooling changes:**
   - `packages/power/tsconfig.json`: remove `outDir` and `rootDir`, add `"noEmit": true`, include `src` and `scripts`, and add `paths` for the test helpers (section 3).
@@ -362,7 +362,8 @@ Not an error, a `warning` field: the list is incomplete (`partial`), progress is
 | GitHub rate limit (60 requests per hour without a token) while recording | A `find_ghosts` uses up to 8 requests, a `pick_ghost` 1. `continue_house` uses none, so the video can restart from the saved file. `RATE_LIMITED` gives the reset time. Record after a break and avoid running `npm run test:live` (about 17 requests) just before. |
 | `PLUGIN_DATA` folder does not survive an update or reinstall (not tested in the spike) | The design does not depend on it: the exorcism works without any saved file, and a lost file only means `find_ghosts` is run again. |
 | The relative path `src/...` form in `mcp.json` was never tested | Not used. Only `${PLUGIN_ROOT}/bundle/server.mjs`, which the spike proved. |
-| The committed bundle is out of date | CI step `git diff --exit-code` (section 2); the smoke test runs the committed file. |
+| The committed bundle is out of date | CI step `git status --porcelain` (section 2); the smoke test runs the committed file. |
+| The bundle was never committed | The same CI step fails the job. |
 | Node version | `engines` says Node >= 24 in the root; the skill tells the Tutor to ask the Student to check Node.js 24 and restart Kiro when tools are missing. |
 | The Tutor shows the model answer too early or leaks it | The Power_Server returns the model-answer instructions only in the step `model-answer`. Beyond that, only the skill text can stop it, and the manual check looks for it. |
 | The session is lost when Kiro or the server restarts | Only finished ghosts are saved; `continue_house` restores them (9.2); the unfinished ghost stays `haunted` (7.9). |
@@ -388,7 +389,7 @@ The Power has pure logic with large input spaces (judgement texts, owner and rep
 
 ## 12. Doubts for the project director
 
-1. **Bundle built in CI instead of committed?** Options: (a) commit the bundle and check it with `git diff` in CI (this design; required by Requirement 1.9 because Kiro installs from GitHub); (b) build only in CI and publish it from another branch (more moving parts). Recommendation: (a).
+1. **Bundle built in CI instead of committed?** Options: (a) commit the bundle and check it with `git status --porcelain` in CI (this design; required by Requirement 1.9 because Kiro installs from GitHub); (b) build only in CI and publish it from another branch (more moving parts). Recommendation: (a).
 2. **Core test helpers.** Options: (a) the `core-testutil/` alias (this design, no change in core); (b) a core entry point for tests, which needs an approved change in `packages/core`. Recommendation: (a) now, (b) only if the alias breaks.
 3. **Separate `continue_house` tool** (this design) or one tool `open_house` that continues when a file exists. Options: (a) two tools, so `find_ghosts` can refuse as 2.7 says; (b) one tool, which would load the file instead of refusing and change the wording of 2.7. Recommendation: (a).
 4. **If the bundle differs between Windows and Linux** on the first CI run, options: (a) set `charset: "utf8"` and other esbuild options until the text is equal; (b) only trust the CI build and commit the file produced in CI. Recommendation: try (a) first; it is a task-time check.
