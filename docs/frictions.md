@@ -241,3 +241,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** Luis Miguel eligió que Kiro escribiera los archivos desde PowerShell (UTF-8 sin BOM, saltos de línea LF), sin crear `tasks.md`.
 
 - **Estado:** abierto (el modo de la sesión no encaja con trabajo que va antes de `tasks.md`).
+
+## 2026-11-15 — `PLAN.md` tenía un carácter invisible y no se podía editar
+
+- **Qué intentaba:** cambiar la línea de "En curso" de `PLAN.md` después del spike del Power.
+
+- **Qué pasó:** la herramienta de editar no encontraba el texto. La línea decía `rama eat/power-spike`, y delante de `eat` había un carácter invisible de salto de página (código 12). Probablemente salió de `\feat/power-spike`, escrito desde PowerShell en la sesión del spike: `\f` se convirtió en ese carácter.
+
+- **Cómo lo rodeé:** sustituir la línea entera desde PowerShell y comprobar que `PLAN.md` ya no tiene caracteres de control.
+
+- **Estado:** resuelto. Al escribir archivos desde PowerShell, no meter rutas con `\` dentro de textos que interpreten escapes.
