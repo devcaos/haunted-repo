@@ -238,6 +238,7 @@ This spec does not change `packages/core`.
 - Private repositories, GitHub tokens and any login.
 - Resuming an unfinished attempt after a restart (only whole Ghosts are saved).
 - Saving the Student's answers, the Ghost_Text or the Tutor's texts.
+- Saving any file in the Student's project (the Workspace), or finding where it is (option A, Open Question 5).
 - Reading the Ghost_Text from the local disk or from a local clone (decided in Open Questions, item 1).
 - Publishing the Power in the Kiro powers registry (kiro.dev/powers).
 - The exorcism certificate and any teacher feature (`PLAN.md`, "Pendientes").
