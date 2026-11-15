@@ -92,6 +92,7 @@ This spec does not change `packages/core`.
 1. WHEN the Student picks a Ghost, THE Power_Server SHALL read the Ghost_Text from GitHub with the owner, repository and `ref` of the saved Haunted_Report, through `@haunted-repo/core`, and SHALL send the Event `pick-ghost` with that path and text to the Engine.
 2. IF reading the Ghost_Text throws any error (including a 404, which the core client reports as `NETWORK_ERROR`, the internal `NOT_TEXT` code, or the plain `Error` of the 8-request budget), THEN THE Power_Server SHALL return an English message (the core message when there is one), SHALL NOT crash, SHALL NOT send `pick-ghost`, and SHALL keep the Session_State unchanged. THE Power_Server SHALL use a new GitHub client for each read.
 3. THE Power_Server SHALL give the Engine the Ghost_Text unchanged.
+4. THE `ref` of the Haunted_Report is the branch name, so the Ghost_Text is the current version of the file on that branch, which may differ from the one Detection scored. This is accepted.
 
 ### Requirement 4: Let the user's Kiro be the Tutor, guided by the Engine
 
