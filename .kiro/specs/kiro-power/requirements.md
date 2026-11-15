@@ -81,7 +81,7 @@ This spec does not change `packages/core`.
 4. IF the repository is private or does not exist (GitHub answers `REPO_NOT_FOUND`), THEN THE message SHALL say that Haunted Repo only works with public repositories and that the URL may be wrong, and SHALL NOT ask the Student for a token or password.
 5. IF Detection returns a Haunted_Report with `partial` set to `true` (rate limit reached halfway), THEN THE Power_Server SHALL return the report with an English warning that the list is incomplete.
 6. IF Detection returns a Haunted_Report with `fewFiles` set to `true`, THEN THE Power_Server SHALL return the `message` of the report together with the Ghosts.
-7. WHEN a Haunted_Report is already saved for a different repository, THE Power_Server SHALL NOT overwrite it or its Exorcism_Progress without telling the Tutor first, and THE Tutor_Skill SHALL tell the Tutor to ask the Student before replacing it.
+7. WHEN a Haunted_Report is already saved for a different repository, THE Power_Server SHALL replace it and its Exorcism_Progress only if the detection Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse with an English message and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
 
 ### Requirement 3: Get the Ghost_Text for the exorcism
 
@@ -152,7 +152,7 @@ This spec does not change `packages/core`.
 2. THE Power_Server SHALL write the Haunted_Report with `JSON.stringify` and the Exorcism_Progress with `formatProgress`, and SHALL read them back with `parseReport` and `parseProgress`.
 3. WHEN a Ghost becomes `exorcised` or stays `haunted` after a full attempt, or the Student answers the self-check, THE Power_Server SHALL save the Exorcism_Progress before it returns the next Tutor_Instructions.
 4. THE Power_Server SHALL NOT save the text of the Student's answers, the Ghost_Text or the texts the Tutor wrote.
-5. IF a saved file is not a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL NOT overwrite or delete that file without the Student's explicit confirmation through the Tutor.
+5. IF a saved file is not a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL overwrite or delete that file only if the Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
 6. IF the Power_Data_Folder or one of its files cannot be written (for example, no permission or a read-only folder), THEN THE Power_Server SHALL return an English message that says the progress was not saved, and SHALL keep the Session_State in memory.
 7. THE Power_Server SHALL NOT send the Haunted_Report, the Exorcism_Progress or any usage data to any server, and SHALL NOT collect telemetry.
 8. FOR ALL valid Exorcism_Progress values, saving them to the Power_Data_Folder and reading them back SHALL give an equal value (save round-trip property).
@@ -219,10 +219,10 @@ This spec does not change `packages/core`.
 - **Repository private or not found:** `REPO_NOT_FOUND` with a message that only public repositories work; no token is asked for (Requirement 2.4).
 - **Rate limit (60 requests per hour without a token):** `RATE_LIMITED`, or a `partial` report with a warning (Requirements 2.3 and 2.5).
 - **A Ghost file removed or renamed after detection:** the Ghost_Text cannot be read; English message; the Ghost stays `haunted` (Requirement 3.2).
-- **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without confirmation (Requirement 7.5).
+- **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without an explicit `replace: true` input (Requirement 7.5).
 - **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
 - **The Workspace folder cannot be found:** everything stays in memory; the Student is told in English that progress will not be saved (Requirement 7.10).
-- **A new repository URL while another report is saved:** the Tutor asks the Student before replacing it (Requirement 2.7).
+- **A new repository URL while another report is saved:** the Tutor asks the Student, and the old report is replaced only with an explicit `replace: true` input (Requirement 2.7).
 - **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
 - **The repeated question after a Simpler_Explanation has a different text:** the Power_Server sends the `pendingQuestion` text (Requirement 4.6).
 - **All Ghosts are `exorcised`:** Step `house-clean` and Haunted_Share 0 (Requirement 4.12).
