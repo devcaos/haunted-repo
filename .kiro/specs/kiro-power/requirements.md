@@ -32,9 +32,10 @@ This spec does not change `packages/core`.
 - **Detection**: `detectGhosts` of `@haunted-repo/core`, which builds a Haunted_Report from a public GitHub repository URL.
 - **Haunted_Report**, **Ghost**, **Ghost_Text**, **Session_State**, **Step**, **Event**, **Tutor_Instructions**, **Verdict**, **Rating**, **Exorcism_Progress**, **Haunted_Share**, **Core_Question**: as defined in the glossary of `.kiro/specs/exorcism/requirements.md`.
 - **Judgement**: the full text the Tutor writes to judge one Student answer: a short reason, then the Verdict line.
-- **Verdict_Retry**: one new request from the Power_Server to the Tutor to write the Judgement of the same answer again, after `INVALID_VERDICT`.
-- **Max_Verdict_Retries**: the largest number of Verdict_Retries for one answer. Its value is 2, so the Tutor gets at most 3 Judgements for one answer.
-- **Verdict_Failure**: the end state of one answer after the Judgement number Max_Verdict_Retries + 1 is still `INVALID_VERDICT`.
+- **Invalid_Judgement_Count**: the number of consecutive judgement Power_Tool calls that `parseVerdict` rejected while the Step is `asking`. It is reset to 0 when a Verdict is accepted, after a Verdict_Failure, and after any accepted `advance`.
+- **Verdict_Retry**: a request from the Power_Server to the Tutor to write the Judgement again, after `INVALID_VERDICT`, while Invalid_Judgement_Count is at most Max_Verdict_Retries.
+- **Max_Verdict_Retries**: the largest number of Verdict_Retries in a row. Its value is 2, so the Tutor gets at most 3 consecutive rejected Judgements before a Verdict_Failure.
+- **Verdict_Failure**: what happens when Invalid_Judgement_Count reaches Max_Verdict_Retries + 1.
 - **GitHub_API**: the host `https://api.github.com`, the only one that `createGitHubClient` of `@haunted-repo/core` calls.
 
 ## Requirements
@@ -106,12 +107,12 @@ This spec does not change `packages/core`.
 1. WHEN the Tutor sends a Judgement, THE Power_Server SHALL pass the Judgement text to `parseVerdict` of the Engine unchanged: it SHALL NOT trim it, remove formatting, change letter case, or look for a Verdict anywhere else in the text.
 2. THE Power_Server SHALL NOT decide a Verdict by any other means than `parseVerdict` (no keyword search, no default Verdict, no "closest match").
 3. WHEN `parseVerdict` returns `right`, `half-right` or `wrong`, THE Power_Server SHALL send the Event `answer-rated` with that Rating and the question text; WHEN it returns `dont-know`, THE Power_Server SHALL send the Event `dont-know` with the question text.
-4. IF `parseVerdict` returns `INVALID_VERDICT` and fewer than Max_Verdict_Retries Verdict_Retries were made for this answer, THEN THE Power_Server SHALL keep the Session_State unchanged, SHALL NOT send any Event, and SHALL return a Verdict_Retry: an English request to write the Judgement of the same answer again, which contains the message of `parseVerdict` and the four allowed last lines, and which says how many tries are left.
-5. THE Verdict_Retry SHALL ask the Tutor to judge the same answer again and SHALL NOT ask the Student to answer again.
-6. IF `parseVerdict` returns `INVALID_VERDICT` after Max_Verdict_Retries Verdict_Retries for the same answer, THEN THE Power_Server SHALL stop asking (Verdict_Failure), keep the Session_State unchanged, record no Rating, and return an English message for the Student that says the Tutor could not give a valid verdict and that the Student can answer the same question again or leave the Ghost.
-7. WHEN a Verdict is accepted, or the Student answers again after a Verdict_Failure, or the Step changes, THE Power_Server SHALL reset the count of Verdict_Retries to 0.
+4. IF `parseVerdict` returns `INVALID_VERDICT`, THEN THE Power_Server SHALL add 1 to Invalid_Judgement_Count; IF the new Invalid_Judgement_Count is at most Max_Verdict_Retries, THEN THE Power_Server SHALL keep the Session_State unchanged, SHALL NOT send any Event, and SHALL return a Verdict_Retry: an English request to write the Judgement again, which contains the message of `parseVerdict`, the four allowed last lines, and the number of tries left (Max_Verdict_Retries + 1 minus Invalid_Judgement_Count).
+5. THE Verdict_Retry SHALL ask the Tutor to write the Judgement again and SHALL NOT ask the Student for a new answer.
+6. IF `parseVerdict` returns `INVALID_VERDICT` and the new Invalid_Judgement_Count reaches Max_Verdict_Retries + 1, THEN THE Power_Server SHALL stop asking (Verdict_Failure), keep the Session_State unchanged, record no Rating, reset Invalid_Judgement_Count to 0, and return an English message for the Student that says the Tutor could not give a valid verdict, that the Step is still `asking`, and that the Student can continue with the same question or leave the Ghost.
+7. THE Power_Server SHALL reset Invalid_Judgement_Count to 0 WHEN a Verdict is accepted, after a Verdict_Failure, and after any `advance` that the Engine accepts.
 8. FOR ALL Judgement texts, THE Power_Server SHALL send an Event if and only if `parseVerdict` accepts the text, and the Rating of that Event SHALL be the Verdict that `parseVerdict` returned (strict-verdict property).
-9. FOR ALL sequences of Judgements for one answer, THE Power_Server SHALL return at most Max_Verdict_Retries Verdict_Retries before a Verdict_Failure or an accepted Verdict, and the Session_State SHALL be equal to the one before after every rejected Judgement (bounded-retry property).
+9. FOR ALL sequences of judgement Power_Tool calls, Invalid_Judgement_Count SHALL never be greater than Max_Verdict_Retries + 1, THE Power_Server SHALL return at most Max_Verdict_Retries Verdict_Retries in a row before a Verdict_Failure or an accepted Verdict, and the Session_State SHALL be equal to the one before after every rejected Judgement (bounded-retry property).
 10. A Judgement that is empty, has only spaces, has the Verdict in bold (`**VERDICT: right**`), has a space before `VERDICT:`, ends with a full stop, or has more than one `VERDICT:` line SHALL count as `INVALID_VERDICT`, because `parseVerdict` rejects it.
 
 ### Requirement 6: Handle "I don't know"
@@ -161,7 +162,7 @@ This spec does not change `packages/core`.
 1. IF the Tutor stops answering, the Kiro session ends or the Power_Server stops during an attempt, THEN THE Ghost SHALL stay `haunted`, and THE Exorcism_Progress saved before that moment SHALL stay valid and unchanged.
 2. WHEN the Power_Server starts and finds a saved Haunted_Report and Exorcism_Progress, THE Power_Server SHALL start a new session from them with `startSession`, so that `exorcised` Ghosts stay `exorcised`.
 3. IF the Tutor calls a Power_Tool that needs a session and no session exists (for example, after a restart), THEN THE Power_Server SHALL return an English message that says how to start or continue, and SHALL NOT change any saved file.
-4. IF the Tutor sends a Judgement or an Event when the Step does not expect it, THEN THE Power_Server SHALL follow Requirement 4.5 and SHALL NOT count it as a Verdict_Retry.
+4. IF the Tutor sends a Judgement or an Event when the Step does not expect it, THEN THE Power_Server SHALL follow Requirement 4.5 and SHALL NOT change Invalid_Judgement_Count.
 
 ### Requirement 10: Show how haunted the house is
 
@@ -190,7 +191,7 @@ This spec does not change `packages/core`.
 ## Edge Cases
 
 - **Invalid verdict:** the Judgement ends without an exact `VERDICT:` line (bold, extra space, full stop, wrong word, empty text). The Power_Server sends no Event, keeps the Session_State and asks the Tutor for the Judgement again (Requirement 5.4).
-- **Repeated invalid verdict:** the Judgement is invalid 3 times for the same answer (1 + Max_Verdict_Retries). The Power_Server stops asking, records no Rating, and tells the Student to answer again or leave the Ghost (Requirement 5.6).
+- **Repeated invalid verdict:** 3 consecutive judgement calls are rejected (Invalid_Judgement_Count reaches 1 + Max_Verdict_Retries). The Power_Server stops asking, records no Rating, resets the count, and tells the Student the Step is still `asking` and they can continue with the same question or leave the Ghost (Requirement 5.6).
 - **Several Verdicts in one message:** `INVALID_VERDICT`, same path as an invalid verdict.
 - **The Student answers "I don't know":** the Tutor gives `dont-know`; first time a Simpler_Explanation and the same question again, second time a model answer and the next question (Requirement 6).
 - **The Student writes "I don't know" inside a longer real answer:** only the Tutor's Verdict counts; the Power_Server never reads the Student's words (Requirement 6.2).
@@ -204,7 +205,7 @@ This spec does not change `packages/core`.
 - **The saved files are broken or edited by hand:** `INVALID_REPORT` or `INVALID_PROGRESS`; nothing is overwritten without confirmation (Requirement 7.5).
 - **The Workspace is read-only:** progress is not saved; the Student is told; the session continues in memory (Requirement 7.6).
 - **A new repository URL while another report is saved:** the Tutor asks the Student before replacing it (Requirement 2.7).
-- **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, not counted as a Verdict_Retry (Requirements 4.5 and 9.4).
+- **The Tutor sends an Event that the Step does not allow:** `INVALID_EVENT`, state unchanged, Invalid_Judgement_Count unchanged (Requirements 4.5 and 9.4).
 - **The repeated question after a Simpler_Explanation has a different text:** the Power_Server sends the `pendingQuestion` text (Requirement 4.6).
 - **All Ghosts are `exorcised`:** Step `house-clean` and Haunted_Share 0 (Requirement 4.12).
 
