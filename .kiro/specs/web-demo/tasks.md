@@ -416,7 +416,7 @@ These open doubts of the design are settled by the approved design and are not r
 - [x] 11. Checkpoint - logic of PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Presentation of the exorcism
+- [x] 12. Presentation of the exorcism
   - [x] 12.1 Draw progress, locked ghosts and the house-clean line
     - In `view/simple/house.ts`: the Progress_Indicator (line plus native `<progress max="1">` with `share`), the locked line on locked cards (from the model, which takes it from `POWER_TEXTS`), the start button on cards with `canStart`, the `exorcised` state label, the house-clean line. Extend `simple.css` with tokens only.
     - Verify: `npm run check` exits `0`.
@@ -430,7 +430,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): draw the exorcism panel`
     - _Requirements: 4.10, 6.4, 6.5, 6.6, 6.7, 6.9, 6.10, 6.14, 6.15, 6.16, 6.17, 6.18, 6.19, 6.20, 6.22, 6.23, 10.2, 12.1, 12.2_
 
-  - [~] 12.3 Extend the source rules for the Answer_Box
+  - [x] 12.3 Extend the source rules for the Answer_Box
     - Check that the rules of tasks 5.6 and 5.7 already scan the new files (`ghost.ts`, `demoScript.ts`, `exorcism.ts`, `demo-script.json` is data and not scanned). Add one rule to `source.test.ts`: `src/view/simple/ghost.ts` reads no `.value` and adds no `input` or `change` listener, so the Answer_Box text never leaves the DOM field. Negative self-check as in task 5.6.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the answer box text is never read`
