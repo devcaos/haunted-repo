@@ -5,36 +5,34 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Spec `web-demo` (aprobada) en construcción. La PR 1 se partió en cuatro PR apiladas: #19, #20 y #21 fusionadas; la pieza 4 (`feat/web-demo-4`) está en revisión. La PR 2 (`feat/web-exorcism`) empieza después de fusionar la pieza 4.
+- Nada. Lo siguiente es la PR 2 de la spec `web-demo`: el exorcismo grabado, rama `feat/web-exorcism`, tareas 8 a 16 de `.kiro/specs/web-demo/tasks.md`.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
-2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea)
+2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea; desde el 15 nov solo queda el hook de comando)
 3. [x] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo; hechos los 3 spikes del 2026-11-11)
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
-6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`, aprobada y en construcción; PR 1: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, partida en cuatro PR apiladas: #19, #20 y #21 fusionadas, pieza 4 en revisión; la PR 2, `feat/web-exorcism`, añade el exorcismo grabado y empieza después de fusionar la pieza 4)
+6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`, aprobada). PR 1 hecha: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, en cuatro PR apiladas (#19, #20, #21 y #22, fusionadas). Falta la PR 2 (`feat/web-exorcism`, tareas 8 a 16): el exorcismo grabado
 7. [ ] Spec: empaquetar como Kiro Power (después de la web de demostración)
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
 9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR #13 fusionada)
-10. [ ] Bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26 (se harán)
+10. [ ] Bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26 (se hacen todos; decidido el 15 nov)
 
 ## Pendientes (Low, ideas, "después si da tiempo")
-- Decidir la categoría definitiva (Costume Contest u otra con menos competencia)
-- "Certificado de exorcismo" para profesores
-- Bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26
+- "Certificado de exorcismo" para profesores: fuera de alcance por ahora; Luis Miguel quiere reconsiderarlo (decisión pendiente)
 - Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
 - Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
 - Cerrado (hook de tests, historial): en la sesión de la PR de `feat/test-hook` no se pudo disparar PostTaskExec editando `tasks.md`. Se añadió la opción B (segundo hook de tipo agente que ejecuta `npm run check`). La prueba real en la spec de detección confirmó que el hook se dispara al completar una tarea (ver la siguiente línea).
-- Cerrado (hook de tests, prueba real en la tarea 2.1): el hook PostTaskExec está confirmado. Se dispara al marcar una tarea como completada, no al pulsar Start task. Al completar la 2.1 llegó al agente la instrucción de ejecutar `npm run check`. Queda decidir cuál de los dos hooks (comando o agente) se deja.
+- Cerrado (hook de tests, prueba real en la tarea 2.1): el hook PostTaskExec está confirmado. Se dispara al marcar una tarea como completada, no al pulsar Start task. Al completar la 2.1 llegó al agente la instrucción de ejecutar `npm run check`. Decidido el 15 nov: solo queda el hook de comando; el de agente se borró.
 - Cerrado (hook de tests): 'Agent Hooks v2' no obliga a migrar. La documentación actual (kiro.dev/docs/hooks, actualizada oct 2026) usa `"version": "v1"` con `trigger` y `action`, igual que nuestro archivo. `timeout` va al nivel del hook, no dentro de `action`. Solo cambió el formato de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`. La documentación no dice que la salida de un hook PostTaskExec llegue al agente.
 - Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
 - Cerrado (13 nov, docs/pre-web-cleanup): Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
 - Low (PR #11, revisión): `parseReport` acepta campos desconocidos sin quitarlos.
 - Cerrado (13 nov, docs/pre-web-cleanup): Medium (auditoría 11 nov): la línea .kiro/specs/*/tasks.meta.json de .gitignore puede chocar con las bases; decidir si se quita
 - Cerrado (web-demo PR 1): Medium (auditoría 11 nov): la demo debe mostrar el aviso de licencia MIT de lukeed/sirv. El pie de la página muestra la línea de copyright y enlaza a `sirv-license.txt`.
-- Low (spec exorcism): siete propiedades opcionales aplazadas (grupo 8 de `tasks.md`): P3 tipo de archivo estable, P7 ida y vuelta del progreso, P8 rango de `hauntedShare`, P9 `hauntedShare` monótono, P10 frase del fantasma determinista, P15 ida y vuelta de la grabación, P17 las `sampleAnswer` se ignoran. Si se hacen, van en una rama nueva (feat/exorcism-properties) y una PR nueva, solo si hay tiempo (la PR #14 ya está fusionada).
+- Low (spec exorcism): siete propiedades opcionales aplazadas (grupo 8 de `tasks.md`): P3 tipo de archivo estable, P7 ida y vuelta del progreso, P8 rango de `hauntedShare`, P9 `hauntedShare` monótono, P10 frase del fantasma determinista, P15 ida y vuelta de la grabación, P17 las `sampleAnswer` se ignoran. Solo se hacen si queda tiempo (decidido el 15 nov), en una rama nueva (feat/exorcism-properties) y una PR nueva (la PR #14 ya está fusionada).
 - Low (revisión exorcism): `buildInstructions` lanza un Error si el estado no trae `current` o `pendingQuestion` (solo pasa con un estado imposible; el motor no lo produce).
 - Low (revisión exorcism): las instrucciones no tienen una sección aparte de "formato de salida": el formato del VERDICT va como regla `verdict-format`.
 - Low (revisión exorcism): `classifyFileKind` no reconoce como barrel un import de TypeScript escrito en varias líneas.
@@ -50,7 +48,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 90-103): `go-to-floor` sigue disponible durante un análisis en vivo y, al terminar, la escena vuelve a la planta principal. Arreglo: no ofrecer navegación mientras `busy`, o no reiniciar la escena.
 - Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 94-100): el estado "Live report ready" o el de error se queda al cambiar de planta (cosmético).
 - Low (revisión PR #20, web-demo pieza 2): `page.ts` (línea 93): `submit-live` se ofrece en la escena del fantasma aunque el formulario está oculto; cerrarlo en la PR 2, tarea 10 cuando existan las acciones del fantasma.
-- Medium (revisión PR #21, web-demo pieza 3): `renderer.ts`, final de `render`: `main.replaceChildren` vuelve a crear los botones de acción en cada render, así que se pierde el foco del teclado (requisito 12.1). Arreglo mínimo: reutilizar el contenedor `.actions` cuando la lista de acciones no cambia, o mover el foco a un elemento estable después del render. Decidir en la pieza 4 o en la PR 2.
+- Medium (revisión PR #21, web-demo pieza 3): `renderer.ts`, final de `render`: `main.replaceChildren` vuelve a crear los botones de acción en cada render, así que se pierde el foco del teclado (requisito 12.1). Arreglo mínimo: reutilizar el contenedor `.actions` cuando la lista de acciones no cambia, o mover el foco a un elemento estable después del render. Se arregla en la PR 2 (`feat/web-exorcism`).
 - Medium (revisión PR #21, web-demo pieza 3): `manifest.test.ts` (líneas 33-50) recorre `allLayers`, que está vacío, así que esos tests hoy no pueden fallar. Arreglo: sacar la comprobación a una función y probarla con una capa de ejemplo válida y otra con `https://`.
 - Low (revisión PR #21, web-demo pieza 3): `resolve.ts` y `house.ts` no tienen tests; el caso "hueco con capas y un archivo que falta" no se ejecuta. Arreglo: pasar el mapa de URL a `resolveSlot` como parámetro y probarlo en Node.
 - Low (revisión PR #21, web-demo pieza 3): en `house.ts`, `ghostStateNodes` repite el `map` de `img` de `slotImages`; que llame a `slotImages`.
@@ -62,20 +60,21 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - [x] Generar `product.md` y `tech.md` con Kiro a partir de `docs/idea.md` (PR #1, 6 nov)
 - [x] Crear `docs/frictions.md` y su recordatorio en el plan (PR #2, 6 nov)
 - [x] Esqueleto del proyecto: workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check (PR #4)
-- [x] Hook de tests con acción de comando y de agente (PR #5; confirmado en real: se dispara al completar una tarea)
+- [x] Hook de tests (PR #5; confirmado en real: se dispara al completar una tarea). Desde el 15 nov solo queda el hook de comando; el de agente se borró
 - [x] Spec de detección de fantasmas: `packages/core` con `detectGhosts`, cliente de GitHub, GitHub falso estricto y test en vivo (PR #11 y #12)
 - [x] Spec de exorcismo: motor puro en `packages/core/src/exorcism/` (sesión, eventos, preguntas, veredicto, progreso, grabación y repetición) y nueva frase del fantasma según la planta (PR #14, 12 nov)
 - [x] Despliegue en GitHub Pages: web pública, CI en cada PR y despliegue al fusionar (PR #13, 12 nov)
+- [x] Web de demostración, PR 1: lista de fantasmas de lukeed/sirv por plantas, formulario en vivo, informe de ejemplo si falla y aviso de licencia (PR #19, #20, #21 y #22, 14-15 nov)
+- [x] Categoría decidida: Costume Contest (15 nov)
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé: Detección de fantasmas (PR #11 y #12), despliegue en Pages (PR #13) y motor del exorcismo (PR #14, 12 nov) están en main. De la web de demostración están en main las piezas 1 a 3 de la PR 1 (#19, #20 y #21); la pieza 4 está en revisión. La web es pública en https://devcaos.github.io/haunted-repo/.
+- Dónde lo dejé (15 nov): en `main` están la detección de fantasmas (PR #11 y #12), el despliegue en Pages (PR #13), el motor del exorcismo (PR #14) y la PR 1 completa de la web de demostración (PR #19 a #22, la última fusionada el 15 nov). La web es pública en https://devcaos.github.io/haunted-repo/ y enseña la lista de fantasmas de lukeed/sirv y el formulario en vivo; todavía no enseña el exorcismo. El bloque de cierre (README, un solo hook de tests, decisiones del 15 nov y este plan) va en la rama `docs/closing-block`, pendiente de que Luis Miguel lo fusione.
+- Lo próximo: la PR 2 de la web de demostración. Crear la rama `feat/web-exorcism` desde `main` actualizado (tarea 8.1 de `.kiro/specs/web-demo/tasks.md`) y seguir con las tareas 8 a 16; la 7.2 se marca `[x]` en el commit de la 8.2. En la PR 2 se arregla también el Medium del foco del teclado (ver "Pendientes"). Después, la spec del Kiro Power (punto 7 de "Siguientes").
+- Hitos: versión mínima funcionando el 20 nov (según `tasks.md` de web-demo, la PR 1 sola ya es la versión mínima), código congelado el 27 nov y entrega el 4 dic de 2026 a las 23:00 (hora de España). Si vamos tarde, `tasks.md` de web-demo dice qué recortar y en qué orden ("If we run late").
 - Qué existe en `packages/core` (`@haunted-repo/core`, carpeta `src/ghost-detection/`): `detectGhosts(url, opts)` devuelve un `Result` con un `HauntedReport`; `parseReport`, `parseRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport` y `createGitHubClient`, todo exportado desde `src/index.ts`. Solo usa `fetch`, `TextDecoder` y `AbortSignal` (sin APIs de Node), para que funcione en el navegador.
 - Test en vivo: `npm run test:live` llama al GitHub real (`lukeed/sirv`, sin token) y gasta hasta 8 de las 60 peticiones por hora. No forma parte de `npm run check` ni de `npm test`. Si falla por límite de peticiones, esperar a que se reinicie y repetir.
 - `web` ya depende de `@haunted-repo/core`; `power` todavía NO. Cada spec posterior que use `core` en un paquete que aún no lo tenga debe añadir `"@haunted-repo/core": "0.0.0"` en su `package.json` y actualizar `package-lock.json`. El script `build` de la raíz lista `core`, `power` y `web` en ese orden; un paquete nuevo se añade en el sitio correcto.
-- Qué estaba a medias: queda decidir qué hook se deja, el de comando o el de agente (.kiro/hooks/test-after-task.json), y si la salida del hook de comando llega al agente.
-- Lo próximo: terminar la web de demostración (punto 6 de "Siguientes": pieza 4 y después la PR 2); después, la spec del Power (punto 7).
-- Categoría: Costume Contest (decidida).
 - Spec de exorcismo (fusionada, PR #14):
   - Qué existe en `packages/core/src/exorcism/`: funciones puras, sin red, sin `Date` ni `Math.random` (lo vigila `purity.test.ts`). `startSession`, `advance` (devuelve un `Transition`: un objeto con `ok: true`, el nuevo estado y las instrucciones; o con `ok: false`, un error y el mismo estado), `decide`, `buildInstructions`, `parseEvent`, `ALLOWED_EVENTS`, `formatVerdict`/`parseVerdict`, `classifyFileKind`, `QUESTION_SETS`, `suggestGhost`, `isPickable`, progreso (`normaliseProgress`, `parseProgress`, `formatProgress`, `hauntedShare`) y grabación (`parseRecording`, `formatRecording`, `replay`). Todo se exporta desde `src/index.ts`.
   - Cómo empezar una sesión: `startSession(report, { progress, profile })` y después `advance(state, event)` con cada evento (`pick-ghost`, `explanation-done`, `answer-rated`, `dont-know`, ...). El estado y las instrucciones son JSON puro, así que se pueden guardar.
@@ -89,4 +88,3 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
   - (f) web: la grabación no guarda el texto del "por qué" de cada veredicto; si la demo lo enseña, necesita un campo propio, y una grabación más rica que tinySession.
   - (g) web: npm test sin npm run build antes usa el dist/ compilado de core (falla si no existe y prueba código viejo si está desfasado); en el diseño, valorar un alias de @haunted-repo/core a packages/core/src en vitest.config.ts. Usada: el alias está en `vitest.config.ts` (web-demo, tarea 1.1).
   - (h) Power: parseVerdict rechaza "**VERDICT: right**", un espacio delante o un punto final; el Power debe volver a pedir el veredicto si recibe INVALID_VERDICT.
-- Web de demostración (spec `web-demo`): la PR 2 (rama `feat/web-exorcism`) se crea desde `main` actualizado solo después de que Luis Miguel fusione la pieza 4 de la PR 1 (`feat/web-demo-4`), y empieza por la tarea 8.1 de `.kiro/specs/web-demo/tasks.md`.

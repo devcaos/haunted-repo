@@ -56,7 +56,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** añadí un segundo hook de tipo agente (opción B) que ejecuta `npm run check` y corrige fallos. La prueba real queda pendiente en la próxima spec (ver `PLAN.md`).
 
-- **Estado:** resuelto: confirmado en la tarea 2.1 de ghost-detection (commit 6ed8f75, 11 nov); queda decidir cuál de los dos hooks se deja.
+- **Estado:** resuelto: confirmado en la tarea 2.1 de ghost-detection (commit 6ed8f75, 11 nov). El 15 nov se decidió dejar solo el hook de comando; el de agente se borró.
 
 ## 2026-11-11 — `timeout` dentro de `action` daba error de formato
 
