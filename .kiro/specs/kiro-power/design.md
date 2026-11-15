@@ -258,7 +258,7 @@ How each requirement is met:
 
 - Written as text built from `JSON.stringify(report)` and `formatProgress(progress)` (7.2), with no extra fields. Nothing else is saved: no answers, no Ghost_Text, no Tutor text (7.4), no `knowsJava` (9.2).
 - Read with `JSON.parse`, then `format === 1`, then `parseReport(JSON.stringify(report))` and `parseProgress(JSON.stringify(progress))`. The report's `overview.owner` and `overview.repo`, in lowercase, must match the file name; if not, the file is `INVALID_REPORT`. Any other problem gives `INVALID_REPORT` or `INVALID_PROGRESS` with a message that names the file (7.5).
-- **Safe write.** Write to `<name>.<random>.tmp` in the same folder, then `rename` it over the final name. A crash leaves either the old file or the new one, never half of a file. A failed write tries to delete the temporary file and does not touch the final file.
+- **Safe write.** Write to `<name>.<random>.tmp` in the same folder, then `rename` it over the final name. A crash leaves either the old file or the new one, never half of a file. A failed write tries to delete the temporary file and does not touch the final file. On Windows, rename can fail with EPERM, EBUSY or EACCES while another program (antivirus, indexer) holds the target file. store.ts retries the rename up to 5 times, waiting 50, 100, 200, 400 and 800 ms, before it reports a failed save (7.6).
 
 ### 6. `PLUGIN_DATA` and the memory fallback
 
@@ -380,6 +380,7 @@ The Power has pure logic with large input spaces (judgement texts, owner and rep
 
 - **Unit tests (Vitest, `packages/power/src/*.test.ts`)** with the strict fake GitHub through the `core-testutil/` alias, wrapped to add `User-Agent` (section 3), and a new temporary folder per test (`fs.mkdtemp` in `os.tmpdir()`) as the Power_Data_Folder. They do not touch the network (11.5, 11.8): `fetch` is always injected.
   - Examples for each tool: a full exorcism walk with the `tinyRecording` report; each detection error code; `partial` and `fewFiles`; `DATA_EXISTS` and `replace: true`; broken files (invalid JSON, wrong `format`, invalid report, invalid progress, owner mismatch); Ghost_Text 404 and not text; first and second "I don't know" with the `pendingQuestion` check (4.6); `failed` and `house-clean`; a second `HauntedPower` on the same folder (restart, 9.1, 9.2, 7.9); no `PLUGIN_DATA`, a `PLUGIN_DATA` that is a file, and a save that fails after start-up (7.6, 7.10, warning only once).
+  - Unit test with an injected rename that fails twice with EPERM and then works: the save succeeds and no warning is returned.
   - A table-driven test of the invalid judgements of 5.10.
   - Queue test: start pick_ghost with a slow fake fetch, call send_event before it resolves, and check that the final state equals the state of the same two calls run one after the other.
 - **Property tests:** Properties 1 to 7 above. Property 1 and 2 drive `HauntedPower` directly and take a report from `tinyRecording`. Property 3 uses `reportArb` and `progressArb` with a real temporary folder. Property 4 wraps the fake `fetch` in a recorder and feeds URL-like strings.
