@@ -380,7 +380,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the exorcism reading and asking states`
     - _Requirements: 6.2, 6.3, 6.4, 6.6, 6.9, 6.10, 6.12, 6.13, 6.14, 6.15, 6.20, 6.22, 10.2, 18.6_
 
-  - [~] 10.4 State tests for the end states
+  - [x] 10.4 State tests for the end states
     - Extend `states.test.ts`: "Self-check", "Exorcised", "Failed", "Retry", "Back to the list", "House clean" (generated script for every ghost), "Engine error" (injected `advance` that returns an error), "Reload" (a second controller from the same data).
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the exorcism end states`

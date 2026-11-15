@@ -73,17 +73,16 @@ function setup(sample: PageDeps["sample"] = committed) {
 }
 
 /** Committed data and committed Demo_Script; Core's engine wrapped to count calls. */
-function setupGhost() {
+function setupGhost(
+  script: DemoScript = committedScript(),
+  engine = { startSession: vi.fn(startSession), advance: vi.fn(advance) },
+) {
   const detect = vi.fn<DetectFn>(() => {
     throw new Error("detect must not be called");
   });
-  const engine = {
-    startSession: vi.fn(startSession),
-    advance: vi.fn(advance),
-  };
   const renderer = createRecordingRenderer();
   const page = createPage(
-    { detect, sample: committed, script: committedScript(), engine },
+    { detect, sample: committed, script, engine },
     renderer,
   );
   page.start();
@@ -530,5 +529,226 @@ describe("page states (PR 2, reading and asking)", () => {
     await page.dispatch({ type: "start-ghost", path: LOCKED });
     expect(renderer.models).toHaveLength(1);
     expect(engine.advance.mock.calls.length).toBe(calls);
+  });
+});
+
+type Page = ReturnType<typeof setupGhost>["page"];
+
+/** Starts a ghost and rates its 3 questions (each after the reveal). */
+async function rateAll(
+  page: Page,
+  path: string,
+  ratings: readonly ("right" | "half-right" | "wrong")[],
+): Promise<void> {
+  await page.dispatch({ type: "start-ghost", path });
+  await page.dispatch({ type: "explanation-continue" });
+  for (const rating of ratings) {
+    await page.dispatch({ type: "show-model-answer" });
+    await page.dispatch({ type: "rate", rating });
+  }
+}
+
+const RIGHT = ["right", "right", "right"] as const;
+const CORE_WRONG = ["wrong", "right", "right"] as const;
+
+/** A valid Demo_Script with content for every sample ghost (to reach house-clean). */
+function fullScript(): DemoScript {
+  const ghosts = sampleData().report.ghosts.map((ghost) => ({
+    path: ghost.path,
+    kind: "general",
+    explanation: `What ${ghost.path} does.`,
+    retryExplanation: `What ${ghost.path} does, told again.`,
+    questions: ["Question one?", "Question two?", "Question three?"],
+    simpler: ["Simpler one.", "Simpler two.", "Simpler three."],
+    modelAnswers: ["Answer one.", "Answer two.", "Answer three."],
+  }));
+  const parsed = parseDemoScript(JSON.stringify({ ghosts }));
+  if (!parsed.ok) throw new Error(parsed.error);
+  return parsed.value;
+}
+
+describe("page states (PR 2, end states)", () => {
+  it("Self-check", async () => {
+    const { page, renderer } = setupGhost();
+    await rateAll(page, EASIEST, RIGHT);
+    const model = renderer.last();
+
+    expect(model.scene).toEqual({
+      kind: "ghost",
+      floor: "attic",
+      path: EASIEST,
+    });
+    expect(model.ghost?.step).toBe("self-check");
+    expect(model.ghost?.prompt).toBe(TEXTS.selfCheck);
+    expect(model.ghost?.code).toBeNull();
+    expect(model.ghost?.reading).toBeNull();
+    expect(model.available).toEqual([
+      { type: "self-check", answer: "yes" },
+      { type: "self-check", answer: "half" },
+      { type: "self-check", answer: "no" },
+    ]);
+    expect(model.available).not.toContainEqual({ type: "leave-ghost" });
+  });
+
+  it("Exorcised", async () => {
+    const { page, renderer } = setupGhost();
+    const total = sampleData().report.ghosts.length;
+    const before = renderer.last().house?.progress;
+    expect(before?.haunted).toBe(total);
+    await rateAll(page, EASIEST, RIGHT);
+
+    await page.dispatch({ type: "self-check", answer: "yes" });
+    const model = renderer.last();
+    expect(model.scene).toEqual({ kind: "floor", floor: "attic" });
+    expect(model.ghost).toBeNull();
+    const card = cardOf(model, EASIEST);
+    expect(card?.state).toBe("exorcised");
+    expect(card?.canStart).toBe(false);
+    expect(card?.lockedLine).toBeNull();
+    expect(model.available).not.toContainEqual({
+      type: "start-ghost",
+      path: EASIEST,
+    });
+    const progress = model.house?.progress;
+    expect(progress?.haunted).toBe(total - 1);
+    expect(progress?.total).toBe(total);
+    expect(progress?.line).toBe(TEXTS.progress(total - 1, total));
+    expect(progress?.share).toBeLessThan(before?.share ?? 0);
+    expect(model.house?.houseClean).toBeNull();
+  });
+
+  it("Failed", async () => {
+    const { page, renderer } = setupGhost();
+    await rateAll(page, EASIEST, CORE_WRONG);
+    const model = renderer.last();
+
+    expect(model.scene.kind).toBe("ghost");
+    expect(model.ghost?.step).toBe("failed");
+    expect(model.ghost?.prompt).toBe(TEXTS.stillHaunted);
+    expect(model.ghost?.code).toBeNull();
+    expect(model.available).toEqual([
+      { type: "retry" },
+      { type: "back-to-list" },
+    ]);
+    expect(cardOf(model, EASIEST)?.state).toBe("haunted");
+  });
+
+  it("Retry", async () => {
+    const { page, renderer } = setupGhost();
+    const content = contentFor(EASIEST);
+    await rateAll(page, EASIEST, CORE_WRONG);
+
+    await page.dispatch({ type: "retry" });
+    const retry = renderer.last();
+    expect(retry.ghost?.step).toBe("explaining");
+    expect(retry.ghost?.reading).toEqual({
+      kind: "retry-explanation",
+      text: content.retryExplanation,
+    });
+    expect(retry.ghost?.code).toBe(sampleData().texts[EASIEST]);
+
+    await page.dispatch({ type: "explanation-continue" });
+    for (const [index, question] of content.questions.entries()) {
+      const ghost = renderer.last().ghost;
+      expect(ghost?.step).toBe("asking");
+      expect(ghost?.questionNumber).toBe(index + 1);
+      expect(ghost?.question).toBe(question);
+      await page.dispatch({ type: "show-model-answer" });
+      await page.dispatch({ type: "rate", rating: "right" });
+    }
+    expect(renderer.last().ghost?.step).toBe("self-check");
+  });
+
+  it("Back to the list", async () => {
+    const { page, renderer, engine } = setupGhost();
+    await rateAll(page, EASIEST, CORE_WRONG);
+    const calls = engine.advance.mock.calls.length;
+
+    await page.dispatch({ type: "back-to-list" });
+    const model = renderer.last();
+    expect(engine.advance.mock.calls.length).toBe(calls);
+    expect(model.scene).toEqual({ kind: "floor", floor: "attic" });
+    expect(model.ghost).toBeNull();
+    expect(model.live.formVisible).toBe(true);
+    const card = cardOf(model, EASIEST);
+    expect(card?.state).toBe("haunted");
+    expect(card?.canStart).toBe(true);
+    expect(model.available).toContainEqual({
+      type: "start-ghost",
+      path: EASIEST,
+    });
+
+    // Starting again sends pick-ghost and shows the first explanation.
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    expect(renderer.last().ghost?.reading?.kind).toBe("explanation");
+  });
+
+  it("House clean", async () => {
+    const { page, renderer } = setupGhost(fullScript());
+    const paths = sampleData().report.ghosts.map((ghost) => ghost.path);
+    for (const path of paths) {
+      await rateAll(page, path, RIGHT);
+      await page.dispatch({ type: "self-check", answer: "yes" });
+    }
+    const model = renderer.last();
+
+    expect(model.scene).toEqual({ kind: "house" });
+    expect(model.ghost).toBeNull();
+    expect(model.house?.houseClean).toBe(TEXTS.houseClean);
+    expect(model.house?.progress?.haunted).toBe(0);
+    expect(model.house?.progress?.line).toBe(TEXTS.progress(0, paths.length));
+    expect(model.house?.progress?.share).toBe(0);
+    for (const path of paths) {
+      expect(cardOf(model, path)?.state).toBe("exorcised");
+    }
+    expect(model.available.some((a) => a.type === "start-ghost")).toBe(false);
+  });
+
+  it("Engine error", async () => {
+    let fail = false;
+    const engine = {
+      startSession: vi.fn(startSession),
+      advance: vi.fn<typeof advance>((state, event) =>
+        fail
+          ? {
+              ok: false,
+              error: { code: "INVALID_EVENT", message: "injected" },
+              state,
+            }
+          : advance(state, event),
+      ),
+    };
+    const { page, renderer } = setupGhost(committedScript(), engine);
+    await rateAll(page, EASIEST, RIGHT);
+    await page.dispatch({ type: "self-check", answer: "yes" });
+    const restarts = engine.startSession.mock.calls.length;
+
+    await page.dispatch({ type: "start-ghost", path: "builder.js" });
+    fail = true;
+    await page.dispatch({ type: "explanation-continue" });
+    const model = renderer.last();
+    expect(model.status).toEqual({ kind: "error", text: TEXTS.engineError });
+    expect(model.scene).toEqual({ kind: "house" });
+    expect(model.ghost).toBeNull();
+    expect(engine.startSession.mock.calls.length).toBe(restarts + 1);
+    expect(cardOf(model, EASIEST)?.state).toBe("exorcised");
+    expect(cardOf(model, "builder.js")?.state).toBe("haunted");
+    expect(cardOf(model, "builder.js")?.canStart).toBe(true);
+  });
+
+  it("Reload", async () => {
+    const first = setupGhost();
+    await rateAll(first.page, EASIEST, RIGHT);
+    await first.page.dispatch({ type: "self-check", answer: "yes" });
+    expect(cardOf(first.renderer.last(), EASIEST)?.state).toBe("exorcised");
+
+    const second = setupGhost();
+    const model = second.renderer.last();
+    const total = sampleData().report.ghosts.length;
+    expect(cardOf(model, EASIEST)?.state).toBe("haunted");
+    expect(model.house?.progress?.haunted).toBe(total);
+    for (const card of model.house?.floors.flatMap((f) => f.ghosts) ?? []) {
+      expect(card.state).not.toBe("exorcised");
+    }
   });
 });
