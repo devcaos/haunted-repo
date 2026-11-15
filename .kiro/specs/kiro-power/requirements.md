@@ -52,7 +52,7 @@ This spec does not change `packages/core`.
 3. WHEN the minimal Power is installed, one call of its tool from the Kiro chat SHALL succeed.
 4. THE result SHALL be written in `docs/spike-power.md`: the steps followed, whether the tool call succeeded, the working directory and the Workspace path the tool returned, and how Kiro started the server.
 5. `design.md` SHALL NOT be written until the spike passes (criterion 3).
-6. `design.md` SHALL use the result of the spike to answer Open Questions 2 (how the installed Power runs its server) and 5 (the Power_Data_Folder).
+6. THE spike result has already answered Open Questions 2 (how the installed Power runs its server) and 5 (the Power_Data_Folder) in this document, and `design.md` SHALL follow those answers: the Power_Server is a single bundled file committed to git (Requirement 1.9), and the Power_Data_Folder is the folder given in `PLUGIN_DATA` (Requirement 7).
 7. THE spike SHALL NOT replace the manual end-to-end check of Requirement 11.7, which stays as the final check.
 
 ### Requirement 1: Package the Power in the current Kiro format
