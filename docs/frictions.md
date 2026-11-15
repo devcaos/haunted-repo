@@ -231,3 +231,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** los cambios de la spec se hicieron con el flujo de specs de Kiro, un punto cada vez, revisando el diff antes de cada commit. `PLAN.md` y este archivo se editaron desde PowerShell, guardando en UTF-8 sin BOM y con saltos de línea LF.
 
 - **Estado:** abierto (no sé por qué cambian las herramientas entre sesiones).
+
+## 2026-11-15 — El modo orquestador no dejaba hacer el spike sin `tasks.md`
+
+- **Qué intentaba:** construir el Power mínimo del spike (requisito 0 de `kiro-power`) antes de escribir `design.md` y `tasks.md`.
+
+- **Qué pasó:** la sesión arrancó en modo orquestador: Kiro solo podía repartir tareas de un `tasks.md` al subagente de tareas, y ese subagente rechaza todo lo que no sea una tarea de un `tasks.md`. El spike va antes de `tasks.md` a propósito, así que no había forma de lanzarlo. Tampoco había herramientas para editar archivos.
+
+- **Cómo lo rodeé:** Luis Miguel eligió que Kiro escribiera los archivos desde PowerShell (UTF-8 sin BOM, saltos de línea LF), sin crear `tasks.md`.
+
+- **Estado:** abierto (el modo de la sesión no encaja con trabajo que va antes de `tasks.md`).
