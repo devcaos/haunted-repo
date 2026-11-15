@@ -359,7 +359,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 4.9, 6.1, 6.2, 8.4, 11.9_
 
 - [ ] 10. Exorcism logic in the page
-  - [~] 10.1 Add the ghost view, the step actions and the event mapping
+  - [x] 10.1 Add the ghost view, the step actions and the event mapping
     - Create `packages/web/src/logic/exorcism.ts`: `readingText`, `buildGhostView` (the table of the design by step: code, licence next to code, judge line, reading, question number, question, revealed answer, Answer_Box, prompt), `ghostActions(step, revealed)` (the rows of the design table) and `eventFor(action, state, content, text)`.
     - Create `packages/web/src/logic/exorcism.test.ts` with examples: rating map `right` / `half-right` / `wrong`; self-check map `yes` / `half` / `no`; the `explanation-done` text equals `readingText`; retry explanation when `current.explanation !== ""`.
     - Extend `actions.test.ts`: for every step and both `revealed` values, every action of `ghostActions` maps to an event type in `ALLOWED_EVENTS[step]` or to `null`.
@@ -367,14 +367,14 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): map exorcism steps to views and events`
     - _Requirements: 6.4, 6.5, 6.6, 6.8, 6.9, 6.10, 6.11, 6.12, 6.13, 6.14, 6.15, 6.16, 6.17, 6.18, 6.19, 6.20, 6.22, 6.24, 10.2_
 
-  - [~] 10.2 Drive the Sample_Session from the controller
+  - [x] 10.2 Drive the Sample_Session from the controller
     - In `page.ts`: `PageDeps.script` and `engine` (defaults to Core's); the Sample_Session from `startSession(sample.report)`; `revealed`; `start-ghost` (`pick-ghost` with the full Ghost_Text, scene `ghost`); ghost actions through `eventFor`, checked against `ALLOWED_EVENTS[step]` before `advance`; `show-model-answer` (local, no event) and `back-to-list` (no event); scenes after leave, back and self-check (floor of that ghost), `house` on `house-clean`; form hidden in the `ghost` scene; `start-ghost` not available while busy; engine error → status `TEXTS.engineError`, session restarted from its progress, scene `house`. `submit-live` never touches the Sample_Session; `show-sample` shows it with its progress.
     - In `main.ts` pass `script: null` for now (the real script is wired in task 12.2, together with the panel renderer).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): drive the sample exorcism from the page`
     - _Requirements: 4.10, 4.11, 4.12, 6.3, 6.8, 6.19, 6.20, 6.23, 6.26, 9.1_
 
-  - [~] 10.3 State tests for the reading and asking states
+  - [x] 10.3 State tests for the reading and asking states
     - Extend `states.test.ts`: "Ghost explaining", "Asking, not revealed", "Asking, revealed" (no engine call for the reveal), "Simplifying", "Model answer", "Leave", "Locked ghost", and the PR 2 check of "Live analysis running" (every sample `canStart` false). Built with the committed data and the committed `demo-script.json`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the exorcism reading and asking states`

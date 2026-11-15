@@ -1,7 +1,9 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
-import { detectGhosts } from "@haunted-repo/core";
+import { advance, detectGhosts, startSession } from "@haunted-repo/core";
 import type { HauntedReport, Result } from "@haunted-repo/core";
+import { contentOf, parseDemoScript } from "./demoScript.js";
+import type { DemoScript, GhostContent } from "./demoScript.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createFakeFetch } from "./fakeDetect.testutil.js";
 import type { FakeGitHubOptions, FakeRepo } from "./fakeDetect.testutil.js";
@@ -12,6 +14,7 @@ import { createPage } from "./page.js";
 import type { DetectFn, PageDeps } from "./page.js";
 import { createRecordingRenderer } from "./recordingRenderer.testutil.js";
 import { TEXTS } from "./texts.js";
+import type { ViewModel } from "./viewModel.js";
 
 function readCommitted(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -25,6 +28,24 @@ const committed = loadSample(
 function sampleData(): SampleData {
   if (!committed.ok) throw new Error(committed.error);
   return committed.value;
+}
+
+const parsedScript = parseDemoScript(
+  readCommitted("../sample/demo-script.json"),
+);
+
+function committedScript(): DemoScript {
+  if (!parsedScript.ok) throw new Error(parsedScript.error);
+  return parsedScript.value;
+}
+
+const EASIEST = "bench/static.js"; // attic, scripted
+const LOCKED = "packages/sirv/index.mjs"; // middle floor, no Ghost_Content
+
+function contentFor(path: string): GhostContent {
+  const content = contentOf(committedScript(), path);
+  if (content === null) throw new Error(`no content for ${path}`);
+  return content;
 }
 
 let fetchCalls = 0;
@@ -46,9 +67,27 @@ function setup(sample: PageDeps["sample"] = committed) {
     throw new Error("detect must not be called");
   });
   const renderer = createRecordingRenderer();
-  const page = createPage({ detect, sample }, renderer);
+  const page = createPage({ detect, sample, script: null }, renderer);
   page.start();
   return { page, renderer, detect };
+}
+
+/** Committed data and committed Demo_Script; Core's engine wrapped to count calls. */
+function setupGhost() {
+  const detect = vi.fn<DetectFn>(() => {
+    throw new Error("detect must not be called");
+  });
+  const engine = {
+    startSession: vi.fn(startSession),
+    advance: vi.fn(advance),
+  };
+  const renderer = createRecordingRenderer();
+  const page = createPage(
+    { detect, sample: committed, script: committedScript(), engine },
+    renderer,
+  );
+  page.start();
+  return { page, renderer, detect, engine };
 }
 
 /** Real detectGhosts against Core's strict fake GitHub. */
@@ -58,7 +97,10 @@ function setupLive(repos: FakeRepo[], options: FakeGitHubOptions = {}) {
     detectGhosts(url, { fetch: fake.fetch }),
   );
   const renderer = createRecordingRenderer();
-  const page = createPage({ detect, sample: committed }, renderer);
+  const page = createPage(
+    { detect, sample: committed, script: null },
+    renderer,
+  );
   page.start();
   return { page, renderer, detect, fake };
 }
@@ -162,12 +204,21 @@ describe("page states (PR 1)", () => {
     });
     const detect = vi.fn<DetectFn>(() => pending);
     const renderer = createRecordingRenderer();
-    const page = createPage({ detect, sample: committed }, renderer);
+    const page = createPage(
+      { detect, sample: committed, script: committedScript() },
+      renderer,
+    );
     page.start();
     await page.dispatch({ type: "go-to-floor", floor: "attic" });
+    const sampleCards = (model: ViewModel) =>
+      model.house?.floors.flatMap((floor) => floor.ghosts) ?? [];
+    expect(sampleCards(renderer.last()).some((c) => c.canStart)).toBe(true);
 
     const running = page.dispatch({ type: "submit-live", url: LIVE_URL });
     const busy = renderer.last();
+    // PR 2: while busy, no sample ghost can be started.
+    expect(busy.house?.source).toBe("sample");
+    for (const card of sampleCards(busy)) expect(card.canStart).toBe(false);
     expect(busy.live.busy).toBe(true);
     expect(busy.status).toEqual({ kind: "busy", text: TEXTS.busy });
     const types = busy.available.map((a) => a.type);
@@ -303,5 +354,181 @@ describe("page states (PR 1)", () => {
     await page.dispatch({ type: "go-to-floor", floor: "attic" });
     expect(renderer.models).toHaveLength(1);
     expect(detect).not.toHaveBeenCalled();
+  });
+});
+
+function cardOf(model: ViewModel, path: string) {
+  return model.house?.floors
+    .flatMap((floor) => floor.ghosts)
+    .find((card) => card.path === path);
+}
+
+describe("page states (PR 2, reading and asking)", () => {
+  it("Ghost explaining", async () => {
+    const { page, renderer } = setupGhost();
+    expect(renderer.last().available).toContainEqual({
+      type: "start-ghost",
+      path: EASIEST,
+    });
+
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    const model = renderer.last();
+    expect(model.scene).toEqual({
+      kind: "ghost",
+      floor: "attic",
+      path: EASIEST,
+    });
+    expect(model.transition).toEqual({
+      from: { kind: "house" },
+      to: { kind: "ghost", floor: "attic", path: EASIEST },
+    });
+    expect(model.live.formVisible).toBe(false);
+    expect(model.ghost?.step).toBe("explaining");
+    expect(model.ghost?.path).toBe(EASIEST);
+    expect(model.ghost?.reading).toEqual({
+      kind: "explanation",
+      text: contentFor(EASIEST).explanation,
+    });
+    expect(model.ghost?.code).toBe(sampleData().texts[EASIEST]);
+    expect(model.ghost?.licenceNextToCode).toBe(true);
+    expect(model.ghost?.judgeLine).toBe(TEXTS.judgeLine);
+    expect(model.available).toEqual([
+      { type: "explanation-continue" },
+      { type: "leave-ghost" },
+    ]);
+  });
+
+  it("Asking, not revealed", async () => {
+    const { page, renderer } = setupGhost();
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    await page.dispatch({ type: "explanation-continue" });
+    const ghost = renderer.last().ghost;
+
+    expect(ghost?.step).toBe("asking");
+    expect(ghost?.questionNumber).toBe(1);
+    expect(ghost?.question).toBe(contentFor(EASIEST).questions[0]);
+    expect(ghost?.showAnswerBox).toBe(true);
+    expect(ghost?.revealedAnswer).toBeNull();
+    expect(ghost?.reading).toBeNull();
+    expect(ghost?.code).toBe(sampleData().texts[EASIEST]);
+    expect(renderer.last().available).toEqual([
+      { type: "show-model-answer" },
+      { type: "dont-know" },
+      { type: "leave-ghost" },
+    ]);
+  });
+
+  it("Asking, revealed", async () => {
+    const { page, renderer, engine } = setupGhost();
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    await page.dispatch({ type: "explanation-continue" });
+    const calls = engine.advance.mock.calls.length;
+
+    await page.dispatch({ type: "show-model-answer" });
+    const model = renderer.last();
+    expect(engine.advance.mock.calls.length).toBe(calls);
+    expect(model.ghost?.step).toBe("asking");
+    expect(model.ghost?.questionNumber).toBe(1);
+    expect(model.ghost?.revealedAnswer).toBe(
+      contentFor(EASIEST).modelAnswers[0],
+    );
+    expect(model.available).toEqual([
+      { type: "rate", rating: "right" },
+      { type: "rate", rating: "half-right" },
+      { type: "rate", rating: "wrong" },
+      { type: "dont-know" },
+      { type: "leave-ghost" },
+    ]);
+  });
+
+  it("Simplifying", async () => {
+    const { page, renderer } = setupGhost();
+    const content = contentFor(EASIEST);
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    await page.dispatch({ type: "explanation-continue" });
+
+    await page.dispatch({ type: "dont-know" });
+    const simpler = renderer.last();
+    expect(simpler.ghost?.step).toBe("simplifying");
+    expect(simpler.ghost?.reading).toEqual({
+      kind: "simpler",
+      text: content.simpler[0],
+    });
+    expect(simpler.ghost?.questionNumber).toBe(1);
+    expect(simpler.ghost?.code).toBe(sampleData().texts[EASIEST]);
+    expect(simpler.available).toEqual([
+      { type: "explanation-continue" },
+      { type: "leave-ghost" },
+    ]);
+
+    await page.dispatch({ type: "explanation-continue" });
+    const again = renderer.last().ghost;
+    expect(again?.step).toBe("asking");
+    expect(again?.questionNumber).toBe(1);
+    expect(again?.question).toBe(content.questions[0]);
+    expect(again?.revealedAnswer).toBeNull();
+  });
+
+  it("Model answer", async () => {
+    const { page, renderer } = setupGhost();
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    await page.dispatch({ type: "explanation-continue" });
+    await page.dispatch({ type: "dont-know" });
+    await page.dispatch({ type: "explanation-continue" });
+
+    await page.dispatch({ type: "dont-know" });
+    const model = renderer.last();
+    expect(model.ghost?.step).toBe("model-answer");
+    expect(model.ghost?.reading).toEqual({
+      kind: "model-answer",
+      text: contentFor(EASIEST).modelAnswers[0],
+    });
+    expect(model.ghost?.questionNumber).toBe(1);
+    expect(model.ghost?.code).toBe(sampleData().texts[EASIEST]);
+    expect(model.available).toEqual([
+      { type: "explanation-continue" },
+      { type: "leave-ghost" },
+    ]);
+  });
+
+  it("Leave", async () => {
+    const { page, renderer } = setupGhost();
+    await page.dispatch({ type: "start-ghost", path: EASIEST });
+    await page.dispatch({ type: "explanation-continue" });
+
+    await page.dispatch({ type: "leave-ghost" });
+    const model = renderer.last();
+    expect(model.scene).toEqual({ kind: "floor", floor: "attic" });
+    expect(model.transition).toEqual({
+      from: { kind: "ghost", floor: "attic", path: EASIEST },
+      to: { kind: "floor", floor: "attic" },
+    });
+    expect(model.ghost).toBeNull();
+    expect(model.live.formVisible).toBe(true);
+    expect(cardOf(model, EASIEST)?.state).toBe("haunted");
+    expect(cardOf(model, EASIEST)?.canStart).toBe(true);
+    expect(model.available).toContainEqual({
+      type: "start-ghost",
+      path: EASIEST,
+    });
+  });
+
+  it("Locked ghost", async () => {
+    const { page, renderer, engine } = setupGhost();
+    const model = renderer.last();
+    const card = cardOf(model, LOCKED);
+
+    expect(card?.state).toBe("locked");
+    expect(card?.lockedLine).toBe(POWER_TEXTS.lockedGhost);
+    expect(card?.canStart).toBe(false);
+    expect(model.available).not.toContainEqual({
+      type: "start-ghost",
+      path: LOCKED,
+    });
+
+    const calls = engine.advance.mock.calls.length;
+    await page.dispatch({ type: "start-ghost", path: LOCKED });
+    expect(renderer.models).toHaveLength(1);
+    expect(engine.advance.mock.calls.length).toBe(calls);
   });
 });
