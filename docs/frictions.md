@@ -221,3 +221,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** los requisitos siguen la documentación actual; corregir `tech.md` queda en "Pendientes" de `PLAN.md`, y cómo se ejecuta el servidor instalado queda como pregunta abierta para el diseño.
 
 - **Estado:** abierto (falta corregir `tech.md` y decidir cómo se distribuye el servidor).
+
+## 2026-11-15 — Las herramientas de editar archivos desaparecieron a mitad de sesión
+
+- **Qué intentaba:** aplicar en `requirements.md` de `kiro-power` los 12 puntos de la revisión, un commit por punto.
+
+- **Qué pasó:** en la primera sesión Kiro editaba archivos con `fs_write` y `str_replace`; en la segunda, las dos herramientas respondían "not available".
+
+- **Cómo lo rodeé:** los cambios de la spec se hicieron con el flujo de specs de Kiro, un punto cada vez, revisando el diff antes de cada commit. `PLAN.md` y este archivo se editaron desde PowerShell, guardando en UTF-8 sin BOM y con saltos de línea LF.
+
+- **Estado:** abierto (no sé por qué cambian las herramientas entre sesiones).
