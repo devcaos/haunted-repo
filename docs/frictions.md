@@ -16,7 +16,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** dejar el formato sin fijar y decidirlo en la spec "empaquetar como Kiro Power".
 
-- **Estado:** abierto.
+- **Estado:** resuelto el 15 nov: ver la entrada "El formato de Power de la documentación no coincide con `tech.md`".
 
 ## 2026-11-06 — La regla de testing choca con que la IA es el Kiro del usuario
 
@@ -211,3 +211,23 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** guardarlo con `git stash` (sin borrarlo; está en `stash@{0}`, con un mensaje que lo explica) y seguir desde `main`.
 
 - **Estado:** abierto: falta saber la causa y decidir si se borra el stash.
+
+## 2026-11-15 — El formato de Power de la documentación no coincide con `tech.md`
+
+- **Qué intentaba:** escribir los requisitos de la spec `kiro-power` siguiendo `tech.md`.
+
+- **Qué pasó:** `tech.md` dice que un Power es "`POWER.md` + steering + servidor MCP". La documentación actual (kiro.dev/docs/powers y kiro.dev/docs/powers/create, leídas el 15 nov) dice que un Power sigue la especificación Agent Plugins: una carpeta con `plugin.json` obligatorio, `skills/` (un `SKILL.md` por skill) y `mcp.json` opcional. Además, `dist/` está en `.gitignore`, así que un Power importado desde GitHub no traería el servidor compilado.
+
+- **Cómo lo rodeé:** los requisitos siguen la documentación actual; corregir `tech.md` queda en "Pendientes" de `PLAN.md`, y cómo se ejecuta el servidor instalado queda como pregunta abierta para el diseño.
+
+- **Estado:** abierto (falta corregir `tech.md` y decidir cómo se distribuye el servidor).
+
+## 2026-11-15 — Las herramientas de editar archivos desaparecieron a mitad de sesión
+
+- **Qué intentaba:** aplicar en `requirements.md` de `kiro-power` los 12 puntos de la revisión, un commit por punto.
+
+- **Qué pasó:** en la primera sesión Kiro editaba archivos con `fs_write` y `str_replace`; en la segunda, las dos herramientas respondían "not available".
+
+- **Cómo lo rodeé:** los cambios de la spec se hicieron con el flujo de specs de Kiro, un punto cada vez, revisando el diff antes de cada commit. `PLAN.md` y este archivo se editaron desde PowerShell, guardando en UTF-8 sin BOM y con saltos de línea LF.
+
+- **Estado:** abierto (no sé por qué cambian las herramientas entre sesiones).

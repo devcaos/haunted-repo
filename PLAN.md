@@ -5,7 +5,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Nada. El exorcismo de la web está completo: la PR 2 de la spec `web-demo` (partida en 4 PR apiladas porque midió 2.973 líneas y el límite es 900) tiene las piezas 1 a 4 fusionadas (#24, #25, #27 y #29). Lo siguiente, en este orden: (1) spec del Kiro Power, (2) diseño visual de la web, (3) vídeo, textos de Devpost y posts bonus.
+- Spec del Kiro Power (`.kiro/specs/kiro-power/`, rama `feat/kiro-power-spec`, PR #31): requisitos corregidos tras la primera revisión (12 puntos, un commit por punto), esperando la segunda revisión. Aún no hay `design.md`, `tasks.md` ni código. Decidido por Luis Miguel: el texto del fantasma sale de GitHub, como la detección. Nuevo requisito 0: un spike con un Power mínimo instalado desde GitHub, antes de escribir `design.md`. Después: (2) diseño visual de la web, (3) vídeo, textos de Devpost y posts bonus.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
@@ -14,13 +14,14 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
 6. [x] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`). PR 1: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, en cuatro PR apiladas (#19, #20, #21 y #22, fusionadas). PR 2: exorcismo de ejemplo de los 2 fantasmas más fáciles, con progreso y fantasmas bloqueados, en cuatro PR apiladas (#24, #25, #27 y #29, fusionadas). El grupo 16 (textos opcionales) se salta en esta versión
-7. [ ] Spec: empaquetar como Kiro Power (lo siguiente). Veredicto estricto: si llega `INVALID_VERDICT`, el Power vuelve a pedir el veredicto
+7. [ ] Spec: empaquetar como Kiro Power (en curso: requisitos escritos, rama `feat/kiro-power-spec`). Veredicto estricto: si llega `INVALID_VERDICT`, el Power vuelve a pedir el veredicto
 7b. [ ] Diseño visual de la web (todavía sin spec; después del Power)
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
 9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR #13 fusionada)
 10. [ ] Vídeo, textos de Devpost y bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26 (se hacen todos; decidido el 15 nov). Es lo último: el código se congela el 27 nov y la entrega es el 4 dic 2026 a las 23:00 (hora de España)
 
 ## Pendientes (Low, ideas, "después si da tiempo")
+- Low (spec kiro-power, 15 nov): `tech.md` dice que un Power es "`POWER.md` + steering + servidor MCP"; la documentación actual de Kiro dice `plugin.json` + `skills/` + `mcp.json`. Corregirlo en una rama de docs aparte.
 - "Certificado de exorcismo" para profesores: fuera de alcance por ahora; Luis Miguel quiere reconsiderarlo (decisión pendiente)
 - Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
@@ -79,7 +80,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 ## Para retomar (traspaso)
 
 - Dónde lo dejé (15 nov): en `main` están la detección de fantasmas (PR #11 y #12), el despliegue en Pages (PR #13), el motor del exorcismo (PR #14), la PR 1 completa de la web de demostración (PR #19 a #22), el bloque de cierre (PR #23), el README nuevo (PR #28) y las 4 piezas de la PR 2 de la web (PR #24: guion de la demo y estados de las tarjetas; PR #25: el controlador que lleva el exorcismo; PR #27: tests de los estados finales y propiedades; PR #29: el panel del exorcismo y el progreso). La web es pública en https://devcaos.github.io/haunted-repo/ y enseña la lista de fantasmas de lukeed/sirv, el formulario en vivo y el exorcismo de ejemplo de los 2 fantasmas más fáciles.
-- Lo próximo, en este orden: (1) spec del Kiro Power (punto 7 de "Siguientes"; veredicto estricto: si llega `INVALID_VERDICT`, se vuelve a pedir), (2) diseño visual de la web (aún sin spec), (3) vídeo, textos de Devpost y posts bonus. Hitos internos: código congelado el 27 nov y entrega el 4 dic 2026 a las 23:00 (hora de España). La rama `feat/web-exorcism` no se sube nunca.
+- 15 nov (tarde): `requirements.md` de la spec `kiro-power` escrito en la rama `feat/kiro-power-spec` (PR solo de docs). Siguiente paso: que el revisor lo lea y Luis Miguel lo apruebe y responda las "Open Questions"; solo entonces se escribe `design.md`. Formato de Power comprobado en kiro.dev/docs/powers el 15 nov: `plugin.json` + `skills/` + `mcp.json` (no `POWER.md`, como dice `tech.md`).
+- Lo próximo, en este orden: (1) spec del Kiro Power (punto 7 de "Siguientes"; veredicto estricto: si llega `INVALID_VERDICT`, se vuelve a pedir hasta 2 veces y luego falla con un mensaje claro), (2) diseño visual de la web (aún sin spec), (3) vídeo, textos de Devpost y posts bonus. Hitos internos: código congelado el 27 nov y entrega el 4 dic 2026 a las 23:00 (hora de España). La rama `feat/web-exorcism` no se sube nunca.
 - Comprobaciones a mano de la PR #29 (las hace Luis Miguel en https://devcaos.github.io/haunted-repo/, sin instalar nada):
   1. [ ] Abre el fantasma más fácil, pulsa "Start" y llega hasta el final. Responde una pregunta con "I don't know", repite otra, y al final haz el juicio de tu propia respuesta (yes, half o no).
   2. [ ] Haz lo mismo con el segundo fantasma más fácil.
