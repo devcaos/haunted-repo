@@ -358,7 +358,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the ghost card state rule`
     - _Requirements: 4.9, 6.1, 6.2, 8.4, 11.9_
 
-- [ ] 10. Exorcism logic in the page
+- [x] 10. Exorcism logic in the page
   - [x] 10.1 Add the ghost view, the step actions and the event mapping
     - Create `packages/web/src/logic/exorcism.ts`: `readingText`, `buildGhostView` (the table of the design by step: code, licence next to code, judge line, reading, question number, question, revealed answer, Answer_Box, prompt), `ghostActions(step, revealed)` (the rows of the design table) and `eventFor(action, state, content, text)`.
     - Create `packages/web/src/logic/exorcism.test.ts` with examples: rating map `right` / `half-right` / `wrong`; self-check map `yes` / `half` / `no`; the `explanation-done` text equals `readingText`; retry explanation when `current.explanation !== ""`.
@@ -404,7 +404,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check live runs keep the sample session`
     - _Requirements: 4.11, 4.12_
 
-  - [~] 10.7 Extend P10 and P11 to the ghost scene
+  - [x] 10.7 Extend P10 and P11 to the ghost scene
     - **Property 10: Unavailable actions change nothing** and **Property 11: The View_Model is plain data and scenes are consistent**
     - **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     - In the two properties of tasks 3.5 and 3.6, let the path include ghost actions with the committed script. P10 also checks that the session object is the same; P11 also checks `ghost.path` and `ghost.floor` equal the scene's. Both check `canStart` iff `start-ghost` is available (P8 link).

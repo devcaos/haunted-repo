@@ -43,6 +43,10 @@
     "10.6 Property test for the Sample_Session isolation": {
       "status": "passed",
       "lastRunTimestamp": 1794762471790
+    },
+    "10.7 Extend P10 and P11 to the ghost scene": {
+      "status": "passed",
+      "lastRunTimestamp": 1794762843758
     }
   },
   "executionHistory": {
@@ -449,6 +453,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758774487
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794762719271
       }
     ],
     "11. Checkpoint - logic of PR 2": [

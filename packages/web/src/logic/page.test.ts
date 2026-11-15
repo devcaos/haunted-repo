@@ -27,6 +27,23 @@ import { createPage } from "./page.js";
 import type { DetectFn, EngineFns } from "./page.js";
 import { createRecordingRenderer } from "./recordingRenderer.testutil.js";
 import { TEXTS } from "./texts.js";
+import type { ViewModel } from "./viewModel.js";
+
+/** P8 link: a card can start exactly when start-ghost for its path is available. */
+function expectCanStartMatchesAvailable(model: ViewModel): void {
+  const cards = model.house?.floors.flatMap((floor) => floor.ghosts) ?? [];
+  for (const card of cards) {
+    expect(card.canStart).toBe(
+      model.available.some(
+        (a) => a.type === "start-ghost" && a.path === card.path,
+      ),
+    );
+  }
+  for (const action of model.available) {
+    if (action.type !== "start-ghost") continue;
+    expect(cards.some((card) => card.path === action.path)).toBe(true);
+  }
+}
 
 function readCommitted(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -267,9 +284,9 @@ describe("page controller properties (PR 1)", () => {
     );
   });
 
-  it("ignores every unavailable action in the list scenes", async () => {
+  it("ignores every unavailable action in every scene", async () => {
     // Feature: web-demo, Property 10: Unavailable actions change nothing
-    // **Validates: Requirements 4.3, 4.9, 18.3**
+    // **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     await fc.assert(
       fc.asyncProperty(
         choicesArb, // the path: each choice picks from model.available
@@ -282,18 +299,35 @@ describe("page controller properties (PR 1)", () => {
                 settle = resolve;
               }),
           );
+          // The engine is wrapped so the test sees the session object the
+          // controller holds: the one from startSession and each ok advance.
+          let session: SessionState | null = null;
           const engine = {
-            startSession: vi.fn<EngineFns["startSession"]>(startSession),
-            advance: vi.fn<EngineFns["advance"]>(advance),
+            startSession: vi.fn<EngineFns["startSession"]>((report, opts) => {
+              const started = startSession(report, opts);
+              session = started.state;
+              return started;
+            }),
+            advance: vi.fn<EngineFns["advance"]>((state, event) => {
+              const result = advance(state, event);
+              if (result.ok) session = result.state;
+              return result;
+            }),
           };
           const renderer = createRecordingRenderer();
           const page = createPage(
-            { detect, sample: committed, script: null, engine },
+            {
+              detect,
+              sample: committed,
+              script: committedScript.value,
+              engine,
+            },
             renderer,
           );
           page.start();
 
-          // Walk a random path of available actions. A live analysis ends ok,
+          // Walk a random path of available actions, ghost actions included.
+          // A live analysis ends ok,
           // ends in fallback, or stays pending (busy) for the rest of the run.
           let pending: Promise<void> | null = null;
           for (const choice of choices) {
@@ -323,18 +357,26 @@ describe("page controller properties (PR 1)", () => {
             await run;
           }
 
+          expectCanStartMatchesAvailable(page.current());
           for (const action of candidates) {
             if (isAvailable(page.current(), action)) continue;
             const before = structuredClone(page.current());
             const renders = renderer.models.length;
             const detectCalls = detect.mock.calls.length;
+            const startCalls = engine.startSession.mock.calls.length;
+            const advanceCalls = engine.advance.mock.calls.length;
+            const kept = session as SessionState | null;
+            const keptCopy = structuredClone(kept);
 
             await page.dispatch(action);
 
             expect(page.current()).toEqual(before);
             expect(renderer.models.length).toBe(renders);
             expect(detect.mock.calls.length).toBe(detectCalls);
-            expect(engine.advance).not.toHaveBeenCalled();
+            expect(engine.startSession.mock.calls.length).toBe(startCalls);
+            expect(engine.advance.mock.calls.length).toBe(advanceCalls);
+            expect(session).toBe(kept);
+            expect(kept).toStrictEqual(keptCopy);
           }
 
           if (pending !== null) {
@@ -349,9 +391,9 @@ describe("page controller properties (PR 1)", () => {
     );
   });
 
-  it("renders plain data with consistent scenes in the list scenes", async () => {
+  it("renders plain data with consistent scenes in every scene", async () => {
     // Feature: web-demo, Property 11: The View_Model is plain data and scenes are consistent
-    // **Validates: Requirements 11.7, 11.8, 18.1, 18.2, 18.4**
+    // **Validates: Requirements 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4**
     // URLs for submit-live: ok, show-message (missing repo, invalid URL).
     // The fake answers 403 rate limit after 12 requests, so later runs fall back.
     const liveUrls = [
@@ -384,11 +426,12 @@ describe("page controller properties (PR 1)", () => {
           );
           const renderer = createRecordingRenderer();
           const page = createPage(
-            { detect, sample: committed, script: null },
+            { detect, sample: committed, script: committedScript.value },
             renderer,
           );
           page.start();
 
+          // The path includes ghost actions with the committed script.
           for (const choice of choices) {
             const options = page.current().available;
             const picked = options[choice % Math.max(options.length, 1)];
@@ -412,6 +455,7 @@ describe("page controller properties (PR 1)", () => {
               expect(model.ghost?.floor).toBe(model.scene.floor);
             }
             expect(model.live.formVisible).toBe(!inGhost);
+            expectCanStartMatchesAvailable(model);
             if (previous === null) {
               expect(model.transition).toBeNull();
             } else if (isDeepStrictEqual(model.scene, previous.scene)) {
