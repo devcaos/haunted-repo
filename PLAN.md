@@ -5,7 +5,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Spec del Kiro Power (.kiro/specs/kiro-power/): requisitos con la opción A aprobados y fusionados (PR #34). **`design.md` escrito** (rama `feat/kiro-power-design`, PR de solo docs): un solo servidor empaquetado con esbuild en `packages/power/bundle/server.mjs`, 6 herramientas, un archivo por repositorio en `PLUGIN_DATA`. **Esperando revisión.** Solo después se escribe `tasks.md`. Después: (2) diseño visual de la web, (3) vídeo, textos de Devpost y posts bonus.
+- Spec del Kiro Power (.kiro/specs/kiro-power/): requisitos con la opción A aprobados y fusionados (PR #34). **`design.md` escrito** (rama `feat/kiro-power-design`, PR de solo docs): un solo servidor empaquetado con esbuild en `packages/power/bundle/server.mjs`, 6 herramientas, un archivo por repositorio en `PLUGIN_DATA`. Revisión de la PR #35 aplicada (CI con `git status --porcelain`, cola de llamadas, reintentos de `rename` en Windows, instalación en la prueba manual, propiedades que pueden fallar, orden de la primera tarea). **Esperando aprobación.** Solo después se escribe `tasks.md`. Después: (2) diseño visual de la web, (3) vídeo, textos de Devpost y posts bonus.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
@@ -26,6 +26,11 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión de requisitos kiro-power, 15 nov): si se recorta 7.5, no se dice qué pasa con `INVALID_REPORT`.
 - Low (revisión de requisitos kiro-power, 15 nov): el glosario dice "3 rejections before the failure", pero el tercer rechazo ya es el fallo.
 - Low (diseño kiro-power, 15 nov): los requisitos 7.6 y 7.10 se solapan; el diseño los separa añadiendo "at start-up" a 7.10 y "after start-up" a 7.6. Cambio de palabras pendiente en `requirements.md` (con el de la línea de corte para 7.8).
+- Low (revisión diseño kiro-power, PR #35, 15 nov): 7.6 pide avisar cuando falla una escritura, pero el diseño avisa una sola vez por cambio de estado: mejor avisar en cada guardado fallido y una sola vez por el modo memoria del arranque.
+- Low (revisión diseño kiro-power, PR #35, 15 nov): El archivo de prueba `haunted-repo--probe.tmp` tiene un nombre fijo y dos ventanas de Kiro pueden chocar: mejor un sufijo aleatorio.
+- Low (revisión diseño kiro-power, PR #35, 15 nov): Un argumento inválido no llega al manejador: el SDK devuelve su propio error -32602 y no el JSON `{ok:false, code}`; la skill debe decir que lo trate como `INVALID_EVENT`.
+- Low (revisión diseño kiro-power, PR #35, 15 nov): El razonamiento del Judgement puede citar la respuesta del alumno (4.7): que la skill lo prohíba y que el servidor nunca registre el texto del Judgement en logs.
+- Low (revisión diseño kiro-power, PR #35, 15 nov): Para el vídeo, comprobar en la prueba manual si Kiro pide "Allow" en cada llamada MCP y si se puede marcar el Power como de confianza.
 - Low (requisitos kiro-power, opción A, 15 nov): la carpeta de `PLUGIN_DATA` lleva el nombre del último trozo de la URL de import (`power`), así que choca con la de cualquier otro Power importado desde una URL que acabe en `/power`. El requisito 7.11 pide nombres de archivo con el repositorio; el diseño debe comprobarlo.
 - Cerrado (rama `docs/power-requirements-option-a`): la línea "Lo próximo" de "Para retomar" todavía tenía la frase antigua del veredicto estricto. Ahora apunta al requisito 5 de `requirements.md`.
 - Low (spike del Power, 15 nov): el paso 3 de la lista del spike (la lista de servidores MCP: cuál de `spike-root` y `spike-relative` estaba en marcha) no se anotó.
