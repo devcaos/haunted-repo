@@ -7,7 +7,10 @@ import type {
   HauntedReport,
   Overview,
 } from "@haunted-repo/core";
+import { hauntedShare } from "@haunted-repo/core";
 import { reportArb } from "../../../core/src/ghost-detection/reportArb.testutil.js";
+import { progressArb } from "../../../core/src/exorcism/progressArb.testutil.js";
+import { uniquePathReportArb } from "./uniquePathReportArb.testutil.js";
 import {
   buildLiveHouse,
   buildSampleHouse,
@@ -216,6 +219,35 @@ describe("buildSampleHouse with an exorcism", () => {
     });
     expect(house.houseClean).toBeNull();
     expect(house.powerLine).toBeNull();
+  });
+
+  it("follows the progress", () => {
+    // Feature: web-demo, Property 6: The progress view follows the progress
+    // **Validates: Requirements 8.1, 8.2, 8.3**
+    const caseArb = uniquePathReportArb.chain((value) =>
+      progressArb(value.ghosts).map((progress) => ({ value, progress })),
+    );
+    fc.assert(
+      fc.property(caseArb, ({ value, progress }) => {
+        const house = buildSampleHouse(value, exorcism({ progress }));
+        const exorcisedPaths = new Set(
+          progress.ghosts
+            .filter((entry) => entry.state === "exorcised")
+            .map((entry) => entry.path),
+        );
+        const total = value.ghosts.length;
+        const haunted = value.ghosts.filter(
+          (g) => !exorcisedPaths.has(g.path),
+        ).length;
+        expect(house.progress).toEqual({
+          line: TEXTS.progress(haunted, total),
+          haunted,
+          total,
+          share: hauntedShare(value, progress),
+        });
+      }),
+      { numRuns: 100 },
+    );
   });
 
   it("shows the house-clean line when every ghost is exorcised", () => {

@@ -340,7 +340,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): show ghost states and progress in the sample`
     - _Requirements: 4.13, 6.1, 6.2, 6.21, 8.1, 8.2, 8.4, 11.9_
 
-  - [~] 9.2 Property test for the progress view
+  - [x] 9.2 Property test for the progress view
     - **Property 6: The progress view follows the progress**
     - **Validates: Requirements 8.1, 8.2, 8.3**
     - Generator: `uniquePathReportArb` and `progressArb(report.ghosts)`. Checks `total`, `haunted`, `share = hauntedShare(report, progress)` and `line = TEXTS.progress(haunted, total)`.
