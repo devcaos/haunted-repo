@@ -27,3 +27,7 @@ const page: PageController = createPage(
   renderer,
 );
 page.start();
+if (new URLSearchParams(location.search).get("scenic") === "1")
+  void import("./view/scenic/scenic.js").then((m) =>
+    m.mountScenic(root, script),
+  );

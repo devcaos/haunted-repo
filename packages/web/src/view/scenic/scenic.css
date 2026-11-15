@@ -1,0 +1,350 @@
+/*
+ * PROTOTYPE (proto/scenic-demo). Only loaded with ?scenic=1.
+ * All hotspot numbers are percentages of the 1856x2304 picture.
+ */
+.scenic-body {
+  --room-x: 31%;
+  --room-y: 23.5%;
+  --room-w: 41%;
+  --room-h: 13.5%;
+  --room-cx: 51.5%;
+  --room-cy: 30.5%;
+  --glow: #f6c27a;
+  --ink: #3a2412;
+  --paper: #e9d6ab;
+  margin: 0;
+  overflow: hidden;
+  background: #05070c;
+}
+
+/* Undo the page-wide rules of simple.css, which is loaded too. */
+.scenic-body #root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.scenic-body .scroll-title,
+.scenic-body .scroll-label {
+  color: var(--ink);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.scenic-body .scroll-form {
+  display: block;
+  margin: 0 0 1rem;
+}
+
+.scenic-body .scroll-ink:hover,
+.scenic-body .scroll-leave:hover {
+  color: #000;
+}
+
+.scenic {
+  /* The viewport crops the sides; the stage always fills the height. */
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.scenic-stage {
+  position: relative;
+  height: 100dvh;
+  aspect-ratio: 1856 / 2304;
+  overflow: hidden;
+}
+
+.scenic-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Only the attic shows the lit picture, through a soft oval mask. */
+.scenic-lit {
+  --mask: radial-gradient(
+    ellipse 23% 8% at var(--room-cx) var(--room-cy),
+    #000 55%,
+    transparent 100%
+  );
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  animation: scenic-flicker 5s infinite;
+}
+
+@keyframes scenic-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  18% {
+    opacity: 0.88;
+  }
+  22% {
+    opacity: 0.97;
+  }
+  47% {
+    opacity: 0.82;
+  }
+  52% {
+    opacity: 1;
+  }
+  76% {
+    opacity: 0.92;
+  }
+}
+
+/* Two slow fog banks near the ground. */
+.scenic-fog,
+.scenic-fog::after {
+  position: absolute;
+  inset: 55% -30% 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 40% 30% at 30% 70%, #c8d2e655, transparent 70%),
+    radial-gradient(ellipse 35% 25% at 75% 60%, #c8d2e644, transparent 70%);
+  filter: blur(12px);
+  animation: scenic-drift 40s ease-in-out infinite alternate;
+}
+
+.scenic-fog::after {
+  content: "";
+  inset: 10% 0 0;
+  opacity: 0.7;
+  animation-duration: 60s;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes scenic-drift {
+  from {
+    transform: translateX(-8%);
+  }
+  to {
+    transform: translateX(8%);
+  }
+}
+
+/* Light rain: thin diagonal streaks that slide down. */
+.scenic-rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: repeating-linear-gradient(
+    105deg,
+    transparent 0 14px,
+    #dfe8ff 14px 15px,
+    transparent 15px 41px
+  );
+  background-size: 100% 180px;
+  -webkit-mask-image: linear-gradient(#000, #0008 60%, transparent);
+  mask-image: linear-gradient(#000, #0008 60%, transparent);
+  animation: scenic-rain 0.6s linear infinite;
+}
+
+@keyframes scenic-rain {
+  to {
+    background-position: -48px 180px;
+  }
+}
+
+/* The attic is a real, invisible button. */
+.scenic-room {
+  position: absolute;
+  left: var(--room-x);
+  top: var(--room-y);
+  width: var(--room-w);
+  height: var(--room-h);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 40% 40% 8% 8%;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    box-shadow 0.4s,
+    background 0.4s;
+}
+
+.scenic-room:hover,
+.scenic-room:focus-visible {
+  outline: none;
+  background: radial-gradient(ellipse at center, #f6c27a22, transparent 70%);
+  box-shadow:
+    0 0 24px 6px #f6c27a66,
+    inset 0 0 30px #f6c27a55;
+}
+
+.scenic-room:focus-visible {
+  outline: 2px solid var(--glow);
+  outline-offset: 4px;
+}
+
+/* The scroll: a CSS parchment, no picture. */
+.scroll {
+  width: min(34rem, 92vw);
+  max-height: 86dvh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+}
+
+.scroll::backdrop {
+  background: radial-gradient(ellipse at center, #0006, #000c);
+}
+
+.scroll[open] {
+  animation: scroll-unroll 0.5s ease-out;
+}
+
+@keyframes scroll-unroll {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.scroll-paper {
+  position: relative;
+  max-height: 86dvh;
+  overflow-y: auto;
+  padding: 2.5rem 2rem 1.5rem;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  line-height: 1.55;
+  background:
+    radial-gradient(ellipse at 20% 15%, #fff6 0, transparent 40%),
+    radial-gradient(ellipse at 80% 90%, #8a5a2a44 0, transparent 50%),
+    linear-gradient(var(--paper), #d9bf8a);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 40px #7a4a1a88,
+    0 10px 40px #000a;
+}
+
+/* Rolled ends at the top and bottom of the scroll. */
+.scroll::before,
+.scroll::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: -3%;
+  right: -3%;
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(#b08850, #6e4a22, #b08850);
+  box-shadow: 0 2px 6px #0008;
+}
+
+.scroll::before {
+  top: -8px;
+}
+
+.scroll::after {
+  bottom: -8px;
+}
+.scenic-body .scroll-title {
+  margin: 0 0 1rem;
+  font-size: 1.3rem;
+  font-style: italic;
+  text-align: center;
+}
+
+.scroll-speech,
+.scroll-reply {
+  margin: 0 0 1rem;
+}
+
+.scroll-reply:empty {
+  display: none;
+}
+
+.scroll-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.scroll-answer {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.5rem 0;
+  border: 0;
+  border-bottom: 1px dashed var(--ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.05rem;
+  font-style: italic;
+  resize: vertical;
+}
+
+.scroll-answer::placeholder {
+  color: #3a241288;
+}
+
+.scroll-answer:focus-visible {
+  outline: none;
+  background: #fff3;
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.scroll-ink,
+.scroll-leave {
+  margin: 0.75rem 0 0;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.scroll-leave {
+  display: block;
+  margin: 0.5rem auto 0;
+  font-style: italic;
+  opacity: 0.8;
+}
+
+.scroll-ink:focus-visible,
+.scroll-leave:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.scenic-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenic-lit,
+  .scenic-fog,
+  .scenic-fog::after,
+  .scroll[open] {
+    animation: none;
+  }
+  .scenic-rain {
+    display: none;
+  }
+}
