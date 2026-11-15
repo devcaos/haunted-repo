@@ -67,7 +67,7 @@ This spec does not change `packages/core`.
 5. WHEN the Student installs the Power with "Import power from a folder" (the `packages/power/` folder) or with "Import power from GitHub" (the URL of this repository), THE Power SHALL start the Power_Server with no further manual step except the ones the Tutor_Skill explains in plain English.
 6. THE Power SHALL NOT include the compiled test files (`*.test.js`, `*.testutil.js`) in what the Power_Server runs (`PLAN.md`, note a).
 7. THE Power_Server SHALL run on Node.js 24 on Windows, macOS and Linux.
-8. IF the Power_Server cannot start (for example, Node.js is missing or older than version 24), THEN THE Tutor_Skill SHALL tell the Tutor to show the Student an English message that names the problem and the fix, and SHALL tell the Tutor not to run an exorcism without the Power_Server.
+8. THE Tutor_Skill SHALL contain this instruction: IF the Power_Tools are not available, THEN the Tutor SHALL tell the Student in English to check that Node.js 24 is installed and to restart Kiro, and SHALL NOT run an exorcism. This criterion is checked by the manual spike (Requirement 11.7), not by an automated test.
 
 ### Requirement 2: Find the ghosts of a public GitHub repository
 
@@ -213,7 +213,7 @@ This spec does not change `packages/core`.
 - **The Student answers "I don't know":** the Tutor gives `dont-know`; first time a Simpler_Explanation and the same question again, second time a model answer and the next question (Requirement 6).
 - **The Student writes "I don't know" inside a longer real answer:** only the Tutor's Verdict counts; the Power_Server never reads the Student's words (Requirement 6.2).
 - **Kiro unavailable or stopped halfway:** the unfinished attempt is lost and the Ghost stays `haunted`; finished Ghosts stay saved (Requirement 9).
-- **The Power_Server cannot start** (Node.js missing or too old): the Tutor_Skill explains the fix in English and no exorcism runs without it (Requirement 1.8).
+- **The Power_Tools are not available** (for example, Node.js is missing or the server did not start): the Tutor_Skill tells the Tutor to ask the Student to check Node.js 24 and restart Kiro, and no exorcism runs (Requirement 1.8, checked by the manual spike).
 - **A tool call with no session** (after a restart): an English message on how to continue (Requirement 9.3).
 - **Repository unreachable:** network error or GitHub down: `NETWORK_ERROR` with an English message; nothing saved (Requirement 2.3).
 - **Repository private or not found:** `REPO_NOT_FOUND` with a message that only public repositories work; no token is asked for (Requirement 2.4).
