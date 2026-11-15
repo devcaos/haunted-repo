@@ -6,8 +6,8 @@
 
 ## Pull requests
 
-- **PR 1** on branch `feat/web-demo` (already created). Tasks 0 to 7.
-- **PR 2** on branch `feat/web-exorcism`, created from an up-to-date `main` only AFTER the project director merges PR 1. Tasks 8 to 16.
+- **PR 1**: tasks 0 to 7, built on branch `feat/web-demo`. It was split into 4 stacked pull requests, one per branch `feat/web-demo-1` to `feat/web-demo-4`, because its real size was 3,492 changed lines (see task 7.2). Each piece is merged in order 1, 2, 3, 4 with a merge commit. Branch `feat/web-demo` is never pushed.
+- **PR 2** on branch `feat/web-exorcism`, created from an up-to-date `main` only AFTER the project director merges piece 4 (`feat/web-demo-4`) of PR 1. Tasks 8 to 16.
 - Kiro never merges. Luis Miguel merges on GitHub.
 - Size per design: PR 1 about 2,350 changed lines, PR 2 about 1,250 changed lines, not counting JSON data and `package-lock.json`. The director (Luis Miguel) accepted these new sizes: he saw them and approved the design. Each PR body carries a size warning with the real count. Tests are never cut to fit the size.
 
@@ -22,7 +22,7 @@ Cut in this order, and only as far as needed:
 ## Working rules for every task
 
 - Kiro runs a task only when the director says so, and asks permission before modifying code.
-- Run every command from the repository root, in PowerShell. Before the first commit of a session, check the branch with `git branch --show-current` (PR 1: `feat/web-demo`; PR 2: `feat/web-exorcism`; never `main`).
+- Run every command from the repository root, in PowerShell. Before the first commit of a session, check the branch with `git branch --show-current` (PR 1: `feat/web-demo`, or `feat/web-demo-1` to `feat/web-demo-4` after the split; PR 2: `feat/web-exorcism`; never `main`).
 - One task = one commit. The commit message is in English, conventional style like the repo history (`feat(web):`, `test(web):`, `chore:`, `docs:`). If a message needs an "and", it is two commits.
 - Before each commit run `npm run check` (lint, format check, build, tests) and fix what fails. A task is done only when it exits `0`.
 - Mark the task `[x]` in this file and include `tasks.md` AND `.kiro/specs/web-demo/tasks.meta.json` (when it exists) in that same commit.
@@ -50,7 +50,7 @@ These open doubts of the design are settled by the approved design and are not r
 
 ## Tasks
 
-### PR 1 — feat/web-demo
+### PR 1 — feat/web-demo (split into feat/web-demo-1 to feat/web-demo-4)
 
 - [x] 0. Commit the spec
   - On branch `feat/web-demo` (check with `git branch --show-current`), commit the spec itself so that "`git status --short` prints nothing" holds for the later tasks: `.kiro/specs/web-demo/requirements.md`, `design.md`, `tasks.md`, `.config.kiro`, and `tasks.meta.json` if it exists.
@@ -59,7 +59,7 @@ These open doubts of the design are settled by the approved design and are not r
   - One commit. Commit message: `docs: add web-demo spec`
   - _Requirements: none (git workflow)_
 
-- [~] 1. Test setup and sample data
+- [x] 1. Test setup and sample data
   - [x] 1.1 Add the Vitest alias for Core
     - In `vitest.config.ts` add `resolve.alias` mapping `@haunted-repo/core` to `packages/core/src/index.ts` (with `fileURLToPath(new URL(...))`), as in the design "Vitest alias". `vitest.live.config.ts` stays unchanged.
     - Verify the "no build" case: `node -e "require('node:fs').rmSync('packages/core/dist',{recursive:true,force:true})"`, then `npm test` passes (the current `checkButton.test.ts` now runs against Core source). Then `npm run check`.
@@ -215,46 +215,46 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): draw the house with the simple renderer`
     - _Requirements: 3.1, 3.3, 3.4, 4.1, 4.4, 4.5, 4.8, 5.4, 10.1, 10.4, 11.8, 11.9, 12.1, 12.2, 12.3, 18.5_
 
-  - [ ] 5.4 Wire the page in `main.ts` and `index.html`
+  - [x] 5.4 Wire the page in `main.ts` and `index.html`
     - Rewrite `packages/web/index.html`: head (title, meta, charset) and `<body><div id="root"></div><script type="module" src="/src/main.ts"></script></body>`; no inline style, no external resource.
     - Rewrite `packages/web/src/main.ts`: import `report.json?raw` and `files.json?raw`, `loadSample`, `createSimpleRenderer` and its CSS, `createPage` with `detect: (url) => detectGhosts(url)` (no `ref`), then `page.start()`. It no longer imports `checkButton.ts`.
     - Verify: `npm run check` exits `0`; `npm run build` output in `packages/web/dist` contains `sirv-license.txt` at its root.
     - Commit message: `feat(web): wire the demo page`
     - _Requirements: 2.1, 2.2, 2.3, 4.2, 10.4, 11.5, 18.5_
 
-  - [ ] 5.5 Delete the check button
+  - [x] 5.5 Delete the check button
     - Delete `packages/web/src/checkButton.ts` and `packages/web/src/checkButton.test.ts`. Its single-flight idea lives on in task 3.2 and P7.
     - Verify: `npm run check` exits `0`; a search for `checkButton` under `packages/web` finds nothing.
     - Commit message: `chore(web): remove the check button`
     - _Requirements: 14.1, 14.3_
 
-  - [ ] 5.6 Add the source rules for storage, HTML, texts and layers
+  - [x] 5.6 Add the source rules for storage, HTML, texts and layers
     - Create `packages/web/src/source.test.ts` (`node:fs`, `/// <reference types="node" />`), scanning non-test files under `src/` and `index.html`: no `localStorage`, `sessionStorage`, `indexedDB`, `document.cookie` (the test skips itself); no `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`; the word `Power` only in `powerTexts.ts`; the text `Check GitHub connection` nowhere; no `style` attribute or `<style>` in `index.html`; Logic_Layer (`src/logic/**`, `src/sample/**`) has no `document`, `window`, `HTMLElement` and no import from `src/view`; `makeSample.ts` has no relative import; `src/view/**` imports Core only with `import type`. Add one negative self-check per rule group (an inline string that the pattern must match), so a rule cannot pass by matching nothing.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check source rules for storage and layers`
     - _Requirements: 4.13, 9.2, 11.7, 14.1, 18.7_
 
-  - [ ] 5.7 Add the source rules for CSS and external addresses
+  - [x] 5.7 Add the source rules for CSS and external addresses
     - Extend `source.test.ts`: in `index.html` and every `.ts`, `.css` and `.svg` under `src/view/`, no `http://` or `https://` and no protocol-relative `//` at the start of a `url(...)`, `@import`, `src` or `href` value (the two SVG namespace values are exempt). In `src/view/simple/**/*.css` except `tokens.css`: no literal colour (the list of the design, CSS named colours included), no size unit and no `font-family` without `var(` (units and exemptions exactly as in the design). Negative self-checks as in task 5.6.
     - Verify: `npm run check` exits `0`; changing one colour in `simple.css` to a hex value makes `npm test` fail (then undo).
     - Commit message: `test(web): check styles use tokens and local files only`
     - _Requirements: 11.2, 11.3, 11.5_
 
-- [ ] 6. Project documents for PR 1
-  - [ ] 6.1 Update `PLAN.md`
+- [x] 6. Project documents for PR 1
+  - [x] 6.1 Update `PLAN.md`
     - Item 6 ("Spec: web de demostración"): PR 1 in progress (list, live form, fallback, licence). "Pendientes": mark the MIT notice line of lukeed/sirv as closed. Note (g): mark it used. Note (e) ("en el navegador se guarda solo el progreso"): replace it with "nothing is saved". Add a short "Para retomar" note: PR 2 starts from `main` after the merge, task 8.1. `PLAN.md` may stay in Spanish.
     - Verify: `npm run check` exits `0`; `git status --short` shows only `PLAN.md`, `tasks.md` (and `tasks.meta.json`).
     - Commit message: `docs: update the plan for web demo PR 1`
     - _Requirements: 16.2, 16.3, 16.6_
 
-  - [ ] 6.2 Add the line to `docs/kiro-usage-log.md`
+  - [x] 6.2 Add the line to `docs/kiro-usage-log.md`
     - One new line about PR 1 of this spec, in the style and order of the file.
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: log Kiro usage for web demo PR 1`
     - _Requirements: 16.4_
 
-- [ ] 7. Final checkpoint and PR 1
-  - [ ] 7.1 Final check of PR 1
+- [~] 7. Final checkpoint and PR 1
+  - [x] 7.1 Final check of PR 1
     - Ensure all tests pass, ask the user if questions arise.
     - Run `npm run check` (exit `0`, no network needed); `git status --short` prints nothing.
     - Count the changed lines with `git diff --stat main...HEAD`, excluding `package-lock.json` and the JSON data (`report.json`, `files.json`); the licence text counts as data too.
@@ -262,28 +262,38 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `docs: close the web demo PR 1 tasks`
     - _Requirements: 15.4_
 
-  - [ ] 7.2 Open PR 1
-    - Push with `git push -u origin feat/web-demo`.
-    - Write the body to a file outside the repository (for example `$env:TEMP\pr1-body.md`), filling `.github/pull_request_template.md`, and run `gh pr create --base main --head feat/web-demo --title "feat: add the web demo ghost list and live form" --body-file <that file>`. Title under 70 characters.
-    - The body includes:
-      - What was built and what PR 2 adds.
-      - **Size warning**: the real changed-line count of task 7.1, that it is over about 500 lines, that the director accepted this size in the design, and that tests were not cut.
-      - The real-service check: the "Run result" of task 1.4.
+  - [-] 7.2 Open PR 1
+    - **Split into 4 stacked pull requests.** Task 7.1 measured 3,492 changed lines for PR 1 (without `package-lock.json`, `report.json`, `files.json`, `sirv-license.txt` and `.kiro/`). The director accepted splitting it into 4 stacked pull requests instead of the single ~3,492-line PR. Each piece is a branch created with `git branch <name> <commit>` on an existing commit of `feat/web-demo` (no rebase, no cherry-pick, no history rewrite); `feat/web-demo` stays as it is. Sizes below exclude the same files and `.kiro/`:
+
+      | Piece | Branch | Commits | Title | Size (code / tests / docs) |
+      |---|---|---|---|---|
+      | 1 | `feat/web-demo-1` | `f6d70df..91e519c` | `feat: add the web demo sample data and view model` | 1,111 (526 / 575 / 10) |
+      | 2 | `feat/web-demo-2` | `9fcbab7..729a340` | `feat: add the web demo page controller and live analysis` | 965 (215 / 750 / 0) |
+      | 3 | `feat/web-demo-3` | `bb0f3fb..62983a0` | `feat: add the web demo styles and house renderer` | 772 (699 / 73 / 0) |
+      | 4 | `feat/web-demo-4` | `245cd40..bd2bf6b` plus the docs commits of the split | `feat: wire the web demo page and add source checks` | 656 before the split docs commits (90 / 556 / 10; 241 of the 656 are deletions) |
+
+    - Stacked: piece 2 is based on piece 1, piece 3 on piece 2, piece 4 on piece 3. Piece 1 targets `main`; pieces 2 to 4 target the previous piece's branch until it is merged.
+    - Push and open one pull request at a time: piece 1 now (`git push -u origin feat/web-demo-1`), and each next piece only after the previous one is reviewed, when the director decides. Never push `feat/web-demo`.
+    - For each piece, write the body to a file outside the repository (for example `$env:TEMP\pr-web-demo-<n>-body.md`), filling `.github/pull_request_template.md`, and run `gh pr create --base <main or previous piece branch> --head feat/web-demo-<n> --title "<title of the table>" --body-file <that file>`. Titles are under 70 characters.
+    - Every body includes: which piece of 4 it is and the stacking; what it adds (its commits); its real size from `git diff --numstat` against its base (code / tests / docs apart, data and licence sizes apart); what a reviewer can check by hand; the merge order; that nothing was merged.
+    - Merge order 1, 2, 3, 4, each with "Create a merge commit" (no squash, no rebase merge), done by the director. After each merge, retarget the next pull request to `main` with `gh pr edit <number> --base main`.
+    - Piece 1 body (sample data commits) also includes the real-service check: the "Run result" of task 1.4.
+    - Piece 4 body (the page is wired here) also includes:
       - **Manual check of the live form after deploy (done by the director, not by Kiro)**, per Requirement 15.3:
         1. Open `https://devcaos.github.io/haunted-repo/` in a clean browser window.
         2. Paste `https://github.com/lukeed/sirv` in the form and submit.
         3. Success: the Ghost_List of the live report and the line "To exorcise the ghosts of this repository, use your own Kiro with the Haunted Repo Power."
         4. Fallback: the Sample_Report and the message "GitHub allows only 60 requests per hour without an account…".
       - Manual page checklist: keyboard only reaches every control; 360 px wide shows no page-wide horizontal scroll; the licence link opens the text; no request in the Network tab on load; changing one colour in `tokens.css` changes the page.
-      - That nothing was merged.
-    - Never merge. No commit in this task (the PR is opened from the commits above); mark it `[x]` in the first commit of PR 2.
+    - Never merge. No code commit in this task (the pull requests are opened from the commits above); mark it `[x]` in the first commit of PR 2.
+    - PR 2 (`feat/web-exorcism`) starts from `main` only after piece 4 is merged.
     - _Requirements: 15.2, 15.3_
 
 ### PR 2 — feat/web-exorcism
 
 - [ ] 8. Branch and Demo_Script
   - [ ] 8.1 Create the branch `feat/web-exorcism`
-    - Only after the director confirms that PR 1 is merged. Run `git checkout main`, `git pull`, then `git checkout -b feat/web-exorcism`. Check that `main` contains the PR 1 commits.
+    - Only after the director confirms that piece 4 of PR 1 (`feat/web-demo-4`, the last of the 4 stacked pull requests) is merged. Run `git checkout main`, `git pull`, then `git checkout -b feat/web-exorcism`. Check that `main` contains the commits of the 4 pieces.
     - No commit of its own; mark this task and task 7.2 `[x]` in the commit of task 8.2.
     - _Requirements: none (git workflow)_
 

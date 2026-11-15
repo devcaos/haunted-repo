@@ -161,3 +161,33 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** Luis Miguel empieza cada tarea con el botón Start task de `tasks.md`, una a una.
 
 - **Estado:** resuelto.
+
+## 2026-11-14 — la PR 1 de web-demo salió mucho más grande que la estimación del diseño
+
+- **Qué intentaba:** abrir la PR 1 de la spec web-demo (tarea 7.2) con el tamaño que estimaba el diseño, unas 2.350 líneas cambiadas.
+
+- **Qué pasó:** al contar las líneas en la tarea 7.1 salieron 3.492 (sin los datos JSON, el texto de la licencia ni `.kiro/`), unas 1.752 de ellas de tests.
+
+- **Cómo lo rodeé:** Luis Miguel aprobó partirla en 4 pull requests apilados (`feat/web-demo-1` a `feat/web-demo-4`), creados como ramas sobre commits que ya existían, sin reescribir la historia (tarea 7.2 de `tasks.md`).
+
+- **Estado:** resuelto.
+
+## 2026-11-14 — la herramienta de tareas cambió `tasks.md` sin commit y desmarcó la tarea 7.1
+
+- **Qué intentaba:** seguir con las tareas de la PR 1 de la spec web-demo.
+
+- **Qué pasó:** la herramienta de tareas de Kiro cambió `tasks.md` sin hacer commit y dejó la tarea 7.1 sin marcar, aunque ya estaba hecha.
+
+- **Cómo lo rodeé:** se restauró a mano la marca `[x]` de la tarea 7.1.
+
+- **Estado:** resuelto.
+
+## 2026-11-14 — la revisión de la PR #20 comparó tamaños medidos con reglas distintas
+
+- **Qué intentaba:** revisar la PR #20 (pieza 2 de 4 de web-demo) y comprobar su tamaño.
+
+- **Qué pasó:** la revisión contó 1.037 líneas añadidas frente a las 959 anunciadas y dio un reparto de 311 de código y 726 de tests. Las 1.037 incluían `.kiro/specs/web-demo/` (78 líneas de marcas de tareas), que el cuerpo de la PR excluía a propósito; el reparto también estaba mal: lo real es 213 de código (`page.ts` 194, `outcome.ts` 19) y 746 de tests. La cifra de la PR era correcta.
+
+- **Cómo lo rodeé:** Kiro lo detectó al ir a anotar la fricción y Luis Miguel eligió anotarla corregida, con las cifras de `git diff --numstat`. Al revisar tamaños, medir con la misma regla que el cuerpo de la PR (qué carpetas se excluyen).
+
+- **Estado:** resuelto.

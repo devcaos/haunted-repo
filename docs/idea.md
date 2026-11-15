@@ -30,11 +30,11 @@ Haunted Repo encuentra el código escrito por IA que todavía no entiendes (los 
 
 ## Piezas previstas
 - **Kiro Power** (paquete instalable de Kiro con herramientas MCP e instrucciones): la herramienta real. La IA que explica y corrige es la del Kiro de cada usuario, así que no hay APIs de pago.
-- **Hook** de Kiro que marca como fantasma cada archivo nuevo o cambiado por el agente.
+- **Detección de fantasmas** (cambio del 2026-11-11, ver `docs/decisiones.md`): hasta 5 archivos clave de un repo público de GitHub, de fácil a difícil, en tres plantas. Sustituye al hook de Kiro que marcaba cada archivo escrito por el agente.
 - **Web de demostración estática** con un repo de ejemplo ya "encantado" y preguntas ya generadas, para que el jurado pruebe sin instalar nada. Las bases exigen una aplicación que funcione en un enlace público, gratis hasta el 29 ene 2027.
 
 ## Categoría
-Provisional: **Costume Contest** (interfaz de terror que ayuda a la función). Revisar si encaja mejor en otra con menos competencia.
+Decidida: **Costume Contest** (interfaz de terror que ayuda a la función).
 
 ## Riesgos conocidos
 1. "Nadie quiere deberes": por eso el público principal son estudiantes y profesores.

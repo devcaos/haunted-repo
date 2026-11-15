@@ -1,22 +1,24 @@
 import { detectGhosts } from "@haunted-repo/core";
-import { createCheckHandler } from "./checkButton.js";
+import { createPage, type PageController } from "./logic/page.js";
+import { loadSample } from "./sample/sampleData.js";
+import reportJson from "./sample/report.json?raw";
+import filesJson from "./sample/files.json?raw";
+import { createSimpleRenderer } from "./view/simple/renderer.js";
+import "./view/simple/simple.css";
 
-const button = document.getElementById("check-button");
-const status = document.getElementById("status");
-
-if (!(button instanceof HTMLButtonElement) || status === null) {
-  throw new Error("Page is missing #check-button or #status");
+const root = document.getElementById("root");
+if (root === null) {
+  throw new Error("Page is missing #root");
 }
 
-const handler = createCheckHandler(detectGhosts, {
-  setBusy: (busy) => {
-    button.disabled = busy;
-  },
-  setStatus: (text) => {
-    status.textContent = text;
-  },
-});
+const sample = loadSample(reportJson, filesJson);
 
-button.addEventListener("click", () => {
-  void handler();
+// The callback runs only on user input, after `page` below exists.
+const renderer = createSimpleRenderer(root, (action) => {
+  void page.dispatch(action);
 });
+const page: PageController = createPage(
+  { detect: (url) => detectGhosts(url), sample },
+  renderer,
+);
+page.start();

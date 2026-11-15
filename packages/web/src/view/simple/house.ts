@@ -94,7 +94,7 @@ function renderWarnings(warnings: WarningsView): HTMLElement | null {
   return el("div", { class: "report-warnings" }, children);
 }
 
-/** The Ghost_List: a heading, the report warnings, the Power line and the three floors. */
+/** The Ghost_List: a heading, the report warnings, the live-report line and the three floors. */
 export function renderHouse(
   model: ViewModel,
   onAction: ActionSink,
