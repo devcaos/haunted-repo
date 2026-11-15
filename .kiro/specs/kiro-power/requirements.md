@@ -69,6 +69,7 @@ This spec does not change `packages/core`.
 6. THE Power SHALL NOT include the compiled test files (`*.test.js`, `*.testutil.js`) in what the Power_Server runs (`PLAN.md`, note a).
 7. THE Power_Server SHALL run on Node.js 24 on Windows, macOS and Linux.
 8. THE Tutor_Skill SHALL contain this instruction: IF the Power_Tools are not available, THEN the Tutor SHALL tell the Student in English to check that Node.js 24 is installed and to restart Kiro, and SHALL NOT run an exorcism. This criterion is checked by the manual spike (Requirement 11.7), not by an automated test.
+9. THE Power_Server that Kiro runs SHALL be a single bundled file, committed to git inside `packages/power/`, with `@modelcontextprotocol/sdk` and `@haunted-repo/core` inside it, because Kiro copies the Power folder as it is and installs no dependencies (no `node_modules/`, no `npm ci`, no build; `docs/spike-power.md`). The bundling tool and how CI checks that the committed file is up to date are decided in the design.
 
 ### Requirement 2: Find the ghosts of a public GitHub repository
 
@@ -258,7 +259,7 @@ If the work runs late, this is what stays and what goes first.
 These points need a decision by the project director or the reviewer before the design.
 
 1. **Source of the Ghost_Text. Decided (15 Nov 2026, Luis Miguel): GitHub.** The Ghost_Text comes from GitHub, as Detection does, not from the local disk (Requirement 3), through `getFileText` of the existing GitHub client. This replaces the note "the Power reads the local disk" of the exorcism spec (Decision 4 and "Out of Scope").
-2. **How the installed Power runs its server.** `dist/` is ignored by git, so a Power imported from GitHub would have no compiled server. Options for the design: commit one bundled server file, publish an npm package and start it with `npx`, or ask the Student to run `npm ci` and `npm run build`. Requirement 1.5 asks for no manual step beyond what the Tutor_Skill explains.
+2. **How the installed Power runs its server. Answered by the spike (15 Nov 2026): one bundled server file committed to git** (Requirement 1.9). Kiro copies `packages/power/` as it is, with no `node_modules/`, no `npm ci` and no build, and runs `node ${PLUGIN_ROOT}/<file>` (`docs/spike-power.md`). The other options (an npm package started with `npx`, or asking the Student to run `npm ci` and `npm run build`) are not used.
 3. **`tech.md` is out of date.** It says "`POWER.md` + steering files + MCP server"; the current Kiro docs say `plugin.json` + `skills/` + `mcp.json`. `tech.md` should be fixed in a separate docs change.
 4. **The value of Max_Verdict_Retries.** These requirements fix it at 2 (3 Judgements in total for one answer).
 5. **The Power_Data_Folder. Decided (15 Nov 2026, Luis Miguel, after the spike): option A of `docs/spike-power.md`.** The Power_Data_Folder is the folder in `PLUGIN_DATA`, outside the Student's project, with one Repository_Data_File per repository (Requirement 7). The Power_Server does not try to find the Workspace, so the question about the Student's `.gitignore` no longer applies. The file names are decided in the design (Requirement 7.11).
