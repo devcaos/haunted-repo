@@ -114,6 +114,7 @@ This spec does not change `packages/core`.
 8. FOR ALL Judgement texts, THE Power_Server SHALL send an Event if and only if `parseVerdict` accepts the text, and the Rating of that Event SHALL be the Verdict that `parseVerdict` returned (strict-verdict property).
 9. FOR ALL sequences of judgement Power_Tool calls, Invalid_Judgement_Count SHALL never be greater than Max_Verdict_Retries + 1, THE Power_Server SHALL return at most Max_Verdict_Retries Verdict_Retries in a row before a Verdict_Failure or an accepted Verdict, and the Session_State SHALL be equal to the one before after every rejected Judgement (bounded-retry property).
 10. A Judgement that is empty, has only spaces, has the Verdict in bold (`**VERDICT: right**`), has a space before `VERDICT:`, ends with a full stop, or has more than one `VERDICT:` line SHALL count as `INVALID_VERDICT`, because `parseVerdict` rejects it.
+11. WHEN the Tutor sends a Judgement and the Step is not `asking`, THE Power_Server SHALL return `INVALID_EVENT` with the allowed Events before calling `parseVerdict`, and SHALL NOT change Invalid_Judgement_Count.
 
 ### Requirement 6: Handle "I don't know"
 
