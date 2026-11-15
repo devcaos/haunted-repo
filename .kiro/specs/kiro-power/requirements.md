@@ -143,22 +143,22 @@ This spec does not change `packages/core`.
 3. WHEN the first `dont-know` for a question is accepted, THE Power_Server SHALL return the Engine's Tutor_Instructions for a Simpler_Explanation, and then the same question again (exorcism Requirements 5.3 to 5.5).
 4. WHEN the second `dont-know` for the same question is accepted, THE Power_Server SHALL return the Engine's Tutor_Instructions for a short model answer, and then the next question or the final decision (exorcism Requirement 5.6).
 
-### Requirement 7: Keep the data only in the user's own files
+### Requirement 7: Keep the data only on the user's own computer
 
-**User Story:** As a student, I want my report and my progress saved only in my own project folder, so that nothing about me or my code goes anywhere else.
+**User Story:** As a student, I want my report and my progress saved only on my own computer, in the folder that Kiro gives the Power, so that nothing about me or my code goes anywhere else.
 
 #### Acceptance Criteria
 
-1. THE Power_Server SHALL save the Haunted_Report and the Exorcism_Progress as JSON files inside the Power_Data_Folder of the Workspace, and SHALL NOT write any file outside the Power_Data_Folder.
-2. THE Power_Server SHALL write the Haunted_Report with `JSON.stringify` and the Exorcism_Progress with `formatProgress`, and SHALL read them back with `parseReport` and `parseProgress`.
+1. THE Power_Server SHALL save the Haunted_Report and the Exorcism_Progress of each repository as JSON in the Repository_Data_File of that repository, inside the Power_Data_Folder (one file per repository), and SHALL NOT write any file outside the Power_Data_Folder. THE Power_Server SHALL NOT try to find the Workspace and SHALL NOT need the MCP `roots` capability.
+2. THE Power_Server SHALL write the Haunted_Report with `JSON.stringify` and the Exorcism_Progress with `formatProgress`, and SHALL read them back with `parseReport` and `parseProgress`. How both values sit in one Repository_Data_File is decided in the design.
 3. WHEN a Ghost becomes `exorcised` or stays `haunted` after a full attempt, or the Student answers the self-check, THE Power_Server SHALL save the Exorcism_Progress before it returns the next Tutor_Instructions.
 4. THE Power_Server SHALL NOT save the text of the Student's answers, the Ghost_Text or the texts the Tutor wrote.
-5. IF a saved file is not a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL overwrite or delete that file only if the Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
+5. IF a Repository_Data_File does not hold a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL overwrite or delete that file only if the Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
 6. IF the Power_Data_Folder or one of its files cannot be written (for example, no permission or a read-only folder), THEN THE Power_Server SHALL return an English message that says the progress was not saved, and SHALL keep the Session_State in memory.
 7. THE Power_Server SHALL NOT send the Haunted_Report, the Exorcism_Progress or any usage data to any server, and SHALL NOT collect telemetry.
-8. FOR ALL valid Exorcism_Progress values, saving them to the Power_Data_Folder and reading them back SHALL give an equal value (save round-trip property).
+8. FOR ALL valid Exorcism_Progress values, saving them in a Repository_Data_File and reading them back SHALL give an equal value (save round-trip property).
 9. THE Power_Server SHALL keep the Session_State of an unfinished attempt only in memory; an unfinished attempt SHALL NOT be resumed after the Power_Server stops (exorcism Requirement 10.8: the Ghost stays `haunted`).
-10. IF the Power_Server cannot find the Workspace folder, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
+10. IF the `PLUGIN_DATA` environment variable is missing, or the folder it names cannot be written, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
 
 ### Requirement 8: Use no network except GitHub
 
