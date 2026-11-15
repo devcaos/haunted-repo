@@ -321,7 +321,7 @@ These open doubts of the design are settled by the approved design and are not r
     - _Requirements: 7.1, 7.11_
     - Approved ghosts: `bench/static.js` (score 7, attic, kind entry-point), `builder.js` (score 9, attic, kind logic). Approved by the director.
 
-  - [~] 8.5 Write the Tutor texts for the 2 easiest ghosts
+  - [x] 8.5 Write the Tutor texts for the 2 easiest ghosts
     - Act as the Tutor. For each approved ghost, get the instruction text of every step (`explaining`, `asking` for each question, `simplifying` for each question, `model-answer`, retry explanation after `retry-ghost`) by driving `startSession` and `advance` with the default profile (for example with a temporary local script that is not committed), and follow it: plain beginner words, an everyday analogy, behaviour questions, no line numbers, no comparison with Java (`java-forbidden`), explanation, retry explanation and each simpler explanation at most 150 words. The 3 questions follow, in order, the 3 objectives of `QUESTION_SETS` for the kind of that file; each simpler explanation is about the part of the file its question is about.
     - Create `packages/web/src/sample/demo-script.json` (hand-written, formatted by Prettier) with the 2 Ghost_Contents.
     - Extend `demoScript.test.ts` (committed content): the committed file parses `ok` (the last part of P2); it holds the 2 easiest ghosts by (score, path); every path is a sample ghost; `kind` equals `classifyFileKind(text, ghost.language)`; each reading text is at most 150 words; no line numbers (regex of the design).

@@ -1,6 +1,10 @@
+/// <reference types="node" />
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import fc from "fast-check";
+import { classifyFileKind, parseReport } from "@haunted-repo/core";
 import type { FileKind } from "@haunted-repo/core";
+import { parseSampleFiles } from "../sample/sampleData.js";
 import { contentOf, parseDemoScript } from "./demoScript.js";
 import type { GhostContent } from "./demoScript.js";
 
@@ -253,5 +257,80 @@ describe("contentOf", () => {
 
   it("returns null when there is no script", () => {
     expect(contentOf(null, "a.js")).toBeNull();
+  });
+});
+
+function readCommitted(relative: string): string {
+  return readFileSync(new URL(relative, import.meta.url), "utf8");
+}
+
+describe("the committed demo script", () => {
+  const scriptJson = readCommitted("../sample/demo-script.json");
+  const report = parseReport(readCommitted("../sample/report.json"));
+  const files = parseSampleFiles(readCommitted("../sample/files.json"));
+  if (!report.ok || !files.ok) throw new Error("the sample does not parse");
+  const ghosts = report.value.ghosts;
+  const script = parseDemoScript(scriptJson);
+  const entries = script.ok ? script.value.ghosts : [];
+
+  it("parses ok", () => {
+    expect(script.ok).toBe(true);
+  });
+
+  it("holds the 2 easiest ghosts by score, then path", () => {
+    const easiest = [...ghosts]
+      .sort((a, b) =>
+        a.difficultyScore !== b.difficultyScore
+          ? a.difficultyScore - b.difficultyScore
+          : a.path < b.path
+            ? -1
+            : a.path > b.path
+              ? 1
+              : 0,
+      )
+      .slice(0, 2)
+      .map((ghost) => ghost.path);
+    const paths = entries.map((entry) => entry.path);
+    expect(paths).toEqual(expect.arrayContaining(easiest));
+  });
+
+  it("uses only ghost paths of the sample", () => {
+    const sample = ghosts.map((ghost) => ghost.path);
+    for (const entry of entries) expect(sample).toContain(entry.path);
+  });
+
+  it("gives each ghost the kind that classifyFileKind finds", () => {
+    for (const entry of entries) {
+      const ghost = ghosts.find((g) => g.path === entry.path)!;
+      const text = files.value.texts[entry.path]!;
+      expect(entry.kind).toBe(classifyFileKind(text, ghost.language));
+    }
+  });
+
+  it("keeps every reading text at most 150 words", () => {
+    for (const entry of entries) {
+      for (const text of [
+        entry.explanation,
+        entry.retryExplanation,
+        ...entry.simpler,
+      ]) {
+        expect(text.trim().split(/\s+/).length).toBeLessThanOrEqual(150);
+      }
+    }
+  });
+
+  it("has no line numbers in any text", () => {
+    for (const entry of entries) {
+      const texts = [
+        entry.explanation,
+        entry.retryExplanation,
+        ...entry.questions,
+        ...entry.simpler,
+        ...entry.modelAnswers,
+      ];
+      for (const text of texts) {
+        expect(text).not.toMatch(/\blines?\s+\d+|\bL\d+\b/i);
+      }
+    }
   });
 });
