@@ -2,6 +2,7 @@ import type { ActionSink, UserAction } from "../../logic/actions.js";
 import { TEXTS } from "../../logic/texts.js";
 import type { GhostView, ViewModel } from "../../logic/viewModel.js";
 import { el } from "./dom.js";
+import { focusKeyOf } from "./focus.js";
 import { renderLicence } from "./licence.js";
 
 /** The label of a ghost action, or null for an action the panel does not show. */
@@ -99,7 +100,11 @@ export function renderGhost(
     const label = ghostLabel(entry);
     if (label === null) return [];
     const action: UserAction = entry;
-    const button = el("button", { type: "button" }, [label]);
+    const button = el(
+      "button",
+      { type: "button", "data-focus-key": focusKeyOf(entry) },
+      [label],
+    );
     button.addEventListener("click", () => onAction(action));
     return [button];
   });

@@ -9,6 +9,24 @@ import { el } from "./dom.js";
 import { createAnswerBox, renderGhost } from "./ghost.js";
 import { renderHouse } from "./house.js";
 import { renderLicence } from "./licence.js";
+import { type FocusBefore, focusAfterRender, focusKeyOf } from "./focus.js";
+
+/** Where focus is now, seen from the rebuilt `main` element. */
+function focusBefore(main: HTMLElement): FocusBefore {
+  const active = document.activeElement;
+  if (!(active instanceof HTMLElement) || !main.contains(active)) {
+    return { where: "outside" };
+  }
+  return { where: "main", key: active.dataset.focusKey ?? null };
+}
+
+/** The element of `main` with this focus key, compared as plain text (no selector escaping). */
+function byFocusKey(main: HTMLElement, key: string): HTMLElement | null {
+  for (const node of main.querySelectorAll<HTMLElement>("[data-focus-key]")) {
+    if (node.dataset.focusKey === key) return node;
+  }
+  return null;
+}
 
 /** Actions this renderer shows as buttons above the Ghost_List, with their label. */
 function actionButton(
@@ -70,11 +88,11 @@ export function createSimpleRenderer(
   );
 
   // Purely visual state: the Answer_Box of the question on screen (kept so the
-  // typed text survives a re-render of the same question) and the last ghost
-  // step drawn (to move focus only when the step changed).
+  // typed text survives a re-render of the same question) and the last model
+  // drawn (to decide where focus goes, see focus.ts).
   let answerBox: HTMLTextAreaElement | null = null;
   let answerKey: string | null = null;
-  let lastStep: string | null = null;
+  let lastModel: ViewModel | null = null;
 
   return {
     render(model: ViewModel): void {
@@ -91,7 +109,11 @@ export function createSimpleRenderer(
       const buttons = model.available.flatMap((entry) => {
         const shown = actionButton(entry);
         if (shown === null) return [];
-        const button = el("button", { type: "button" }, [shown.label]);
+        const button = el(
+          "button",
+          { type: "button", "data-focus-key": focusKeyOf(entry) },
+          [shown.label],
+        );
         button.addEventListener("click", () => onAction(shown.action));
         return [button];
       });
@@ -118,18 +140,21 @@ export function createSimpleRenderer(
         answerKey = null;
         if (model.house !== null) content.push(renderHouse(model, onAction));
       }
+      const before = focusBefore(main);
       main.replaceChildren(...content);
 
-      // Focus moves into the Exorcism_Panel when it opens and at every new
-      // step, so it never falls back to <body> (Requirement 6.7).
-      const step = ghost === null ? null : ghost.step;
-      if (
-        heading !== null &&
-        (model.transition !== null || step !== lastStep)
-      ) {
-        heading.focus();
+      // Rebuilding `main` drops the focus of any element inside it, so focus
+      // is put back on a stable element and never falls to <body>
+      // (Requirements 6.7, 12.1).
+      const target = focusAfterRender(lastModel, model, before);
+      lastModel = model;
+      let focusEl: HTMLElement | null = null;
+      if (target.kind === "ghost-heading") focusEl = heading;
+      if (target.kind === "list-heading") {
+        focusEl = main.querySelector<HTMLElement>(".list-heading");
       }
-      lastStep = step;
+      if (target.kind === "key") focusEl = byFocusKey(main, target.key);
+      focusEl?.focus();
 
       footer.replaceChildren(
         ...(model.licence === null ? [] : [renderLicence(model.licence)]),

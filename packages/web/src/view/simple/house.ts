@@ -12,6 +12,7 @@ import type {
 import type { AssetSlotId } from "../assets/manifest.js";
 import { resolveSlot } from "../assets/resolve.js";
 import { el } from "./dom.js";
+import { focusKeyOf } from "./focus.js";
 
 const SCENE_SLOT: Record<Floor, AssetSlotId> = {
   attic: "scene.attic",
@@ -54,9 +55,15 @@ function renderCard(card: GhostCardView, onAction: ActionSink): HTMLElement {
   }
   // canStart is true exactly when start-ghost for this path is available (P8).
   if (card.canStart) {
-    const start = el("button", { type: "button", class: "start" }, [
-      TEXTS.actionLabels["start-ghost"],
-    ]);
+    const start = el(
+      "button",
+      {
+        type: "button",
+        class: "start",
+        "data-focus-key": focusKeyOf({ type: "start-ghost", path: card.path }),
+      },
+      [TEXTS.actionLabels["start-ghost"]],
+    );
     start.addEventListener("click", () =>
       onAction({ type: "start-ghost", path: card.path }),
     );
@@ -130,7 +137,10 @@ export function renderHouse(
   if (house === null) return el("div", { class: "ghost-list" });
   const children: HTMLElement[] = [
     ...slotImages("scene.house"),
-    el("h2", {}, [TEXTS.houseHeading(house.repoName)]),
+    // tabindex="-1": the renderer can move focus here (focus.ts).
+    el("h2", { class: "list-heading", tabindex: "-1" }, [
+      TEXTS.houseHeading(house.repoName),
+    ]),
   ];
   if (house.houseClean !== null) {
     children.push(el("p", { class: "house-clean" }, [house.houseClean]));
