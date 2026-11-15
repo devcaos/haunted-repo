@@ -395,7 +395,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check every available action is accepted`
     - _Requirements: 4.10, 6.3, 6.5, 6.6, 6.8, 6.9, 6.15, 6.17, 6.20, 6.25, 18.3_
 
-  - [~] 10.6 Property test for the Sample_Session isolation
+  - [x] 10.6 Property test for the Sample_Session isolation
     - **Property 9: A live analysis never changes the Sample_Session**
     - **Validates: Requirements 4.11, 4.12**
     - Generator: `choicesArb` for a judge path stopped in a `house` or `floor` scene, plus the outcome generator of P7. Checks: after `submit-live` and then `show-sample` (when available), the session is the same object and the sample house has the same card states and progress.
