@@ -22,6 +22,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Pendientes (Low, ideas, "después si da tiempo")
 - Low (spec kiro-power, 15 nov): `tech.md` dice que un Power es "`POWER.md` + steering + servidor MCP"; la documentación actual de Kiro dice `plugin.json` + `skills/` + `mcp.json`. Corregirlo en una rama de docs aparte.
+- Low (revisión de requisitos kiro-power, 15 nov): la línea de corte ("Cut line") no incluye 7.8, aunque 11.4 pide su test de propiedad.
+- Low (revisión de requisitos kiro-power, 15 nov): si se recorta 7.5, no se dice qué pasa con `INVALID_REPORT`.
+- Low (revisión de requisitos kiro-power, 15 nov): el glosario dice "3 rejections before the failure", pero el tercer rechazo ya es el fallo.
+- Low (revisión de requisitos kiro-power, 15 nov): una frase antigua en "Para retomar".
 - "Certificado de exorcismo" para profesores: fuera de alcance por ahora; Luis Miguel quiere reconsiderarlo (decisión pendiente)
 - Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
 - Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
