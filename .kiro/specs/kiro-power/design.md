@@ -399,6 +399,11 @@ The Power has pure logic with large input spaces (judgement texts, owner and rep
 
   The whole check of step 2: run `find_ghosts` on `lukeed/sirv`, exorcise one ghost, answer "I don't know" once, and see at least one Verdict_Retry (the check may force one by asking the Tutor to end a judgement with a full stop). Also check: the Tutor writes in English only, one question per message, does not leak the model answer, tells the Student about a `warning` once, and asks before `replace: true`. The results of steps 2 and 3 go in `docs/spike-power-e2e.md`. For the video, this is the take to record: ghost list, one exorcism with one "I don't know", the map from `house_status`.
 
+### Notes for tasks.md
+
+- The first task builds the bundle, the stdio smoke test and the CI step that checks the committed bundle (section 2), including the Windows/Linux determinism check of doubt 12.4. This removes the biggest risk first.
+- The manual end-to-end check in Kiro (section 10) is planned for about 22 Nov 2026.
+
 ## 12. Doubts for the project director
 
 1. **Bundle built in CI instead of committed?** Options: (a) commit the bundle and check it with `git status --porcelain` in CI (this design; required by Requirement 1.9 because Kiro installs from GitHub); (b) build only in CI and publish it from another branch (more moving parts). Recommendation: (a).
