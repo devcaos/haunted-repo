@@ -204,6 +204,40 @@ button:disabled {
   border-style: dashed;
 }
 
+.ghost-card .locked-line {
+  color: var(--color-cold);
+  font-size: var(--text-small);
+}
+
+.ghost-card[data-ghost-state="exorcised"] .state {
+  color: var(--color-cold);
+}
+
+.ghost-card .start {
+  margin-top: var(--space-2);
+}
+
+/* Progress_Indicator and house-clean line */
+
+.progress p {
+  margin-bottom: var(--space-1);
+  color: var(--color-text);
+}
+
+.progress progress {
+  width: var(--size-full);
+  height: var(--space-3);
+  accent-color: var(--color-candle);
+}
+
+.house-clean {
+  padding: var(--space-3);
+  border: var(--size-line) solid var(--color-cold);
+  border-radius: var(--size-radius);
+  background: var(--color-panel);
+  color: var(--color-light);
+}
+
 .empty {
   color: var(--color-muted);
   font-style: italic;

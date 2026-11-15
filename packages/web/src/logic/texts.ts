@@ -30,12 +30,14 @@ export const TEXTS = {
   sampleBroken: "The sample could not be loaded. Please reload the page.",
   formLabel: "Public GitHub repository URL",
   // Labels of user actions. Any renderer may use them as button text or
-  // accessible names. The ghost action labels are added in PR 2.
+  // accessible names. The labels of the Exorcism_Panel actions are added
+  // with the panel.
   actionLabels: {
     "submit-live": "Find the ghosts",
     "show-sample": "Show the sample again",
     "go-to-house": "Back to the house",
     "go-to-floor": "Go to this floor",
+    "start-ghost": "Start the exorcism",
   },
   // PR 2: the sample exorcism.
   judgeLine:

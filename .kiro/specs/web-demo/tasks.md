@@ -413,11 +413,11 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): extend view model checks to the ghost scene`
     - _Requirements: 4.3, 4.9, 4.10, 6.17, 11.7, 11.8, 18.1, 18.2, 18.3, 18.4_
 
-- [~] 11. Checkpoint - logic of PR 2
+- [x] 11. Checkpoint - logic of PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Presentation of the exorcism
-  - [~] 12.1 Draw progress, locked ghosts and the house-clean line
+  - [x] 12.1 Draw progress, locked ghosts and the house-clean line
     - In `view/simple/house.ts`: the Progress_Indicator (line plus native `<progress max="1">` with `share`), the locked line on locked cards (from the model, which takes it from `POWER_TEXTS`), the start button on cards with `canStart`, the `exorcised` state label, the house-clean line. Extend `simple.css` with tokens only.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw progress and ghost states`

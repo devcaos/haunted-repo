@@ -5,6 +5,7 @@ import type {
   FloorView,
   GhostCardView,
   HouseView,
+  ProgressView,
   ViewModel,
   WarningsView,
 } from "../../logic/viewModel.js";
@@ -41,7 +42,7 @@ function ghostStateNodes(card: GhostCardView): HTMLElement[] {
   return [];
 }
 
-function renderCard(card: GhostCardView): HTMLElement {
+function renderCard(card: GhostCardView, onAction: ActionSink): HTMLElement {
   const children: HTMLElement[] = [
     el("p", {}, [el("code", { class: "path" }, [card.path])]),
     el("p", { class: "score" }, [TEXTS.scoreLine(card.score)]),
@@ -51,6 +52,16 @@ function renderCard(card: GhostCardView): HTMLElement {
   if (card.lockedLine !== null) {
     children.push(el("p", { class: "locked-line" }, [card.lockedLine]));
   }
+  // canStart is true exactly when start-ghost for this path is available (P8).
+  if (card.canStart) {
+    const start = el("button", { type: "button", class: "start" }, [
+      TEXTS.actionLabels["start-ghost"],
+    ]);
+    start.addEventListener("click", () =>
+      onAction({ type: "start-ghost", path: card.path }),
+    );
+    children.push(start);
+  }
   return el(
     "li",
     { class: "ghost-card", "data-ghost-state": card.state },
@@ -58,7 +69,7 @@ function renderCard(card: GhostCardView): HTMLElement {
   );
 }
 
-function renderFloor(floor: FloorView): HTMLElement {
+function renderFloor(floor: FloorView, onAction: ActionSink): HTMLElement {
   const children: HTMLElement[] = [
     ...slotImages(SCENE_SLOT[floor.floor]),
     el("h3", {}, [floor.title]),
@@ -67,7 +78,13 @@ function renderFloor(floor: FloorView): HTMLElement {
     children.push(el("p", { class: "empty" }, [floor.emptyLine]));
   }
   if (floor.ghosts.length > 0) {
-    children.push(el("ul", {}, floor.ghosts.map(renderCard)));
+    children.push(
+      el(
+        "ul",
+        {},
+        floor.ghosts.map((card) => renderCard(card, onAction)),
+      ),
+    );
   }
   return el("section", { class: "floor", "data-floor": floor.floor }, children);
 }
@@ -94,23 +111,36 @@ function renderWarnings(warnings: WarningsView): HTMLElement | null {
   return el("div", { class: "report-warnings" }, children);
 }
 
-/** The Ghost_List: a heading, the report warnings, the live-report line and the three floors. */
+/** The Progress_Indicator: the line plus a native progress bar with the haunted share. */
+function renderProgress(progress: ProgressView): HTMLElement {
+  const bar = el("progress", {
+    max: "1",
+    value: String(progress.share),
+    "aria-label": progress.line,
+  });
+  return el("div", { class: "progress" }, [el("p", {}, [progress.line]), bar]);
+}
+
+/** The Ghost_List: a heading, the progress, the warnings, the live-report line and the three floors. */
 export function renderHouse(
   model: ViewModel,
   onAction: ActionSink,
 ): HTMLElement {
-  void onAction; // PR 2 adds the start button of each card
   const house: HouseView | null = model.house;
   if (house === null) return el("div", { class: "ghost-list" });
   const children: HTMLElement[] = [
     ...slotImages("scene.house"),
     el("h2", {}, [TEXTS.houseHeading(house.repoName)]),
   ];
+  if (house.houseClean !== null) {
+    children.push(el("p", { class: "house-clean" }, [house.houseClean]));
+  }
+  if (house.progress !== null) children.push(renderProgress(house.progress));
   const warnings = renderWarnings(house.warnings);
   if (warnings !== null) children.push(warnings);
   if (house.powerLine !== null) {
     children.push(el("p", { class: "power-line" }, [house.powerLine]));
   }
-  children.push(...house.floors.map(renderFloor));
+  children.push(...house.floors.map((floor) => renderFloor(floor, onAction)));
   return el("div", { class: "ghost-list" }, children);
 }
