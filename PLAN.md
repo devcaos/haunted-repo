@@ -5,7 +5,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Nada. Lo siguiente es la PR 2 de la spec `web-demo`: el exorcismo grabado, rama `feat/web-exorcism`, tareas 8 a 16 de `.kiro/specs/web-demo/tasks.md`.
+- PR 2 de la spec `web-demo` (el exorcismo grabado, tareas 8 a 16), partida en 4 PR apiladas porque midió 2.973 líneas y el límite es 900. Pieza 1 fusionada (#24). Pieza 2 abierta (#25, `feat/web-exorcism-2`, 859 líneas), pendiente de revisión. Piezas 3 y 4 pendientes de abrir.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
@@ -13,7 +13,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 3. [x] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo; hechos los 3 spikes del 2026-11-11)
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
-6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`, aprobada). PR 1 hecha: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, en cuatro PR apiladas (#19, #20, #21 y #22, fusionadas). Falta la PR 2 (`feat/web-exorcism`, tareas 8 a 16): el exorcismo grabado
+6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`, aprobada). PR 1 hecha: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, en cuatro PR apiladas (#19, #20, #21 y #22, fusionadas). PR 2 (el exorcismo grabado, tareas 8 a 16) partida en 4 PR apiladas: pieza 1 fusionada (#24), pieza 2 abierta (#25), piezas 3 y 4 pendientes
 7. [ ] Spec: empaquetar como Kiro Power (después de la web de demostración)
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
 9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR #13 fusionada)
@@ -52,6 +52,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Medium (revisión PR #21, web-demo pieza 3): `manifest.test.ts` (líneas 33-50) recorre `allLayers`, que está vacío, así que esos tests hoy no pueden fallar. Arreglo: sacar la comprobación a una función y probarla con una capa de ejemplo válida y otra con `https://`.
 - Low (revisión PR #21, web-demo pieza 3): `resolve.ts` y `house.ts` no tienen tests; el caso "hueco con capas y un archivo que falta" no se ejecuta. Arreglo: pasar el mapa de URL a `resolveSlot` como parámetro y probarlo en Node.
 - Low (revisión PR #21, web-demo pieza 3): en `house.ts`, `ghostStateNodes` repite el `map` de `img` de `slotImages`; que llame a `slotImages`.
+- Piezas 3 y 4 de la PR 2 de web-demo: sin abrir. Ramas locales `feat/web-exorcism-3` (685 líneas, tests de los estados finales y propiedades) y `feat/web-exorcism-4` (678 líneas más el commit de docs del reparto, panel del exorcismo y progreso). Se abren de una en una cuando Luis Miguel lo decida.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
@@ -69,8 +70,8 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé (15 nov): en `main` están la detección de fantasmas (PR #11 y #12), el despliegue en Pages (PR #13), el motor del exorcismo (PR #14) y la PR 1 completa de la web de demostración (PR #19 a #22, la última fusionada el 15 nov). La web es pública en https://devcaos.github.io/haunted-repo/ y enseña la lista de fantasmas de lukeed/sirv y el formulario en vivo; todavía no enseña el exorcismo. El bloque de cierre (README, un solo hook de tests, decisiones del 15 nov y este plan) va en la rama `docs/closing-block`, pendiente de que Luis Miguel lo fusione.
-- Lo próximo: la PR 2 de la web de demostración. Crear la rama `feat/web-exorcism` desde `main` actualizado (tarea 8.1 de `.kiro/specs/web-demo/tasks.md`) y seguir con las tareas 8 a 16; la 7.2 se marca `[x]` en el commit de la 8.2. En la PR 2 se arregla también el Medium del foco del teclado (ver "Pendientes"). Después, la spec del Kiro Power (punto 7 de "Siguientes").
+- Dónde lo dejé (15 nov): en `main` están la detección de fantasmas (PR #11 y #12), el despliegue en Pages (PR #13), el motor del exorcismo (PR #14), la PR 1 completa de la web de demostración (PR #19 a #22), el bloque de cierre (PR #23) y la pieza 1 de 4 de la PR 2 de la web (PR #24: guion de la demo y estados de las tarjetas, sin cambio visible). La web es pública en https://devcaos.github.io/haunted-repo/ y enseña la lista de fantasmas de lukeed/sirv y el formulario en vivo; todavía no enseña el exorcismo. La pieza 2 (PR #25, `feat/web-exorcism-2`: el controlador que lleva el exorcismo, 859 líneas) está abierta. Las piezas 3 y 4 son ramas locales sin subir.
+- Lo próximo: Luis Miguel revisa y fusiona la pieza 2 (PR #25, "Create a merge commit"). Después se abre la pieza 3 (`feat/web-exorcism-3`, base `main`) y luego la 4, de una en una. La rama `feat/web-exorcism` no se sube nunca. La tarea 15.1 de `.kiro/specs/web-demo/tasks.md` se marca `[x]` cuando estén abiertas las 4 PR. El Medium del foco del teclado (ver "Pendientes") se arregla en la pieza 4. Después, la spec del Kiro Power (punto 7 de "Siguientes").
 - Hitos: versión mínima funcionando el 20 nov (según `tasks.md` de web-demo, la PR 1 sola ya es la versión mínima), código congelado el 27 nov y entrega el 4 dic de 2026 a las 23:00 (hora de España). Si vamos tarde, `tasks.md` de web-demo dice qué recortar y en qué orden ("If we run late").
 - Qué existe en `packages/core` (`@haunted-repo/core`, carpeta `src/ghost-detection/`): `detectGhosts(url, opts)` devuelve un `Result` con un `HauntedReport`; `parseReport`, `parseRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport` y `createGitHubClient`, todo exportado desde `src/index.ts`. Solo usa `fetch`, `TextDecoder` y `AbortSignal` (sin APIs de Node), para que funcione en el navegador.
 - Test en vivo: `npm run test:live` llama al GitHub real (`lukeed/sirv`, sin token) y gasta hasta 8 de las 60 peticiones por hora. No forma parte de `npm run check` ni de `npm test`. Si falla por límite de peticiones, esperar a que se reinicie y repetir.
