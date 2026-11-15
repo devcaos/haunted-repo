@@ -313,12 +313,13 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the demo script parser`
     - _Requirements: 7.4, 7.5, 7.8_
 
-  - [~] 8.4 Confirm the 2 easiest ghosts with the director
+  - [x] 8.4 Confirm the 2 easiest ghosts with the director
     - From the committed `packages/web/src/sample/report.json`, sort the ghosts by `difficultyScore` ascending, then by path with `a < b` (the order of `suggestGhost`). Tell the director, in Spanish, the 2 first paths with their score and floor, and the kind that `classifyFileKind` gives on each Ghost_Text.
     - WAIT for an explicit "yes". Write no Ghost_Content text before it.
     - After the "yes", write the 2 paths under this task in `tasks.md` as a sub-bullet "Approved ghosts: ...", mark it `[x]` and commit.
     - Commit message: `docs: record the two demo ghosts`
     - _Requirements: 7.1, 7.11_
+    - Approved ghosts: `bench/static.js` (score 7, attic, kind entry-point), `builder.js` (score 9, attic, kind logic). Approved by the director.
 
   - [~] 8.5 Write the Tutor texts for the 2 easiest ghosts
     - Act as the Tutor. For each approved ghost, get the instruction text of every step (`explaining`, `asking` for each question, `simplifying` for each question, `model-answer`, retry explanation after `retry-ghost`) by driving `startSession` and `advance` with the default profile (for example with a temporary local script that is not committed), and follow it: plain beginner words, an everyday analogy, behaviour questions, no line numbers, no comparison with Java (`java-forbidden`), explanation, retry explanation and each simpler explanation at most 150 words. The 3 questions follow, in order, the 3 objectives of `QUESTION_SETS` for the kind of that file; each simpler explanation is about the part of the file its question is about.
