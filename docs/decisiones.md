@@ -28,6 +28,12 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-12 | Un fantasma queda exorcizado con al menos 2 de 3 respuestas buenas, si la primera (pregunta central) no está mal | Requisitos aprobados de la spec exorcism | — |
 | 2026-11-12 | La spec del exorcismo va en una sola PR (#14) | Decisión de Luis Miguel: partirla al final era inviable para él | Partir la PR en varias |
 | 2026-11-14 | La PR 1 de la spec web-demo se parte en 4 PR apiladas (`feat/web-demo-1` a `feat/web-demo-4`), que se fusionan en orden 1, 2, 3, 4 con "Create a merge commit" | Decisión de Luis Miguel. La tarea 7.1 midió 3.492 líneas cambiadas frente a las 2.350 que estimaba el diseño; las 4 piezas tienen de 656 a 1.111 líneas (tabla de la tarea 7.2 de `tasks.md`) | Una sola PR de unas 3.492 líneas |
+| 2026-11-15 | Categoría: **Costume Contest** (decidida) | Decisión de Luis Miguel | Otra categoría con menos competencia |
+| 2026-11-15 | Bonus: se hacen todos (entrada de blog en DEV.to y post con #KiroweenHackathon26) | Decisión de Luis Miguel | — |
+| 2026-11-15 | Las 7 propiedades opcionales del exorcismo (grupo 8 de `tasks.md` de `exorcism`) solo se hacen si queda tiempo | Decisión de Luis Miguel | — |
+| 2026-11-15 | "Certificado de exorcismo": sigue fuera de alcance por ahora; decisión pendiente | Luis Miguel quiere reconsiderarlo | — |
+| 2026-11-15 | Hook de tests: solo el hook de comando (sustituye a la fila de los dos hooks del 11 nov) | Decisión de Luis Miguel | Hook de tipo agente (borrado de `.kiro/hooks/test-after-task.json`) |
+| 2026-11-15 | El Kiro Power va después de la web de demostración | Decisión de Luis Miguel | — |
 
 ## Rechazado (no volver a proponer sin evidencia nueva)
 
