@@ -5,18 +5,19 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 **Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
 
 ## En curso
-- Nada en curso. Lo siguiente es la spec de la web de demostración (punto 6 de "Siguientes").
+- Spec `web-demo` (aprobada) en construcción. La PR 1 se partió en cuatro PR apiladas: #19, #20 y #21 fusionadas; la pieza 4 (`feat/web-demo-4`) está en revisión. La PR 2 (`feat/web-exorcism`) empieza después de fusionar la pieza 4.
 
 ## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
 1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
 2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea)
-3. [ ] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo)
+3. [x] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo; hechos los 3 spikes del 2026-11-11)
 4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
 5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
-6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`; PR 1 en curso en `feat/web-demo`: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia; la PR 2 añade el exorcismo grabado)
-7. [ ] Spec: empaquetar como Kiro Power
+6. [ ] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`, aprobada y en construcción; PR 1: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, partida en cuatro PR apiladas: #19, #20 y #21 fusionadas, pieza 4 en revisión; la PR 2, `feat/web-exorcism`, añade el exorcismo grabado y empieza después de fusionar la pieza 4)
+7. [ ] Spec: empaquetar como Kiro Power (después de la web de demostración)
 8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
 9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR #13 fusionada)
+10. [ ] Bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26 (se harán)
 
 ## Pendientes (Low, ideas, "después si da tiempo")
 - Decidir la categoría definitiva (Costume Contest u otra con menos competencia)
@@ -68,12 +69,13 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Para retomar (traspaso)
 
-- Dónde lo dejé: Detección de fantasmas (PR #11 y #12), despliegue en Pages (PR #13) y motor del exorcismo (PR #14, 12 nov) están en main. La web es pública en https://devcaos.github.io/haunted-repo/.
+- Dónde lo dejé: Detección de fantasmas (PR #11 y #12), despliegue en Pages (PR #13) y motor del exorcismo (PR #14, 12 nov) están en main. De la web de demostración están en main las piezas 1 a 3 de la PR 1 (#19, #20 y #21); la pieza 4 está en revisión. La web es pública en https://devcaos.github.io/haunted-repo/.
 - Qué existe en `packages/core` (`@haunted-repo/core`, carpeta `src/ghost-detection/`): `detectGhosts(url, opts)` devuelve un `Result` con un `HauntedReport`; `parseReport`, `parseRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport` y `createGitHubClient`, todo exportado desde `src/index.ts`. Solo usa `fetch`, `TextDecoder` y `AbortSignal` (sin APIs de Node), para que funcione en el navegador.
 - Test en vivo: `npm run test:live` llama al GitHub real (`lukeed/sirv`, sin token) y gasta hasta 8 de las 60 peticiones por hora. No forma parte de `npm run check` ni de `npm test`. Si falla por límite de peticiones, esperar a que se reinicie y repetir.
 - `web` ya depende de `@haunted-repo/core`; `power` todavía NO. Cada spec posterior que use `core` en un paquete que aún no lo tenga debe añadir `"@haunted-repo/core": "0.0.0"` en su `package.json` y actualizar `package-lock.json`. El script `build` de la raíz lista `core`, `power` y `web` en ese orden; un paquete nuevo se añade en el sitio correcto.
 - Qué estaba a medias: queda decidir qué hook se deja, el de comando o el de agente (.kiro/hooks/test-after-task.json), y si la salida del hook de comando llega al agente.
-- Lo próximo: spec de la web de demostración (punto 6 de "Siguientes"); después, la del Power (punto 7). Sigue pendiente el spike (punto 3).
+- Lo próximo: terminar la web de demostración (punto 6 de "Siguientes": pieza 4 y después la PR 2); después, la spec del Power (punto 7).
+- Categoría: Costume Contest (decidida).
 - Spec de exorcismo (fusionada, PR #14):
   - Qué existe en `packages/core/src/exorcism/`: funciones puras, sin red, sin `Date` ni `Math.random` (lo vigila `purity.test.ts`). `startSession`, `advance` (devuelve un `Transition`: un objeto con `ok: true`, el nuevo estado y las instrucciones; o con `ok: false`, un error y el mismo estado), `decide`, `buildInstructions`, `parseEvent`, `ALLOWED_EVENTS`, `formatVerdict`/`parseVerdict`, `classifyFileKind`, `QUESTION_SETS`, `suggestGhost`, `isPickable`, progreso (`normaliseProgress`, `parseProgress`, `formatProgress`, `hauntedShare`) y grabación (`parseRecording`, `formatRecording`, `replay`). Todo se exporta desde `src/index.ts`.
   - Cómo empezar una sesión: `startSession(report, { progress, profile })` y después `advance(state, event)` con cada evento (`pick-ghost`, `explanation-done`, `answer-rated`, `dont-know`, ...). El estado y las instrucciones son JSON puro, así que se pueden guardar.
@@ -87,4 +89,4 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
   - (f) web: la grabación no guarda el texto del "por qué" de cada veredicto; si la demo lo enseña, necesita un campo propio, y una grabación más rica que tinySession.
   - (g) web: npm test sin npm run build antes usa el dist/ compilado de core (falla si no existe y prueba código viejo si está desfasado); en el diseño, valorar un alias de @haunted-repo/core a packages/core/src en vitest.config.ts. Usada: el alias está en `vitest.config.ts` (web-demo, tarea 1.1).
   - (h) Power: parseVerdict rechaza "**VERDICT: right**", un espacio delante o un punto final; el Power debe volver a pedir el veredicto si recibe INVALID_VERDICT.
-- Web de demostración (spec `web-demo`): la PR 2 (rama `feat/web-exorcism`) se crea desde `main` actualizado solo después de que Luis Miguel fusione la PR 1, y empieza por la tarea 8.1 de `.kiro/specs/web-demo/tasks.md`.
+- Web de demostración (spec `web-demo`): la PR 2 (rama `feat/web-exorcism`) se crea desde `main` actualizado solo después de que Luis Miguel fusione la pieza 4 de la PR 1 (`feat/web-demo-4`), y empieza por la tarea 8.1 de `.kiro/specs/web-demo/tasks.md`.
