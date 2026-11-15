@@ -25,7 +25,6 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (revisión de requisitos kiro-power, 15 nov): la línea de corte ("Cut line") no incluye 7.8, aunque 11.4 pide su test de propiedad.
 - Low (revisión de requisitos kiro-power, 15 nov): si se recorta 7.5, no se dice qué pasa con `INVALID_REPORT`.
 - Low (revisión de requisitos kiro-power, 15 nov): el glosario dice "3 rejections before the failure", pero el tercer rechazo ya es el fallo.
-- Low (revisión de requisitos kiro-power, 15 nov): una frase antigua en "Para retomar".
 - Low (requisitos kiro-power, opción A, 15 nov): la carpeta de `PLUGIN_DATA` lleva el nombre del último trozo de la URL de import (`power`), así que choca con la de cualquier otro Power importado desde una URL que acabe en `/power`. El requisito 7.11 pide nombres de archivo con el repositorio; el diseño debe comprobarlo.
 - Cerrado (rama `docs/power-requirements-option-a`): la línea "Lo próximo" de "Para retomar" todavía tenía la frase antigua del veredicto estricto. Ahora apunta al requisito 5 de `requirements.md`.
 - Low (spike del Power, 15 nov): el paso 3 de la lista del spike (la lista de servidores MCP: cuál de `spike-root` y `spike-relative` estaba en marcha) no se anotó.
