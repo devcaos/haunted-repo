@@ -2,6 +2,7 @@ import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type {
   ExorcismProgress,
+  ExorcismStep,
   Floor,
   Ghost,
   HauntedReport,
@@ -246,6 +247,79 @@ describe("buildSampleHouse with an exorcism", () => {
           share: hauntedShare(value, progress),
         });
       }),
+      { numRuns: 100 },
+    );
+  });
+
+  it("follows progress and content in every card", () => {
+    // Feature: web-demo, Property 8: Card state follows progress and content
+    // **Validates: Requirements 4.9, 6.1, 6.2, 8.4, 11.9**
+    const STEPS: readonly ExorcismStep[] = [
+      "choosing",
+      "explaining",
+      "asking",
+      "simplifying",
+      "model-answer",
+      "self-check",
+      "failed",
+      "house-clean",
+    ];
+    const caseArb = uniquePathReportArb.chain((value) =>
+      fc.record({
+        value: fc.constant(value),
+        progress: progressArb(value.ghosts),
+        scripted: fc.subarray(value.ghosts.map((g) => g.path)),
+        step: fc.constantFrom(...STEPS),
+        startAllowed: fc.boolean(),
+      }),
+    );
+    fc.assert(
+      fc.property(
+        caseArb,
+        ({ value, progress, scripted, step, startAllowed }) => {
+          const build = (allowed: boolean) =>
+            buildSampleHouse(value, {
+              progress,
+              step,
+              scripted: new Set(scripted),
+              startAllowed: allowed,
+            });
+          const cards = build(startAllowed).floors.flatMap((f) => f.ghosts);
+          const exorcisedPaths = new Set(
+            progress.ghosts
+              .filter((entry) => entry.state === "exorcised")
+              .map((entry) => entry.path),
+          );
+          const stepAllowsStart = step === "choosing" || step === "failed";
+          for (const c of cards) {
+            const state = exorcisedPaths.has(c.path)
+              ? "exorcised"
+              : scripted.includes(c.path)
+                ? "haunted"
+                : "locked";
+            expect(c.state).toBe(state);
+            expect(c.lockedLine).toBe(
+              state === "locked" ? POWER_TEXTS.lockedGhost : null,
+            );
+            expect(c.canStart).toBe(
+              state === "haunted" && stepAllowsStart && startAllowed,
+            );
+          }
+          // The state does not depend on startAllowed.
+          const other = build(!startAllowed).floors.flatMap((f) => f.ghosts);
+          expect(other.map((c) => c.state)).toEqual(cards.map((c) => c.state));
+          // Every live card is haunted, cannot start and has no locked line.
+          for (const c of buildLiveHouse(value).floors.flatMap(
+            (f) => f.ghosts,
+          )) {
+            expect(c).toMatchObject({
+              state: "haunted",
+              canStart: false,
+              lockedLine: null,
+            });
+          }
+        },
+      ),
       { numRuns: 100 },
     );
   });

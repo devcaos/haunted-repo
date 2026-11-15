@@ -330,7 +330,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add tutor texts for the two easiest ghosts`
     - _Requirements: 7.1, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.10_
 
-- [ ] 9. Sample card state and progress
+- [x] 9. Sample card state and progress
   - [x] 9.1 Extend the sample house with card states and progress
     - In `houseView.ts`, `buildSampleHouse(report, exorcism)` with the `exorcism` argument of the design: card state (`exorcised` / `locked` / `haunted`), `canStart` (haunted cards, step `choosing` or `failed`, `startAllowed`), `lockedLine` from `POWER_TEXTS.lockedGhost`, `progress` (`TEXTS.progress`, `haunted`, `total`, `share = hauntedShare`), `houseClean` on `house-clean`.
     - In `texts.ts` add the PR 2 lines (`judgeLine`, `selfCheck`, `stillHaunted`, `houseClean`, `progress`, `engineError`).
@@ -349,7 +349,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the progress view`
     - _Requirements: 8.1, 8.2, 8.3_
 
-  - [~] 9.3 Property test for the card state
+  - [x] 9.3 Property test for the card state
     - **Property 8: Card state follows progress and content**
     - **Validates: Requirements 4.9, 6.1, 6.2, 8.4, 11.9**
     - Generator: `uniquePathReportArb`, `progressArb`, `fc.subarray` of the paths, `fc.constantFrom` of the 8 steps, `fc.boolean()` for `startAllowed`. Checks the state rule, that it does not depend on `startAllowed`, the locked line, the `canStart` rule, and that every live card is `haunted` with `canStart` false and no locked line. The part "canStart iff `start-ghost` is available" is checked inside P1, P10 and P11 (tasks 10.5 and 10.7).

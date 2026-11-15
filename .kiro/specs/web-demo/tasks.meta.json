@@ -31,6 +31,10 @@
     "9.2 Property test for the progress view": {
       "status": "passed",
       "lastRunTimestamp": 1794759885265
+    },
+    "9.3 Property test for the card state": {
+      "status": "passed",
+      "lastRunTimestamp": 1794759995372
     }
   },
   "executionHistory": {
@@ -353,6 +357,11 @@
         "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
         "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
         "timestamp": 1794758773798
+      },
+      {
+        "executionId": "5b2209c8-89d4-4c5b-bedf-0cb250cbfec3",
+        "chatSessionId": "sess_a77e0f86-3c58-4dc4-a7aa-901005569923",
+        "timestamp": 1794759919939
       }
     ],
     "10.1 Add the ghost view, the step actions and the event mapping": [
