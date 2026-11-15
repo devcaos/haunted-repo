@@ -52,7 +52,7 @@ This spec does not change `packages/core`.
 3. WHEN the minimal Power is installed, one call of its tool from the Kiro chat SHALL succeed.
 4. THE result SHALL be written in `docs/spike-power.md`: the steps followed, whether the tool call succeeded, the working directory and the Workspace path the tool returned, and how Kiro started the server.
 5. `design.md` SHALL NOT be written until the spike passes (criterion 3).
-6. `design.md` SHALL use the result of the spike to answer Open Questions 2 (how the installed Power runs its server) and 5 (the Power_Data_Folder).
+6. THE spike result has already answered Open Questions 2 (how the installed Power runs its server) and 5 (the Power_Data_Folder) in this document, and `design.md` SHALL follow those answers: the Power_Server is a single bundled file committed to git (Requirement 1.9), and the Power_Data_Folder is the folder given in `PLUGIN_DATA` (Requirement 7).
 7. THE spike SHALL NOT replace the manual end-to-end check of Requirement 11.7, which stays as the final check.
 
 ### Requirement 1: Package the Power in the current Kiro format
@@ -78,7 +78,7 @@ This spec does not change `packages/core`.
 #### Acceptance Criteria
 
 1. WHEN the Tutor calls the detection Power_Tool with a repository URL, THE Power_Server SHALL call Detection with that URL and return the Haunted_Report: for each Ghost its path, Floor, Difficulty_Score and reason, in the order of the report (easy to hard).
-2. WHEN Detection succeeds, THE Power_Server SHALL save the Haunted_Report in the Repository_Data_File of that repository, inside the Power_Data_Folder (Requirement 7) and SHALL return the Haunted_Share and the suggested Ghost (exorcism Requirement 1.1).
+2. WHEN Detection succeeds and no Repository_Data_File exists for that repository, THE Power_Server SHALL save the Haunted_Report in the Repository_Data_File of that repository, inside the Power_Data_Folder (Requirement 7); WHEN one already exists, Requirement 2.7 applies. THE Power_Server SHALL return the Haunted_Share and the suggested Ghost (exorcism Requirement 1.1).
 3. IF Detection returns an error (`INVALID_URL`, `REPO_NOT_FOUND`, `RATE_LIMITED`, `NETWORK_ERROR`, `EMPTY_REPO` or `NO_SUPPORTED_FILES`), THEN THE Power_Server SHALL return the error code and an English message that says what happened and what the Student can do, and SHALL NOT change any saved file.
 4. IF the repository is private or does not exist (GitHub answers `REPO_NOT_FOUND`), THEN THE message SHALL say that Haunted Repo only works with public repositories and that the URL may be wrong, and SHALL NOT ask the Student for a token or password.
 5. IF Detection returns a Haunted_Report with `partial` set to `true` (rate limit reached halfway), THEN THE Power_Server SHALL return the report with an English warning that the list is incomplete.
@@ -254,6 +254,7 @@ If the work runs late, this is what stays and what goes first.
 
 - **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 7.10, 7.11, 8 and 11. Saving in `PLUGIN_DATA` (7.1) needs the safe file names of 7.11 and the in-memory fallback of 7.10. Requirement 0 is the gate before the design, so it is always done first.
 - **Cut first if late:** 2.7, 7.5, 9.2 and 10.
+- **If 2.7 is cut:** WHEN the same repository is detected again, THE Power_Server SHALL replace only the Haunted_Report in its Repository_Data_File and keep the existing Exorcism_Progress unchanged, and `startSession` SHALL ignore the entries of the Exorcism_Progress whose Ghost path is not in the new Haunted_Report (exorcism Requirement 7.6), so `exorcised` Ghosts stay `exorcised`.
 
 ## Open Questions
 
