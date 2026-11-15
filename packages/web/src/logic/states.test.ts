@@ -4,6 +4,7 @@ import { advance, detectGhosts, startSession } from "@haunted-repo/core";
 import type { HauntedReport, Result } from "@haunted-repo/core";
 import { contentOf, parseDemoScript } from "./demoScript.js";
 import type { DemoScript, GhostContent } from "./demoScript.js";
+import { fullScriptFor } from "./demoScript.testutil.js";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createFakeFetch } from "./fakeDetect.testutil.js";
 import type { FakeGitHubOptions, FakeRepo } from "./fakeDetect.testutil.js";
@@ -553,18 +554,7 @@ const CORE_WRONG = ["wrong", "right", "right"] as const;
 
 /** A valid Demo_Script with content for every sample ghost (to reach house-clean). */
 function fullScript(): DemoScript {
-  const ghosts = sampleData().report.ghosts.map((ghost) => ({
-    path: ghost.path,
-    kind: "general",
-    explanation: `What ${ghost.path} does.`,
-    retryExplanation: `What ${ghost.path} does, told again.`,
-    questions: ["Question one?", "Question two?", "Question three?"],
-    simpler: ["Simpler one.", "Simpler two.", "Simpler three."],
-    modelAnswers: ["Answer one.", "Answer two.", "Answer three."],
-  }));
-  const parsed = parseDemoScript(JSON.stringify({ ghosts }));
-  if (!parsed.ok) throw new Error(parsed.error);
-  return parsed.value;
+  return fullScriptFor(sampleData().report);
 }
 
 describe("page states (PR 2, end states)", () => {

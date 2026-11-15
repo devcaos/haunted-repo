@@ -386,7 +386,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `test(web): check the exorcism end states`
     - _Requirements: 6.16, 6.17, 6.18, 6.19, 6.21, 6.24, 6.26, 8.3, 8.4, 9.3, 18.6_
 
-  - [~] 10.5 Property test for the engine walk
+  - [x] 10.5 Property test for the engine walk
     - **Property 1: Every available action is accepted by the engine**
     - **Validates: Requirements 6.5, 6.6, 6.8, 6.9, 6.15, 6.17, 6.20, 6.25, 4.10, 18.3**
     - Generator: `choicesArb` (up to 200 numbers), each taken modulo `model.available` (skipping `submit-live`). Two runs: the committed data and script, and a generated script with content for every sample ghost (to reach `house-clean`). `engine.advance` is wrapped to record every call. Checks of the design, plus: `canStart` of each card is true iff `start-ghost` for its path is available (P8 link); and one example that the `pick-ghost` text equals the `files.json` text (6.3).
