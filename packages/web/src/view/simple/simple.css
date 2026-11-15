@@ -257,6 +257,54 @@ button:disabled {
   padding-left: var(--space-4);
 }
 
+/* Exorcism_Panel */
+
+.panel {
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--size-line) solid var(--color-line);
+  border-radius: var(--size-radius);
+  background: var(--color-panel);
+}
+
+.panel .judge-line {
+  color: var(--color-muted);
+  font-size: var(--text-small);
+  font-style: italic;
+}
+
+.panel .reading,
+.panel .question,
+.panel .revealed {
+  margin: var(--space-3) 0;
+}
+
+.panel .reading p,
+.panel .revealed p {
+  white-space: pre-line;
+}
+
+.panel .question p {
+  color: var(--color-light);
+}
+
+.panel .revealed {
+  padding: var(--space-2) var(--space-3);
+  border-left: var(--size-focus) solid var(--color-cold);
+}
+
+.panel .answer {
+  margin: var(--space-3) 0;
+}
+
+.panel textarea {
+  resize: vertical;
+}
+
+.panel .prompt {
+  color: var(--color-light);
+}
+
 /* Code_Block: own scroll and a maximum height */
 
 .code-block {

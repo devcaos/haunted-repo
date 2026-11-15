@@ -30,15 +30,33 @@ export const TEXTS = {
   sampleBroken: "The sample could not be loaded. Please reload the page.",
   formLabel: "Public GitHub repository URL",
   // Labels of user actions. Any renderer may use them as button text or
-  // accessible names. The labels of the Exorcism_Panel actions are added
-  // with the panel.
+  // accessible names.
   actionLabels: {
     "submit-live": "Find the ghosts",
     "show-sample": "Show the sample again",
     "go-to-house": "Back to the house",
     "go-to-floor": "Go to this floor",
     "start-ghost": "Start the exorcism",
+    "explanation-continue": "Continue",
+    "show-model-answer": "Show the model answer",
+    "dont-know": "I don't know",
+    rate: { right: "Got it", "half-right": "Partly", wrong: "Missed it" },
+    "self-check": { yes: "Yes", half: "Partly", no: "Not yet" },
+    retry: "Try again",
+    "back-to-list": "Back to the list",
+    "leave-ghost": "Leave this ghost",
   },
+  // PR 2: the Exorcism_Panel.
+  ghostHeading: (path: string) => `Exorcising ${path}`,
+  readingTitles: {
+    explanation: "What this file does",
+    "retry-explanation": "Another way to see it",
+    simpler: "A simpler explanation",
+    "model-answer": "Model answer",
+  },
+  questionTitle: (n: number) => `Question ${n} of 3`,
+  answerLabel: "Your answer (it is never sent or saved)",
+  revealedTitle: "Model answer",
   // PR 2: the sample exorcism.
   judgeLine:
     "In the real tool, your own Kiro reads your answer and judges it. Here you judge it yourself.",

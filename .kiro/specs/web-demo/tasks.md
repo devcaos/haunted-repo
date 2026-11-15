@@ -423,7 +423,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): draw progress and ghost states`
     - _Requirements: 4.13, 6.1, 6.2, 6.21, 8.1, 8.2, 8.3, 8.4, 11.9_
 
-  - [~] 12.2 Draw the Exorcism_Panel and wire the Demo_Script
+  - [x] 12.2 Draw the Exorcism_Panel and wire the Demo_Script
     - Create `packages/web/src/view/simple/ghost.ts` (`renderGhost`): heading with `tabindex="-1"`, reading text, Code_Block `<pre class="code-block" tabindex="0"><code>` with the full Ghost_Text, Licence_Notice next to the code, judge line, question, Answer_Box `<textarea>` with a label and no event listener, revealed model answer, one button per available ghost action (labels from `TEXTS.actionLabels`), self-check prompt and buttons, failed prompt with "Try again" and "Back to the list". In `renderer.ts` show the panel when `model.ghost` is not null and move focus to its heading when the scene or the step changed. Extend `simple.css` (tokens only).
     - In `main.ts` import `demo-script.json?raw`, parse it with `parseDemoScript` and pass the script (or `null` when the parse fails).
     - Verify: `npm run check` exits `0`.

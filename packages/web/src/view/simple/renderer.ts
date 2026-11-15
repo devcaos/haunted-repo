@@ -6,6 +6,7 @@ import type {
 import { TEXTS } from "../../logic/texts.js";
 import type { Renderer, ViewModel } from "../../logic/viewModel.js";
 import { el } from "./dom.js";
+import { createAnswerBox, renderGhost } from "./ghost.js";
 import { renderHouse } from "./house.js";
 import { renderLicence } from "./licence.js";
 
@@ -18,7 +19,8 @@ function actionButton(
       return { label: TEXTS.actionLabels["show-sample"], action };
     default:
       // submit-live is the form button; go-to-floor and go-to-house are
-      // not shown by this renderer; ghost actions arrive in PR 2.
+      // not shown by this renderer; start-ghost is on each card; the other
+      // ghost actions are in the Exorcism_Panel.
       return null;
   }
 }
@@ -67,6 +69,13 @@ export function createSimpleRenderer(
     footer,
   );
 
+  // Purely visual state: the Answer_Box of the question on screen (kept so the
+  // typed text survives a re-render of the same question) and the last ghost
+  // step drawn (to move focus only when the step changed).
+  let answerBox: HTMLTextAreaElement | null = null;
+  let answerKey: string | null = null;
+  let lastStep: string | null = null;
+
   return {
     render(model: ViewModel): void {
       // `transition` is ignored: this renderer has no animation.
@@ -90,10 +99,37 @@ export function createSimpleRenderer(
       if (buttons.length > 0) {
         content.push(el("div", { class: "actions" }, buttons));
       }
-      if (model.ghost === null && model.house !== null) {
-        content.push(renderHouse(model, onAction));
+      const ghost = model.ghost;
+      let heading: HTMLElement | null = null;
+      if (ghost !== null) {
+        // A new question (or a new ghost) gets a new, empty Answer_Box.
+        const key = ghost.showAnswerBox
+          ? `${ghost.path}\n${String(ghost.questionNumber)}`
+          : null;
+        if (key !== answerKey) {
+          answerBox = key === null ? null : createAnswerBox();
+          answerKey = key;
+        }
+        const drawn = renderGhost(model, ghost, answerBox, onAction);
+        content.push(drawn.panel);
+        heading = drawn.heading;
+      } else {
+        answerBox = null;
+        answerKey = null;
+        if (model.house !== null) content.push(renderHouse(model, onAction));
       }
       main.replaceChildren(...content);
+
+      // Focus moves into the Exorcism_Panel when it opens and at every new
+      // step, so it never falls back to <body> (Requirement 6.7).
+      const step = ghost === null ? null : ghost.step;
+      if (
+        heading !== null &&
+        (model.transition !== null || step !== lastStep)
+      ) {
+        heading.focus();
+      }
+      lastStep = step;
 
       footer.replaceChildren(
         ...(model.licence === null ? [] : [renderLicence(model.licence)]),
