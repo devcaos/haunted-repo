@@ -129,6 +129,7 @@ Common rules for all tools:
 
 - Every tool returns a normal MCP result with two text items: first a short English message for the Student, then a JSON text with the data. A failure sets `isError: true`. No `outputSchema` is used: the JSON is plain text that the Tutor reads (simpler, and Kiro shows it as it is).
 - Every tool that needs a session answers `NO_SESSION` when none exists (9.3), with a message that says to call `find_ghosts` or `continue_house`.
+- HauntedPower runs one tool call at a time: every public method is chained on one internal promise queue, so a call that waits for GitHub (find_ghosts, pick_ghost) can never be overtaken by another call. Kiro may call two tools at the same time.
 - **Session answer.** Every answer of a session tool carries the same block, so the Tutor always knows where it is (4.2):
 
   ```
@@ -380,6 +381,7 @@ The Power has pure logic with large input spaces (judgement texts, owner and rep
 - **Unit tests (Vitest, `packages/power/src/*.test.ts`)** with the strict fake GitHub through the `core-testutil/` alias, wrapped to add `User-Agent` (section 3), and a new temporary folder per test (`fs.mkdtemp` in `os.tmpdir()`) as the Power_Data_Folder. They do not touch the network (11.5, 11.8): `fetch` is always injected.
   - Examples for each tool: a full exorcism walk with the `tinyRecording` report; each detection error code; `partial` and `fewFiles`; `DATA_EXISTS` and `replace: true`; broken files (invalid JSON, wrong `format`, invalid report, invalid progress, owner mismatch); Ghost_Text 404 and not text; first and second "I don't know" with the `pendingQuestion` check (4.6); `failed` and `house-clean`; a second `HauntedPower` on the same folder (restart, 9.1, 9.2, 7.9); no `PLUGIN_DATA`, a `PLUGIN_DATA` that is a file, and a save that fails after start-up (7.6, 7.10, warning only once).
   - A table-driven test of the invalid judgements of 5.10.
+  - Queue test: start pick_ghost with a slow fake fetch, call send_event before it resolves, and check that the final state equals the state of the same two calls run one after the other.
 - **Property tests:** Properties 1 to 7 above. Property 1 and 2 drive `HauntedPower` directly and take a report from `tinyRecording`. Property 3 uses `reportArb` and `progressArb` with a real temporary folder. Property 4 wraps the fake `fetch` in a recorder and feeds URL-like strings.
 - **Handlers called directly:** the tests call the methods of `HauntedPower`, not the MCP layer. This is simpler and covers all rules.
 - **Stdio smoke test (one test, cheap):** `bundle.smoke.test.ts` starts `bundle/server.mjs` with the SDK `Client` and `StdioClientTransport` (with `PLUGIN_DATA` set to a temporary folder), lists the six tools, and calls `house_status` expecting `NO_SESSION`. It proves that the committed file starts on Node 24, includes the SDK and zod, and does not contain test file names (1.6). It makes no network call.
