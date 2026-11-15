@@ -48,7 +48,11 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Medium (revisión PR #20, web-demo pieza 2): `page.test.ts` (líneas 15-16) importa `sessionArb.testutil` y `reportArb.testutil` con rutas relativas dentro de `packages/core/src`; se rompe si Core los mueve. Arreglo mínimo: exportarlos desde un único punto de entrada de Core solo para tests.
 - Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 90-103): `go-to-floor` sigue disponible durante un análisis en vivo y, al terminar, la escena vuelve a la planta principal. Arreglo: no ofrecer navegación mientras `busy`, o no reiniciar la escena.
 - Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 94-100): el estado "Live report ready" o el de error se queda al cambiar de planta (cosmético).
-- Low (revisión PR #20, web-demo pieza 2): `page.ts` (línea 93): `submit-live` se ofrece en la escena del fantasma aunque el formulario está oculto; cerrarlo en la pieza 3 cuando existan las acciones del fantasma.
+- Low (revisión PR #20, web-demo pieza 2): `page.ts` (línea 93): `submit-live` se ofrece en la escena del fantasma aunque el formulario está oculto; cerrarlo en la PR 2, tarea 10 cuando existan las acciones del fantasma.
+- Medium (revisión PR #21, web-demo pieza 3): `renderer.ts`, final de `render`: `main.replaceChildren` vuelve a crear los botones de acción en cada render, así que se pierde el foco del teclado (requisito 12.1). Arreglo mínimo: reutilizar el contenedor `.actions` cuando la lista de acciones no cambia, o mover el foco a un elemento estable después del render. Decidir en la pieza 4 o en la PR 2.
+- Medium (revisión PR #21, web-demo pieza 3): `manifest.test.ts` (líneas 33-50) recorre `allLayers`, que está vacío, así que esos tests hoy no pueden fallar. Arreglo: sacar la comprobación a una función y probarla con una capa de ejemplo válida y otra con `https://`.
+- Low (revisión PR #21, web-demo pieza 3): `resolve.ts` y `house.ts` no tienen tests; el caso "hueco con capas y un archivo que falta" no se ejecuta. Arreglo: pasar el mapa de URL a `resolveSlot` como parámetro y probarlo en Node.
+- Low (revisión PR #21, web-demo pieza 3): en `house.ts`, `ghostStateNodes` repite el `map` de `img` de `slotImages`; que llame a `slotImages`.
 
 ## Hecho
 - [x] Elegir idea (6 nov)
