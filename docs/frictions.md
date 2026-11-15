@@ -191,3 +191,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** Kiro lo detectó al ir a anotar la fricción y Luis Miguel eligió anotarla corregida, con las cifras de `git diff --numstat`. Al revisar tamaños, medir con la misma regla que el cuerpo de la PR (qué carpetas se excluyen).
 
 - **Estado:** resuelto.
+
+## 2026-11-15 — la PR 2 de web-demo (el exorcismo) salió de 2.973 líneas y hubo que partirla en 4
+
+- **Qué intentaba:** abrir la PR 2 de la spec web-demo (rama `feat/web-exorcism`, el exorcismo grabado) como una sola pull request (tarea 15.1).
+
+- **Qué pasó:** la comprobación final midió 2.973 líneas cambiadas (código 1.000, tests 1.960, docs 13), sin `.kiro/`, `package-lock.json` ni datos JSON (`demo-script.json`, 46 líneas, aparte). El límite de Luis Miguel es 900.
+
+- **Cómo lo rodeé:** partirla en 4 pull requests apiladas (`feat/web-exorcism-1` a `feat/web-exorcism-4`), creadas como ramas sobre commits que ya existían, sin reescribir la historia. Tamaños medidos con `git diff --numstat` contra la pieza anterior, con la misma regla: 787 (más 46 de JSON), 859, 685 y 678. Suman 3.009, más que 2.973, porque algunas líneas cambian en más de una pieza.
+
+- **Estado:** en curso: piezas 1 (#24) y 2 (#25) fusionadas, piezas 3 y 4 pendientes.
