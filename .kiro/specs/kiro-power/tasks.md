@@ -77,7 +77,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Owners and repos accepted by `parseRepoUrl` in any letter case; the name is lowercase, matches the own-file pattern, has no path separator, `path.join(folder, name)` stays inside `folder`, and references that differ in more than letter case give different names.
     - **Validates: Requirements 7.1, 7.11**
 
-  - [ ] 3.3 Implement `src/store.ts` with the folder store and the memory store
+  - [x] 3.3 Implement `src/store.ts` with the folder store and the memory store
     - One `Store` interface (`read(name)`, `write(name, text)`); `read` distinguishes "does not exist" from other read errors.
     - Folder store: write to `<name>.<random>.tmp` in the same folder, then `rename` over the final name; on a failed write, try to delete the temporary file and leave the final file untouched. It only opens names that pass `isOwnDataFile` and never lists the folder.
     - Memory store: a `Map` of file name to text.
