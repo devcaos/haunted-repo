@@ -92,7 +92,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: a rename that fails twice with `EPERM` and then works (save succeeds); a rename that always fails with `EBUSY` (6 attempts, then failure); an `ENOSPC` failure (no retry).
     - _Requirements: 7.6_
 
-  - [ ] 3.5 Write the property test for the save round-trip
+  - [x] 3.5 Write the property test for the save round-trip
     - **Property 3: Save round-trip**
     - `reportArb` and `progressArb` (through the `core-testutil/` alias) with a real temporary folder: save, read back, equal report and progress; the file has only the keys `format`, `report` and `progress`.
     - Add the `core-testutil/` alias here: root `vitest.config.ts` aliases `core-testutil/` to `packages/core/src/`, and `packages/power/tsconfig.json` has the same prefix in `paths` (design section 3).
