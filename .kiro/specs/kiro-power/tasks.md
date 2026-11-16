@@ -59,7 +59,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Write two lines in `docs/spike-power.md`.
     - _Requirements: 1.5, 1.9_
 
-- [ ] 2. Checkpoint: PR 1
+- [x] 2. Checkpoint: PR 1
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 2: Data file, store and network guard
