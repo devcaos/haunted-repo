@@ -17,3 +17,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - name: Check that the committed bundle is up to date
+        shell: bash
+        run: test -z "$(git status --porcelain -- packages/power/bundle)" || { git status --porcelain -- packages/power/bundle; exit 1; }

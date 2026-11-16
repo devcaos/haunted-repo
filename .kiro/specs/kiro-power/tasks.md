@@ -45,7 +45,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - No network call.
     - _Requirements: 1.6, 1.7, 1.9, 9.3, 11.8_
 
-  - [ ] 1.4 Add the CI step that checks the committed bundle
+  - [x] 1.4 Add the CI step that checks the committed bundle
     - In `.github/workflows/ci.yml`, after `npm run check`: `test -z "$(git status --porcelain -- packages/power/bundle)" || { git status --porcelain -- packages/power/bundle; exit 1; }`.
     - Determinism check (design doubt 12.4): on the PR, confirm the CI job passes with the bundle built on Windows. If it fails, compare the first different lines with `git diff` before changing any esbuild option (`charset: "utf8"` does not fix path differences). If it still differs, stop and ask the director (options in doubt 12.4).
     - _Requirements: 1.9_
