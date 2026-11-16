@@ -125,7 +125,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: `NO_SESSION` for each session method; the queue runs two calls in order.
     - _Requirements: 4.1, 4.2, 9.3, 11.5_
 
-  - [ ] 5.3 Implement the `find_ghosts` tool
+  - [x] 5.3 Implement the `find_ghosts` tool
     - `parseRepoUrl`; read the Repository_Data_File before any network call; refuse with `DATA_EXISTS`, `INVALID_REPORT` or `INVALID_PROGRESS` (message names the file and says to ask the Student before `replace: true`) when a file exists and `replace` is not `true`.
     - Otherwise `detectGhosts`, save `{ report, progress }` with all ghosts `haunted`, `startSession(report, { profile: { knowsJava: knowsJava ?? false } })`, and return the ghosts (path, floor, score, reason, report order), `hauntedShare`, `suggested` (`suggestGhost`), and the `choosing` instructions. `partial` adds the incomplete-list warning; `fewFiles` adds the report `message`.
     - Detection errors return their code with the English message; `REPO_NOT_FOUND` says only public repositories work and the URL may be wrong, never asks for a token.
@@ -140,7 +140,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Folder states: no file, a valid file, a file with arbitrary broken content. After `find_ghosts` without `replace: true`, every file is byte-identical and the recording fetch saw no request when a file existed.
     - **Validates: Requirements 2.2, 2.7, 7.5**
 
-  - [ ] 5.5 Implement the `continue_house` tool
+  - [x] 5.5 Implement the `continue_house` tool
     - No network. Read the Repository_Data_File, start a new session with `startSession(report, { progress, profile })`, drop any attempt in memory. `NO_DATA` when there is no file; `INVALID_URL`, `INVALID_REPORT`, `INVALID_PROGRESS` as in the design.
     - Wire the real handler in `register.ts` and rebuild the bundle.
     - Unit tests: exorcised ghosts stay exorcised; `NO_DATA`; broken file; the recording fetch sees no request.

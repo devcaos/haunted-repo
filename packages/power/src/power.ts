@@ -4,15 +4,33 @@
 import {
   ALLOWED_EVENTS,
   buildInstructions,
+  detectGhosts,
   hauntedShare,
+  parseRepoUrl,
+  startSession,
+  suggestGhost,
 } from "@haunted-repo/core";
 import type {
   ExorcismEvent,
+  ExorcismProgress,
   ExorcismStep,
+  Floor,
   HauntedReport,
   SessionState,
 } from "@haunted-repo/core";
-import { INTERNAL_MESSAGE, NO_SESSION_MESSAGE } from "./messages.js";
+import { dataFileName, parseDataFile, serialiseDataFile } from "./dataFile.js";
+import {
+  brokenDataMessage,
+  dataExistsMessage,
+  ghostsFoundMessage,
+  houseContinuedMessage,
+  INTERNAL_MESSAGE,
+  noDataMessage,
+  NO_SESSION_MESSAGE,
+  PARTIAL_WARNING,
+  REPO_NOT_FOUND_MESSAGE,
+  saveFailedWarning,
+} from "./messages.js";
 import type { Store } from "./store.js";
 
 /** The answer of a session tool when the call is accepted. */
@@ -36,6 +54,31 @@ export interface ErrorAnswer {
 }
 
 export type Answer = SessionAnswer | ErrorAnswer;
+
+/** One ghost as find_ghosts shows it (Requirement 2.1). */
+export interface GhostSummary {
+  path: string;
+  floor: Floor;
+  difficultyScore: number;
+  reason: string;
+}
+
+/** The answer of find_ghosts when it succeeds. */
+export interface FindGhostsAnswer extends SessionAnswer {
+  ghosts: GhostSummary[];
+  suggested: string | null;
+}
+
+export interface FindGhostsInput {
+  url: string;
+  knowsJava?: boolean;
+  replace?: boolean;
+}
+
+export interface ContinueHouseInput {
+  url: string;
+  knowsJava?: boolean;
+}
 
 /** The one in-memory session. `invalidCount` is the Invalid_Judgement_Count. */
 export interface Session {
@@ -115,6 +158,165 @@ export class HauntedPower {
     this.storageOk = options.storageOk;
   }
 
+  /**
+   * find_ghosts (Requirement 2). The Repository_Data_File is read before
+   * any network call; an existing file (valid or broken) is never changed
+   * unless `replace` is true.
+   */
+  findGhosts(input: FindGhostsInput): Promise<FindGhostsAnswer | ErrorAnswer> {
+    return this.queue.run(() => this.doFindGhosts(input));
+  }
+
+  private async doFindGhosts(
+    input: FindGhostsInput,
+  ): Promise<FindGhostsAnswer | ErrorAnswer> {
+    const parsed = parseRepoUrl(input.url);
+    if (!parsed.ok) {
+      return errorAnswer(parsed.error.code, parsed.error.message);
+    }
+    const name = dataFileName(parsed.value.owner, parsed.value.repo);
+
+    if (input.replace !== true) {
+      const saved = await this.store.read(name);
+      if (saved.kind === "found") {
+        const content = parseDataFile(saved.text, name);
+        if (content.ok) {
+          return errorAnswer("DATA_EXISTS", dataExistsMessage(name));
+        }
+        return errorAnswer(
+          content.error.code,
+          brokenDataMessage(content.error.message),
+        );
+      }
+      if (saved.kind === "error") {
+        // A file that exists but cannot be read is treated as broken.
+        return errorAnswer("INVALID_REPORT", brokenDataMessage(saved.message));
+      }
+    }
+
+    const detected = await detectGhosts(input.url, { fetch: this.fetch });
+    if (!detected.ok) {
+      const { code, message } = detected.error;
+      return errorAnswer(
+        code,
+        code === "REPO_NOT_FOUND" ? REPO_NOT_FOUND_MESSAGE : message,
+      );
+    }
+    const report = detected.value;
+    const { state } = startSession(report, {
+      profile: { knowsJava: input.knowsJava ?? false },
+    });
+
+    const warnings: string[] = [];
+    if (report.overview.partial) warnings.push(PARTIAL_WARNING);
+    const saveProblem = await this.save(name, report, state.progress);
+    if (saveProblem !== null) warnings.push(saveFailedWarning(saveProblem));
+
+    const session: Session = {
+      owner: report.overview.owner,
+      repo: report.overview.repo,
+      report,
+      state,
+      invalidCount: 0,
+    };
+    this.session = session;
+
+    const suggested = suggestGhost(state.ghosts, state.progress)?.path ?? null;
+    let message = ghostsFoundMessage(
+      session.owner,
+      session.repo,
+      report.ghosts.length,
+      suggested,
+    );
+    if (report.overview.fewFiles && report.overview.message !== null) {
+      message = `${message} ${report.overview.message}`;
+    }
+    const base = sessionAnswer(
+      session,
+      message,
+      warnings.length > 0 ? warnings.join(" ") : undefined,
+    );
+    return {
+      ...base,
+      ghosts: report.ghosts.map((g) => ({
+        path: g.path,
+        floor: g.floor,
+        difficultyScore: g.difficultyScore,
+        reason: g.reason,
+      })),
+      suggested,
+    };
+  }
+
+  /**
+   * continue_house (Requirements 4.1, 9.2). No network: it reads the
+   * Repository_Data_File and starts a new session from its report and
+   * progress, so exorcised ghosts stay exorcised. Any attempt in memory is
+   * dropped (Requirement 7.9). A broken file is never changed here.
+   */
+  continueHouse(input: ContinueHouseInput): Promise<Answer> {
+    return this.queue.run(() => this.doContinueHouse(input));
+  }
+
+  private async doContinueHouse(input: ContinueHouseInput): Promise<Answer> {
+    const parsed = parseRepoUrl(input.url);
+    if (!parsed.ok) {
+      return errorAnswer(parsed.error.code, parsed.error.message);
+    }
+    const name = dataFileName(parsed.value.owner, parsed.value.repo);
+
+    const saved = await this.store.read(name);
+    if (saved.kind === "missing") {
+      return errorAnswer("NO_DATA", noDataMessage(name));
+    }
+    if (saved.kind === "error") {
+      // A file that exists but cannot be read is treated as broken.
+      return errorAnswer("INVALID_REPORT", brokenDataMessage(saved.message));
+    }
+    const content = parseDataFile(saved.text, name);
+    if (!content.ok) {
+      return errorAnswer(
+        content.error.code,
+        brokenDataMessage(content.error.message),
+      );
+    }
+
+    const { report, progress } = content.value;
+    const { state } = startSession(report, {
+      progress,
+      profile: { knowsJava: input.knowsJava ?? false },
+    });
+    const session: Session = {
+      owner: report.overview.owner,
+      repo: report.overview.repo,
+      report,
+      state,
+      invalidCount: 0,
+    };
+    this.session = session;
+    return sessionAnswer(
+      session,
+      houseContinuedMessage(session.owner, session.repo),
+    );
+  }
+
+  /**
+   * Saves report and progress in the Repository_Data_File. Returns null on
+   * success, or the English problem when the save failed; the session then
+   * continues in memory (Requirement 7.6).
+   */
+  private async save(
+    name: string,
+    report: HauntedReport,
+    progress: ExorcismProgress,
+  ): Promise<string | null> {
+    const result = await this.store.write(
+      name,
+      serialiseDataFile(report, progress),
+    );
+    return result.ok ? null : result.message;
+  }
+
   /** pick_ghost (task 7.1). For now only the NO_SESSION check. */
   pickGhost(): Promise<Answer> {
     return this.queue.run(() => this.skeleton());
@@ -136,8 +338,8 @@ export class HauntedPower {
   }
 
   // Session tools answer NO_SESSION without a session (Requirement 9.3).
-  // No session can exist until find_ghosts arrives (task 5.3), so the other
-  // branch is a placeholder that later tasks replace.
+  // The other branch is a placeholder until each tool gets its real handler
+  // (tasks 5.6, 7.1, 7.2 and 7.3).
   private skeleton(): Answer {
     if (this.session === null) {
       return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
