@@ -9,6 +9,7 @@ import {
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createPower } from "./createPower.js";
 import { dataFileName, parseDataFile, serialiseDataFile } from "./dataFile.js";
+import { ForbiddenUrlError } from "./guardFetch.js";
 import {
   dataExistsMessage,
   PARTIAL_WARNING,
@@ -19,7 +20,7 @@ import {
   type FindGhostsAnswer,
   type ErrorAnswer,
 } from "./power.js";
-import { createFolderStore, type Store } from "./store.js";
+import { createFolderStore, createMemoryStore, type Store } from "./store.js";
 import {
   createTestGitHub,
   type FakeGitHubOptions,
@@ -307,6 +308,32 @@ describe("find_ghosts", () => {
     expect(reread.ok).toBe(true);
   });
 
+  it("runs two calls at once one after the other, with a single detection", async () => {
+    // Requests of one detection of o/r, measured on a separate fake.
+    const reference = createTestGitHub([fiveFiles]);
+    ok(
+      await new HauntedPower({
+        fetch: reference.fetch,
+        store: createMemoryStore(),
+        storageOk: true,
+      }).findGhosts({ url: "github.com/o/r" }),
+    );
+    const oneDetection = reference.fake.requestCount;
+    expect(oneDetection).toBeGreaterThan(0);
+
+    // Without the queue both calls would read "no file" and both detect.
+    const { power, fake } = setup([fiveFiles]);
+    const answers = await Promise.all([
+      power.findGhosts({ url: "github.com/o/r" }),
+      power.findGhosts({ url: "github.com/o/r" }),
+    ]);
+    expect(answers.map((a) => (a.ok ? "ok" : a.code))).toEqual([
+      "ok",
+      "DATA_EXISTS",
+    ]);
+    expect(fake.requestCount).toBe(oneDetection);
+  });
+
   it("keeps the session and warns when the save fails", async () => {
     const failing: Store = {
       read: () => Promise.resolve({ kind: "missing" }),
@@ -329,11 +356,18 @@ describe("createPower", () => {
       return github.fetch(input, init);
     }) as typeof fetch;
     const power = await createPower(folder, recorder);
+
+    // detectGhosts only calls api.github.com, so a working find_ghosts does
+    // not prove the guard. Call the Power's own fetch with another origin:
+    // it must be refused before the inner fetch is called.
+    const powerFetch = power["fetch"];
+    await expect(powerFetch("https://example.com/")).rejects.toBeInstanceOf(
+      ForbiddenUrlError,
+    );
+    expect(seen).toEqual([]);
+
     ok(await power.findGhosts({ url: "github.com/o/r" }));
     expect(seen.length).toBeGreaterThan(0);
-    expect(
-      seen.every((u) => new URL(u).origin === "https://api.github.com"),
-    ).toBe(true);
     expect(Object.keys(await folderSnapshot())).toEqual([
       dataFileName("o", "r"),
     ]);

@@ -341,3 +341,23 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** volver a escribir el archivo con sus líneas en blanco, leer los archivos con la herramienta de lectura (que sí las muestra) y hacer cambios pequeños en vez de reescribir archivos enteros. Pasó otra vez al escribir esta misma entrada con un texto multilínea en PowerShell: se corrigió editando el archivo directamente.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — El encargo nombraba una rama que no era la de la PR #42
+
+- **Qué intentaba:** arreglar los hallazgos de la revisión de la PR #42 (la de arriba de la pila 3a+3b+3c) en la rama `feat/kiro-power-tools-read-2`, como decía el encargo.
+
+- **Qué pasó:** `gh pr list` mostró que la PR #42 sale de la rama `feat/kiro-power-tools-read` (3c); `feat/kiro-power-tools-read-2` es la PR #41 (3b). Las líneas citadas en la revisión (`power.ts` hacia la 398, `store.ts` hacia la 149) solo existen en la 3c: en la 3b `power.ts` tiene 349 líneas.
+
+- **Cómo lo rodeé:** se trabajó en la rama de la PR #42 (`feat/kiro-power-tools-read`), que es la que encaja con el número de PR, con "la de arriba de la pila" y con las líneas citadas. Se avisa a Luis Miguel en la respuesta.
+
+- **Estado:** resuelto con rodeo (pendiente de que Luis Miguel lo confirme).
+
+## 2026-11-16 — Una copia de seguridad y una edición lanzadas a la vez
+
+- **Qué intentaba:** partir los dos tests nuevos de `findGhosts.test.ts` en dos commits: copiar el archivo completo a una carpeta temporal, quitar un test, hacer el primer commit y volver a poner la copia.
+
+- **Qué pasó:** Kiro lanzó la copia y las ediciones en paralelo; las ediciones terminaron antes, así que la copia guardó el archivo ya recortado. Al restaurarla no cambió nada, y solo se vio porque `npm run check` seguía dando 763 tests y no 764.
+
+- **Cómo lo rodeé:** volver a escribir el test a mano y hacer el commit. Para la próxima: lanzar la copia de seguridad sola y esperar a que acabe antes de editar.
+
+- **Estado:** resuelto con rodeo.

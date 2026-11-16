@@ -30432,6 +30432,17 @@ function houseContinuedMessage(owner, repo) {
 function saveFailedWarning(problem) {
   return `Your progress will not be saved: ${problem}`;
 }
+var MEMORY_MODE_WARNING = saveFailedWarning(
+  "Kiro gave Haunted Repo no folder it can write to, so your ghosts and progress stay in memory only until Kiro or the Power restarts."
+);
+function houseStatusMessage(haunted, total) {
+  if (haunted === 0) {
+    return `No ghost haunts this house any more: all ${total} are exorcised.`;
+  }
+  const ghosts = total === 1 ? "ghost" : "ghosts";
+  const verb = haunted === 1 ? "haunts" : "haunt";
+  return `${haunted} of ${total} ${ghosts} still ${verb} this house.`;
+}
 function ghostsFoundMessage(owner, repo, count, suggested) {
   const ghosts = count === 1 ? "1 ghost" : `${count} ghosts`;
   const start = suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
@@ -30463,7 +30474,7 @@ function errorAnswer(code, message, state) {
 var SerialQueue = class {
   tail = Promise.resolve();
   run(fn) {
-    const run = this.tail.then(fn);
+    const run = this.tail.then(() => fn());
     this.tail = run.catch(() => {
     });
     return run;
@@ -30472,13 +30483,28 @@ var SerialQueue = class {
 var HauntedPower = class {
   fetch;
   store;
+  /**
+   * True while saves reach the Power_Data_Folder. False for the whole run
+   * when the run starts in memory mode (Requirement 7.10), and after a
+   * failed save until a later save works (Requirement 7.6).
+   */
   storageOk;
   session = null;
+  /** The run started in memory mode: the store is a memory store. */
+  memoryOnly;
+  /**
+   * The storage warning not yet given to the Student. It is set when the
+   * state of storageOk changes to false and given once, with the next
+   * accepted answer (design section 6).
+   */
+  pendingWarning;
   queue = new SerialQueue();
   constructor(options) {
     this.fetch = options.fetch;
     this.store = options.store;
     this.storageOk = options.storageOk;
+    this.memoryOnly = !options.storageOk;
+    this.pendingWarning = this.memoryOnly ? MEMORY_MODE_WARNING : null;
   }
   /**
    * find_ghosts (Requirement 2). The Repository_Data_File is read before
@@ -30522,10 +30548,7 @@ var HauntedPower = class {
     const { state } = startSession(report, {
       profile: { knowsJava: input.knowsJava ?? false }
     });
-    const warnings = [];
-    if (report.overview.partial) warnings.push(PARTIAL_WARNING);
-    const saveProblem = await this.save(name, report, state.progress);
-    if (saveProblem !== null) warnings.push(saveFailedWarning(saveProblem));
+    await this.save(name, report, state.progress);
     const session = {
       owner: report.overview.owner,
       repo: report.overview.repo,
@@ -30547,7 +30570,9 @@ var HauntedPower = class {
     const base = sessionAnswer(
       session,
       message,
-      warnings.length > 0 ? warnings.join(" ") : void 0
+      this.withStorageWarning(
+        report.overview.partial ? PARTIAL_WARNING : void 0
+      )
     );
     return {
       ...base,
@@ -30604,20 +30629,50 @@ var HauntedPower = class {
     this.session = session;
     return sessionAnswer(
       session,
-      houseContinuedMessage(session.owner, session.repo)
+      houseContinuedMessage(session.owner, session.repo),
+      this.withStorageWarning()
     );
   }
   /**
-   * Saves report and progress in the Repository_Data_File. Returns null on
-   * success, or the English problem when the save failed; the session then
-   * continues in memory (Requirement 7.6).
+   * Saves report and progress in the Repository_Data_File and updates
+   * storageOk (design section 6). The session always continues, in memory
+   * when the save failed (Requirement 7.6).
+   *
+   * - Memory mode: the memory store keeps the data; storageOk stays false
+   *   for the whole run and no new warning is added.
+   * - A failed save while storageOk is true sets it to false and adds the
+   *   warning once; more failed saves add nothing.
+   * - A save that works sets storageOk back to true, so a later failure is
+   *   told again.
    */
   async save(name, report, progress) {
     const result = await this.store.write(
       name,
       serialiseDataFile(report, progress)
     );
-    return result.ok ? null : result.message;
+    if (this.memoryOnly) return;
+    if (result.ok) {
+      this.storageOk = true;
+      this.pendingWarning = null;
+      return;
+    }
+    if (this.storageOk) {
+      this.storageOk = false;
+      this.pendingWarning = saveFailedWarning(result.message);
+    }
+  }
+  /**
+   * The warning of an accepted answer: `other` (if any) followed by the
+   * pending storage warning, which is given only once.
+   */
+  withStorageWarning(other) {
+    const parts = [];
+    if (other !== void 0) parts.push(other);
+    if (this.pendingWarning !== null) {
+      parts.push(this.pendingWarning);
+      this.pendingWarning = null;
+    }
+    return parts.length > 0 ? parts.join(" ") : void 0;
   }
   /** pick_ghost (task 7.1). For now only the NO_SESSION check. */
   pickGhost() {
@@ -30631,13 +30686,38 @@ var HauntedPower = class {
   judgeAnswer() {
     return this.queue.run(() => this.skeleton());
   }
-  /** house_status (task 5.6). For now only the NO_SESSION check. */
+  /**
+   * house_status (Requirements 10.1, 10.2). Every ghost of the current
+   * session with its floor and state, and the Haunted_Share, which comes
+   * only from hauntedShare of the Engine. No network, no file access.
+   */
   houseStatus() {
-    return this.queue.run(() => this.skeleton());
+    return this.queue.run(() => this.doHouseStatus());
+  }
+  doHouseStatus() {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    const ghosts = state.ghosts.map((ghost) => ({
+      path: ghost.path,
+      floor: ghost.floor,
+      state: state.progress.ghosts.find((entry) => entry.path === ghost.path)?.state ?? "haunted"
+    }));
+    const haunted = ghosts.filter((g) => g.state === "haunted").length;
+    return {
+      ...sessionAnswer(
+        session,
+        houseStatusMessage(haunted, ghosts.length),
+        this.withStorageWarning()
+      ),
+      ghosts
+    };
   }
   // Session tools answer NO_SESSION without a session (Requirement 9.3).
   // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 5.6, 7.1, 7.2 and 7.3).
+  // (tasks 7.1, 7.2 and 7.3).
   skeleton() {
     if (this.session === null) {
       return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
@@ -30887,7 +30967,7 @@ function registerTools(server2, power2) {
     {
       description: "Show every ghost of the current house, haunted or exorcised, and how much of the house is still haunted."
     },
-    safe(noSession)
+    safe(async () => toResult(await power2.houseStatus()))
   );
 }
 

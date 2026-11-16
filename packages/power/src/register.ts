@@ -131,6 +131,6 @@ export function registerTools(server: McpServer, power: HauntedPower): void {
       description:
         "Show every ghost of the current house, haunted or exorcised, and how much of the house is still haunted.",
     },
-    safe(noSession),
+    safe(async () => toResult(await power.houseStatus())),
   );
 }

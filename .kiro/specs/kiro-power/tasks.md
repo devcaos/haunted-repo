@@ -108,7 +108,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status
 
-- [ ] 5. Session and house tools
+- [x] 5. Session and house tools
   - [x] 5.1 Add the strict fake GitHub helper
     - The `core-testutil/` alias already exists (task 3.5).
     - `src/testGitHub.testutil.ts`: wraps the strict fake of `core-testutil/ghost-detection/fakeGitHub.testutil.js` and adds only `User-Agent: vitest`, like `detectGhosts.test.ts`; strict in every other way.
@@ -146,19 +146,19 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: exorcised ghosts stay exorcised; `NO_DATA`; broken file; the recording fetch sees no request.
     - _Requirements: 4.1, 4.8, 7.5, 7.9, 9.1, 9.2_
 
-  - [ ] 5.6 Implement the `house_status` tool
+  - [x] 5.6 Implement the `house_status` tool
     - Return each ghost (path, floor, `haunted` or `exorcised`), `hauntedShare(report, progress)` as a number, and English text such as "3 of 5 ghosts still haunt this house".
     - Wire the real handler in `register.ts` and rebuild the bundle; update the smoke test only if its expectations change (it still expects `NO_SESSION` with no session).
     - Unit tests: share and text after `find_ghosts`; `NO_SESSION`.
     - _Requirements: 10.1, 10.2, 9.3_
 
-  - [ ] 5.7 Implement the `PLUGIN_DATA` memory fallback and the warning-once rule
+  - [x] 5.7 Implement the `PLUGIN_DATA` memory fallback and the warning-once rule
     - `HauntedPower` keeps a `storageOk` flag: the first answer of a run that starts in memory mode carries `warning: "Your progress will not be saved: ..."`; no new warning while the state does not change; a failing save sets the flag to false and adds the warning once; a later successful save sets it back to true. The session continues in memory after a failed save.
     - Rebuild the bundle.
     - Unit tests: no `PLUGIN_DATA`; `PLUGIN_DATA` is a file; a save that fails after start-up (warning once, session kept); a later save that works clears the state; `continue_house` works within one run in memory mode.
     - _Requirements: 7.6, 7.10_
 
-- [ ] 6. Checkpoint: PR 3
+- [x] 6. Checkpoint: PR 3
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 4: Exorcism tools and the strict verdict
