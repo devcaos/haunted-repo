@@ -35,7 +35,7 @@ This spec does not change `packages/core`.
 - **Judgement**: the full text the Tutor writes to judge one Student answer: a short reason, then the Verdict line.
 - **Invalid_Judgement_Count**: the number of consecutive judgement Power_Tool calls that `parseVerdict` rejected while the Step is `asking`. It is reset to 0 when a Verdict is accepted, after a Verdict_Failure, and after any accepted `advance`.
 - **Verdict_Retry**: a request from the Power_Server to the Tutor to write the Judgement again, after `INVALID_VERDICT`, while Invalid_Judgement_Count is at most Max_Verdict_Retries.
-- **Max_Verdict_Retries**: the largest number of Verdict_Retries in a row. Its value is 2, so the Tutor gets at most 3 consecutive rejected Judgements before a Verdict_Failure.
+- **Max_Verdict_Retries**: the largest number of Verdict_Retries in a row. Its value is 2: 2 Verdict_Retries, then the third rejection is the Verdict_Failure.
 - **Verdict_Failure**: what happens when Invalid_Judgement_Count reaches Max_Verdict_Retries + 1.
 - **GitHub_API**: the host `https://api.github.com`, the only one that `createGitHubClient` of `@haunted-repo/core` calls.
 
@@ -155,11 +155,11 @@ This spec does not change `packages/core`.
 3. WHEN a Ghost becomes `exorcised` or stays `haunted` after a full attempt, or the Student answers the self-check, THE Power_Server SHALL save the Exorcism_Progress before it returns the next Tutor_Instructions.
 4. THE Power_Server SHALL NOT save the text of the Student's answers, the Ghost_Text or the texts the Tutor wrote.
 5. IF a Repository_Data_File does not hold a valid Haunted_Report (`INVALID_REPORT`) or a valid Exorcism_Progress (`INVALID_PROGRESS`), THEN THE Power_Server SHALL return the error code and an English message that names the file, and SHALL overwrite or delete that file only if the Power_Tool call carries an explicit confirmation input (for example `replace: true`); without that input, THE Power_Server SHALL refuse and SHALL NOT change any file. THE Tutor_Skill SHALL tell the Tutor to ask the Student before sending that input.
-6. IF the Power_Data_Folder or one of its files cannot be written (for example, no permission or a read-only folder), THEN THE Power_Server SHALL return an English message that says the progress was not saved, and SHALL keep the Session_State in memory.
+6. IF, after start-up, the Power_Data_Folder or one of its files cannot be written (for example, no permission or a read-only folder), THEN THE Power_Server SHALL return an English message that says the progress was not saved, and SHALL keep the Session_State in memory.
 7. THE Power_Server SHALL NOT send the Haunted_Report, the Exorcism_Progress or any usage data to any server, and SHALL NOT collect telemetry.
 8. FOR ALL valid Exorcism_Progress values, saving them in a Repository_Data_File and reading them back SHALL give an equal value (save round-trip property).
 9. THE Power_Server SHALL keep the Session_State of an unfinished attempt only in memory; an unfinished attempt SHALL NOT be resumed after the Power_Server stops (exorcism Requirement 10.8: the Ghost stays `haunted`).
-10. IF the `PLUGIN_DATA` environment variable is missing, or the folder it names cannot be written, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
+10. IF the `PLUGIN_DATA` environment variable is missing, or the folder it names cannot be written at start-up, THEN THE Power_Server SHALL keep everything in memory and tell the Student in English that progress will not be saved.
 11. THE Power_Data_Folder may be shared with another Power: Kiro names it after the last part of the import URL (`power` in the spike), not after the `name` in `plugin.json`, so another Power imported from a URL that ends in the same folder name may get the same folder. THEREFORE THE Power_Server SHALL use for each Repository_Data_File a name that includes the repository (owner and name) and marks it as a Haunted Repo file, and SHALL NOT read, change or delete any file in the Power_Data_Folder that does not have that kind of name. THE design SHALL check this naming against how Kiro really names the folder.
 
 ### Requirement 8: Use no network except GitHub
@@ -252,7 +252,7 @@ This spec does not change `packages/core`.
 
 If the work runs late, this is what stays and what goes first.
 
-- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 7.10, 7.11, 8 and 11. Saving in `PLUGIN_DATA` (7.1) needs the safe file names of 7.11 and the in-memory fallback of 7.10. Requirement 0 is the gate before the design, so it is always done first.
+- **Must have for the video:** Requirements 1, 2.1 to 2.5, 3, 4, 5, 6, 7.1 to 7.4, 7.8, 7.10, 7.11, 8 and 11. Saving in `PLUGIN_DATA` (7.1) needs the safe file names of 7.11 and the in-memory fallback of 7.10. Requirement 0 is the gate before the design, so it is always done first.
 - **Cut first if late:** 2.7, 7.5, 9.2 and 10.
 - **If 2.7 is cut:** WHEN the same repository is detected again, THE Power_Server SHALL replace only the Haunted_Report in its Repository_Data_File and keep the existing Exorcism_Progress unchanged, and `startSession` SHALL ignore the entries of the Exorcism_Progress whose Ghost path is not in the new Haunted_Report (exorcism Requirement 7.6), so `exorcised` Ghosts stay `exorcised`.
 
