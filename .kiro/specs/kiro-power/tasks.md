@@ -190,7 +190,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: table-driven invalid judgements of 5.10 (empty, only spaces, bold, leading space, full stop, two `VERDICT:` lines; trailing spaces accepted; an indented `VERDICT:` line is not a second line); first and second "I don't know" with the `pendingQuestion` check; retry texts and `triesLeft`; Verdict_Failure.
     - _Requirements: 4.6, 4.7, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.10, 5.11, 6.2, 6.3, 6.4, 9.4_
 
-  - [ ] 7.4 Write the property test for the strict verdict, and see it fail once
+  - [x] 7.4 Write the property test for the strict verdict, and see it fail once
     - **Property 1: Strict verdict**
     - Drive `HauntedPower` directly with the `tinyRecording` report. Generator: valid judgements (random reason, then one of the four `VERDICT:` lines, optional trailing spaces, optional CRLF) mixed with near misses (leading space, bold, full stop, lowercase `verdict: right`, two `VERDICT:` lines with an invalid last one, empty, only spaces). The check compares the step and the ratings of the Session_State after the call with what `parseVerdict` returns for the same text; the return code alone is not enough.
     - Mutation check: temporarily add `.trim()` before `parseVerdict` in the gate, run the test and see Property 1 fail on a leading-space near miss; revert the change; write one line with the result in `docs/kiro-usage-log.md`.
