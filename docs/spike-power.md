@@ -142,5 +142,5 @@ Respuesta del spike: el servidor **no puede encontrar el Workspace por sí solo*
 
 ## Folder-import check (task 1.6, 2026-11-16)
 
-Luis Miguel imported the Power in Kiro IDE with "Import power from a folder" from `packages/power/` of the branch `feat/kiro-power-store`: it loads and the six tools appear.
+Luis Miguel imported the Power in Kiro IDE with "Import power from a folder" from `packages/power/` of the PR 1 branch `feat/kiro-power-bundle` (merged as PR #37): it loads and the six tools appear.
 A call to `house_status` from the chat answered `NO_SESSION`, as expected with no saved house.
