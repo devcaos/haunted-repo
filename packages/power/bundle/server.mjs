@@ -29247,9 +29247,11 @@ var StdioServerTransport = class {
   }
 };
 
-// src/register.ts
+// src/messages.ts
 var NO_SESSION_MESSAGE = "There is no exorcism session yet. Call find_ghosts with a public GitHub repository URL, or continue_house to continue a saved house.";
 var INTERNAL_MESSAGE = "Something went wrong inside Haunted Repo. Please try again.";
+
+// src/register.ts
 function errorResult(answer) {
   return {
     content: [

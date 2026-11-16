@@ -109,13 +109,13 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status
 
 - [ ] 5. Session and house tools
-  - [ ] 5.1 Add the strict fake GitHub helper
+  - [x] 5.1 Add the strict fake GitHub helper
     - The `core-testutil/` alias already exists (task 3.5).
     - `src/testGitHub.testutil.ts`: wraps the strict fake of `core-testutil/ghost-detection/fakeGitHub.testutil.js` and adds only `User-Agent: vitest`, like `detectGhosts.test.ts`; strict in every other way.
     - A small test that the wrapper still rejects what the fake rejects (for example an unknown path).
     - _Requirements: 11.1, 11.5_
 
-  - [ ] 5.2 Implement the `HauntedPower` skeleton and `src/messages.ts`
+  - [x] 5.2 Implement the `HauntedPower` skeleton and `src/messages.ts`
     - `src/power.ts`: class `HauntedPower` with constructor arguments `fetch`, `store` and `storageOk`; one in-memory session `{ owner, repo, report, state, invalidCount }`; one internal promise queue so public methods run one at a time.
     - The queue survives a failed call: chain each call so that a rejected promise never blocks the next one (for example `const run = this.queue.then(fn); this.queue = run.catch(() => {}); return run;`). Unit test: a call that throws, then a second call that still runs and answers.
     - Helpers that build the session answer `{ ok: true, step, allowedEvents, instructions, hauntedShare, message, warning? }` (with `instructions` equal to the `text` of `buildInstructions(state)` unchanged and `allowedEvents` equal to `ALLOWED_EVENTS[step]`) and the error answer `{ ok: false, code, message, step?, allowedEvents? }`.

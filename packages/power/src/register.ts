@@ -3,14 +3,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
+import { INTERNAL_MESSAGE, NO_SESSION_MESSAGE } from "./messages.js";
 
 type ErrorAnswer = { ok: false; code: string; message: string };
-
-const NO_SESSION_MESSAGE =
-  "There is no exorcism session yet. Call find_ghosts with a public GitHub repository URL, or continue_house to continue a saved house.";
-
-const INTERNAL_MESSAGE =
-  "Something went wrong inside Haunted Repo. Please try again.";
 
 /** Two text items: a short message for the Student, then the JSON data. */
 function errorResult(answer: ErrorAnswer): CallToolResult {
