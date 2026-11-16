@@ -34,6 +34,7 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-15 | "Certificado de exorcismo": sigue fuera de alcance por ahora; decisión pendiente | Luis Miguel quiere reconsiderarlo | — |
 | 2026-11-15 | Hook de tests: solo el hook de comando (sustituye a la fila de los dos hooks del 11 nov) | Decisión de Luis Miguel | Hook de tipo agente (borrado de `.kiro/hooks/test-after-task.json`) |
 | 2026-11-15 | El Kiro Power va después de la web de demostración | Decisión de Luis Miguel | — |
+| 2026-11-16 | guardFetch rejects redirects (`redirect: "error"`); a renamed repo that redirects fails with a clear message | Decided by the director on 16 Nov to keep requirement 8.1 (GitHub only) simple and safe | Follow redirects |
 
 ## Rechazado (no volver a proponer sin evidencia nueva)
 

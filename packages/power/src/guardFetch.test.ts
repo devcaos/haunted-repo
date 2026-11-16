@@ -1,5 +1,11 @@
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import { describe, expect, it } from "vitest";
-import { ForbiddenUrlError, guardFetch } from "./guardFetch.js";
+import {
+  ForbiddenUrlError,
+  guardFetch,
+  RedirectRefusedError,
+} from "./guardFetch.js";
 
 interface Call {
   input: string | URL | Request;
@@ -44,7 +50,7 @@ describe("guardFetch", () => {
     expect(rec.calls).toHaveLength(0);
   });
 
-  it("passes a URL under https://api.github.com/ unchanged", async () => {
+  it("passes a URL under https://api.github.com/ with redirect error", async () => {
     const rec = recorder();
     const url = "https://api.github.com/repos/lukeed/sirv";
     const init: RequestInit = {
@@ -55,7 +61,8 @@ describe("guardFetch", () => {
     expect(response.status).toBe(200);
     expect(rec.calls).toHaveLength(1);
     expect(rec.calls[0]?.input).toBe(url);
-    expect(rec.calls[0]?.init).toBe(init);
+    expect(rec.calls[0]?.init).toEqual({ ...init, redirect: "error" });
+    expect(init.redirect).toBeUndefined();
     expect(new Headers(rec.calls[0]?.init?.headers).has("Authorization")).toBe(
       false,
     );
@@ -69,6 +76,61 @@ describe("guardFetch", () => {
     await guarded(url);
     await guarded(request);
     expect(rec.calls.map((c) => c.input)).toEqual([url, request]);
+    expect(rec.calls.map((c) => c.init?.redirect)).toEqual(["error", "error"]);
     expect(request.headers.has("Authorization")).toBe(false);
+  });
+
+  it("asks for redirect error even when the caller asks to follow", async () => {
+    const rec = recorder();
+    await guardFetch(rec.fetch)("https://api.github.com/repos/a/b", {
+      redirect: "follow",
+    });
+    expect(rec.calls[0]?.init?.redirect).toBe("error");
+  });
+
+  it("turns a refused redirect into a clear RedirectRefusedError", async () => {
+    // Same shape as Node's fetch (checked against the real fetch below).
+    const redirecting: typeof fetch = () =>
+      Promise.reject(
+        new TypeError("fetch failed", {
+          cause: new Error("unexpected redirect"),
+        }),
+      );
+    const error: unknown = await guardFetch(redirecting)(
+      "https://api.github.com/repos/old/name",
+    ).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(RedirectRefusedError);
+    expect((error as Error).message).toContain("redirect");
+    expect((error as Error).message).toContain("new URL");
+  });
+
+  it("passes other inner fetch errors on unchanged", async () => {
+    const original = new TypeError("fetch failed", {
+      cause: new Error("getaddrinfo ENOTFOUND"),
+    });
+    const failing: typeof fetch = () => Promise.reject(original);
+    await expect(
+      guardFetch(failing)("https://api.github.com/repos/a/b"),
+    ).rejects.toBe(original);
+  });
+
+  it("matches how the real Node fetch refuses a 3xx with redirect error", async () => {
+    const server = createServer((_req, res) => {
+      res.writeHead(301, { location: "https://example.com/" });
+      res.end();
+    });
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    try {
+      const { port } = server.address() as AddressInfo;
+      const error: unknown = await fetch(`http://127.0.0.1:${port}/`, {
+        redirect: "error",
+      }).catch((e: unknown) => e);
+      expect(error).toBeInstanceOf(TypeError);
+      const cause = (error as TypeError).cause;
+      expect(cause).toBeInstanceOf(Error);
+      expect((cause as Error).message).toBe("unexpected redirect");
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 });
