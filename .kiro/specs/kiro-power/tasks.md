@@ -38,7 +38,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - The ignored local folder `packages/power/dist/` can be deleted by hand (not a commit).
     - _Requirements: 1.3, 1.6, 11.3_
 
-  - [ ] 1.3 Write the stdio smoke test `src/bundle.smoke.test.ts`
+  - [x] 1.3 Write the stdio smoke test `src/bundle.smoke.test.ts`
     - Start `bundle/server.mjs` with the SDK `Client` and `StdioClientTransport`, with `PLUGIN_DATA` set to a new temporary folder (`fs.mkdtemp` in `os.tmpdir()`).
     - Check that `listTools` returns exactly the six tool names, and that `house_status` answers `isError: true` with code `NO_SESSION`.
     - Check that the bundle text contains no test file names (`.test.`, `.testutil.`).
