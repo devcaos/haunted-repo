@@ -152,7 +152,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: share and text after `find_ghosts`; `NO_SESSION`.
     - _Requirements: 10.1, 10.2, 9.3_
 
-  - [ ] 5.7 Implement the `PLUGIN_DATA` memory fallback and the warning-once rule
+  - [x] 5.7 Implement the `PLUGIN_DATA` memory fallback and the warning-once rule
     - `HauntedPower` keeps a `storageOk` flag: the first answer of a run that starts in memory mode carries `warning: "Your progress will not be saved: ..."`; no new warning while the state does not change; a failing save sets the flag to false and adds the warning once; a later successful save sets it back to true. The session continues in memory after a failed save.
     - Rebuild the bundle.
     - Unit tests: no `PLUGIN_DATA`; `PLUGIN_DATA` is a file; a save that fails after start-up (warning once, session kept); a later save that works clears the state; `continue_house` works within one run in memory mode.

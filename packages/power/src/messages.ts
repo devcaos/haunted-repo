@@ -40,6 +40,11 @@ export function saveFailedWarning(problem: string): string {
   return `Your progress will not be saved: ${problem}`;
 }
 
+/** Warning of a run that starts in memory mode (Requirement 7.10). */
+export const MEMORY_MODE_WARNING = saveFailedWarning(
+  "Kiro gave Haunted Repo no folder it can write to, so your ghosts and progress stay in memory only until Kiro or the Power restarts.",
+);
+
 /** Text of house_status (Requirement 10.1), e.g. "3 of 5 ghosts still haunt this house." */
 export function houseStatusMessage(haunted: number, total: number): string {
   if (haunted === 0) {
