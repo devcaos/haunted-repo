@@ -103,7 +103,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: `https://example.com/repos/a/b` and `https://api.github.com.evil.example/` are refused and the inner `fetch` is never called; a URL under `https://api.github.com/` reaches it unchanged.
     - _Requirements: 4.9, 7.7, 8.1, 8.2_
 
-- [ ] 4. Checkpoint: PR 2
+- [x] 4. Checkpoint: PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status
