@@ -261,3 +261,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** `git stash push --include-untracked` antes de cambiar de rama y `git stash pop` después. `tasks.meta.json` nunca se sube.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — Windows PowerShell 5 no acepta `&&`
+
+- **Qué intentaba:** encadenar dos comandos de git en una sola línea.
+
+- **Qué pasó:** la terminal es Windows PowerShell 5, que no acepta `&&` (llegó en PowerShell 7). El primer comando encadenado ni siquiera se pudo leer.
+
+- **Cómo lo rodeé:** usar `;` para encadenar e `if ($?) { ... }` cuando el segundo comando solo debe correr si el primero funcionó.
+
+- **Estado:** resuelto con rodeo.
