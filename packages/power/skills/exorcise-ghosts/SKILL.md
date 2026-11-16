@@ -21,7 +21,7 @@ If the Haunted Repo tools (`find_ghosts`, `continue_house`, `pick_ghost`, `send_
      - Continue: call `continue_house` with the same `url` and `knowsJava`.
      - Start again: call `find_ghosts` again with `replace: true`, but only after the Student clearly says yes.
    - If it answers `INVALID_REPORT` or `INVALID_PROGRESS`, the saved file of that repository is broken. Tell the Student, and call `find_ghosts` with `replace: true` only after the Student says yes.
-   - For any other error, tell the Student the `message` of the answer in plain words. Never ask for a token or a password.
+   - Never ask for a token or a password.
 3. Show the ghosts (path, floor and reason, in the order given, from easy to hard) and the `suggested` ghost. Let the Student pick one, then call `pick_ghost` with its `path`.
 4. Loop. Every answer of a tool gives `step`, `allowedEvents` and `instructions`. Do exactly what `instructions` says for the current `step`:
    - `explaining`, `simplifying`, `model-answer`: write what the instructions ask (the explanation, the simpler explanation or the model answer). Then call `send_event` with `type: "explanation-done"` and `text` set to exactly what you wrote.
@@ -53,5 +53,6 @@ If the Haunted Repo tools (`find_ghosts`, `continue_house`, `pick_ghost`, `send_
 - "I don't know" in any language, an empty answer, or an answer that does not try to answer is `VERDICT: dont-know`.
 - If `judge_answer` answers `INVALID_VERDICT`, write the Judgement again and call `judge_answer` again. Do not ask the Student again.
 - If `judge_answer` answers `VERDICT_FAILED`, tell the Student that no rating was recorded, and let them answer the same question again or leave the ghost.
+- If any tool answers an error, tell the Student its message in plain words and continue from the returned step and allowedEvents.
 - If an answer has a `warning`, tell the Student once, in plain English.
 - Do not send the Student's answers to any tool, except inside the reason of the Judgement, and keep that reason short.
