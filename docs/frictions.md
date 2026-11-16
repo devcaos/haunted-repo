@@ -301,3 +301,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** comprobar el resultado real del push mirando la rama remota y la PR en vez de fiarse del código de salida.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — Un filtro `--jq` con `->` falló en `gh run view`
+
+- **Qué intentaba:** ver el resultado de los pasos del job de CI de la PR #37 con `gh run view` y un filtro `--jq` que contenía `->`.
+
+- **Qué pasó:** el comando falló. Windows PowerShell 5 rompe las comillas al pasar el argumento a un programa externo, así que `gh` recibió el filtro partido.
+
+- **Cómo lo rodeé:** usar `gh run view <id> -v`, que muestra los pasos del job sin filtro.
+
+- **Estado:** resuelto con rodeo.
