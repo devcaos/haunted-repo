@@ -13,6 +13,7 @@ Rules for every task:
 - Every task ends with `npm run check` passing, then one commit (one commit = one thing). Before that commit, mark the task `[x]` in this file and include `tasks.md` in the same commit.
 - Every task that changes code reachable from `src/server.ts` also commits the rebuilt `packages/power/bundle/server.mjs` in the same commit (`npm run check` rebuilds it; the CI step of task 1.4 fails otherwise).
 - Property tests use fast-check with at least 100 runs and start with the comment `// Feature: kiro-power, Property <n>: <text>`.
+- Before opening each PR, count changed lines without `package-lock.json` and `packages/power/bundle/` (`git diff --stat main`). If over 900, split it into stacked PRs (PR 3 and PR 4 are the likely ones).
 
 The work is split into five pull requests of under about 900 lines each (lockfile and the generated bundle not counted), plus the final manual check.
 
@@ -53,6 +54,11 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - One rule block in `eslint.config.js` for `packages/power/src/**/*.ts`, so nothing writes to the stdio output by mistake (design doubt 6). Logs, if any, use `process.stderr.write`.
     - _Requirements: 1.7, 4.7_
 
+  - [ ] 1.6 Quick check in Kiro (done by the director, not automatable)
+    - Uninstall the spike Power, install with "Import power from a folder" from `packages/power/` of the PR 1 branch, check that the six tools appear and that `house_status` answers `NO_SESSION`.
+    - Write two lines in `docs/spike-power.md`.
+    - _Requirements: 1.5, 1.9_
+
 - [ ] 2. Checkpoint: PR 1
   - Ensure all tests pass, ask the user if questions arise.
 
@@ -88,7 +94,8 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
   - [ ] 3.5 Write the property test for the save round-trip
     - **Property 3: Save round-trip**
-    - `reportArb` and `progressArb` (through the `core-testutil/` alias, added here if task 5.1 is not done yet, otherwise reused) with a real temporary folder: save, read back, equal report and progress; the file has only the keys `format`, `report` and `progress`.
+    - `reportArb` and `progressArb` (through the `core-testutil/` alias) with a real temporary folder: save, read back, equal report and progress; the file has only the keys `format`, `report` and `progress`.
+    - Add the `core-testutil/` alias here: root `vitest.config.ts` aliases `core-testutil/` to `packages/core/src/`, and `packages/power/tsconfig.json` has the same prefix in `paths` (design section 3).
     - **Validates: Requirements 7.1, 7.2, 7.4, 7.8**
 
   - [ ] 3.6 Implement `src/guardFetch.ts`
@@ -102,15 +109,15 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status
 
 - [ ] 5. Session and house tools
-  - [ ] 5.1 Add the `core-testutil/` alias and the strict fake GitHub helper
-    - Root `vitest.config.ts`: alias `core-testutil/` to `packages/core/src/`. `packages/power/tsconfig.json`: the same prefix in `paths` (design section 3).
+  - [ ] 5.1 Add the strict fake GitHub helper
+    - The `core-testutil/` alias already exists (task 3.5).
     - `src/testGitHub.testutil.ts`: wraps the strict fake of `core-testutil/ghost-detection/fakeGitHub.testutil.js` and adds only `User-Agent: vitest`, like `detectGhosts.test.ts`; strict in every other way.
     - A small test that the wrapper still rejects what the fake rejects (for example an unknown path).
-    - If task 3.5 already added the alias, this task only adds the helper.
     - _Requirements: 11.1, 11.5_
 
   - [ ] 5.2 Implement the `HauntedPower` skeleton and `src/messages.ts`
     - `src/power.ts`: class `HauntedPower` with constructor arguments `fetch`, `store` and `storageOk`; one in-memory session `{ owner, repo, report, state, invalidCount }`; one internal promise queue so public methods run one at a time.
+    - The queue survives a failed call: chain each call so that a rejected promise never blocks the next one (for example `const run = this.queue.then(fn); this.queue = run.catch(() => {}); return run;`). Unit test: a call that throws, then a second call that still runs and answers.
     - Helpers that build the session answer `{ ok: true, step, allowedEvents, instructions, hauntedShare, message, warning? }` (with `instructions` equal to the `text` of `buildInstructions(state)` unchanged and `allowedEvents` equal to `ALLOWED_EVENTS[step]`) and the error answer `{ ok: false, code, message, step?, allowedEvents? }`.
     - `NO_SESSION` for every session tool when there is no session.
     - `src/messages.ts`: every English text the Power_Server writes.
@@ -123,9 +130,10 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Otherwise `detectGhosts`, save `{ report, progress }` with all ghosts `haunted`, `startSession(report, { profile: { knowsJava: knowsJava ?? false } })`, and return the ghosts (path, floor, score, reason, report order), `hauntedShare`, `suggested` (`suggestGhost`), and the `choosing` instructions. `partial` adds the incomplete-list warning; `fewFiles` adds the report `message`.
     - Detection errors return their code with the English message; `REPO_NOT_FOUND` says only public repositories work and the URL may be wrong, never asks for a token.
     - With `replace: true`, only the file of that repository is replaced.
+    - Add `src/createPower.ts` (no MCP SDK, no `node:fs`): `createPower(pluginData, baseFetch)` calls `openStore(pluginData)` and returns `new HauntedPower({ fetch: guardFetch(baseFetch), store, storageOk })`. `server.ts` calls `createPower(process.env.PLUGIN_DATA, globalThis.fetch)` once and passes the Power to `register.ts`.
     - Wire the real handler in `register.ts` and rebuild the bundle.
     - Unit tests with the fake GitHub and a temporary folder: success, each detection error code, `partial`, `fewFiles`, `DATA_EXISTS`, broken files, `replace: true`, another repository's file unchanged.
-    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 4.1, 4.8, 7.2, 7.5_
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 4.1, 4.8, 7.2, 7.5, 8.1_
 
   - [ ]* 5.4 Write the property test for "no change without `replace`"
     - **Property 6: No change without `replace`**
@@ -145,7 +153,6 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - _Requirements: 10.1, 10.2, 9.3_
 
   - [ ] 5.7 Implement the `PLUGIN_DATA` memory fallback and the warning-once rule
-    - `server.ts` calls `openStore(process.env.PLUGIN_DATA)` and passes `storageOk` to `HauntedPower`.
     - `HauntedPower` keeps a `storageOk` flag: the first answer of a run that starts in memory mode carries `warning: "Your progress will not be saved: ..."`; no new warning while the state does not change; a failing save sets the flag to false and adds the warning once; a later successful save sets it back to true. The session continues in memory after a failed save.
     - Rebuild the bundle.
     - Unit tests: no `PLUGIN_DATA`; `PLUGIN_DATA` is a file; a save that fails after start-up (warning once, session kept); a later save that works clears the state; `continue_house` works within one run in memory mode.
@@ -197,7 +204,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
   - [ ] 7.6 Write the property test for the network allowlist
     - **Property 4: Network allowlist**
-    - Wrap the fake `fetch` in a recorder and put `guardFetch` in front of it, as `server.ts` does. Feed random sequences of tool calls with URL-like strings and arbitrary paths. Every request the recorder saw parses with `new URL()`, has origin exactly `https://api.github.com`, and has no `Authorization` header.
+    - Wrap the fake `fetch` in a recorder and build the Power with `createPower(tempFolder, recorder)`, so `guardFetch` sits in front of it as in `server.ts`. Feed random sequences of tool calls with URL-like strings and arbitrary paths. Every request the recorder saw parses with `new URL()`, has origin exactly `https://api.github.com`, and has no `Authorization` header.
     - **Validates: Requirements 4.9, 7.7, 8.1, 8.2, 8.3, 8.4**
 
   - [ ]* 7.7 Write the property test for foreign files
@@ -240,7 +247,6 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 - [ ] 11. Manual end-to-end check in Kiro IDE (done by the director with Kiro; not automatable)
   - [ ] 11.1 Install from the branch folder before merging and run the whole check
-    - In Kiro, uninstall the spike Power (installed folder `power`), so its old tools do not mix with the new ones.
     - Install with "Import power from a folder" from `packages/power/` of the branch, before merging.
     - Run `find_ghosts` on `https://github.com/lukeed/sirv`, exorcise one ghost, answer "I don't know" once, and see at least one Verdict_Retry (the check may force one by asking the Tutor to end a judgement with a full stop).
     - Also check: the Tutor writes in English only, one question per message, does not leak the model answer, tells the Student about a `warning` once, and asks before sending `replace: true`.
@@ -270,27 +276,28 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     { "id": 1, "tasks": ["1.2"] },
     { "id": 2, "tasks": ["1.3"] },
     { "id": 3, "tasks": ["1.4", "1.5"] },
-    { "id": 4, "tasks": ["3.1", "3.6"] },
-    { "id": 5, "tasks": ["3.2", "3.3"] },
-    { "id": 6, "tasks": ["3.4"] },
-    { "id": 7, "tasks": ["3.5"] },
-    { "id": 8, "tasks": ["5.1"] },
-    { "id": 9, "tasks": ["5.2"] },
-    { "id": 10, "tasks": ["5.3"] },
-    { "id": 11, "tasks": ["5.4", "5.5"] },
-    { "id": 12, "tasks": ["5.6"] },
-    { "id": 13, "tasks": ["5.7"] },
-    { "id": 14, "tasks": ["7.1"] },
-    { "id": 15, "tasks": ["7.2"] },
-    { "id": 16, "tasks": ["7.3"] },
-    { "id": 17, "tasks": ["7.4"] },
-    { "id": 18, "tasks": ["7.5"] },
-    { "id": 19, "tasks": ["7.6", "7.7"] },
-    { "id": 20, "tasks": ["7.8"] },
-    { "id": 21, "tasks": ["9.1", "9.3"] },
-    { "id": 22, "tasks": ["9.2"] },
-    { "id": 23, "tasks": ["11.1"] },
-    { "id": 24, "tasks": ["11.2"] }
+    { "id": 4, "tasks": ["1.6"] },
+    { "id": 5, "tasks": ["3.1", "3.6"] },
+    { "id": 6, "tasks": ["3.2", "3.3"] },
+    { "id": 7, "tasks": ["3.4"] },
+    { "id": 8, "tasks": ["3.5"] },
+    { "id": 9, "tasks": ["5.1"] },
+    { "id": 10, "tasks": ["5.2"] },
+    { "id": 11, "tasks": ["5.3"] },
+    { "id": 12, "tasks": ["5.4", "5.5"] },
+    { "id": 13, "tasks": ["5.6"] },
+    { "id": 14, "tasks": ["5.7"] },
+    { "id": 15, "tasks": ["7.1"] },
+    { "id": 16, "tasks": ["7.2"] },
+    { "id": 17, "tasks": ["7.3"] },
+    { "id": 18, "tasks": ["7.4"] },
+    { "id": 19, "tasks": ["7.5"] },
+    { "id": 20, "tasks": ["7.6", "7.7"] },
+    { "id": 21, "tasks": ["7.8"] },
+    { "id": 22, "tasks": ["9.1", "9.3"] },
+    { "id": 23, "tasks": ["9.2"] },
+    { "id": 24, "tasks": ["11.1"] },
+    { "id": 25, "tasks": ["11.2"] }
   ]
 }
 ```
