@@ -351,3 +351,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** se trabajó en la rama de la PR #42 (`feat/kiro-power-tools-read`), que es la que encaja con el número de PR, con "la de arriba de la pila" y con las líneas citadas. Se avisa a Luis Miguel en la respuesta.
 
 - **Estado:** resuelto con rodeo (pendiente de que Luis Miguel lo confirme).
+
+## 2026-11-16 — Una copia de seguridad y una edición lanzadas a la vez
+
+- **Qué intentaba:** partir los dos tests nuevos de `findGhosts.test.ts` en dos commits: copiar el archivo completo a una carpeta temporal, quitar un test, hacer el primer commit y volver a poner la copia.
+
+- **Qué pasó:** Kiro lanzó la copia y las ediciones en paralelo; las ediciones terminaron antes, así que la copia guardó el archivo ya recortado. Al restaurarla no cambió nada, y solo se vio porque `npm run check` seguía dando 763 tests y no 764.
+
+- **Cómo lo rodeé:** volver a escribir el test a mano y hacer el commit. Para la próxima: lanzar la copia de seguridad sola y esperar a que acabe antes de editar.
+
+- **Estado:** resuelto con rodeo.
