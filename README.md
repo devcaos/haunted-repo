@@ -88,7 +88,7 @@ npm run check
 
 `npm run check` runs lint, format check, build and tests. It needs no network and no secrets.
 
-`npm run test:live` calls the real GitHub API (lukeed/sirv, no token). It is run by hand and is not part of `npm run check`. It uses up to 8 of the 60 requests per hour that GitHub allows without an account.
+`npm run test:live` calls the real GitHub API (lukeed/sirv, no token). It is run by hand and is not part of `npm run check`. The two live tests use about 17 of the 60 requests per hour that GitHub allows without an account.
 
 ## Project structure
 

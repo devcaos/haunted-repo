@@ -188,6 +188,23 @@ describe("pick_ghost", () => {
     expect(seen).toHaveLength(9);
   });
 
+  it.each<[string | null, string]>([
+    [
+      'Could not read the file "src/b.ts" from GitHub. Please try again in a moment.',
+      'Could not read the file "src/b.ts" from GitHub. Please try again in a moment. The ghost stays haunted. You can also pick another ghost.',
+    ],
+    [
+      'The file "src/b.ts" is not text.',
+      'The file "src/b.ts" is not text. The ghost stays haunted. Try again in a moment, or pick another ghost.',
+    ],
+    [
+      null,
+      'Could not read the file "src/b.ts" from GitHub. The ghost stays haunted. Try again in a moment, or pick another ghost.',
+    ],
+  ])("says try again only once (%s)", (problem, message) => {
+    expect(ghostTextUnreadableMessage("src/b.ts", problem)).toBe(message);
+  });
+
   it("gives the general text for the plain request budget error", () => {
     // The budget error of the core client is a plain Error with no code.
     expect(

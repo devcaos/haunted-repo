@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "haunted-repo",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Haunted Repo finds the AI-written code in a repository that you do not understand yet and helps you understand it with plain explanations and questions.",
   "author": { "name": "devcaos" },
   "keywords": ["haunted", "ghost", "exorcise", "exorcism", "understand code"],

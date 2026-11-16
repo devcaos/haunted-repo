@@ -163,7 +163,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 4: Exorcism tools and the strict verdict
 
-- [ ] 7. Exorcism tools
+- [x] 7. Exorcism tools
   - [x] 7.1 Implement the `pick_ghost` tool
     - Check that the step allows `pick-ghost` and that `isPickable` is true **before** any request; else `INVALID_EVENT` with the allowed events.
     - Read the Ghost_Text with a new `createGitHubClient({ fetch })` and `getFileText(owner, repo, report.overview.ref, path)`; send `{ type: "pick-ghost", path, text }` to `advance` with the text unchanged.
@@ -212,35 +212,35 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Random other files in the temporary Power_Data_Folder whose names do not match the own-file pattern; after any sequence of tool calls (with and without `replace: true`) they are byte-identical.
     - **Validates: Requirements 7.11**
 
-  - [ ] 7.8 Write the full-walk and restart tests
+  - [x] 7.8 Write the full-walk and restart tests
     - A full exorcism walk with the `tinyRecording` report through `find_ghosts`, `pick_ghost`, `send_event` and `judge_answer` until the ghost is exorcised, checking the saved file after each change of progress.
     - Restart: a second `HauntedPower` on the same folder; `continue_house` keeps exorcised ghosts; an unfinished attempt is not resumed and its ghost stays `haunted`; the saved file before the stop is unchanged.
     - _Requirements: 4.1, 7.3, 7.9, 9.1, 9.2_
 
-- [ ] 8. Checkpoint: PR 4
+- [x] 8. Checkpoint: PR 4
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 5: Tutor_Skill, manifest and live test
 
-- [ ] 9. Skill, manifest and live test
-  - [ ] 9.1 Write the Tutor_Skill `skills/exorcise-ghosts/SKILL.md`
+- [x] 9. Skill, manifest and live test
+  - [x] 9.1 Write the Tutor_Skill `skills/exorcise-ghosts/SKILL.md`
     - Front matter `name: exorcise-ghosts` and the description of design section 8.
     - The order of calls (ask for the URL and Java, `find_ghosts`, `DATA_EXISTS` handling with `continue_house` or `replace: true` only after the Student says yes, `pick_ghost`, the loop with `send_event` and `judge_answer`, self-check, `failed`, `house-clean`, `house_status`, `continue_house` after a restart and ask about Java again).
     - The rules of design section 8, one line each (English only, one question per message, follow `instructions`, never show the model answer early, the exact four `VERDICT:` lines, "I don't know" in any language is `dont-know`, `INVALID_VERDICT` and `VERDICT_FAILED` handling, pass on a `warning` once, tools missing means check Node.js 24 and restart Kiro, keep the Judgement reason short).
     - _Requirements: 1.4, 1.8, 2.7, 4.3, 4.4, 4.8, 4.10, 4.11, 5.5, 6.1, 7.5, 9.2_
 
-  - [ ] 9.2 Update `plugin.json` and write the manifest test
+  - [x] 9.2 Update `plugin.json` and write the manifest test
     - `plugin.json`: `$schema`, kebab-case `name`, `version` `0.1.0`, real `description`, `author.name`, keywords including `haunted`, `ghost`, `exorcise`, `exorcism`, `understand code`, and without `haunted spike`.
     - `src/manifest.test.ts`: reads `plugin.json`, `mcp.json` and the front matter of `SKILL.md`, and checks the fields of 1.1 to 1.4 (one stdio server, `${PLUGIN_ROOT}/bundle/server.mjs`, no `env`, skill `name` and `description` present).
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [ ] 9.3 Write the live test `src/ghostText.live.test.ts`
+  - [x] 9.3 Write the live test `src/ghostText.live.test.ts`
     - Matches `*.live.test.ts` of `vitest.live.config.ts`; uses the real `fetch` through `guardFetch` and a temporary folder.
     - `find_ghosts` for `https://github.com/lukeed/sirv`, then `pick_ghost` for the first ghost; the step is `explaining` and the Ghost_Text read is not empty. Same helpful rate-limit message as the core live test. About 9 requests.
     - Not part of `npm test` or `npm run check`; run it once with `npm run test:live` before the commit.
     - _Requirements: 3.1, 8.1, 11.6_
 
-- [ ] 10. Checkpoint: PR 5
+- [x] 10. Checkpoint: PR 5
   - Ensure all tests pass, ask the user if questions arise.
 
 ### Final: manual check in Kiro (planned for about 22 Nov 2026)
