@@ -140,7 +140,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Folder states: no file, a valid file, a file with arbitrary broken content. After `find_ghosts` without `replace: true`, every file is byte-identical and the recording fetch saw no request when a file existed.
     - **Validates: Requirements 2.2, 2.7, 7.5**
 
-  - [ ] 5.5 Implement the `continue_house` tool
+  - [x] 5.5 Implement the `continue_house` tool
     - No network. Read the Repository_Data_File, start a new session with `startSession(report, { progress, profile })`, drop any attempt in memory. `NO_DATA` when there is no file; `INVALID_URL`, `INVALID_REPORT`, `INVALID_PROGRESS` as in the design.
     - Wire the real handler in `register.ts` and rebuild the bundle.
     - Unit tests: exorcised ghosts stay exorcised; `NO_DATA`; broken file; the recording fetch sees no request.

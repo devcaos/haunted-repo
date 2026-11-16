@@ -76,7 +76,11 @@ export function registerTools(server: McpServer, power: HauntedPower): void {
         knowsJava: z.boolean().optional(),
       },
     },
-    safe(noSession),
+    safe(async ({ url, knowsJava }) => {
+      const input: Parameters<HauntedPower["continueHouse"]>[0] = { url };
+      if (knowsJava !== undefined) input.knowsJava = knowsJava;
+      return toResult(await power.continueHouse(input));
+    }),
   );
 
   server.registerTool(

@@ -27,6 +27,15 @@ export function brokenDataMessage(problem: string): string {
   return `${problem} ${ASK_BEFORE_REPLACE}`;
 }
 
+/** NO_DATA: continue_house without a saved file (design section 4). */
+export function noDataMessage(fileName: string): string {
+  return `There is no saved house for this repository (file "${fileName}"). Call find_ghosts with its URL to find its ghosts.`;
+}
+
+export function houseContinuedMessage(owner: string, repo: string): string {
+  return `Continuing the saved house of ${owner}/${repo}. Exorcised ghosts stay exorcised; an unfinished attempt starts again.`;
+}
+
 export function saveFailedWarning(problem: string): string {
   return `Your progress will not be saved: ${problem}`;
 }

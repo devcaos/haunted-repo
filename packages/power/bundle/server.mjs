@@ -30423,6 +30423,12 @@ function dataExistsMessage(fileName) {
 function brokenDataMessage(problem) {
   return `${problem} ${ASK_BEFORE_REPLACE}`;
 }
+function noDataMessage(fileName) {
+  return `There is no saved house for this repository (file "${fileName}"). Call find_ghosts with its URL to find its ghosts.`;
+}
+function houseContinuedMessage(owner, repo) {
+  return `Continuing the saved house of ${owner}/${repo}. Exorcised ghosts stay exorcised; an unfinished attempt starts again.`;
+}
 function saveFailedWarning(problem) {
   return `Your progress will not be saved: ${problem}`;
 }
@@ -30553,6 +30559,53 @@ var HauntedPower = class {
       })),
       suggested
     };
+  }
+  /**
+   * continue_house (Requirements 4.1, 9.2). No network: it reads the
+   * Repository_Data_File and starts a new session from its report and
+   * progress, so exorcised ghosts stay exorcised. Any attempt in memory is
+   * dropped (Requirement 7.9). A broken file is never changed here.
+   */
+  continueHouse(input) {
+    return this.queue.run(() => this.doContinueHouse(input));
+  }
+  async doContinueHouse(input) {
+    const parsed = parseRepoUrl(input.url);
+    if (!parsed.ok) {
+      return errorAnswer(parsed.error.code, parsed.error.message);
+    }
+    const name = dataFileName(parsed.value.owner, parsed.value.repo);
+    const saved = await this.store.read(name);
+    if (saved.kind === "missing") {
+      return errorAnswer("NO_DATA", noDataMessage(name));
+    }
+    if (saved.kind === "error") {
+      return errorAnswer("INVALID_REPORT", brokenDataMessage(saved.message));
+    }
+    const content = parseDataFile(saved.text, name);
+    if (!content.ok) {
+      return errorAnswer(
+        content.error.code,
+        brokenDataMessage(content.error.message)
+      );
+    }
+    const { report, progress } = content.value;
+    const { state } = startSession(report, {
+      progress,
+      profile: { knowsJava: input.knowsJava ?? false }
+    });
+    const session = {
+      owner: report.overview.owner,
+      repo: report.overview.repo,
+      report,
+      state,
+      invalidCount: 0
+    };
+    this.session = session;
+    return sessionAnswer(
+      session,
+      houseContinuedMessage(session.owner, session.repo)
+    );
   }
   /**
    * Saves report and progress in the Repository_Data_File. Returns null on
@@ -30787,7 +30840,11 @@ function registerTools(server2, power2) {
         knowsJava: boolean2().optional()
       }
     },
-    safe(noSession)
+    safe(async ({ url, knowsJava }) => {
+      const input = { url };
+      if (knowsJava !== void 0) input.knowsJava = knowsJava;
+      return toResult(await power2.continueHouse(input));
+    })
   );
   server2.registerTool(
     "pick_ghost",
