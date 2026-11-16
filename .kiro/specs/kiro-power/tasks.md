@@ -196,13 +196,13 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Mutation check: temporarily add `.trim()` before `parseVerdict` in the gate, run the test and see Property 1 fail on a leading-space near miss; revert the change; write one line with the result in `docs/kiro-usage-log.md`.
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.8, 6.2**
 
-  - [ ] 7.5 Write the property test for the bounded retry, and see it fail once
+  - [x] 7.5 Write the property test for the bounded retry, and see it fail once
     - **Property 2: Bounded retry**
     - Random sequences of `judge_answer` calls (valid and invalid judgements) and calls when the step is not `asking`. Check: at most 2 Verdict_Retries in a row; the third consecutive rejection is a Verdict_Failure; the count is 0 after a Verdict_Failure or an accepted Verdict; after each rejected judgement the Session_State equals the one before and no Event was sent; a call outside `asking` leaves count and state unchanged.
     - Mutation check: temporarily remove the count reset after a Verdict_Failure, run the test and see Property 2 fail; revert the change; write one line with the result in `docs/kiro-usage-log.md`.
     - **Validates: Requirements 5.4, 5.6, 5.7, 5.9, 5.11, 9.4**
 
-  - [ ] 7.6 Write the property test for the network allowlist
+  - [x] 7.6 Write the property test for the network allowlist
     - **Property 4: Network allowlist**
     - Wrap the fake `fetch` in a recorder and build the Power with `createPower(tempFolder, recorder)`, so `guardFetch` sits in front of it as in `server.ts`. Feed random sequences of tool calls with URL-like strings and arbitrary paths. Every request the recorder saw parses with `new URL()`, has origin exactly `https://api.github.com`, and has no `Authorization` header.
     - **Validates: Requirements 4.9, 7.7, 8.1, 8.2, 8.3, 8.4**

@@ -1,0 +1,41 @@
+
+ RUN  v5.1.0 C:/proyectos/haunted-repo
+
+ ❯ packages/power/src/judgeAnswer.retry.property.test.ts (1 test | 1 failed) 41ms
+   ❯ judge_answer: Property 2, bounded retry (1)
+     × retries are bounded and a rejected judgement changes nothing 39ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/power/src/judgeAnswer.retry.property.test.ts > judge_answer: Property 2, bounded retry > retries are bounded and a rejected judgement changes nothing
+Error: Property failed after 5 tests
+{ seed: 1205222974, path: "4:2:1:5:5:6:1:4:4:4", endOnFailure: true }
+Counterexample: [[{"kind":"judge","judgement":" VERDICT: right"},{"kind":"judge","judgement":"   "},{"kind":"judge","judgement":"VERDICT: right."},{"kind":"outside","judgement":"VERDICT: right","state":{"step":"choosing","profile":{"knowsJava":false},"ghosts":[{"path":"src/a.ts","language":"TypeScript","difficultyScore":40,"floor":"middle floor","factors":{"lines":8,"branches":1,"maxIndent":1,"imports":1},"reason":"It has many lines."},{"path":"src/b.ts","language":"TypeScript","difficultyScore":50,"floor":"middle floor","factors":{"lines":10,"branches":2,"maxIndent":1,"imports":2},"reason":"It has many lines."},{"path":"src/c.ts","language":"TypeScript","difficultyScore":60,"floor":"middle floor","factors":{"lines":12,"branches":2,"maxIndent":1,"imports":3},"reason":"It has many lines."}],"progress":{"ghosts":[{"path":"src/a.ts","state":"haunted","ratings":[],"selfCheck":null},{"path":"src/b.ts","state":"haunted","ratings":[],"selfCheck":null},{"path":"src/c.ts","state":"haunted","ratings":[],"selfCheck":null}]},"asked":{},"current":null}}]]
+Shrunk 9 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: expected 3 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 3
+
+ ❯ packages/power/src/judgeAnswer.retry.property.test.ts:188:42
+ ❯ AsyncProperty.run node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ packages/power/src/judgeAnswer.retry.property.test.ts:119:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  20:45:33
+   Duration  498ms (import 41%, transform 40%, tests 15%, worker 3%)
+
