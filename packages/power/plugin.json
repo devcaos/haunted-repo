@@ -2,16 +2,9 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "haunted-repo",
   "version": "0.0.1",
-  "description": "Tracer spike of Haunted Repo: one tool that says where the Power server runs and which workspace it can see.",
+  "description": "Haunted Repo finds the AI-written code in a repository that you do not understand yet and helps you understand it with plain explanations and questions.",
   "author": { "name": "devcaos" },
-  "keywords": [
-    "haunted",
-    "ghost",
-    "exorcise",
-    "exorcism",
-    "understand code",
-    "haunted spike"
-  ],
+  "keywords": ["haunted", "ghost", "exorcise", "exorcism", "understand code"],
   "repository": "https://github.com/devcaos/haunted-repo",
   "license": "MIT"
 }
