@@ -1,15 +1,10 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
-    "spike-root": {
+    "haunted-repo": {
       "type": "stdio",
       "command": "node",
-      "args": ["${PLUGIN_ROOT}/src/spike/server.ts"]
-    },
-    "spike-relative": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["src/spike/server.ts"]
+      "args": ["${PLUGIN_ROOT}/bundle/server.mjs"]
     }
   }
 }

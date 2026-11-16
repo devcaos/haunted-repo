@@ -22,7 +22,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 1: Bundle first (biggest risk)
 
 - [ ] 1. Bundled server, smoke test and CI check
-  - [ ] 1.1 Add the dependencies, the bundle script and a stub server
+  - [x] 1.1 Add the dependencies, the bundle script and a stub server
     - In `packages/power/package.json`: dependencies `@haunted-repo/core` `0.0.0`, `@modelcontextprotocol/sdk` `1.32.2`, `zod` `4.6.7`; development dependency `esbuild` `0.28.2`; script `"build": "tsc --noEmit && node scripts/bundle.ts"` (design section 2).
     - Run `npm install` from the root and commit `package-lock.json`; check that the lockfile contains the Linux esbuild entry (`@esbuild/linux-x64`) so `npm ci` works in CI.
     - `packages/power/tsconfig.json`: remove `outDir` and `rootDir`, add `"noEmit": true`, include `src` and `scripts`.
@@ -32,25 +32,25 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Commit the generated `packages/power/bundle/server.mjs`.
     - _Requirements: 1.3, 1.7, 1.9, 11.2_
 
-  - [ ] 1.2 Remove the spike leftovers and point `mcp.json` to the bundle
+  - [x] 1.2 Remove the spike leftovers and point `mcp.json` to the bundle
     - Delete `packages/power/src/spike/`, `packages/power/skills/haunted-spike/`, the placeholder `src/index.ts` and `src/index.test.ts` (`add`).
     - `mcp.json`: one stdio server `haunted-repo` with `"command": "node"`, `"args": ["${PLUGIN_ROOT}/bundle/server.mjs"]`, no `env`; remove the `spike-relative` entry.
     - The ignored local folder `packages/power/dist/` can be deleted by hand (not a commit).
     - _Requirements: 1.3, 1.6, 11.3_
 
-  - [ ] 1.3 Write the stdio smoke test `src/bundle.smoke.test.ts`
+  - [x] 1.3 Write the stdio smoke test `src/bundle.smoke.test.ts`
     - Start `bundle/server.mjs` with the SDK `Client` and `StdioClientTransport`, with `PLUGIN_DATA` set to a new temporary folder (`fs.mkdtemp` in `os.tmpdir()`).
     - Check that `listTools` returns exactly the six tool names, and that `house_status` answers `isError: true` with code `NO_SESSION`.
     - Check that the bundle text contains no test file names (`.test.`, `.testutil.`).
     - No network call.
     - _Requirements: 1.6, 1.7, 1.9, 9.3, 11.8_
 
-  - [ ] 1.4 Add the CI step that checks the committed bundle
+  - [x] 1.4 Add the CI step that checks the committed bundle
     - In `.github/workflows/ci.yml`, after `npm run check`: `test -z "$(git status --porcelain -- packages/power/bundle)" || { git status --porcelain -- packages/power/bundle; exit 1; }`.
     - Determinism check (design doubt 12.4): on the PR, confirm the CI job passes with the bundle built on Windows. If it fails, compare the first different lines with `git diff` before changing any esbuild option (`charset: "utf8"` does not fix path differences). If it still differs, stop and ask the director (options in doubt 12.4).
     - _Requirements: 1.9_
 
-  - [ ] 1.5 Add the ESLint `no-console` rule for `packages/power/src`
+  - [x] 1.5 Add the ESLint `no-console` rule for `packages/power/src`
     - One rule block in `eslint.config.js` for `packages/power/src/**/*.ts`, so nothing writes to the stdio output by mistake (design doubt 6). Logs, if any, use `process.stderr.write`.
     - _Requirements: 1.7, 4.7_
 

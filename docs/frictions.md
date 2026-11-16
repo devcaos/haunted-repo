@@ -251,3 +251,63 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** sustituir la línea entera desde PowerShell y comprobar que `PLAN.md` ya no tiene caracteres de control.
 
 - **Estado:** resuelto. Al escribir archivos desde PowerShell, no meter rutas con `\` dentro de textos que interpreten escapes.
+
+## 2026-11-16 — El seguimiento de tareas ensucia el árbol antes de empezar la tarea
+
+- **Qué intentaba:** comprobar que el árbol de trabajo estaba limpio antes de `git switch main`, en la PR 1 de `kiro-power`.
+
+- **Qué pasó:** el seguimiento de estado del orquestador escribe `[-]` en `tasks.md` y crea `tasks.meta.json` (sin seguimiento en git) antes de que empiece la tarea, así que la comprobación de "árbol limpio" falló.
+
+- **Cómo lo rodeé:** `git stash push --include-untracked` antes de cambiar de rama y `git stash pop` después. `tasks.meta.json` nunca se sube.
+
+- **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — Windows PowerShell 5 no acepta `&&`
+
+- **Qué intentaba:** encadenar dos comandos de git en una sola línea.
+
+- **Qué pasó:** la terminal es Windows PowerShell 5, que no acepta `&&` (llegó en PowerShell 7). El primer comando encadenado ni siquiera se pudo leer.
+
+- **Cómo lo rodeé:** usar `;` para encadenar e `if ($?) { ... }` cuando el segundo comando solo debe correr si el primero funcionó.
+
+- **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — En modo Supervised no se pudo reescribir `mcp.json` entero
+
+- **Qué intentaba:** cambiar `packages/power/mcp.json` para que apunte al bundle (tarea 1.2 de `kiro-power`).
+
+- **Qué pasó:** en modo Supervised la herramienta se negó a reescribir el archivo entero, porque tiene un `$schema` remoto (una URL).
+
+- **Cómo lo rodeé:** editar solo las líneas que cambiaban, con reemplazos pequeños. Eso sí funcionó.
+
+- **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — Un `git grep` con exclusiones `:!` fue rechazado
+
+- **Qué intentaba:** buscar texto en el repositorio con `git grep`, excluyendo carpetas con patrones `:!`.
+
+- **Qué pasó:** la comprobación de permisos rechazó el comando.
+
+- **Cómo lo rodeé:** usar la herramienta de búsqueda del espacio de trabajo en vez de `git grep`.
+
+- **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — `git push` terminó con código 1 aunque el push funcionó
+
+- **Qué intentaba:** subir la rama `feat/kiro-power-bundle` para actualizar la PR #37.
+
+- **Qué pasó:** `git push` devolvió código de salida 1, pero el push había funcionado. Git escribe sus mensajes de progreso en stderr (la salida de errores), y Windows PowerShell 5 trata cualquier texto en stderr de un programa externo como un error.
+
+- **Cómo lo rodeé:** comprobar el resultado real del push mirando la rama remota y la PR en vez de fiarse del código de salida.
+
+- **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — Un filtro `--jq` con `->` falló en `gh run view`
+
+- **Qué intentaba:** ver el resultado de los pasos del job de CI de la PR #37 con `gh run view` y un filtro `--jq` que contenía `->`.
+
+- **Qué pasó:** el comando falló. Windows PowerShell 5 rompe las comillas al pasar el argumento a un programa externo, así que `gh` recibió el filtro partido.
+
+- **Cómo lo rodeé:** usar `gh run view <id> -v`, que muestra los pasos del job sin filtro.
+
+- **Estado:** resuelto con rodeo.
