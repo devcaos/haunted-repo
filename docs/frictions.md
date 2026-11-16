@@ -311,3 +311,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** usar `gh run view <id> -v`, que muestra los pasos del job sin filtro.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — `npm run check | Select-Object` escondió un fallo de Prettier
+
+- **Qué intentaba:** pasar `npm run check` antes del commit de `plugin.json` (PR 2 de `kiro-power`) y ver solo las últimas líneas con `| Select-Object -Last 8`.
+
+- **Qué pasó:** Prettier encontró un problema de formato en `packages/power/plugin.json` y `npm run check` falló, pero la herramienta informó código de salida 0: con la tubería (`|`), el código que llega es el del último comando, `Select-Object`, que sí funcionó. Solo se vio el fallo leyendo la salida.
+
+- **Cómo lo rodeé:** guardar toda la salida en un archivo temporal (`npm run check *> $env:TEMP\hr-check.log`), mirar `$LASTEXITCODE` y después leer el final del archivo con `Get-Content -Tail`.
+
+- **Estado:** resuelto con rodeo.
