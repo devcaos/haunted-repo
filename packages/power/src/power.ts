@@ -24,6 +24,7 @@ import {
   dataExistsMessage,
   ghostsFoundMessage,
   houseContinuedMessage,
+  houseStatusMessage,
   INTERNAL_MESSAGE,
   noDataMessage,
   NO_SESSION_MESSAGE,
@@ -67,6 +68,18 @@ export interface GhostSummary {
 export interface FindGhostsAnswer extends SessionAnswer {
   ghosts: GhostSummary[];
   suggested: string | null;
+}
+
+/** One ghost as house_status shows it (Requirement 10.1). */
+export interface GhostStatus {
+  path: string;
+  floor: Floor;
+  state: "haunted" | "exorcised";
+}
+
+/** The answer of house_status when there is a session. */
+export interface HouseStatusAnswer extends SessionAnswer {
+  ghosts: GhostStatus[];
 }
 
 export interface FindGhostsInput {
@@ -332,14 +345,39 @@ export class HauntedPower {
     return this.queue.run(() => this.skeleton());
   }
 
-  /** house_status (task 5.6). For now only the NO_SESSION check. */
-  houseStatus(): Promise<Answer> {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * house_status (Requirements 10.1, 10.2). Every ghost of the current
+   * session with its floor and state, and the Haunted_Share, which comes
+   * only from hauntedShare of the Engine. No network, no file access.
+   */
+  houseStatus(): Promise<HouseStatusAnswer | ErrorAnswer> {
+    return this.queue.run(() => this.doHouseStatus());
+  }
+
+  private doHouseStatus(): HouseStatusAnswer | ErrorAnswer {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    // state.progress is normalised by the Engine: one entry per ghost.
+    const ghosts: GhostStatus[] = state.ghosts.map((ghost) => ({
+      path: ghost.path,
+      floor: ghost.floor,
+      state:
+        state.progress.ghosts.find((entry) => entry.path === ghost.path)
+          ?.state ?? "haunted",
+    }));
+    const haunted = ghosts.filter((g) => g.state === "haunted").length;
+    return {
+      ...sessionAnswer(session, houseStatusMessage(haunted, ghosts.length)),
+      ghosts,
+    };
   }
 
   // Session tools answer NO_SESSION without a session (Requirement 9.3).
   // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 5.6, 7.1, 7.2 and 7.3).
+  // (tasks 7.1, 7.2 and 7.3).
   private skeleton(): Answer {
     if (this.session === null) {
       return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);

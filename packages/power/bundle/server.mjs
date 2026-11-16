@@ -30432,6 +30432,14 @@ function houseContinuedMessage(owner, repo) {
 function saveFailedWarning(problem) {
   return `Your progress will not be saved: ${problem}`;
 }
+function houseStatusMessage(haunted, total) {
+  if (haunted === 0) {
+    return `No ghost haunts this house any more: all ${total} are exorcised.`;
+  }
+  const ghosts = total === 1 ? "ghost" : "ghosts";
+  const verb = haunted === 1 ? "haunts" : "haunt";
+  return `${haunted} of ${total} ${ghosts} still ${verb} this house.`;
+}
 function ghostsFoundMessage(owner, repo, count, suggested) {
   const ghosts = count === 1 ? "1 ghost" : `${count} ghosts`;
   const start = suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
@@ -30631,13 +30639,34 @@ var HauntedPower = class {
   judgeAnswer() {
     return this.queue.run(() => this.skeleton());
   }
-  /** house_status (task 5.6). For now only the NO_SESSION check. */
+  /**
+   * house_status (Requirements 10.1, 10.2). Every ghost of the current
+   * session with its floor and state, and the Haunted_Share, which comes
+   * only from hauntedShare of the Engine. No network, no file access.
+   */
   houseStatus() {
-    return this.queue.run(() => this.skeleton());
+    return this.queue.run(() => this.doHouseStatus());
+  }
+  doHouseStatus() {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    const ghosts = state.ghosts.map((ghost) => ({
+      path: ghost.path,
+      floor: ghost.floor,
+      state: state.progress.ghosts.find((entry) => entry.path === ghost.path)?.state ?? "haunted"
+    }));
+    const haunted = ghosts.filter((g) => g.state === "haunted").length;
+    return {
+      ...sessionAnswer(session, houseStatusMessage(haunted, ghosts.length)),
+      ghosts
+    };
   }
   // Session tools answer NO_SESSION without a session (Requirement 9.3).
   // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 5.6, 7.1, 7.2 and 7.3).
+  // (tasks 7.1, 7.2 and 7.3).
   skeleton() {
     if (this.session === null) {
       return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
@@ -30887,7 +30916,7 @@ function registerTools(server2, power2) {
     {
       description: "Show every ghost of the current house, haunted or exorcised, and how much of the house is still haunted."
     },
-    safe(noSession)
+    safe(async () => toResult(await power2.houseStatus()))
   );
 }
 

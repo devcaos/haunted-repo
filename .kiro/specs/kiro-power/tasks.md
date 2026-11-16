@@ -146,7 +146,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: exorcised ghosts stay exorcised; `NO_DATA`; broken file; the recording fetch sees no request.
     - _Requirements: 4.1, 4.8, 7.5, 7.9, 9.1, 9.2_
 
-  - [ ] 5.6 Implement the `house_status` tool
+  - [x] 5.6 Implement the `house_status` tool
     - Return each ghost (path, floor, `haunted` or `exorcised`), `hauntedShare(report, progress)` as a number, and English text such as "3 of 5 ghosts still haunt this house".
     - Wire the real handler in `register.ts` and rebuild the bundle; update the smoke test only if its expectations change (it still expects `NO_SESSION` with no session).
     - Unit tests: share and text after `find_ghosts`; `NO_SESSION`.

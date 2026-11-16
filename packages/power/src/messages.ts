@@ -40,6 +40,16 @@ export function saveFailedWarning(problem: string): string {
   return `Your progress will not be saved: ${problem}`;
 }
 
+/** Text of house_status (Requirement 10.1), e.g. "3 of 5 ghosts still haunt this house." */
+export function houseStatusMessage(haunted: number, total: number): string {
+  if (haunted === 0) {
+    return `No ghost haunts this house any more: all ${total} are exorcised.`;
+  }
+  const ghosts = total === 1 ? "ghost" : "ghosts";
+  const verb = haunted === 1 ? "haunts" : "haunt";
+  return `${haunted} of ${total} ${ghosts} still ${verb} this house.`;
+}
+
 export function ghostsFoundMessage(
   owner: string,
   repo: string,
