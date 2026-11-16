@@ -122,3 +122,46 @@ export function eventAcceptedMessage(step: string): string {
       return "Follow the instructions of this step.";
   }
 }
+
+/** INVALID_EVENT of judge_answer outside `asking` (Requirement 5.11). */
+export function judgeNotAllowedMessage(step: string): string {
+  return `A judgement cannot be sent in the step "${step}". Send one of the allowed events instead.`;
+}
+
+/**
+ * Verdict_Retry (Requirements 5.4, 5.5): the message of parseVerdict, the
+ * four allowed last lines and the tries left. It asks the Tutor, never the
+ * Student.
+ */
+export function verdictRetryMessage(
+  problem: string,
+  lines: readonly string[],
+  triesLeft: number,
+): string {
+  return [
+    `Your judgement was not accepted. ${problem}`,
+    "Write the judgement again (do not ask the Student again). Allowed last lines:",
+    lines.join(" | "),
+    `Tries left: ${triesLeft}.`,
+  ].join("\n");
+}
+
+/** Verdict_Failure (Requirement 5.6). */
+export const VERDICT_FAILED_MESSAGE = [
+  "The Tutor could not give a valid verdict for this answer. No rating was recorded.",
+  'The step is still "asking". The Student can continue with the same question or leave the ghost.',
+].join("\n");
+
+/** The message of an accepted judgement, by the step it leads to. */
+export function judgementAcceptedMessage(step: string): string {
+  switch (step) {
+    case "simplifying":
+      return "The Student does not know yet. Give a simpler explanation, then ask the same question again.";
+    case "model-answer":
+      return "Give the Student a short model answer to the question.";
+    case "asking":
+      return "Ask the Student the next question the instructions describe, then wait for the answer.";
+    default:
+      return eventAcceptedMessage(step);
+  }
+}

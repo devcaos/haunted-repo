@@ -181,7 +181,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: `explanation-done`, `self-check-answered` (progress saved), `retry-ghost`, `leave-ghost`, an event the step does not allow, `failed`, `house-clean`.
     - _Requirements: 4.4, 4.5, 4.10, 4.11, 4.12, 6.3, 6.4, 7.3, 9.4_
 
-  - [ ] 7.3 Implement `src/verdictGate.ts` and the `judge_answer` tool
+  - [x] 7.3 Implement `src/verdictGate.ts` and the `judge_answer` tool
     - `MAX_VERDICT_RETRIES = 2`. The strict flow of design section 7: no session gives `NO_SESSION`; step not `asking` gives `INVALID_EVENT` before `parseVerdict` and leaves the count unchanged; `parseVerdict(judgement)` with the text exactly as received (no `trim`, no search, no default).
     - Accepted: count to 0; question is `pendingQuestion` when not `null`, otherwise the Tutor's text; send `answer-rated` (`right`, `half-right`, `wrong`) or `dont-know`; save if progress changed. A refusal by `advance` (blank question) gives `INVALID_EVENT`, state unchanged.
     - Rejected: count + 1; at most 2 gives a Verdict_Retry (`INVALID_VERDICT`, `retry: true`, `triesLeft = 3 - count`, the message of `parseVerdict`, the four allowed lines, "do not ask the Student again"); 3 gives a Verdict_Failure (`VERDICT_FAILED`, `retry: false`, count to 0, step, allowed events and instructions of the unchanged state).

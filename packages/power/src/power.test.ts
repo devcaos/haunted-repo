@@ -16,7 +16,7 @@ import {
 } from "./power.js";
 import type { Store } from "./store.js";
 
-// The skeleton never reads or writes, so this store fails loudly if it does.
+// Without a session nothing reads or writes, so this store fails loudly if it does.
 const unusedStore: Store = {
   read: () => Promise.reject(new Error("store must not be used")),
   write: () => Promise.reject(new Error("store must not be used")),
@@ -48,7 +48,10 @@ describe("HauntedPower without a session", () => {
   const calls: [string, (p: HauntedPower) => Promise<unknown>][] = [
     ["pickGhost", (p) => p.pickGhost({ path: "src/a.ts" })],
     ["sendEvent", (p) => p.sendEvent({ type: "leave-ghost" })],
-    ["judgeAnswer", (p) => p.judgeAnswer()],
+    [
+      "judgeAnswer",
+      (p) => p.judgeAnswer({ question: "Q?", judgement: "VERDICT: right" }),
+    ],
     ["houseStatus", (p) => p.houseStatus()],
   ];
 
