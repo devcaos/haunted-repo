@@ -164,7 +164,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 4: Exorcism tools and the strict verdict
 
 - [ ] 7. Exorcism tools
-  - [ ] 7.1 Implement the `pick_ghost` tool
+  - [x] 7.1 Implement the `pick_ghost` tool
     - Check that the step allows `pick-ghost` and that `isPickable` is true **before** any request; else `INVALID_EVENT` with the allowed events.
     - Read the Ghost_Text with a new `createGitHubClient({ fetch })` and `getFileText(owner, repo, report.overview.ref, path)`; send `{ type: "pick-ghost", path, text }` to `advance` with the text unchanged.
     - Any read error returns `GHOST_TEXT_UNREADABLE` (with the core message when it has one), no crash, state unchanged.
@@ -172,7 +172,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: success (step `explaining`, text unchanged); 404; not text; the request budget error; pick from `failed`; queue test (start `pick_ghost` with a slow fake fetch, call `send_event` before it resolves, final state equals the two calls run one after the other).
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.5_
 
-  - [ ] 7.2 Implement the `send_event` tool
+  - [x] 7.2 Implement the `send_event` tool
     - Build the event from `type`, `text` and `answer`, check it with `parseEvent`, call `advance`. `INVALID_EVENT` returns the Engine message and the allowed events, state unchanged.
     - Save rule: after every accepted `advance`, compare `formatProgress(state.progress)` with the saved text and save before answering if it changed.
     - Reset `invalidCount` to 0 after any accepted `advance`.

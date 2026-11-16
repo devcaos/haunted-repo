@@ -66,3 +66,59 @@ export function ghostsFoundMessage(
     suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
   return `Found ${ghosts} in ${owner}/${repo}, from easy to hard.${start}`;
 }
+
+/** INVALID_EVENT of pick_ghost when the step does not allow pick-ghost. */
+export function pickNotAllowedMessage(step: string): string {
+  return `A ghost cannot be picked in the step "${step}". Send one of the allowed events instead.`;
+}
+
+/** INVALID_EVENT of pick_ghost for a path that is not a haunted ghost. */
+export function notPickableMessage(path: string): string {
+  return `"${path}" is not a haunted ghost of this house. Pick one of the haunted ghosts that find_ghosts or house_status lists.`;
+}
+
+/** GHOST_TEXT_UNREADABLE (Requirement 3.2): the core message when there is one. */
+export function ghostTextUnreadableMessage(
+  path: string,
+  problem: string | null,
+): string {
+  const detail = problem ?? `Could not read the file "${path}" from GitHub.`;
+  return `${detail} The ghost stays haunted. Try again in a moment, or pick another ghost.`;
+}
+
+export function ghostPickedMessage(path: string): string {
+  return `The ghost ${path} is ready. Explain it to the Student now.`;
+}
+
+/** INVALID_EVENT of send_event for a type it never sends (Requirement 5.2). */
+export function sendEventTypeMessage(type: string): string {
+  return `send_event does not send "${type}". It sends only explanation-done, self-check-answered, retry-ghost and leave-ghost; judgements go to judge_answer.`;
+}
+
+/** `failed` (Requirement 4.11): the two options of the Engine. */
+export const GHOST_FAILED_MESSAGE =
+  "The ghost stays haunted for now. Let the Student choose: try the same ghost again after a new explanation (send_event with retry-ghost), or pick another ghost (pick_ghost).";
+
+/** `house-clean` (Requirement 4.12). */
+export const HOUSE_CLEAN_MESSAGE =
+  "The house is clean: no haunted ghost is left.";
+
+/** The message of an accepted send_event, by the step it leads to. */
+export function eventAcceptedMessage(step: string): string {
+  switch (step) {
+    case "explaining":
+      return "Explain the ghost to the Student again, in a new way.";
+    case "asking":
+      return "Ask the Student the question the instructions describe, then wait for the answer.";
+    case "self-check":
+      return "The ghost is exorcised. Ask the Student the self-check question.";
+    case "choosing":
+      return "Let the Student pick the next ghost.";
+    case "failed":
+      return GHOST_FAILED_MESSAGE;
+    case "house-clean":
+      return HOUSE_CLEAN_MESSAGE;
+    default:
+      return "Follow the instructions of this step.";
+  }
+}

@@ -3,9 +3,14 @@
 // constructor arguments, so every rule can be tested without Kiro.
 import {
   ALLOWED_EVENTS,
+  advance,
   buildInstructions,
+  createGitHubClient,
   detectGhosts,
+  formatProgress,
   hauntedShare,
+  isPickable,
+  parseEvent,
   parseRepoUrl,
   startSession,
   suggestGhost,
@@ -22,16 +27,22 @@ import { dataFileName, parseDataFile, serialiseDataFile } from "./dataFile.js";
 import {
   brokenDataMessage,
   dataExistsMessage,
+  eventAcceptedMessage,
+  ghostPickedMessage,
   ghostsFoundMessage,
+  ghostTextUnreadableMessage,
   houseContinuedMessage,
   houseStatusMessage,
   INTERNAL_MESSAGE,
   MEMORY_MODE_WARNING,
   noDataMessage,
   NO_SESSION_MESSAGE,
+  notPickableMessage,
+  pickNotAllowedMessage,
   PARTIAL_WARNING,
   REPO_NOT_FOUND_MESSAGE,
   saveFailedWarning,
+  sendEventTypeMessage,
 } from "./messages.js";
 import type { Store } from "./store.js";
 
@@ -87,6 +98,41 @@ export interface FindGhostsInput {
   url: string;
   knowsJava?: boolean;
   replace?: boolean;
+}
+
+export interface PickGhostInput {
+  path: string;
+}
+
+/** The only event types send_event sends (design section 4). */
+export const SEND_EVENT_TYPES = [
+  "explanation-done",
+  "self-check-answered",
+  "retry-ghost",
+  "leave-ghost",
+] as const;
+
+export interface SendEventInput {
+  type: (typeof SEND_EVENT_TYPES)[number];
+  text?: string;
+  answer?: "yes" | "half" | "no";
+}
+
+/**
+ * The message of an error thrown by the core GitHub client: core errors
+ * (DetectError, not exported by core) carry a string `code`. Any other
+ * error, such as the plain Error of the request budget, gives null, so the
+ * Student gets the general text and no internal detail.
+ */
+export function coreMessage(error: unknown): string | null {
+  if (
+    error instanceof Error &&
+    typeof (error as { code?: unknown }).code === "string" &&
+    error.message !== ""
+  ) {
+    return error.message;
+  }
+  return null;
 }
 
 export interface ContinueHouseInput {
@@ -170,6 +216,13 @@ export class HauntedPower {
    */
   protected storageOk: boolean;
   protected session: Session | null = null;
+  /**
+   * formatProgress of the progress last written to the store for the
+   * current session, or null when none was written. After an accepted
+   * advance the progress is saved when it differs from this text (7.3), so
+   * a failed save is tried again with the next accepted event.
+   */
+  protected savedProgress: string | null = null;
   /** The run started in memory mode: the store is a memory store. */
   private readonly memoryOnly: boolean;
   /**
@@ -237,6 +290,7 @@ export class HauntedPower {
       profile: { knowsJava: input.knowsJava ?? false },
     });
 
+    this.savedProgress = null;
     await this.save(name, report, state.progress);
 
     const session: Session = {
@@ -325,6 +379,8 @@ export class HauntedPower {
       invalidCount: 0,
     };
     this.session = session;
+    // The file holds this progress (the Engine only normalises it).
+    this.savedProgress = formatProgress(state.progress);
     return sessionAnswer(
       session,
       houseContinuedMessage(session.owner, session.repo),
@@ -353,6 +409,7 @@ export class HauntedPower {
       name,
       serialiseDataFile(report, progress),
     );
+    if (result.ok) this.savedProgress = formatProgress(progress);
     if (this.memoryOnly) return;
     if (result.ok) {
       this.storageOk = true;
@@ -380,14 +437,130 @@ export class HauntedPower {
     return parts.length > 0 ? parts.join(" ") : undefined;
   }
 
-  /** pick_ghost (task 7.1). For now only the NO_SESSION check. */
-  pickGhost(): Promise<Answer> {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * pick_ghost (Requirements 3.1 to 3.4). The step and the path are checked
+   * before any request. The Ghost_Text is read from GitHub with a new client
+   * and given to the Engine unchanged. A failed read leaves the session as
+   * it was and never sends pick-ghost.
+   */
+  pickGhost(input: PickGhostInput): Promise<Answer> {
+    return this.queue.run(() => this.doPickGhost(input));
   }
 
-  /** send_event (task 7.2). For now only the NO_SESSION check. */
-  sendEvent(): Promise<Answer> {
-    return this.queue.run(() => this.skeleton());
+  private async doPickGhost(input: PickGhostInput): Promise<Answer> {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    if (!ALLOWED_EVENTS[state.step].includes("pick-ghost")) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        pickNotAllowedMessage(state.step),
+        state,
+      );
+    }
+    if (!isPickable(state.ghosts, state.progress, input.path)) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        notPickableMessage(input.path),
+        state,
+      );
+    }
+
+    let text: string;
+    try {
+      const client = createGitHubClient({ fetch: this.fetch });
+      text = await client.getFileText(
+        session.owner,
+        session.repo,
+        session.report.overview.ref,
+        input.path,
+      );
+    } catch (error) {
+      return errorAnswer(
+        "GHOST_TEXT_UNREADABLE",
+        ghostTextUnreadableMessage(input.path, coreMessage(error)),
+        state,
+      );
+    }
+
+    const transition = advance(state, {
+      type: "pick-ghost",
+      path: input.path,
+      text,
+    });
+    if (!transition.ok) {
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    session.state = transition.state;
+    // Any accepted advance resets the Invalid_Judgement_Count (5.7).
+    session.invalidCount = 0;
+    // pick-ghost never changes the progress, so there is nothing to save.
+    return sessionAnswer(
+      session,
+      ghostPickedMessage(input.path),
+      this.withStorageWarning(),
+    );
+  }
+
+  /**
+   * send_event (Requirements 4.4, 4.5, 4.10 to 4.12, 6.3, 6.4, 7.3). Builds
+   * the event from the input, checks it with parseEvent and advance; a
+   * refused event leaves the session as it was. answer-rated and dont-know
+   * are never sent here: only judge_answer sends them (5.2).
+   */
+  sendEvent(input: SendEventInput): Promise<Answer> {
+    return this.queue.run(() => this.doSendEvent(input));
+  }
+
+  private async doSendEvent(input: SendEventInput): Promise<Answer> {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    if (!(SEND_EVENT_TYPES as readonly string[]).includes(input.type)) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        sendEventTypeMessage(String(input.type)),
+        state,
+      );
+    }
+    const raw: Record<string, unknown> = { type: input.type };
+    if (input.text !== undefined) raw["text"] = input.text;
+    if (input.answer !== undefined) raw["answer"] = input.answer;
+    const parsed = parseEvent(raw);
+    if (!parsed.ok) {
+      return errorAnswer("INVALID_EVENT", parsed.error.message, state);
+    }
+    const transition = advance(state, parsed.value);
+    if (!transition.ok) {
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    await this.accept(session, transition.state);
+    return sessionAnswer(
+      session,
+      eventAcceptedMessage(session.state.step),
+      this.withStorageWarning(),
+    );
+  }
+
+  /**
+   * Keeps the state of an advance the Engine accepted: resets the
+   * Invalid_Judgement_Count (5.7) and, when the progress differs from the
+   * saved one, saves it before the answer is returned (7.3).
+   */
+  protected async accept(session: Session, next: SessionState): Promise<void> {
+    session.state = next;
+    session.invalidCount = 0;
+    if (formatProgress(next.progress) !== this.savedProgress) {
+      await this.save(
+        dataFileName(session.owner, session.repo),
+        session.report,
+        next.progress,
+      );
+    }
   }
 
   /** judge_answer (task 7.3). For now only the NO_SESSION check. */
@@ -431,7 +604,7 @@ export class HauntedPower {
 
   // Session tools answer NO_SESSION without a session (Requirement 9.3).
   // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 7.1, 7.2 and 7.3).
+  // (tasks 7.2 and 7.3).
   private skeleton(): Answer {
     if (this.session === null) {
       return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
