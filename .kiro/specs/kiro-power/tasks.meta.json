@@ -1,0 +1,301 @@
+{
+  "pbtResults": {
+    "3.2 Write the property test for safe file names": {
+      "status": "passed",
+      "lastRunTimestamp": 1794845790612
+    },
+    "3.5 Write the property test for the save round-trip": {
+      "status": "passed",
+      "lastRunTimestamp": 1794846546741
+    },
+    "7.4 Write the property test for the strict verdict, and see it fail once": {
+      "status": "passed",
+      "lastRunTimestamp": 1794858066507
+    },
+    "7.5 Write the property test for the bounded retry, and see it fail once": {
+      "status": "passed",
+      "lastRunTimestamp": 1794858356749
+    },
+    "7.6 Write the property test for the network allowlist": {
+      "status": "passed",
+      "lastRunTimestamp": 1794858621214
+    }
+  },
+  "executionHistory": {
+    "1.1 Add the dependencies, the bundle script and a stub server": [
+      {
+        "executionId": "6320e34e-8b58-4b8d-a210-d1b84f486d2f",
+        "chatSessionId": "sess_c8422138-180c-42d7-9fe2-7487afb3dcca",
+        "timestamp": 1794842903886
+      }
+    ],
+    "1.2 Remove the spike leftovers and point `mcp.json` to the bundle": [
+      {
+        "executionId": "6320e34e-8b58-4b8d-a210-d1b84f486d2f",
+        "chatSessionId": "sess_c8422138-180c-42d7-9fe2-7487afb3dcca",
+        "timestamp": 1794843294921
+      }
+    ],
+    "1.3 Write the stdio smoke test `src/bundle.smoke.test.ts`": [
+      {
+        "executionId": "6320e34e-8b58-4b8d-a210-d1b84f486d2f",
+        "chatSessionId": "sess_c8422138-180c-42d7-9fe2-7487afb3dcca",
+        "timestamp": 1794843428567
+      }
+    ],
+    "1.5 Add the ESLint `no-console` rule for `packages/power/src`": [
+      {
+        "executionId": "6320e34e-8b58-4b8d-a210-d1b84f486d2f",
+        "chatSessionId": "sess_c8422138-180c-42d7-9fe2-7487afb3dcca",
+        "timestamp": 1794843565281
+      }
+    ],
+    "1.4 Add the CI step that checks the committed bundle": [
+      {
+        "executionId": "6320e34e-8b58-4b8d-a210-d1b84f486d2f",
+        "chatSessionId": "sess_c8422138-180c-42d7-9fe2-7487afb3dcca",
+        "timestamp": 1794843681778
+      },
+      {
+        "executionId": "6320e34e-8b58-4b8d-a210-d1b84f486d2f",
+        "chatSessionId": "sess_c8422138-180c-42d7-9fe2-7487afb3dcca",
+        "timestamp": 1794844055576
+      }
+    ],
+    "1.6 Quick check in Kiro (done by the director, not automatable)": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794845297890
+      }
+    ],
+    "3.1 Implement `src/dataFile.ts` (name, serialise, parse)": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794845419739
+      }
+    ],
+    "3.2 Write the property test for safe file names": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794845556264
+      }
+    ],
+    "3.3 Implement `src/store.ts` with the folder store and the memory store": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794845883825
+      }
+    ],
+    "3.4 Add the Windows rename retries to the folder store": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794846088422
+      }
+    ],
+    "3.5 Write the property test for the save round-trip": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794846441953
+      }
+    ],
+    "3.6 Implement `src/guardFetch.ts`": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794846631925
+      }
+    ],
+    "4. Checkpoint: PR 2": [
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794846809649
+      },
+      {
+        "executionId": "94352fc9-27d3-4b37-b382-d1fbe98b4fb1",
+        "chatSessionId": "sess_8c3a0d9f-b83b-4d33-8767-919535582155",
+        "timestamp": 1794847308355
+      }
+    ],
+    "5.1 Add the strict fake GitHub helper": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794849643741
+      }
+    ],
+    "5.2 Implement the `HauntedPower` skeleton and `src/messages.ts`": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794849736054
+      }
+    ],
+    "5.3 Implement the `find_ghosts` tool": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794849959368
+      }
+    ],
+    "5.5 Implement the `continue_house` tool": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794850503435
+      }
+    ],
+    "5.6 Implement the `house_status` tool": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794850770169
+      }
+    ],
+    "5.7 Implement the `PLUGIN_DATA` memory fallback and the warning-once rule": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794851052161
+      }
+    ],
+    "5. Session and house tools": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794851433361
+      }
+    ],
+    "6. Checkpoint: PR 3": [
+      {
+        "executionId": "bf474772-9adb-42f7-9a1f-06e54b5c9f11",
+        "chatSessionId": "sess_5b5bc077-5515-4aba-a42a-a1f19851f891",
+        "timestamp": 1794851460762
+      }
+    ],
+    "7.1 Implement the `pick_ghost` tool": [
+      {
+        "executionId": "2ff177d8-2f96-4b6f-8452-827401e478b2",
+        "chatSessionId": "sess_2d070fea-a145-449e-8d53-73e7407453dc",
+        "timestamp": 1794856707564
+      }
+    ],
+    "7.2 Implement the `send_event` tool": [
+      {
+        "executionId": "2ff177d8-2f96-4b6f-8452-827401e478b2",
+        "chatSessionId": "sess_2d070fea-a145-449e-8d53-73e7407453dc",
+        "timestamp": 1794857172532
+      }
+    ],
+    "7.3 Implement `src/verdictGate.ts` and the `judge_answer` tool": [
+      {
+        "executionId": "2ff177d8-2f96-4b6f-8452-827401e478b2",
+        "chatSessionId": "sess_2d070fea-a145-449e-8d53-73e7407453dc",
+        "timestamp": 1794857582774
+      }
+    ],
+    "7.4 Write the property test for the strict verdict, and see it fail once": [
+      {
+        "executionId": "2ff177d8-2f96-4b6f-8452-827401e478b2",
+        "chatSessionId": "sess_2d070fea-a145-449e-8d53-73e7407453dc",
+        "timestamp": 1794857927738
+      }
+    ],
+    "7.5 Write the property test for the bounded retry, and see it fail once": [
+      {
+        "executionId": "2ff177d8-2f96-4b6f-8452-827401e478b2",
+        "chatSessionId": "sess_2d070fea-a145-449e-8d53-73e7407453dc",
+        "timestamp": 1794858208019
+      }
+    ],
+    "7.6 Write the property test for the network allowlist": [
+      {
+        "executionId": "2ff177d8-2f96-4b6f-8452-827401e478b2",
+        "chatSessionId": "sess_2d070fea-a145-449e-8d53-73e7407453dc",
+        "timestamp": 1794858465039
+      }
+    ],
+    "7.8 Write the full-walk and restart tests": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450415
+      },
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859492177
+      }
+    ],
+    "8. Checkpoint: PR 4": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450513
+      }
+    ],
+    "9.1 Write the Tutor_Skill `skills/exorcise-ghosts/SKILL.md`": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450568
+      },
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794860302821
+      }
+    ],
+    "9.2 Update `plugin.json` and write the manifest test": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450627
+      },
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794860549084
+      }
+    ],
+    "9.3 Write the live test `src/ghostText.live.test.ts`": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450683
+      },
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794861765814
+      }
+    ],
+    "10. Checkpoint: PR 5": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450754
+      }
+    ],
+    "11.1 Install from the branch folder before merging and run the whole check": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450832
+      }
+    ],
+    "11.2 Install from GitHub after merging and repeat one call": [
+      {
+        "executionId": "bc7f1e2a-8f04-4f02-b7fe-cbde0d5f790a",
+        "chatSessionId": "sess_97a9b27f-9065-4873-8631-dda3a4bb7b5b",
+        "timestamp": 1794859450891
+      }
+    ]
+  }
+}
