@@ -30474,7 +30474,7 @@ function errorAnswer(code, message, state) {
 var SerialQueue = class {
   tail = Promise.resolve();
   run(fn) {
-    const run = this.tail.then(fn);
+    const run = this.tail.then(() => fn());
     this.tail = run.catch(() => {
     });
     return run;

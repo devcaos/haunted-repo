@@ -153,7 +153,8 @@ export class SerialQueue {
   private tail: Promise<unknown> = Promise.resolve();
 
   run<T>(fn: () => T | Promise<T>): Promise<T> {
-    const run = this.tail.then(fn);
+    // fn is called with no argument: it never receives the previous result.
+    const run = this.tail.then(() => fn());
     this.tail = run.catch(() => {});
     return run;
   }
