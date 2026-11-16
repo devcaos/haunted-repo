@@ -328,6 +328,6 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Qué pasó:** `git diff --stat main`, sin `package-lock.json` ni `packages/power/bundle/`, dio 1.032 líneas cambiadas (1.010 añadidas y 22 borradas) antes de las entradas de este archivo; el límite de Luis Miguel es 900. Unas 615 son de tests.
 
-- **Cómo lo rodeé:** no se subió la rama; se propuso a Luis Miguel partirla en dos PR apiladas sobre commits que ya existen, sin reescribir la historia.
+- **Cómo lo rodeé:** no se subió la rama; se propuso a Luis Miguel partirla en dos PR apiladas sobre commits que ya existen, sin reescribir la historia. Luis Miguel eligió la opción A: la rama nueva `feat/kiro-power-store-1` apunta al commit b7fa850 (tareas 1.6, 3.1 y 3.2) y va contra `main` (PR 2a); `feat/kiro-power-store` (tareas 3.3 a 3.6 y arreglos de la revisión) va encima de ella (PR 2b).
 
-- **Estado:** abierto (falta que Luis Miguel elija cómo partirla).
+- **Estado:** resuelto (opción A: dos PR apiladas; la 2a se fusiona primero).
