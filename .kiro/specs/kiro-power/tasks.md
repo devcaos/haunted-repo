@@ -64,7 +64,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 2: Data file, store and network guard
 
-- [ ] 3. Pure modules and the store
+- [x] 3. Pure modules and the store
   - [x] 3.1 Implement `src/dataFile.ts` (name, serialise, parse)
     - `dataFileName(owner, repo)`: `haunted-repo--<owner>@<repo>.json` in lowercase; re-checks owner `[a-z0-9-]+` and repo `[a-z0-9._-]+` and throws if one fails. `isOwnDataFile(name)` with `^haunted-repo--[a-z0-9-]+@[a-z0-9._-]+\.json$`.
     - `serialiseDataFile(report, progress)`: `{ format: 1, report, progress }` built from `JSON.stringify(report)` and `formatProgress(progress)`, no other keys.
@@ -98,7 +98,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Add the `core-testutil/` alias here: root `vitest.config.ts` aliases `core-testutil/` to `packages/core/src/`, and `packages/power/tsconfig.json` has the same prefix in `paths` (design section 3).
     - **Validates: Requirements 7.1, 7.2, 7.4, 7.8**
 
-  - [ ] 3.6 Implement `src/guardFetch.ts`
+  - [x] 3.6 Implement `src/guardFetch.ts`
     - `guardFetch(fetch)` returns a `fetch` that parses the request URL with `new URL()` and throws, without calling the inner `fetch`, if it does not parse or its origin is not exactly `https://api.github.com`. It never adds an `Authorization` header.
     - Unit tests: `https://example.com/repos/a/b` and `https://api.github.com.evil.example/` are refused and the inner `fetch` is never called; a URL under `https://api.github.com/` reaches it unchanged.
     - _Requirements: 4.9, 7.7, 8.1, 8.2_
