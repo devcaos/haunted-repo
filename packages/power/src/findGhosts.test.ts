@@ -20,7 +20,7 @@ import {
   type FindGhostsAnswer,
   type ErrorAnswer,
 } from "./power.js";
-import { createFolderStore, type Store } from "./store.js";
+import { createFolderStore, createMemoryStore, type Store } from "./store.js";
 import {
   createTestGitHub,
   type FakeGitHubOptions,
@@ -306,6 +306,32 @@ describe("find_ghosts", () => {
       name,
     );
     expect(reread.ok).toBe(true);
+  });
+
+  it("runs two calls at once one after the other, with a single detection", async () => {
+    // Requests of one detection of o/r, measured on a separate fake.
+    const reference = createTestGitHub([fiveFiles]);
+    ok(
+      await new HauntedPower({
+        fetch: reference.fetch,
+        store: createMemoryStore(),
+        storageOk: true,
+      }).findGhosts({ url: "github.com/o/r" }),
+    );
+    const oneDetection = reference.fake.requestCount;
+    expect(oneDetection).toBeGreaterThan(0);
+
+    // Without the queue both calls would read "no file" and both detect.
+    const { power, fake } = setup([fiveFiles]);
+    const answers = await Promise.all([
+      power.findGhosts({ url: "github.com/o/r" }),
+      power.findGhosts({ url: "github.com/o/r" }),
+    ]);
+    expect(answers.map((a) => (a.ok ? "ok" : a.code))).toEqual([
+      "ok",
+      "DATA_EXISTS",
+    ]);
+    expect(fake.requestCount).toBe(oneDetection);
   });
 
   it("keeps the session and warns when the save fails", async () => {
