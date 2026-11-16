@@ -90,7 +90,7 @@ export function registerTools(server: McpServer, power: HauntedPower): void {
         "Pick the ghost (file path) to exorcise next. The Power reads its text from GitHub.",
       inputSchema: { path: z.string() },
     },
-    safe(noSession),
+    safe(async ({ path }) => toResult(await power.pickGhost({ path }))),
   );
 
   server.registerTool(

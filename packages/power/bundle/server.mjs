@@ -5110,8 +5110,8 @@ var require_multipleOf = __commonJS({
         const { gen, data, schemaCode, it } = cxt;
         const prec = it.opts.multipleOfPrecision;
         const res = gen.let("res");
-        const invalid2 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid2}))`);
+        const invalid3 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid3}))`);
       }
     };
     exports.default = def;
@@ -11008,8 +11008,8 @@ var require_multipleOf2 = __commonJS({
         const { gen, data, schemaCode, it } = cxt;
         const prec = it.opts.multipleOfPrecision;
         const res = gen.let("res");
-        const invalid2 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid2}))`);
+        const invalid3 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid3}))`);
       }
     };
     exports.default = def;
@@ -29508,7 +29508,7 @@ function rateLimitError(headers) {
 function createGitHubClient(opts = {}) {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   let count = 0;
-  async function get(path2, accept = "application/vnd.github+json") {
+  async function get(path2, accept2 = "application/vnd.github+json") {
     if (count >= MAX_REQUESTS) {
       throw new Error(`GitHub request budget of ${MAX_REQUESTS} exceeded`);
     }
@@ -29519,7 +29519,7 @@ function createGitHubClient(opts = {}) {
       response = await doFetch(`${API_ROOT}${path2}`, {
         method: "GET",
         headers: {
-          Accept: accept,
+          Accept: accept2,
           "X-GitHub-Api-Version": "2022-11-28"
         },
         signal: AbortSignal.timeout(timeoutMs)
@@ -29892,6 +29892,168 @@ var ALLOWED_EVENTS = {
   failed: ["retry-ghost", "pick-ghost"],
   "house-clean": []
 };
+var RATINGS = ["right", "half-right", "wrong"];
+var SELF_CHECKS = ["yes", "half", "no"];
+function isRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function isNotBlank(value) {
+  return typeof value === "string" && value.trim() !== "";
+}
+function invalid2(message) {
+  return fail2("INVALID_EVENT", message);
+}
+function parseEvent(raw) {
+  try {
+    if (!isRecord(raw)) return invalid2("The event must be an object.");
+    const type = raw["type"];
+    switch (type) {
+      case "pick-ghost": {
+        const path2 = raw["path"];
+        const text = raw["text"];
+        if (typeof path2 !== "string") {
+          return invalid2('The event "pick-ghost" needs a string "path".');
+        }
+        if (typeof text !== "string") {
+          return invalid2('The event "pick-ghost" needs a string "text".');
+        }
+        return ok2({ type, path: path2, text });
+      }
+      case "explanation-done": {
+        const text = raw["text"];
+        if (!isNotBlank(text)) {
+          return invalid2(
+            'The event "explanation-done" needs a "text" that is not blank.'
+          );
+        }
+        return ok2({ type, text });
+      }
+      case "answer-rated": {
+        const rating = raw["rating"];
+        const question = raw["question"];
+        if (typeof rating !== "string" || !RATINGS.includes(rating)) {
+          return invalid2(
+            'The event "answer-rated" needs a "rating" of right, half-right or wrong.'
+          );
+        }
+        if (!isNotBlank(question)) {
+          return invalid2(
+            'The event "answer-rated" needs a "question" that is not blank.'
+          );
+        }
+        return ok2({ type, rating, question });
+      }
+      case "dont-know": {
+        const question = raw["question"];
+        if (!isNotBlank(question)) {
+          return invalid2(
+            'The event "dont-know" needs a "question" that is not blank.'
+          );
+        }
+        return ok2({ type, question });
+      }
+      case "self-check-answered": {
+        const answer = raw["answer"];
+        if (typeof answer !== "string" || !SELF_CHECKS.includes(answer)) {
+          return invalid2(
+            'The event "self-check-answered" needs an "answer" of yes, half or no.'
+          );
+        }
+        return ok2({ type, answer });
+      }
+      case "retry-ghost":
+        return ok2({ type });
+      case "leave-ghost":
+        return ok2({ type });
+      default:
+        return invalid2("The event has an unknown or missing type.");
+    }
+  } catch {
+    return invalid2("The event could not be read.");
+  }
+}
+
+// ../core/src/exorcism/fileKind.ts
+var MAX_LINE_LENGTH2 = 500;
+var TS_JS_FUNCTION_LIKE = [
+  /\bfunction\b/,
+  /=>/,
+  /^\s*(public|private|protected|static|async)\s+\w+.*\(/
+];
+var PATTERNS = {
+  TypeScript: {
+    entryMarkers: ["process.argv", "createServer(", ".listen(", "createRoot("],
+    functionLike: TS_JS_FUNCTION_LIKE,
+    typeDeclaration: [/^(export\s+)?(declare\s+)?(interface|type|enum)\s+\w+/]
+  },
+  JavaScript: {
+    entryMarkers: ["process.argv", "createServer(", ".listen(", "createRoot("],
+    functionLike: TS_JS_FUNCTION_LIKE,
+    typeDeclaration: []
+  },
+  Java: {
+    entryMarkers: ["public static void main("],
+    functionLike: [
+      /^\s*(?:(?:public|private|protected|static|final|abstract|synchronized)\s+)*(?!(?:else|return|new|throw)\b)[\w<>[\],.?]+\s+\w+\s*\([^)]*\)\s*(?:throws\s+[\w., ]+)?\{\s*$/
+    ],
+    typeDeclaration: [/\b(record|enum|interface)\s+\w+/]
+  },
+  Python: {
+    entryMarkers: ['if __name__ == "__main__"', "if __name__ == '__main__'"],
+    functionLike: [/^\s*(async\s+)?def\s+\w+/],
+    typeDeclaration: [
+      /^\s*@dataclass/,
+      /^\s*class\s+\w+\s*\(.*\b(TypedDict|NamedTuple|Enum)\b.*\)/
+    ]
+  }
+};
+var IMPORT_LINE = /^(import\b|from\s+\S+\s+import\b)/;
+var REEXPORT_LINE = /^export\b.*\bfrom\b/;
+var TS_TYPE_LINE = /^(export\s+)?type\s/;
+var PROPERTY_SIGNATURE = /^(readonly\s+)?[\w$]+\??\s*:\s*\(.*\)\s*=>/;
+function isCommentLine2(trimmed) {
+  return trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("/*") || trimmed.startsWith("*");
+}
+function codeLinesOf(text) {
+  const clean = text.startsWith("\uFEFF") ? text.slice(1) : text;
+  const result = [];
+  for (const rawLine of clean.split(/\r?\n/)) {
+    const line = rawLine.slice(0, MAX_LINE_LENGTH2);
+    const trimmed = line.trim();
+    if (trimmed === "" || isCommentLine2(trimmed)) continue;
+    result.push(line);
+  }
+  return result;
+}
+function isFunctionLike(line, language) {
+  const trimmed = line.trim();
+  const isTs = language === "TypeScript";
+  const ignoreArrow = isTs && (TS_TYPE_LINE.test(trimmed) || PROPERTY_SIGNATURE.test(trimmed));
+  for (const pattern of PATTERNS[language].functionLike) {
+    if (ignoreArrow && pattern.source === "=>") continue;
+    if (pattern.test(line)) return true;
+  }
+  return false;
+}
+function classifyFileKind(text, language) {
+  const factors = measureFactors(text);
+  if (factors.lines === 0) return "general";
+  const patterns = PATTERNS[language];
+  const lines = codeLinesOf(text);
+  const trimmedLines = lines.map((l) => l.trim());
+  const hasMarker = lines.some(
+    (l) => patterns.entryMarkers.some((m) => l.includes(m))
+  );
+  const isBarrel = trimmedLines.length > 0 && trimmedLines.every((l) => IMPORT_LINE.test(l) || REEXPORT_LINE.test(l));
+  if (hasMarker || isBarrel) return "entry-point";
+  const hasFunction = lines.some((l) => isFunctionLike(l, language));
+  const hasType = trimmedLines.some(
+    (l) => patterns.typeDeclaration.some((p) => p.test(l))
+  );
+  if (factors.branches === 0 && !hasFunction && hasType) return "data-shape";
+  if (hasFunction) return "logic";
+  return "general";
+}
 
 // ../core/src/exorcism/questions.ts
 var QUESTION_SETS = {
@@ -29969,6 +30131,9 @@ function suggestGhost(ghosts, progress) {
     }
   }
   return best;
+}
+function isPickable(ghosts, progress, path2) {
+  return ghosts.some((g) => g.path === path2) && hauntedPaths(progress).has(path2);
 }
 
 // ../core/src/exorcism/instructions.ts
@@ -30214,14 +30379,14 @@ function buildInstructions(state) {
 }
 
 // ../core/src/exorcism/progress.ts
-var RATINGS = ["right", "half-right", "wrong"];
-var SELF_CHECKS = ["yes", "half", "no"];
-function isRecord(value) {
+var RATINGS2 = ["right", "half-right", "wrong"];
+var SELF_CHECKS2 = ["yes", "half", "no"];
+function isRecord2(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function entryProblem(entry, index) {
   const where = `ghosts[${index}]`;
-  if (!isRecord(entry)) return `${where} must be an object.`;
+  if (!isRecord2(entry)) return `${where} must be an object.`;
   if (typeof entry["path"] !== "string")
     return `${where}.path must be a string.`;
   if (entry["state"] !== "haunted" && entry["state"] !== "exorcised") {
@@ -30231,17 +30396,17 @@ function entryProblem(entry, index) {
   if (!Array.isArray(ratings) || ratings.length !== 0 && ratings.length !== 3) {
     return `${where}.ratings must be a list of 0 or 3 ratings.`;
   }
-  if (!ratings.every((r) => typeof r === "string" && RATINGS.includes(r))) {
+  if (!ratings.every((r) => typeof r === "string" && RATINGS2.includes(r))) {
     return `${where}.ratings must only contain "right", "half-right" or "wrong".`;
   }
   const selfCheck = entry["selfCheck"];
-  if (selfCheck !== null && !(typeof selfCheck === "string" && SELF_CHECKS.includes(selfCheck))) {
+  if (selfCheck !== null && !(typeof selfCheck === "string" && SELF_CHECKS2.includes(selfCheck))) {
     return `${where}.selfCheck must be "yes", "half", "no" or null.`;
   }
   return null;
 }
 function progressProblem(value) {
-  if (!isRecord(value)) return "The progress must be an object.";
+  if (!isRecord2(value)) return "The progress must be an object.";
   const ghosts = value["ghosts"];
   if (!Array.isArray(ghosts)) return "The progress must have a ghosts list.";
   const seen = /* @__PURE__ */ new Set();
@@ -30332,6 +30497,156 @@ function startSession(report, options) {
   };
   return { state, instructions: buildInstructions(state) };
 }
+function refuse(state, message) {
+  return { ok: false, error: { code: "INVALID_EVENT", message }, state };
+}
+function accept(state) {
+  return { ok: true, state, instructions: buildInstructions(state) };
+}
+function pickGhost(state, event) {
+  if (!isPickable(state.ghosts, state.progress, event.path)) {
+    return refuse(state, "That ghost cannot be picked.");
+  }
+  const ghost = state.ghosts.find((g) => g.path === event.path);
+  if (ghost === void 0) return refuse(state, "That ghost cannot be picked.");
+  const current = {
+    path: event.path,
+    text: event.text,
+    kind: classifyFileKind(event.text, ghost.language),
+    explanation: "",
+    simpler: [],
+    attemptStart: state.asked[event.path]?.length ?? 0,
+    questionIndex: 0,
+    dontKnowCount: 0,
+    pendingQuestion: null,
+    ratings: []
+  };
+  return accept({ ...state, step: "explaining", current });
+}
+function advance(state, event) {
+  const parsed = parseEvent(event);
+  if (!parsed.ok) return { ok: false, error: parsed.error, state };
+  const e = parsed.value;
+  if (!ALLOWED_EVENTS[state.step].includes(e.type)) {
+    return refuse(
+      state,
+      `The event ${e.type} is not accepted in the step ${state.step}.`
+    );
+  }
+  if (e.type === "pick-ghost") return pickGhost(state, e);
+  const current = state.current;
+  if (current === null) return refuse(state, "There is no ghost in progress.");
+  if (e.type === "explanation-done") {
+    if (state.step === "explaining") {
+      return accept({
+        ...state,
+        step: "asking",
+        current: { ...current, explanation: e.text }
+      });
+    }
+    if (state.step === "simplifying") {
+      return accept({
+        ...state,
+        step: "asking",
+        current: { ...current, simpler: [...current.simpler, e.text] }
+      });
+    }
+    if (state.step === "model-answer") return nextQuestion(state, current);
+  }
+  if (e.type === "answer-rated" && state.step === "asking") {
+    const asked = current.pendingQuestion === null ? withQuestion(state, current.path, e.question) : state.asked;
+    return nextQuestion(
+      { ...state, asked },
+      { ...current, ratings: [...current.ratings, e.rating] }
+    );
+  }
+  if (e.type === "dont-know" && state.step === "asking") {
+    if (current.dontKnowCount === 0) {
+      return accept({
+        ...state,
+        step: "simplifying",
+        asked: withQuestion(state, current.path, e.question),
+        current: { ...current, dontKnowCount: 1, pendingQuestion: e.question }
+      });
+    }
+    return accept({
+      ...state,
+      step: "model-answer",
+      current: { ...current, ratings: [...current.ratings, "wrong"] }
+    });
+  }
+  if (e.type === "self-check-answered" && state.step === "self-check") {
+    const progress = updateEntry(state, current.path, (entry) => ({
+      ...entry,
+      selfCheck: e.answer
+    }));
+    const next = { ...state, progress, current: null };
+    return accept({
+      ...next,
+      step: suggestGhost(state.ghosts, progress) === null ? "house-clean" : "choosing"
+    });
+  }
+  if (e.type === "retry-ghost" && state.step === "failed") {
+    return accept({
+      ...state,
+      step: "explaining",
+      current: {
+        ...current,
+        simpler: [],
+        attemptStart: state.asked[current.path]?.length ?? 0,
+        questionIndex: 0,
+        dontKnowCount: 0,
+        pendingQuestion: null,
+        ratings: []
+      }
+    });
+  }
+  if (e.type === "leave-ghost") {
+    return accept({ ...state, step: "choosing", current: null });
+  }
+  return refuse(state, `The event ${e.type} cannot be applied now.`);
+}
+function updateEntry(state, path2, change) {
+  return {
+    ghosts: state.progress.ghosts.map(
+      (entry) => entry.path === path2 ? change(entry) : entry
+    )
+  };
+}
+function withQuestion(state, path2, question) {
+  return { ...state.asked, [path2]: [...state.asked[path2] ?? [], question] };
+}
+function nextQuestion(state, current) {
+  if (current.questionIndex === 2) {
+    const passed = decide(current.ratings);
+    const progress = updateEntry(state, current.path, (entry) => ({
+      ...entry,
+      state: passed ? "exorcised" : "haunted",
+      ratings: [...current.ratings]
+    }));
+    return accept({
+      ...state,
+      step: passed ? "self-check" : "failed",
+      progress,
+      current
+    });
+  }
+  const questionIndex = current.questionIndex === 0 ? 1 : 2;
+  return accept({
+    ...state,
+    step: "asking",
+    current: {
+      ...current,
+      questionIndex,
+      dontKnowCount: 0,
+      pendingQuestion: null
+    }
+  });
+}
+function decide(ratings) {
+  const good = ratings.filter((r) => r !== "wrong").length;
+  return good >= 2 && ratings[0] !== "wrong";
+}
 
 // src/dataFile.ts
 var MARKER = "haunted-repo--";
@@ -30355,7 +30670,7 @@ function isOwnDataFile(name) {
 function serialiseDataFile(report, progress) {
   return `{"format":1,"report":${JSON.stringify(report)},"progress":${formatProgress(progress)}}`;
 }
-function isRecord2(value) {
+function isRecord3(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 function fail3(code, fileName, problem) {
@@ -30374,7 +30689,7 @@ function parseDataFile(text, fileName) {
   } catch {
     return fail3("INVALID_REPORT", fileName, "it is not valid JSON text.");
   }
-  if (!isRecord2(raw) || raw["format"] !== 1) {
+  if (!isRecord3(raw) || raw["format"] !== 1) {
     return fail3("INVALID_REPORT", fileName, "its format is not 1.");
   }
   if (!("report" in raw)) {
@@ -30448,8 +30763,27 @@ function ghostsFoundMessage(owner, repo, count, suggested) {
   const start = suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
   return `Found ${ghosts} in ${owner}/${repo}, from easy to hard.${start}`;
 }
+function pickNotAllowedMessage(step) {
+  return `A ghost cannot be picked in the step "${step}". Send one of the allowed events instead.`;
+}
+function notPickableMessage(path2) {
+  return `"${path2}" is not a haunted ghost of this house. Pick one of the haunted ghosts that find_ghosts or house_status lists.`;
+}
+function ghostTextUnreadableMessage(path2, problem) {
+  const detail = problem ?? `Could not read the file "${path2}" from GitHub.`;
+  return `${detail} The ghost stays haunted. Try again in a moment, or pick another ghost.`;
+}
+function ghostPickedMessage(path2) {
+  return `The ghost ${path2} is ready. Explain it to the Student now.`;
+}
 
 // src/power.ts
+function coreMessage(error2) {
+  if (error2 instanceof Error && typeof error2.code === "string" && error2.message !== "") {
+    return error2.message;
+  }
+  return null;
+}
 function sessionAnswer(session, message, warning) {
   const { state } = session;
   const answer = {
@@ -30674,9 +31008,66 @@ var HauntedPower = class {
     }
     return parts.length > 0 ? parts.join(" ") : void 0;
   }
-  /** pick_ghost (task 7.1). For now only the NO_SESSION check. */
-  pickGhost() {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * pick_ghost (Requirements 3.1 to 3.4). The step and the path are checked
+   * before any request. The Ghost_Text is read from GitHub with a new client
+   * and given to the Engine unchanged. A failed read leaves the session as
+   * it was and never sends pick-ghost.
+   */
+  pickGhost(input) {
+    return this.queue.run(() => this.doPickGhost(input));
+  }
+  async doPickGhost(input) {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    if (!ALLOWED_EVENTS[state.step].includes("pick-ghost")) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        pickNotAllowedMessage(state.step),
+        state
+      );
+    }
+    if (!isPickable(state.ghosts, state.progress, input.path)) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        notPickableMessage(input.path),
+        state
+      );
+    }
+    let text;
+    try {
+      const client = createGitHubClient({ fetch: this.fetch });
+      text = await client.getFileText(
+        session.owner,
+        session.repo,
+        session.report.overview.ref,
+        input.path
+      );
+    } catch (error2) {
+      return errorAnswer(
+        "GHOST_TEXT_UNREADABLE",
+        ghostTextUnreadableMessage(input.path, coreMessage(error2)),
+        state
+      );
+    }
+    const transition = advance(state, {
+      type: "pick-ghost",
+      path: input.path,
+      text
+    });
+    if (!transition.ok) {
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    session.state = transition.state;
+    session.invalidCount = 0;
+    return sessionAnswer(
+      session,
+      ghostPickedMessage(input.path),
+      this.withStorageWarning()
+    );
   }
   /** send_event (task 7.2). For now only the NO_SESSION check. */
   sendEvent() {
@@ -30717,7 +31108,7 @@ var HauntedPower = class {
   }
   // Session tools answer NO_SESSION without a session (Requirement 9.3).
   // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 7.1, 7.2 and 7.3).
+  // (tasks 7.2 and 7.3).
   skeleton() {
     if (this.session === null) {
       return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
@@ -30932,7 +31323,7 @@ function registerTools(server2, power2) {
       description: "Pick the ghost (file path) to exorcise next. The Power reads its text from GitHub.",
       inputSchema: { path: string2() }
     },
-    safe(noSession)
+    safe(async ({ path: path2 }) => toResult(await power2.pickGhost({ path: path2 })))
   );
   server2.registerTool(
     "send_event",

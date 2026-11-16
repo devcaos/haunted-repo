@@ -66,3 +66,26 @@ export function ghostsFoundMessage(
     suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
   return `Found ${ghosts} in ${owner}/${repo}, from easy to hard.${start}`;
 }
+
+/** INVALID_EVENT of pick_ghost when the step does not allow pick-ghost. */
+export function pickNotAllowedMessage(step: string): string {
+  return `A ghost cannot be picked in the step "${step}". Send one of the allowed events instead.`;
+}
+
+/** INVALID_EVENT of pick_ghost for a path that is not a haunted ghost. */
+export function notPickableMessage(path: string): string {
+  return `"${path}" is not a haunted ghost of this house. Pick one of the haunted ghosts that find_ghosts or house_status lists.`;
+}
+
+/** GHOST_TEXT_UNREADABLE (Requirement 3.2): the core message when there is one. */
+export function ghostTextUnreadableMessage(
+  path: string,
+  problem: string | null,
+): string {
+  const detail = problem ?? `Could not read the file "${path}" from GitHub.`;
+  return `${detail} The ghost stays haunted. Try again in a moment, or pick another ghost.`;
+}
+
+export function ghostPickedMessage(path: string): string {
+  return `The ghost ${path} is ready. Explain it to the Student now.`;
+}

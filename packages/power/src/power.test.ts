@@ -46,7 +46,7 @@ function tinySession(): Session {
 
 describe("HauntedPower without a session", () => {
   const calls: [string, (p: HauntedPower) => Promise<unknown>][] = [
-    ["pickGhost", (p) => p.pickGhost()],
+    ["pickGhost", (p) => p.pickGhost({ path: "src/a.ts" })],
     ["sendEvent", (p) => p.sendEvent()],
     ["judgeAnswer", (p) => p.judgeAnswer()],
     ["houseStatus", (p) => p.houseStatus()],

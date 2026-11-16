@@ -164,7 +164,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 4: Exorcism tools and the strict verdict
 
 - [ ] 7. Exorcism tools
-  - [ ] 7.1 Implement the `pick_ghost` tool
+  - [x] 7.1 Implement the `pick_ghost` tool
     - Check that the step allows `pick-ghost` and that `isPickable` is true **before** any request; else `INVALID_EVENT` with the allowed events.
     - Read the Ghost_Text with a new `createGitHubClient({ fetch })` and `getFileText(owner, repo, report.overview.ref, path)`; send `{ type: "pick-ghost", path, text }` to `advance` with the text unchanged.
     - Any read error returns `GHOST_TEXT_UNREADABLE` (with the core message when it has one), no crash, state unchanged.
