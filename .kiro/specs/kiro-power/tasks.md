@@ -222,7 +222,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 5: Tutor_Skill, manifest and live test
 
-- [ ] 9. Skill, manifest and live test
+- [x] 9. Skill, manifest and live test
   - [x] 9.1 Write the Tutor_Skill `skills/exorcise-ghosts/SKILL.md`
     - Front matter `name: exorcise-ghosts` and the description of design section 8.
     - The order of calls (ask for the URL and Java, `find_ghosts`, `DATA_EXISTS` handling with `continue_house` or `replace: true` only after the Student says yes, `pick_ghost`, the loop with `send_event` and `judge_answer`, self-check, `failed`, `house-clean`, `house_status`, `continue_house` after a restart and ask about Java again).
@@ -234,13 +234,13 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - `src/manifest.test.ts`: reads `plugin.json`, `mcp.json` and the front matter of `SKILL.md`, and checks the fields of 1.1 to 1.4 (one stdio server, `${PLUGIN_ROOT}/bundle/server.mjs`, no `env`, skill `name` and `description` present).
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-  - [ ] 9.3 Write the live test `src/ghostText.live.test.ts`
+  - [x] 9.3 Write the live test `src/ghostText.live.test.ts`
     - Matches `*.live.test.ts` of `vitest.live.config.ts`; uses the real `fetch` through `guardFetch` and a temporary folder.
     - `find_ghosts` for `https://github.com/lukeed/sirv`, then `pick_ghost` for the first ghost; the step is `explaining` and the Ghost_Text read is not empty. Same helpful rate-limit message as the core live test. About 9 requests.
     - Not part of `npm test` or `npm run check`; run it once with `npm run test:live` before the commit.
     - _Requirements: 3.1, 8.1, 11.6_
 
-- [ ] 10. Checkpoint: PR 5
+- [x] 10. Checkpoint: PR 5
   - Ensure all tests pass, ask the user if questions arise.
 
 ### Final: manual check in Kiro (planned for about 22 Nov 2026)
