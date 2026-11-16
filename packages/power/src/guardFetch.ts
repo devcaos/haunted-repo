@@ -36,9 +36,10 @@ function isRedirectError(error: unknown): boolean {
 }
 
 // Returns a fetch that refuses, without calling the inner fetch, any URL that
-// does not parse or whose origin is not exactly https://api.github.com.
-// The input is passed on unchanged and the init only gets redirect "error",
-// so a 3xx never takes a request off api.github.com. No header is ever added.
+// does not parse, has a user or password, or whose origin is not exactly
+// https://api.github.com. The input is passed on unchanged and the init only
+// gets redirect "error", so a 3xx never takes a request off api.github.com.
+// No header is ever added.
 export function guardFetch(inner: typeof fetch): typeof fetch {
   return async (input, init) => {
     let url: URL;
@@ -46,6 +47,11 @@ export function guardFetch(inner: typeof fetch): typeof fetch {
       url = new URL(inputUrl(input));
     } catch {
       throw new ForbiddenUrlError("Request refused: the URL does not parse.");
+    }
+    if (url.username !== "" || url.password !== "") {
+      throw new ForbiddenUrlError(
+        "Request refused: the URL must not contain a user or password.",
+      );
     }
     if (url.origin !== ALLOWED_ORIGIN) {
       throw new ForbiddenUrlError(

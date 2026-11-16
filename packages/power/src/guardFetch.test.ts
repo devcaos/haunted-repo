@@ -28,6 +28,7 @@ describe("guardFetch", () => {
     "https://api.github.com.evil.example/",
     "http://api.github.com/repos/a/b",
     "https://api.github.com:8443/repos/a/b",
+    "https://u:p@api.github.com/",
     "not a url",
     "",
   ])("refuses %j without calling the inner fetch", async (url) => {
