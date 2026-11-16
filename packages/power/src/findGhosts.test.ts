@@ -9,6 +9,7 @@ import {
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createPower } from "./createPower.js";
 import { dataFileName, parseDataFile, serialiseDataFile } from "./dataFile.js";
+import { ForbiddenUrlError } from "./guardFetch.js";
 import {
   dataExistsMessage,
   PARTIAL_WARNING,
@@ -329,11 +330,18 @@ describe("createPower", () => {
       return github.fetch(input, init);
     }) as typeof fetch;
     const power = await createPower(folder, recorder);
+
+    // detectGhosts only calls api.github.com, so a working find_ghosts does
+    // not prove the guard. Call the Power's own fetch with another origin:
+    // it must be refused before the inner fetch is called.
+    const powerFetch = power["fetch"];
+    await expect(powerFetch("https://example.com/")).rejects.toBeInstanceOf(
+      ForbiddenUrlError,
+    );
+    expect(seen).toEqual([]);
+
     ok(await power.findGhosts({ url: "github.com/o/r" }));
     expect(seen.length).toBeGreaterThan(0);
-    expect(
-      seen.every((u) => new URL(u).origin === "https://api.github.com"),
-    ).toBe(true);
     expect(Object.keys(await folderSnapshot())).toEqual([
       dataFileName("o", "r"),
     ]);
