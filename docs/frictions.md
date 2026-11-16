@@ -311,3 +311,33 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** usar `gh run view <id> -v`, que muestra los pasos del job sin filtro.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — `npm run check | Select-Object` escondió un fallo de Prettier
+
+- **Qué intentaba:** pasar `npm run check` antes del commit de `plugin.json` (PR 2 de `kiro-power`) y ver solo las últimas líneas con `| Select-Object -Last 8`.
+
+- **Qué pasó:** Prettier encontró un problema de formato en `packages/power/plugin.json` y `npm run check` falló, pero la herramienta informó código de salida 0: con la tubería (`|`), el código que llega es el del último comando, `Select-Object`, que sí funcionó. Solo se vio el fallo leyendo la salida.
+
+- **Cómo lo rodeé:** guardar toda la salida en un archivo temporal (`npm run check *> $env:TEMP\hr-check.log`), mirar `$LASTEXITCODE` y después leer el final del archivo con `Get-Content -Tail`.
+
+- **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — La PR 2 de `kiro-power` pasó del límite de 900 líneas
+
+- **Qué intentaba:** abrir la PR 2 de `kiro-power` (rama `feat/kiro-power-store`: tarea 1.6, tareas 3.1 a 3.6 y los arreglos de la revisión de la PR #37) como una sola pull request.
+
+- **Qué pasó:** `git diff --stat main`, sin `package-lock.json` ni `packages/power/bundle/`, dio 1.032 líneas cambiadas (1.010 añadidas y 22 borradas) antes de las entradas de este archivo; el límite de Luis Miguel es 900. Unas 615 son de tests.
+
+- **Cómo lo rodeé:** no se subió la rama; se propuso a Luis Miguel partirla en dos PR apiladas sobre commits que ya existen, sin reescribir la historia. Luis Miguel eligió la opción A: la rama nueva `feat/kiro-power-store-1` apunta al commit b7fa850 (tareas 1.6, 3.1 y 3.2) y va contra `main` (PR 2a); `feat/kiro-power-store` (tareas 3.3 a 3.6 y arreglos de la revisión) va encima de ella (PR 2b).
+
+- **Estado:** resuelto (opción A: dos PR apiladas; la 2a se fusiona primero).
+
+## 2026-11-16 — La salida de la consola esconde las líneas en blanco de los archivos
+
+- **Qué intentaba:** arreglar `packages/power/src/guardFetch.ts` en la revisión de la PR 2b, reescribiendo el archivo entero a partir de lo que mostraba `Get-Content`.
+
+- **Qué pasó:** la salida de los comandos que le llega a Kiro no enseña las líneas en blanco, así que Kiro creyó que el archivo no las tenía y lo reescribió sin ellas. Prettier no lo marca como error, así que `npm run check` no lo habría parado. Se vio en `git diff`, que mostraba las líneas en blanco borradas.
+
+- **Cómo lo rodeé:** volver a escribir el archivo con sus líneas en blanco, leer los archivos con la herramienta de lectura (que sí las muestra) y hacer cambios pequeños en vez de reescribir archivos enteros. Pasó otra vez al escribir esta misma entrada con un texto multilínea en PowerShell: se corrigió editando el archivo directamente.
+
+- **Estado:** resuelto con rodeo.

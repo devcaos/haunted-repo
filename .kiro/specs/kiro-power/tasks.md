@@ -59,12 +59,12 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Write two lines in `docs/spike-power.md`.
     - _Requirements: 1.5, 1.9_
 
-- [ ] 2. Checkpoint: PR 1
+- [x] 2. Checkpoint: PR 1
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 2: Data file, store and network guard
 
-- [ ] 3. Pure modules and the store
+- [x] 3. Pure modules and the store
   - [x] 3.1 Implement `src/dataFile.ts` (name, serialise, parse)
     - `dataFileName(owner, repo)`: `haunted-repo--<owner>@<repo>.json` in lowercase; re-checks owner `[a-z0-9-]+` and repo `[a-z0-9._-]+` and throws if one fails. `isOwnDataFile(name)` with `^haunted-repo--[a-z0-9-]+@[a-z0-9._-]+\.json$`.
     - `serialiseDataFile(report, progress)`: `{ format: 1, report, progress }` built from `JSON.stringify(report)` and `formatProgress(progress)`, no other keys.
@@ -77,7 +77,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Owners and repos accepted by `parseRepoUrl` in any letter case; the name is lowercase, matches the own-file pattern, has no path separator, `path.join(folder, name)` stays inside `folder`, and references that differ in more than letter case give different names.
     - **Validates: Requirements 7.1, 7.11**
 
-  - [ ] 3.3 Implement `src/store.ts` with the folder store and the memory store
+  - [x] 3.3 Implement `src/store.ts` with the folder store and the memory store
     - One `Store` interface (`read(name)`, `write(name, text)`); `read` distinguishes "does not exist" from other read errors.
     - Folder store: write to `<name>.<random>.tmp` in the same folder, then `rename` over the final name; on a failed write, try to delete the temporary file and leave the final file untouched. It only opens names that pass `isOwnDataFile` and never lists the folder.
     - Memory store: a `Map` of file name to text.
@@ -86,24 +86,24 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - `store.ts` is the only module that imports `node:fs`.
     - _Requirements: 7.1, 7.6, 7.10, 7.11, 9.1_
 
-  - [ ] 3.4 Add the Windows rename retries to the folder store
+  - [x] 3.4 Add the Windows rename retries to the folder store
     - When `rename` fails with `EPERM`, `EBUSY` or `EACCES`, retry up to 5 times, waiting 50, 100, 200, 400 and 800 ms, then report a failed save. Other error codes fail at once.
     - `rename` and the wait function are injectable, so tests do not really wait.
     - Unit tests: a rename that fails twice with `EPERM` and then works (save succeeds); a rename that always fails with `EBUSY` (6 attempts, then failure); an `ENOSPC` failure (no retry).
     - _Requirements: 7.6_
 
-  - [ ] 3.5 Write the property test for the save round-trip
+  - [x] 3.5 Write the property test for the save round-trip
     - **Property 3: Save round-trip**
     - `reportArb` and `progressArb` (through the `core-testutil/` alias) with a real temporary folder: save, read back, equal report and progress; the file has only the keys `format`, `report` and `progress`.
     - Add the `core-testutil/` alias here: root `vitest.config.ts` aliases `core-testutil/` to `packages/core/src/`, and `packages/power/tsconfig.json` has the same prefix in `paths` (design section 3).
     - **Validates: Requirements 7.1, 7.2, 7.4, 7.8**
 
-  - [ ] 3.6 Implement `src/guardFetch.ts`
+  - [x] 3.6 Implement `src/guardFetch.ts`
     - `guardFetch(fetch)` returns a `fetch` that parses the request URL with `new URL()` and throws, without calling the inner `fetch`, if it does not parse or its origin is not exactly `https://api.github.com`. It never adds an `Authorization` header.
     - Unit tests: `https://example.com/repos/a/b` and `https://api.github.com.evil.example/` are refused and the inner `fetch` is never called; a URL under `https://api.github.com/` reaches it unchanged.
     - _Requirements: 4.9, 7.7, 8.1, 8.2_
 
-- [ ] 4. Checkpoint: PR 2
+- [x] 4. Checkpoint: PR 2
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status

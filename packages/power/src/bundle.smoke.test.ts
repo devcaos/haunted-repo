@@ -43,7 +43,9 @@ describe("bundle/server.mjs over stdio", () => {
     });
     client = new Client({ name: "smoke-test", version: "0.0.0" });
     await client.connect(transport);
-  });
+    // Starting a node process can be slow on a busy CI runner, so allow more
+    // than the default 10 s hook timeout.
+  }, 30_000);
 
   afterAll(async () => {
     await client?.close();
