@@ -223,7 +223,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 5: Tutor_Skill, manifest and live test
 
 - [ ] 9. Skill, manifest and live test
-  - [ ] 9.1 Write the Tutor_Skill `skills/exorcise-ghosts/SKILL.md`
+  - [x] 9.1 Write the Tutor_Skill `skills/exorcise-ghosts/SKILL.md`
     - Front matter `name: exorcise-ghosts` and the description of design section 8.
     - The order of calls (ask for the URL and Java, `find_ghosts`, `DATA_EXISTS` handling with `continue_house` or `replace: true` only after the Student says yes, `pick_ghost`, the loop with `send_event` and `judge_answer`, self-check, `failed`, `house-clean`, `house_status`, `continue_house` after a restart and ask about Java again).
     - The rules of design section 8, one line each (English only, one question per message, follow `instructions`, never show the model answer early, the exact four `VERDICT:` lines, "I don't know" in any language is `dont-know`, `INVALID_VERDICT` and `VERDICT_FAILED` handling, pass on a `warning` once, tools missing means check Node.js 24 and restart Kiro, keep the Judgement reason short).
