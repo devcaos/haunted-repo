@@ -30806,7 +30806,8 @@ function notPickableMessage(path2) {
 }
 function ghostTextUnreadableMessage(path2, problem) {
   const detail = problem ?? `Could not read the file "${path2}" from GitHub.`;
-  return `${detail} The ghost stays haunted. Try again in a moment, or pick another ghost.`;
+  const next = /\btry again\b/i.test(detail) ? "You can also pick another ghost." : "Try again in a moment, or pick another ghost.";
+  return `${detail} The ghost stays haunted. ${next}`;
 }
 function ghostPickedMessage(path2) {
   return `The ghost ${path2} is ready. Explain it to the Student now.`;

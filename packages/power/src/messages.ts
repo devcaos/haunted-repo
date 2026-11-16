@@ -83,7 +83,11 @@ export function ghostTextUnreadableMessage(
   problem: string | null,
 ): string {
   const detail = problem ?? `Could not read the file "${path}" from GitHub.`;
-  return `${detail} The ghost stays haunted. Try again in a moment, or pick another ghost.`;
+  // Some core messages already say when to try again: say it only once.
+  const next = /\btry again\b/i.test(detail)
+    ? "You can also pick another ghost."
+    : "Try again in a moment, or pick another ghost.";
+  return `${detail} The ghost stays haunted. ${next}`;
 }
 
 export function ghostPickedMessage(path: string): string {
