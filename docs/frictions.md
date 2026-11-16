@@ -281,3 +281,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** editar solo las líneas que cambiaban, con reemplazos pequeños. Eso sí funcionó.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — Un `git grep` con exclusiones `:!` fue rechazado
+
+- **Qué intentaba:** buscar texto en el repositorio con `git grep`, excluyendo carpetas con patrones `:!`.
+
+- **Qué pasó:** la comprobación de permisos rechazó el comando.
+
+- **Cómo lo rodeé:** usar la herramienta de búsqueda del espacio de trabajo en vez de `git grep`.
+
+- **Estado:** resuelto con rodeo.
