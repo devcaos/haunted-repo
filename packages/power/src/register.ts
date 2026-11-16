@@ -1,6 +1,7 @@
 // Registers the six Power_Tools (design section 4). Handlers stay thin: they
 // call HauntedPower and turn its answer into an MCP result. Tools without
-// their real handler yet are stubs that answer NO_SESSION.
+// their real handler yet (judge_answer, task 7.3) are stubs that answer
+// NO_SESSION.
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
@@ -109,7 +110,12 @@ export function registerTools(server: McpServer, power: HauntedPower): void {
         answer: z.enum(["yes", "half", "no"]).optional(),
       },
     },
-    safe(noSession),
+    safe(async ({ type, text, answer }) => {
+      const input: Parameters<HauntedPower["sendEvent"]>[0] = { type };
+      if (text !== undefined) input.text = text;
+      if (answer !== undefined) input.answer = answer;
+      return toResult(await power.sendEvent(input));
+    }),
   );
 
   server.registerTool(

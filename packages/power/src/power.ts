@@ -7,8 +7,10 @@ import {
   buildInstructions,
   createGitHubClient,
   detectGhosts,
+  formatProgress,
   hauntedShare,
   isPickable,
+  parseEvent,
   parseRepoUrl,
   startSession,
   suggestGhost,
@@ -25,6 +27,7 @@ import { dataFileName, parseDataFile, serialiseDataFile } from "./dataFile.js";
 import {
   brokenDataMessage,
   dataExistsMessage,
+  eventAcceptedMessage,
   ghostPickedMessage,
   ghostsFoundMessage,
   ghostTextUnreadableMessage,
@@ -39,6 +42,7 @@ import {
   PARTIAL_WARNING,
   REPO_NOT_FOUND_MESSAGE,
   saveFailedWarning,
+  sendEventTypeMessage,
 } from "./messages.js";
 import type { Store } from "./store.js";
 
@@ -98,6 +102,20 @@ export interface FindGhostsInput {
 
 export interface PickGhostInput {
   path: string;
+}
+
+/** The only event types send_event sends (design section 4). */
+export const SEND_EVENT_TYPES = [
+  "explanation-done",
+  "self-check-answered",
+  "retry-ghost",
+  "leave-ghost",
+] as const;
+
+export interface SendEventInput {
+  type: (typeof SEND_EVENT_TYPES)[number];
+  text?: string;
+  answer?: "yes" | "half" | "no";
 }
 
 /**
@@ -198,6 +216,13 @@ export class HauntedPower {
    */
   protected storageOk: boolean;
   protected session: Session | null = null;
+  /**
+   * formatProgress of the progress last written to the store for the
+   * current session, or null when none was written. After an accepted
+   * advance the progress is saved when it differs from this text (7.3), so
+   * a failed save is tried again with the next accepted event.
+   */
+  protected savedProgress: string | null = null;
   /** The run started in memory mode: the store is a memory store. */
   private readonly memoryOnly: boolean;
   /**
@@ -265,6 +290,7 @@ export class HauntedPower {
       profile: { knowsJava: input.knowsJava ?? false },
     });
 
+    this.savedProgress = null;
     await this.save(name, report, state.progress);
 
     const session: Session = {
@@ -353,6 +379,8 @@ export class HauntedPower {
       invalidCount: 0,
     };
     this.session = session;
+    // The file holds this progress (the Engine only normalises it).
+    this.savedProgress = formatProgress(state.progress);
     return sessionAnswer(
       session,
       houseContinuedMessage(session.owner, session.repo),
@@ -381,6 +409,7 @@ export class HauntedPower {
       name,
       serialiseDataFile(report, progress),
     );
+    if (result.ok) this.savedProgress = formatProgress(progress);
     if (this.memoryOnly) return;
     if (result.ok) {
       this.storageOk = true;
@@ -475,9 +504,63 @@ export class HauntedPower {
     );
   }
 
-  /** send_event (task 7.2). For now only the NO_SESSION check. */
-  sendEvent(): Promise<Answer> {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * send_event (Requirements 4.4, 4.5, 4.10 to 4.12, 6.3, 6.4, 7.3). Builds
+   * the event from the input, checks it with parseEvent and advance; a
+   * refused event leaves the session as it was. answer-rated and dont-know
+   * are never sent here: only judge_answer sends them (5.2).
+   */
+  sendEvent(input: SendEventInput): Promise<Answer> {
+    return this.queue.run(() => this.doSendEvent(input));
+  }
+
+  private async doSendEvent(input: SendEventInput): Promise<Answer> {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    if (!(SEND_EVENT_TYPES as readonly string[]).includes(input.type)) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        sendEventTypeMessage(String(input.type)),
+        state,
+      );
+    }
+    const raw: Record<string, unknown> = { type: input.type };
+    if (input.text !== undefined) raw["text"] = input.text;
+    if (input.answer !== undefined) raw["answer"] = input.answer;
+    const parsed = parseEvent(raw);
+    if (!parsed.ok) {
+      return errorAnswer("INVALID_EVENT", parsed.error.message, state);
+    }
+    const transition = advance(state, parsed.value);
+    if (!transition.ok) {
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    await this.accept(session, transition.state);
+    return sessionAnswer(
+      session,
+      eventAcceptedMessage(session.state.step),
+      this.withStorageWarning(),
+    );
+  }
+
+  /**
+   * Keeps the state of an advance the Engine accepted: resets the
+   * Invalid_Judgement_Count (5.7) and, when the progress differs from the
+   * saved one, saves it before the answer is returned (7.3).
+   */
+  protected async accept(session: Session, next: SessionState): Promise<void> {
+    session.state = next;
+    session.invalidCount = 0;
+    if (formatProgress(next.progress) !== this.savedProgress) {
+      await this.save(
+        dataFileName(session.owner, session.repo),
+        session.report,
+        next.progress,
+      );
+    }
   }
 
   /** judge_answer (task 7.3). For now only the NO_SESSION check. */

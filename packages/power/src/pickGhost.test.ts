@@ -295,4 +295,35 @@ describe("pick_ghost", () => {
     ]);
     expect(power.current()?.state).toEqual(serial.power.current()?.state);
   });
+
+  it("finishes a slow pick before a send_event sent during it (queue)", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const slow = (f: typeof fetch) =>
+      (async (input: string | URL | Request, init?: RequestInit) => {
+        await gate;
+        return f(input, init);
+      }) as typeof fetch;
+    const { power } = setup({}, slow);
+    power.setSession(choosingState());
+    const explained = { type: "explanation-done", text: "It is one." } as const;
+
+    const pick = power.pickGhost({ path: "src/a.ts" });
+    // Sent before the pick resolves: run alone, it would be refused.
+    const event = power.sendEvent(explained);
+    release();
+    const [picked, sent] = await Promise.all([pick, event]);
+
+    // The same two calls run one after the other.
+    const serial = setup();
+    serial.power.setSession(choosingState());
+    const sPicked = await serial.power.pickGhost({ path: "src/a.ts" });
+    const sSent = await serial.power.sendEvent(explained);
+
+    expect(ok(picked).step).toBe("explaining");
+    expect(ok(sent).step).toBe("asking");
+    expect([picked, sent]).toEqual([sPicked, sSent]);
+    expect(power.current()?.state).toEqual(serial.power.current()?.state);
+    expect(power.current()?.state.current?.explanation).toBe("It is one.");
+  });
 });

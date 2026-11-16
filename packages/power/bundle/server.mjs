@@ -30776,8 +30776,37 @@ function ghostTextUnreadableMessage(path2, problem) {
 function ghostPickedMessage(path2) {
   return `The ghost ${path2} is ready. Explain it to the Student now.`;
 }
+function sendEventTypeMessage(type) {
+  return `send_event does not send "${type}". It sends only explanation-done, self-check-answered, retry-ghost and leave-ghost; judgements go to judge_answer.`;
+}
+var GHOST_FAILED_MESSAGE = "The ghost stays haunted for now. Let the Student choose: try the same ghost again after a new explanation (send_event with retry-ghost), or pick another ghost (pick_ghost).";
+var HOUSE_CLEAN_MESSAGE = "The house is clean: no haunted ghost is left.";
+function eventAcceptedMessage(step) {
+  switch (step) {
+    case "explaining":
+      return "Explain the ghost to the Student again, in a new way.";
+    case "asking":
+      return "Ask the Student the question the instructions describe, then wait for the answer.";
+    case "self-check":
+      return "The ghost is exorcised. Ask the Student the self-check question.";
+    case "choosing":
+      return "Let the Student pick the next ghost.";
+    case "failed":
+      return GHOST_FAILED_MESSAGE;
+    case "house-clean":
+      return HOUSE_CLEAN_MESSAGE;
+    default:
+      return "Follow the instructions of this step.";
+  }
+}
 
 // src/power.ts
+var SEND_EVENT_TYPES = [
+  "explanation-done",
+  "self-check-answered",
+  "retry-ghost",
+  "leave-ghost"
+];
 function coreMessage(error2) {
   if (error2 instanceof Error && typeof error2.code === "string" && error2.message !== "") {
     return error2.message;
@@ -30824,6 +30853,13 @@ var HauntedPower = class {
    */
   storageOk;
   session = null;
+  /**
+   * formatProgress of the progress last written to the store for the
+   * current session, or null when none was written. After an accepted
+   * advance the progress is saved when it differs from this text (7.3), so
+   * a failed save is tried again with the next accepted event.
+   */
+  savedProgress = null;
   /** The run started in memory mode: the store is a memory store. */
   memoryOnly;
   /**
@@ -30882,6 +30918,7 @@ var HauntedPower = class {
     const { state } = startSession(report, {
       profile: { knowsJava: input.knowsJava ?? false }
     });
+    this.savedProgress = null;
     await this.save(name, report, state.progress);
     const session = {
       owner: report.overview.owner,
@@ -30961,6 +30998,7 @@ var HauntedPower = class {
       invalidCount: 0
     };
     this.session = session;
+    this.savedProgress = formatProgress(state.progress);
     return sessionAnswer(
       session,
       houseContinuedMessage(session.owner, session.repo),
@@ -30984,6 +31022,7 @@ var HauntedPower = class {
       name,
       serialiseDataFile(report, progress)
     );
+    if (result.ok) this.savedProgress = formatProgress(progress);
     if (this.memoryOnly) return;
     if (result.ok) {
       this.storageOk = true;
@@ -31069,9 +31108,61 @@ var HauntedPower = class {
       this.withStorageWarning()
     );
   }
-  /** send_event (task 7.2). For now only the NO_SESSION check. */
-  sendEvent() {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * send_event (Requirements 4.4, 4.5, 4.10 to 4.12, 6.3, 6.4, 7.3). Builds
+   * the event from the input, checks it with parseEvent and advance; a
+   * refused event leaves the session as it was. answer-rated and dont-know
+   * are never sent here: only judge_answer sends them (5.2).
+   */
+  sendEvent(input) {
+    return this.queue.run(() => this.doSendEvent(input));
+  }
+  async doSendEvent(input) {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    if (!SEND_EVENT_TYPES.includes(input.type)) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        sendEventTypeMessage(String(input.type)),
+        state
+      );
+    }
+    const raw = { type: input.type };
+    if (input.text !== void 0) raw["text"] = input.text;
+    if (input.answer !== void 0) raw["answer"] = input.answer;
+    const parsed = parseEvent(raw);
+    if (!parsed.ok) {
+      return errorAnswer("INVALID_EVENT", parsed.error.message, state);
+    }
+    const transition = advance(state, parsed.value);
+    if (!transition.ok) {
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    await this.accept(session, transition.state);
+    return sessionAnswer(
+      session,
+      eventAcceptedMessage(session.state.step),
+      this.withStorageWarning()
+    );
+  }
+  /**
+   * Keeps the state of an advance the Engine accepted: resets the
+   * Invalid_Judgement_Count (5.7) and, when the progress differs from the
+   * saved one, saves it before the answer is returned (7.3).
+   */
+  async accept(session, next) {
+    session.state = next;
+    session.invalidCount = 0;
+    if (formatProgress(next.progress) !== this.savedProgress) {
+      await this.save(
+        dataFileName(session.owner, session.repo),
+        session.report,
+        next.progress
+      );
+    }
   }
   /** judge_answer (task 7.3). For now only the NO_SESSION check. */
   judgeAnswer() {
@@ -31340,7 +31431,12 @@ function registerTools(server2, power2) {
         answer: _enum(["yes", "half", "no"]).optional()
       }
     },
-    safe(noSession)
+    safe(async ({ type, text, answer }) => {
+      const input = { type };
+      if (text !== void 0) input.text = text;
+      if (answer !== void 0) input.answer = answer;
+      return toResult(await power2.sendEvent(input));
+    })
   );
   server2.registerTool(
     "judge_answer",

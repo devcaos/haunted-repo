@@ -172,7 +172,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: success (step `explaining`, text unchanged); 404; not text; the request budget error; pick from `failed`; queue test (start `pick_ghost` with a slow fake fetch, call `send_event` before it resolves, final state equals the two calls run one after the other).
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.5_
 
-  - [ ] 7.2 Implement the `send_event` tool
+  - [x] 7.2 Implement the `send_event` tool
     - Build the event from `type`, `text` and `answer`, check it with `parseEvent`, call `advance`. `INVALID_EVENT` returns the Engine message and the allowed events, state unchanged.
     - Save rule: after every accepted `advance`, compare `formatProgress(state.progress)` with the saved text and save before answering if it changed.
     - Reset `invalidCount` to 0 after any accepted `advance`.
