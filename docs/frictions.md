@@ -331,3 +331,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** no se subió la rama; se propuso a Luis Miguel partirla en dos PR apiladas sobre commits que ya existen, sin reescribir la historia. Luis Miguel eligió la opción A: la rama nueva `feat/kiro-power-store-1` apunta al commit b7fa850 (tareas 1.6, 3.1 y 3.2) y va contra `main` (PR 2a); `feat/kiro-power-store` (tareas 3.3 a 3.6 y arreglos de la revisión) va encima de ella (PR 2b).
 
 - **Estado:** resuelto (opción A: dos PR apiladas; la 2a se fusiona primero).
+
+## 2026-11-16 — La salida de la consola esconde las líneas en blanco de los archivos
+
+- **Qué intentaba:** arreglar `packages/power/src/guardFetch.ts` en la revisión de la PR 2b, reescribiendo el archivo entero a partir de lo que mostraba `Get-Content`.
+
+- **Qué pasó:** la salida de los comandos que le llega a Kiro no enseña las líneas en blanco, así que Kiro creyó que el archivo no las tenía y lo reescribió sin ellas. Prettier no lo marca como error, así que `npm run check` no lo habría parado. Se vio en `git diff`, que mostraba las líneas en blanco borradas.
+
+- **Cómo lo rodeé:** volver a escribir el archivo con sus líneas en blanco, leer los archivos con la herramienta de lectura (que sí las muestra) y hacer cambios pequeños en vez de reescribir archivos enteros. Pasó otra vez al escribir esta misma entrada con un texto multilínea en PowerShell: se corrigió editando el archivo directamente.
+
+- **Estado:** resuelto con rodeo.
