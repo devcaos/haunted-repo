@@ -251,3 +251,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** sustituir la línea entera desde PowerShell y comprobar que `PLAN.md` ya no tiene caracteres de control.
 
 - **Estado:** resuelto. Al escribir archivos desde PowerShell, no meter rutas con `\` dentro de textos que interpreten escapes.
+
+## 2026-11-16 — El seguimiento de tareas ensucia el árbol antes de empezar la tarea
+
+- **Qué intentaba:** comprobar que el árbol de trabajo estaba limpio antes de `git switch main`, en la PR 1 de `kiro-power`.
+
+- **Qué pasó:** el seguimiento de estado del orquestador escribe `[-]` en `tasks.md` y crea `tasks.meta.json` (sin seguimiento en git) antes de que empiece la tarea, así que la comprobación de "árbol limpio" falló.
+
+- **Cómo lo rodeé:** `git stash push --include-untracked` antes de cambiar de rama y `git stash pop` después. `tasks.meta.json` nunca se sube.
+
+- **Estado:** resuelto con rodeo.
