@@ -229,7 +229,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - The rules of design section 8, one line each (English only, one question per message, follow `instructions`, never show the model answer early, the exact four `VERDICT:` lines, "I don't know" in any language is `dont-know`, `INVALID_VERDICT` and `VERDICT_FAILED` handling, pass on a `warning` once, tools missing means check Node.js 24 and restart Kiro, keep the Judgement reason short).
     - _Requirements: 1.4, 1.8, 2.7, 4.3, 4.4, 4.8, 4.10, 4.11, 5.5, 6.1, 7.5, 9.2_
 
-  - [ ] 9.2 Update `plugin.json` and write the manifest test
+  - [x] 9.2 Update `plugin.json` and write the manifest test
     - `plugin.json`: `$schema`, kebab-case `name`, `version` `0.1.0`, real `description`, `author.name`, keywords including `haunted`, `ghost`, `exorcise`, `exorcism`, `understand code`, and without `haunted spike`.
     - `src/manifest.test.ts`: reads `plugin.json`, `mcp.json` and the front matter of `SKILL.md`, and checks the fields of 1.1 to 1.4 (one stdio server, `${PLUGIN_ROOT}/bundle/server.mjs`, no `env`, skill `name` and `description` present).
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
