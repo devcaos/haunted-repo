@@ -80,6 +80,71 @@ describe("folder store", () => {
   });
 });
 
+describe("folder store rename retries", () => {
+  function codeError(code: string): Error {
+    return Object.assign(new Error(code), { code });
+  }
+
+  /** A rename that fails with the given codes, in order, then really renames. */
+  function scripted(codes: readonly string[]) {
+    const waits: number[] = [];
+    let attempts = 0;
+    const fs = {
+      ...nodeFolderFs,
+      rename: (from: string, to: string) => {
+        const code = codes[attempts];
+        attempts++;
+        return code === undefined
+          ? nodeFolderFs.rename(from, to)
+          : Promise.reject(codeError(code));
+      },
+      wait: (ms: number) => {
+        waits.push(ms);
+        return Promise.resolve();
+      },
+    };
+    return { fs, waits, attempts: () => attempts };
+  }
+
+  it("saves after a rename that fails twice with EPERM", async () => {
+    const { fs, waits, attempts } = scripted(["EPERM", "EPERM"]);
+    const result = await createFolderStore(folder, fs).write(NAME, "saved");
+    expect(result).toEqual({ ok: true });
+    expect(attempts()).toBe(3);
+    expect(waits).toEqual([50, 100]);
+    expect(await readFile(join(folder, NAME), "utf8")).toBe("saved");
+    expect(await readdir(folder)).toEqual([NAME]);
+  });
+
+  it("fails after 6 attempts when rename always fails with EBUSY", async () => {
+    await createFolderStore(folder).write(NAME, "old");
+    const { fs, waits, attempts } = scripted(Array(10).fill("EBUSY"));
+    const result = await createFolderStore(folder, fs).write(NAME, "new");
+    expect(result.ok).toBe(false);
+    expect(attempts()).toBe(6);
+    expect(waits).toEqual([50, 100, 200, 400, 800]);
+    expect(await readFile(join(folder, NAME), "utf8")).toBe("old");
+    expect(await readdir(folder)).toEqual([NAME]);
+  });
+
+  it("retries EACCES too", async () => {
+    const { fs, attempts } = scripted(["EACCES"]);
+    expect(await createFolderStore(folder, fs).write(NAME, "x")).toEqual({
+      ok: true,
+    });
+    expect(attempts()).toBe(2);
+  });
+
+  it("does not retry ENOSPC", async () => {
+    const { fs, waits, attempts } = scripted(["ENOSPC"]);
+    const result = await createFolderStore(folder, fs).write(NAME, "x");
+    expect(result.ok).toBe(false);
+    expect(attempts()).toBe(1);
+    expect(waits).toEqual([]);
+    expect(await readdir(folder)).toEqual([]);
+  });
+});
+
 describe("memory store", () => {
   it("reads back what it wrote and says missing otherwise", async () => {
     const store = createMemoryStore();

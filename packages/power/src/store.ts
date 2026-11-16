@@ -4,6 +4,7 @@
 import { randomUUID } from "node:crypto";
 import * as fsp from "node:fs/promises";
 import * as path from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 import { isOwnDataFile } from "./dataFile.js";
 
 /** Result of reading one file. "missing" means the file does not exist. */
@@ -26,6 +27,8 @@ export interface FolderFs {
   writeFile(file: string, text: string): Promise<void>;
   rename(from: string, to: string): Promise<void>;
   unlink(file: string): Promise<void>;
+  /** Waits before a rename retry; tests inject one that does not wait. */
+  wait(ms: number): Promise<void>;
 }
 
 export const nodeFolderFs: FolderFs = {
@@ -33,7 +36,51 @@ export const nodeFolderFs: FolderFs = {
   writeFile: (file, text) => fsp.writeFile(file, text, "utf8"),
   rename: (from, to) => fsp.rename(from, to),
   unlink: (file) => fsp.unlink(file),
+  wait: (ms) => sleep(ms),
 };
+
+/**
+ * Waits before each rename retry (design section 5). On Windows, rename can
+ * fail for a short time while another program (antivirus, indexer) holds
+ * the target file.
+ */
+export const RENAME_RETRY_DELAYS_MS: readonly number[] = [
+  50, 100, 200, 400, 800,
+];
+
+const RETRYABLE_RENAME_CODES: ReadonlySet<string> = new Set([
+  "EPERM",
+  "EBUSY",
+  "EACCES",
+]);
+
+/**
+ * Renames, retrying after the delays above when the error code is EPERM,
+ * EBUSY or EACCES. Any other error, or the last failure, is thrown.
+ */
+async function renameWithRetries(
+  fs: FolderFs,
+  from: string,
+  to: string,
+): Promise<void> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await fs.rename(from, to);
+      return;
+    } catch (error) {
+      const code = errorCode(error);
+      const delay = RENAME_RETRY_DELAYS_MS[attempt];
+      if (
+        delay === undefined ||
+        code === undefined ||
+        !RETRYABLE_RENAME_CODES.has(code)
+      ) {
+        throw error;
+      }
+      await fs.wait(delay);
+    }
+  }
+}
 
 const PROBE_NAME = "haunted-repo--probe.tmp";
 
@@ -89,7 +136,7 @@ export function createFolderStore(
       const tempFile = path.join(folder, `${name}.${randomUUID()}.tmp`);
       try {
         await fs.writeFile(tempFile, text);
-        await fs.rename(tempFile, finalFile);
+        await renameWithRetries(fs, tempFile, finalFile);
         return { ok: true };
       } catch (error) {
         try {

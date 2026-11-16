@@ -86,7 +86,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - `store.ts` is the only module that imports `node:fs`.
     - _Requirements: 7.1, 7.6, 7.10, 7.11, 9.1_
 
-  - [ ] 3.4 Add the Windows rename retries to the folder store
+  - [x] 3.4 Add the Windows rename retries to the folder store
     - When `rename` fails with `EPERM`, `EBUSY` or `EACCES`, retry up to 5 times, waiting 50, 100, 200, 400 and 800 ms, then report a failed save. Other error codes fail at once.
     - `rename` and the wait function are injectable, so tests do not really wait.
     - Unit tests: a rename that fails twice with `EPERM` and then works (save succeeds); a rename that always fails with `EBUSY` (6 attempts, then failure); an `ENOSPC` failure (no retry).
