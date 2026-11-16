@@ -50,7 +50,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Determinism check (design doubt 12.4): on the PR, confirm the CI job passes with the bundle built on Windows. If it fails, compare the first different lines with `git diff` before changing any esbuild option (`charset: "utf8"` does not fix path differences). If it still differs, stop and ask the director (options in doubt 12.4).
     - _Requirements: 1.9_
 
-  - [ ] 1.5 Add the ESLint `no-console` rule for `packages/power/src`
+  - [x] 1.5 Add the ESLint `no-console` rule for `packages/power/src`
     - One rule block in `eslint.config.js` for `packages/power/src/**/*.ts`, so nothing writes to the stdio output by mistake (design doubt 6). Logs, if any, use `process.stderr.write`.
     - _Requirements: 1.7, 4.7_
 
