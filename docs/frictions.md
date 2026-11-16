@@ -291,3 +291,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** usar la herramienta de búsqueda del espacio de trabajo en vez de `git grep`.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — `git push` terminó con código 1 aunque el push funcionó
+
+- **Qué intentaba:** subir la rama `feat/kiro-power-bundle` para actualizar la PR #37.
+
+- **Qué pasó:** `git push` devolvió código de salida 1, pero el push había funcionado. Git escribe sus mensajes de progreso en stderr (la salida de errores), y Windows PowerShell 5 trata cualquier texto en stderr de un programa externo como un error.
+
+- **Cómo lo rodeé:** comprobar el resultado real del push mirando la rama remota y la PR en vez de fiarse del código de salida.
+
+- **Estado:** resuelto con rodeo.
