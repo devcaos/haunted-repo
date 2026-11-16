@@ -321,3 +321,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** guardar toda la salida en un archivo temporal (`npm run check *> $env:TEMP\hr-check.log`), mirar `$LASTEXITCODE` y después leer el final del archivo con `Get-Content -Tail`.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — La PR 2 de `kiro-power` pasó del límite de 900 líneas
+
+- **Qué intentaba:** abrir la PR 2 de `kiro-power` (rama `feat/kiro-power-store`: tarea 1.6, tareas 3.1 a 3.6 y los arreglos de la revisión de la PR #37) como una sola pull request.
+
+- **Qué pasó:** `git diff --stat main`, sin `package-lock.json` ni `packages/power/bundle/`, dio 1.032 líneas cambiadas (1.010 añadidas y 22 borradas) antes de las entradas de este archivo; el límite de Luis Miguel es 900. Unas 615 son de tests.
+
+- **Cómo lo rodeé:** no se subió la rama; se propuso a Luis Miguel partirla en dos PR apiladas sobre commits que ya existen, sin reescribir la historia.
+
+- **Estado:** abierto (falta que Luis Miguel elija cómo partirla).
