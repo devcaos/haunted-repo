@@ -32,7 +32,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Commit the generated `packages/power/bundle/server.mjs`.
     - _Requirements: 1.3, 1.7, 1.9, 11.2_
 
-  - [ ] 1.2 Remove the spike leftovers and point `mcp.json` to the bundle
+  - [x] 1.2 Remove the spike leftovers and point `mcp.json` to the bundle
     - Delete `packages/power/src/spike/`, `packages/power/skills/haunted-spike/`, the placeholder `src/index.ts` and `src/index.test.ts` (`add`).
     - `mcp.json`: one stdio server `haunted-repo` with `"command": "node"`, `"args": ["${PLUGIN_ROOT}/bundle/server.mjs"]`, no `env`; remove the `spike-relative` entry.
     - The ignored local folder `packages/power/dist/` can be deleted by hand (not a commit).
