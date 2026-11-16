@@ -362,7 +362,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Estado:** resuelto con rodeo.
 
-## 2026-11-17 — Las comillas dobles rompen `git commit -m` en PowerShell 5
+## 2026-11-16 — Las comillas dobles rompen `git commit -m` en PowerShell 5
 
 - **Qué intentaba:** hacer un commit con un mensaje que llevaba comillas dobles, con `git commit -m "..."` desde Windows PowerShell 5.
 
