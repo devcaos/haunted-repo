@@ -18,12 +18,12 @@ Haunted Repo encuentra el código escrito por IA que todavía no entiendes (los 
 - Origen real: en mi proyecto anterior (Duly, otro hackathon) nadie leía el código que hacía la IA. Soy estudiante de 1.º de DAM, vengo de Derecho, y dirijo a una IA que programa por mí.
 
 ## Para quién (público concreto)
-1. **Estudiantes** que programan con IA (ciclos de FP, bootcamps, universidad).
-2. **Profesores**, que necesitan saber si el alumno entiende el código que entrega. El alumno entrega su proyecto con un "certificado de exorcismo".
-3. En segundo plano: cualquiera que programe dirigiendo agentes (vibe coding).
+1. **Público principal:** principiantes que hacen proyectos con IA sin entender el código (por ejemplo, estudiantes de 1.º de FP). Primero van las explicaciones, con palabras sencillas, y las preguntas son sobre comportamiento.
+2. **Secundario:** cualquiera que programe dirigiendo agentes (vibe coding).
+3. **Idea para más adelante, no en esta versión:** profesores que quieren saber si el alumno entiende el código que entrega, con el "certificado de exorcismo" (decisión pendiente; Luis Miguel quiere reconsiderarla).
 
 ## Cómo funciona (concepto)
-- El repo es una **casa encantada**: cada carpeta es una habitación.
+- El repo es una **casa encantada** con tres plantas: desván (fácil), planta media y sótano (difícil). No hay una habitación por carpeta. La web la dibujará como un SVG con aspecto de videojuego (estilo Halloween, con animación y un diseño de fantasma distinto para cada planta), decidido el 16 nov.
 - El código hecho por la IA que no has validado son **fantasmas**. Versión mínima: un fantasma por archivo, no por línea.
 - Para exorcizar un fantasma: explicación para principiantes y **preguntas que hacen pensar** (abiertas o de predecir qué devuelve el código), corregidas por la IA. Si las superas, el fantasma desaparece.
 - Un mapa muestra cuánta parte del proyecto está encantada.
@@ -45,6 +45,6 @@ Decidida: **Costume Contest** (interfaz de terror que ayuda a la función).
 6. Costume Contest exige diseño excelente.
 
 ## Reglas de Kiroween que afectan a la idea
-- El repo de ejemplo de la demo es nuevo, hecho para la demo. No usar código de Duly en público.
+- La demo se abre sobre el repo público lukeed/sirv (licencia MIT), no sobre un repo nuevo. No usar código de Duly en público.
 - Sin marcas ni música de terceros en el vídeo.
 - Objetivo realista: Best Student Project de la categoría. Elegible confirmado en Discussions (la FP cuenta).
