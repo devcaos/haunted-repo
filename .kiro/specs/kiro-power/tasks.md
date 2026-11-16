@@ -163,7 +163,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 4: Exorcism tools and the strict verdict
 
-- [ ] 7. Exorcism tools
+- [x] 7. Exorcism tools
   - [x] 7.1 Implement the `pick_ghost` tool
     - Check that the step allows `pick-ghost` and that `isPickable` is true **before** any request; else `INVALID_EVENT` with the allowed events.
     - Read the Ghost_Text with a new `createGitHubClient({ fetch })` and `getFileText(owner, repo, report.overview.ref, path)`; send `{ type: "pick-ghost", path, text }` to `advance` with the text unchanged.
@@ -212,12 +212,12 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Random other files in the temporary Power_Data_Folder whose names do not match the own-file pattern; after any sequence of tool calls (with and without `replace: true`) they are byte-identical.
     - **Validates: Requirements 7.11**
 
-  - [ ] 7.8 Write the full-walk and restart tests
+  - [x] 7.8 Write the full-walk and restart tests
     - A full exorcism walk with the `tinyRecording` report through `find_ghosts`, `pick_ghost`, `send_event` and `judge_answer` until the ghost is exorcised, checking the saved file after each change of progress.
     - Restart: a second `HauntedPower` on the same folder; `continue_house` keeps exorcised ghosts; an unfinished attempt is not resumed and its ghost stays `haunted`; the saved file before the stop is unchanged.
     - _Requirements: 4.1, 7.3, 7.9, 9.1, 9.2_
 
-- [ ] 8. Checkpoint: PR 4
+- [x] 8. Checkpoint: PR 4
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 5: Tutor_Skill, manifest and live test
