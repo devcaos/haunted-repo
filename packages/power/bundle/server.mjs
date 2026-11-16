@@ -3058,15 +3058,15 @@ var require_compile = __commonJS({
       var _a3;
       if (((_a3 = parsedRef.fragment) === null || _a3 === void 0 ? void 0 : _a3[0]) !== "/")
         return;
-      for (const part of parsedRef.fragment.slice(1).split("/")) {
+      for (const part2 of parsedRef.fragment.slice(1).split("/")) {
         if (typeof schema === "boolean")
           return;
-        const partSchema = schema[(0, util_1.unescapeFragment)(part)];
+        const partSchema = schema[(0, util_1.unescapeFragment)(part2)];
         if (partSchema === void 0)
           return;
         schema = partSchema;
         const schId = typeof schema === "object" && schema[this.opts.schemaId];
-        if (!PREVENT_SCOPE_CHANGE.has(part) && schId) {
+        if (!PREVENT_SCOPE_CHANGE.has(part2) && schId) {
           baseId = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, schId);
         }
       }
@@ -3206,15 +3206,15 @@ var require_utils = __commonJS({
       const parts = left.concat(right);
       let hextetCount = 0;
       for (let i = 0; i < parts.length; i++) {
-        const part = parts[i];
-        if (part === "") return void 0;
-        if (part.indexOf(".") !== -1) {
-          if (i !== parts.length - 1 || compression !== -1 && right.length === 0 || !isIPv4(part)) return void 0;
+        const part2 = parts[i];
+        if (part2 === "") return void 0;
+        if (part2.indexOf(".") !== -1) {
+          if (i !== parts.length - 1 || compression !== -1 && right.length === 0 || !isIPv4(part2)) return void 0;
           hextetCount += 2;
           continue;
         }
-        if (!isHextet(part)) return void 0;
-        parts[i] = parseInt(part, 16).toString(16);
+        if (!isHextet(part2)) return void 0;
+        parts[i] = parseInt(part2, 16).toString(16);
         hextetCount++;
       }
       if (compression === -1) {
@@ -3262,8 +3262,8 @@ var require_utils = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path) {
-      let input = path;
+    function removeDotSegments(path2) {
+      let input = path2;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -3337,11 +3337,11 @@ var require_utils = __commonJS({
       }
       return output.join("");
     }
-    function removeDotSegmentsRelative(path) {
-      if (path === "" || path[0] === "/") {
-        return removeDotSegments(path);
+    function removeDotSegmentsRelative(path2) {
+      if (path2 === "" || path2[0] === "/") {
+        return removeDotSegments(path2);
       }
-      const segments = path.split("/");
+      const segments = path2.split("/");
       const last = segments.length - 1;
       const output = [];
       let trailingDirectory = false;
@@ -3704,8 +3704,8 @@ var require_schemes = __commonJS({
       }
       if (wsComponent.resourceName) {
         const queryIndex = wsComponent.resourceName.indexOf("?");
-        const path = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
-        wsComponent.path = path && path !== "/" ? path : void 0;
+        const path2 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
+        wsComponent.path = path2 && path2 !== "/" ? path2 : void 0;
         wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
@@ -5110,8 +5110,8 @@ var require_multipleOf = __commonJS({
         const { gen, data, schemaCode, it } = cxt;
         const prec = it.opts.multipleOfPrecision;
         const res = gen.let("res");
-        const invalid = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid}))`);
+        const invalid2 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid2}))`);
       }
     };
     exports.default = def;
@@ -10131,15 +10131,15 @@ var require_compile2 = __commonJS({
       var _a3;
       if (((_a3 = parsedRef.fragment) === null || _a3 === void 0 ? void 0 : _a3[0]) !== "/")
         return;
-      for (const part of parsedRef.fragment.slice(1).split("/")) {
+      for (const part2 of parsedRef.fragment.slice(1).split("/")) {
         if (typeof schema === "boolean")
           return;
-        const partSchema = schema[(0, util_1.unescapeFragment)(part)];
+        const partSchema = schema[(0, util_1.unescapeFragment)(part2)];
         if (partSchema === void 0)
           return;
         schema = partSchema;
         const schId = typeof schema === "object" && schema[this.opts.schemaId];
-        if (!PREVENT_SCOPE_CHANGE.has(part) && schId) {
+        if (!PREVENT_SCOPE_CHANGE.has(part2) && schId) {
           baseId = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, schId);
         }
       }
@@ -11008,8 +11008,8 @@ var require_multipleOf2 = __commonJS({
         const { gen, data, schemaCode, it } = cxt;
         const prec = it.opts.multipleOfPrecision;
         const res = gen.let("res");
-        const invalid = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid}))`);
+        const invalid2 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid2}))`);
       }
     };
     exports.default = def;
@@ -13324,8 +13324,8 @@ function getErrorMap() {
 
 // ../../node_modules/zod/v3/helpers/parseUtil.js
 var makeIssue = (params) => {
-  const { data, path, errorMaps, issueData } = params;
-  const fullPath = [...path, ...issueData.path || []];
+  const { data, path: path2, errorMaps, issueData } = params;
+  const fullPath = [...path2, ...issueData.path || []];
   const fullIssue = {
     ...issueData,
     path: fullPath
@@ -13337,15 +13337,15 @@ var makeIssue = (params) => {
       message: issueData.message
     };
   }
-  let errorMessage = "";
+  let errorMessage2 = "";
   const maps = errorMaps.filter((m) => !!m).slice().reverse();
   for (const map of maps) {
-    errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
+    errorMessage2 = map(fullIssue, { data, defaultError: errorMessage2 }).message;
   }
   return {
     ...issueData,
     path: fullPath,
-    message: errorMessage
+    message: errorMessage2
   };
 };
 function addIssueToContext(ctx, issueData) {
@@ -13440,11 +13440,11 @@ var errorUtil;
 
 // ../../node_modules/zod/v3/types.js
 var ParseInputLazyPath = class {
-  constructor(parent, value, path, key) {
+  constructor(parent, value, path2, key) {
     this._cachedPath = [];
     this.parent = parent;
     this.data = value;
-    this._path = path;
+    this._path = path2;
     this._key = key;
   }
   get path() {
@@ -17082,10 +17082,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path) {
-  if (!path)
+function getElementAtPath(obj, path2) {
+  if (!path2)
     return obj;
-  return path.reduce((acc, key) => acc?.[key], obj);
+  return path2.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys = Object.keys(promisesObj);
@@ -17425,11 +17425,11 @@ function explicitlyAborted(x, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path, issues) {
+function prefixIssues(path2, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path);
+    iss.path.unshift(path2);
     return iss;
   });
 }
@@ -17887,16 +17887,16 @@ function flattenError(error2, mapper = (issue2) => issue2.message) {
 }
 function formatError(error2, mapper = (issue2) => issue2.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error3, path = []) => {
+  const processError = (error3, path2 = []) => {
     for (const issue2 of error3.issues) {
       if (issue2.code === "invalid_union" && issue2.errors.length) {
-        issue2.errors.map((issues) => processError({ issues }, [...path, ...issue2.path]));
+        issue2.errors.map((issues) => processError({ issues }, [...path2, ...issue2.path]));
       } else if (issue2.code === "invalid_key") {
-        processError({ issues: issue2.issues }, [...path, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path2, ...issue2.path]);
       } else if (issue2.code === "invalid_element") {
-        processError({ issues: issue2.issues }, [...path, ...issue2.path]);
+        processError({ issues: issue2.issues }, [...path2, ...issue2.path]);
       } else {
-        const fullpath = [...path, ...issue2.path];
+        const fullpath = [...path2, ...issue2.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue2));
         } else {
@@ -21401,11 +21401,11 @@ function foldObjects(members2) {
         continue;
       const parts = [];
       for (const other of objects) {
-        const part = other.properties?.[key] ?? undeclaredConstraint(other);
-        if (part === null || part === void 0)
+        const part2 = other.properties?.[key] ?? undeclaredConstraint(other);
+        if (part2 === null || part2 === void 0)
           continue;
-        if (!parts.some((seen) => JSON.stringify(seen) === JSON.stringify(part)))
-          parts.push(part);
+        if (!parts.some((seen) => JSON.stringify(seen) === JSON.stringify(part2)))
+          parts.push(part2);
       }
       const merged = parts.length === 1 ? parts[0] : foldObjects(parts) ?? { allOf: parts };
       assignProp(properties, key, merged);
@@ -22582,11 +22582,11 @@ function normalizeObjectSchema(schema) {
   }
   return void 0;
 }
-function getDotPath(path) {
-  if (path.length === 0) {
+function getDotPath(path2) {
+  if (path2.length === 0) {
     return "object root";
   }
-  return path.reduce((acc, seg, index) => {
+  return path2.reduce((acc, seg, index) => {
     if (index === 0) {
       return String(seg);
     }
@@ -25278,19 +25278,19 @@ var getRefs = (options) => {
 };
 
 // ../../node_modules/zod-to-json-schema/dist/esm/errorMessages.js
-function addErrorMessage(res, key, errorMessage, refs) {
+function addErrorMessage(res, key, errorMessage2, refs) {
   if (!refs?.errorMessages)
     return;
-  if (errorMessage) {
+  if (errorMessage2) {
     res.errorMessage = {
       ...res.errorMessage,
-      [key]: errorMessage
+      [key]: errorMessage2
     };
   }
 }
-function setResponseValueAndErrors(res, key, value, errorMessage, refs) {
+function setResponseValueAndErrors(res, key, value, errorMessage2, refs) {
   res[key] = value;
-  addErrorMessage(res, key, errorMessage, refs);
+  addErrorMessage(res, key, errorMessage2, refs);
 }
 
 // ../../node_modules/zod-to-json-schema/dist/esm/getRelativePath.js
@@ -26604,8 +26604,8 @@ var Protocol = class {
                   if (queuedMessage.type === "response") {
                     resolver(message);
                   } else {
-                    const errorMessage = message;
-                    const error2 = new McpError(errorMessage.error.code, errorMessage.error.message, errorMessage.error.data);
+                    const errorMessage2 = message;
+                    const error2 = new McpError(errorMessage2.error.code, errorMessage2.error.message, errorMessage2.error.data);
                     resolver(error2);
                   }
                 } else {
@@ -27916,23 +27916,23 @@ var Server = class extends Protocol {
       const wrappedHandler = async (request, extra) => {
         const validatedRequest = safeParse2(CallToolRequestSchema, request);
         if (!validatedRequest.success) {
-          const errorMessage = validatedRequest.error instanceof Error ? validatedRequest.error.message : String(validatedRequest.error);
-          throw new McpError(ErrorCode.InvalidParams, `Invalid tools/call request: ${errorMessage}`);
+          const errorMessage2 = validatedRequest.error instanceof Error ? validatedRequest.error.message : String(validatedRequest.error);
+          throw new McpError(ErrorCode.InvalidParams, `Invalid tools/call request: ${errorMessage2}`);
         }
         const { params } = validatedRequest.data;
         const result = await Promise.resolve(handler(request, extra));
         if (params.task) {
           const taskValidationResult = safeParse2(CreateTaskResultSchema, result);
           if (!taskValidationResult.success) {
-            const errorMessage = taskValidationResult.error instanceof Error ? taskValidationResult.error.message : String(taskValidationResult.error);
-            throw new McpError(ErrorCode.InvalidParams, `Invalid task creation result: ${errorMessage}`);
+            const errorMessage2 = taskValidationResult.error instanceof Error ? taskValidationResult.error.message : String(taskValidationResult.error);
+            throw new McpError(ErrorCode.InvalidParams, `Invalid task creation result: ${errorMessage2}`);
           }
           return taskValidationResult.data;
         }
         const validationResult = safeParse2(CallToolResultSchema, result);
         if (!validationResult.success) {
-          const errorMessage = validationResult.error instanceof Error ? validationResult.error.message : String(validationResult.error);
-          throw new McpError(ErrorCode.InvalidParams, `Invalid tools/call result: ${errorMessage}`);
+          const errorMessage2 = validationResult.error instanceof Error ? validationResult.error.message : String(validationResult.error);
+          throw new McpError(ErrorCode.InvalidParams, `Invalid tools/call result: ${errorMessage2}`);
         }
         return validationResult.data;
       };
@@ -28472,12 +28472,12 @@ var McpServer = class {
    * @param errorMessage - The error message.
    * @returns The tool error result.
    */
-  createToolError(errorMessage) {
+  createToolError(errorMessage2) {
     return {
       content: [
         {
           type: "text",
-          text: errorMessage
+          text: errorMessage2
         }
       ],
       isError: true
@@ -28498,8 +28498,8 @@ var McpServer = class {
     const parseResult = await safeParseAsync2(schemaToParse, args ?? {});
     if (!parseResult.success) {
       const error2 = "error" in parseResult ? parseResult.error : "Unknown error";
-      const errorMessage = getParseErrorMessage(error2);
-      throw new McpError(ErrorCode.InvalidParams, `Input validation error: Invalid arguments for tool ${toolName}: ${errorMessage}`);
+      const errorMessage2 = getParseErrorMessage(error2);
+      throw new McpError(ErrorCode.InvalidParams, `Input validation error: Invalid arguments for tool ${toolName}: ${errorMessage2}`);
     }
     return parseResult.data;
   }
@@ -28523,8 +28523,8 @@ var McpServer = class {
     const parseResult = await safeParseAsync2(outputObj, result.structuredContent);
     if (!parseResult.success) {
       const error2 = "error" in parseResult ? parseResult.error : "Unknown error";
-      const errorMessage = getParseErrorMessage(error2);
-      throw new McpError(ErrorCode.InvalidParams, `Output validation error: Invalid structured content for tool ${toolName}: ${errorMessage}`);
+      const errorMessage2 = getParseErrorMessage(error2);
+      throw new McpError(ErrorCode.InvalidParams, `Output validation error: Invalid structured content for tool ${toolName}: ${errorMessage2}`);
     }
   }
   /**
@@ -28736,8 +28736,8 @@ var McpServer = class {
         const parseResult = await safeParseAsync2(argsObj, request.params.arguments ?? {});
         if (!parseResult.success) {
           const error2 = "error" in parseResult ? parseResult.error : "Unknown error";
-          const errorMessage = getParseErrorMessage(error2);
-          throw new McpError(ErrorCode.InvalidParams, `Invalid arguments for prompt ${request.params.name}: ${errorMessage}`);
+          const errorMessage2 = getParseErrorMessage(error2);
+          throw new McpError(ErrorCode.InvalidParams, `Invalid arguments for prompt ${request.params.name}: ${errorMessage2}`);
         }
         const args = parseResult.data;
         const cb = prompt.callback;
@@ -29247,18 +29247,1497 @@ var StdioServerTransport = class {
   }
 };
 
+// src/guardFetch.ts
+var ALLOWED_ORIGIN = "https://api.github.com";
+var ForbiddenUrlError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ForbiddenUrlError";
+  }
+};
+var RedirectRefusedError = class extends Error {
+  constructor() {
+    super(
+      "Request refused: GitHub answered with a redirect, and the Power does not follow redirects. If the repository was renamed or moved, use its new URL."
+    );
+    this.name = "RedirectRefusedError";
+  }
+};
+function inputUrl(input) {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.href;
+  return input.url;
+}
+function isRedirectError(error2) {
+  if (!(error2 instanceof TypeError)) return false;
+  const cause = error2.cause;
+  return cause instanceof Error && cause.message === "unexpected redirect";
+}
+function guardFetch(inner) {
+  return async (input, init) => {
+    let url;
+    try {
+      url = new URL(inputUrl(input));
+    } catch {
+      throw new ForbiddenUrlError("Request refused: the URL does not parse.");
+    }
+    if (url.username !== "" || url.password !== "") {
+      throw new ForbiddenUrlError(
+        "Request refused: the URL must not contain a user or password."
+      );
+    }
+    if (url.origin !== ALLOWED_ORIGIN) {
+      throw new ForbiddenUrlError(
+        `Request refused: only ${ALLOWED_ORIGIN} is allowed.`
+      );
+    }
+    try {
+      return await inner(input, { ...init, redirect: "error" });
+    } catch (error2) {
+      if (isRedirectError(error2)) throw new RedirectRefusedError();
+      throw error2;
+    }
+  };
+}
+
+// ../core/src/ghost-detection/errors.ts
+var DetectError = class extends Error {
+  code;
+  constructor(code, message) {
+    super(message);
+    this.name = "DetectError";
+    this.code = code;
+  }
+  /** Public shape for a Result. NOT_TEXT never leaves the orchestrator, so it is cast. */
+  get info() {
+    return { code: this.code, message: this.message };
+  }
+};
+function ok(value) {
+  return { ok: true, value };
+}
+function fail(code, message) {
+  return { ok: false, error: { code, message } };
+}
+function isCode(error2, code) {
+  return error2 instanceof DetectError && error2.code === code;
+}
+
+// ../core/src/ghost-detection/eligibility.ts
+var LANGUAGE_BY_EXTENSION = {
+  ".ts": "TypeScript",
+  ".tsx": "TypeScript",
+  ".js": "JavaScript",
+  ".jsx": "JavaScript",
+  ".mjs": "JavaScript",
+  ".cjs": "JavaScript",
+  ".java": "Java",
+  ".py": "Python"
+};
+var EXCLUDED_FOLDERS = /* @__PURE__ */ new Set([
+  "node_modules",
+  "dist",
+  "build",
+  "out",
+  "vendor",
+  "target",
+  "coverage",
+  ".git",
+  "__pycache__",
+  ".next"
+]);
+var TEST_FOLDERS = /* @__PURE__ */ new Set(["test", "tests", "__tests__", "spec"]);
+function splitPath(path2) {
+  const parts = path2.split("/");
+  const name = parts.pop() ?? "";
+  return { folders: parts, name };
+}
+function extensionOf(name) {
+  const dot = name.lastIndexOf(".");
+  return dot === -1 ? "" : name.slice(dot).toLowerCase();
+}
+function languageOf(path2) {
+  const { name } = splitPath(path2);
+  return LANGUAGE_BY_EXTENSION[extensionOf(name)] ?? null;
+}
+function isEligible(path2) {
+  if (languageOf(path2) === null) return false;
+  const { folders, name } = splitPath(path2);
+  const lowerFolders = folders.map((f) => f.toLowerCase());
+  if (lowerFolders.some((f) => EXCLUDED_FOLDERS.has(f))) return false;
+  const lowerName = name.toLowerCase();
+  if (lowerName.endsWith(".d.ts") || lowerName.endsWith(".min.js")) {
+    return false;
+  }
+  if (lowerName.includes(".generated.") || lowerName.includes(".gen.") || lowerName.includes(".config.")) {
+    return false;
+  }
+  if (lowerName.startsWith(".eslintrc.") || lowerName === "setup.py") {
+    return false;
+  }
+  if (lowerName.includes(".test.") || lowerName.includes(".spec.")) {
+    return false;
+  }
+  if (lowerName.startsWith("test_") || name.endsWith("Test.java")) {
+    return false;
+  }
+  if (lowerFolders.some((f) => TEST_FOLDERS.has(f))) return false;
+  return true;
+}
+
+// ../core/src/ghost-detection/floor.ts
+function floorOf(score) {
+  if (score <= 33) return "attic";
+  if (score <= 66) return "middle floor";
+  return "basement";
+}
+
+// ../core/src/ghost-detection/factors.ts
+var MAX_LINE_LENGTH = 500;
+var BRANCH_PATTERN = /\b(if|elif|for|while|switch|case|catch)\b/g;
+var IMPORT_PATTERN = /^(import\b|from\s+\S+\s+import\b)/;
+function isCommentLine(trimmed) {
+  return trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("/*") || trimmed.startsWith("*");
+}
+function indentOf(line) {
+  let tabs = 0;
+  let spaces = 0;
+  for (const ch of line) {
+    if (ch === "	") tabs++;
+    else if (ch === " ") spaces++;
+    else break;
+  }
+  return tabs + Math.floor(spaces / 4);
+}
+function measureFactors(text) {
+  const clean = text.startsWith("\uFEFF") ? text.slice(1) : text;
+  const factors = { lines: 0, branches: 0, maxIndent: 0, imports: 0 };
+  for (const rawLine of clean.split(/\r?\n/)) {
+    const line = rawLine.slice(0, MAX_LINE_LENGTH);
+    const trimmed = line.trim();
+    if (trimmed === "") continue;
+    factors.maxIndent = Math.max(factors.maxIndent, indentOf(line));
+    if (IMPORT_PATTERN.test(trimmed) || trimmed.includes("require(")) {
+      factors.imports++;
+    }
+    if (isCommentLine(trimmed)) continue;
+    factors.lines++;
+    factors.branches += trimmed.match(BRANCH_PATTERN)?.length ?? 0;
+  }
+  return factors;
+}
+function part(value, cap, weight) {
+  return Math.min(value, cap) / cap * weight;
+}
+function difficultyScore(f) {
+  return Math.round(
+    part(f.lines, 400, 40) + part(f.branches, 60, 30) + part(f.maxIndent, 8, 20) + part(f.imports, 20, 10)
+  );
+}
+var DECISIONS = "if/elif/for/while/switch/case/catch";
+var SENTENCES = {
+  attic: {
+    lines: (f) => `It is easy to read; the part that weighs most is its length (${f.lines} lines of code).`,
+    branches: (f) => `It is easy to read; the part that weighs most is the number of decisions it makes (${f.branches} ${DECISIONS}).`,
+    maxIndent: (f) => `It is easy to read; the part that weighs most is how nested the code is (${f.maxIndent} levels).`,
+    imports: (f) => `It is easy to read; the part that weighs most is the number of other files it depends on (${f.imports} imports).`
+  },
+  "middle floor": {
+    lines: (f) => `It is of medium difficulty, mostly because it is fairly long (${f.lines} lines of code).`,
+    branches: (f) => `It is of medium difficulty, mostly because it makes several decisions (${f.branches} ${DECISIONS}).`,
+    maxIndent: (f) => `It is of medium difficulty, mostly because the code is nested (${f.maxIndent} levels).`,
+    imports: (f) => `It is of medium difficulty, mostly because it depends on several other files (${f.imports} imports).`
+  },
+  basement: {
+    lines: (f) => `It is hard, mostly because it is long (${f.lines} lines of code).`,
+    branches: (f) => `It is hard, mostly because it makes many decisions (${f.branches} ${DECISIONS}).`,
+    maxIndent: (f) => `It is hard, mostly because the code is deeply nested (${f.maxIndent} levels).`,
+    imports: (f) => `It is hard, mostly because it depends on many other files (${f.imports} imports).`
+  }
+};
+function reasonFor(f) {
+  const candidates = [
+    { points: part(f.lines, 400, 40), winner: "lines" },
+    { points: part(f.branches, 60, 30), winner: "branches" },
+    { points: part(f.maxIndent, 8, 20), winner: "maxIndent" },
+    { points: part(f.imports, 20, 10), winner: "imports" }
+  ];
+  let best = candidates[0];
+  for (const c of candidates) {
+    if (c.points > best.points) best = c;
+  }
+  if (best.points === 0)
+    return "It is easy to read; it is very short and simple.";
+  return SENTENCES[floorOf(difficultyScore(f))][best.winner](f);
+}
+
+// ../core/src/ghost-detection/githubClient.ts
+var API_ROOT = "https://api.github.com";
+var MAX_REQUESTS = 8;
+var DEFAULT_TIMEOUT_MS = 1e4;
+var NETWORK_MESSAGE = "Could not reach GitHub. Please try again in a moment.";
+function networkError() {
+  return new DetectError("NETWORK_ERROR", NETWORK_MESSAGE);
+}
+function rateLimitError(headers) {
+  if (headers.get("x-ratelimit-remaining") === "0") {
+    const reset = Number(headers.get("x-ratelimit-reset"));
+    if (headers.get("x-ratelimit-reset") !== null && Number.isFinite(reset)) {
+      const time3 = new Date(reset * 1e3);
+      if (!Number.isNaN(time3.getTime())) {
+        const iso = time3.toISOString().replace(/\.\d{3}Z$/, "Z");
+        return new DetectError(
+          "RATE_LIMITED",
+          `GitHub rate limit reached. It resets at ${iso}. Try again after that.`
+        );
+      }
+    }
+  }
+  const retryAfter = Number(headers.get("retry-after"));
+  if (headers.get("retry-after") !== null && Number.isFinite(retryAfter)) {
+    return new DetectError(
+      "RATE_LIMITED",
+      `GitHub rate limit reached. Try again in about ${Math.ceil(retryAfter)} seconds.`
+    );
+  }
+  return new DetectError(
+    "RATE_LIMITED",
+    "GitHub rate limit reached. Try again in a minute."
+  );
+}
+function createGitHubClient(opts = {}) {
+  const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  let count = 0;
+  async function get(path2, accept = "application/vnd.github+json") {
+    if (count >= MAX_REQUESTS) {
+      throw new Error(`GitHub request budget of ${MAX_REQUESTS} exceeded`);
+    }
+    count++;
+    const doFetch = opts.fetch ?? globalThis.fetch;
+    let response;
+    try {
+      response = await doFetch(`${API_ROOT}${path2}`, {
+        method: "GET",
+        headers: {
+          Accept: accept,
+          "X-GitHub-Api-Version": "2022-11-28"
+        },
+        signal: AbortSignal.timeout(timeoutMs)
+      });
+    } catch {
+      throw networkError();
+    }
+    if (response.status === 403 || response.status === 429) {
+      throw rateLimitError(response.headers);
+    }
+    return response;
+  }
+  async function readJson(response) {
+    try {
+      const body = await response.json();
+      if (typeof body === "object" && body !== null && !Array.isArray(body)) {
+        return body;
+      }
+    } catch {
+    }
+    throw networkError();
+  }
+  return {
+    get requestCount() {
+      return count;
+    },
+    async getRepo(owner, repo) {
+      const response = await get(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`
+      );
+      if (response.status === 404) {
+        throw new DetectError(
+          "REPO_NOT_FOUND",
+          "Repository not found. Only public GitHub repositories are supported."
+        );
+      }
+      if (response.status !== 200) throw networkError();
+      const body = await readJson(response);
+      const branch = body["default_branch"];
+      return {
+        defaultBranch: typeof branch === "string" && branch !== "" ? branch : null
+      };
+    },
+    async getTree(owner, repo, ref) {
+      const response = await get(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/git/trees/${encodeURIComponent(ref)}?recursive=1`
+      );
+      if (response.status === 409) {
+        throw new DetectError(
+          "EMPTY_REPO",
+          "This repository is empty. Add some code and try again."
+        );
+      }
+      if (response.status !== 200) throw networkError();
+      const body = await readJson(response);
+      const tree = body["tree"];
+      if (!Array.isArray(tree)) throw networkError();
+      const entries = [];
+      for (const item of tree) {
+        if (typeof item !== "object" || item === null) throw networkError();
+        const { path: path2, mode, type, size } = item;
+        if (typeof path2 !== "string" || typeof mode !== "string" || typeof type !== "string") {
+          throw networkError();
+        }
+        entries.push(
+          typeof size === "number" ? { path: path2, mode, type, size } : { path: path2, mode, type }
+        );
+      }
+      return { entries, truncated: body["truncated"] === true };
+    },
+    async getFileText(owner, repo, ref, path2) {
+      const encodedPath = path2.split("/").map(encodeURIComponent).join("/");
+      const response = await get(
+        `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodedPath}?ref=${encodeURIComponent(ref)}`,
+        "application/vnd.github.raw+json"
+      );
+      const readError = () => new DetectError(
+        "NETWORK_ERROR",
+        `Could not read the file "${path2}" from GitHub. Please try again in a moment.`
+      );
+      if (response.status !== 200) throw readError();
+      let bytes;
+      try {
+        bytes = await response.arrayBuffer();
+      } catch {
+        throw readError();
+      }
+      let text;
+      try {
+        text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+      } catch {
+        throw new DetectError("NOT_TEXT", `The file "${path2}" is not text.`);
+      }
+      if (text.includes("\0")) {
+        throw new DetectError("NOT_TEXT", `The file "${path2}" is not text.`);
+      }
+      return text;
+    }
+  };
+}
+
+// ../core/src/ghost-detection/keyFiles.ts
+var KEY_NAMES = /* @__PURE__ */ new Set([
+  "main",
+  "index",
+  "app",
+  "server",
+  "program",
+  "__main__"
+]);
+var KEY_FOLDERS = /* @__PURE__ */ new Set(["src", "app", "lib"]);
+var MIN_SIZE = 200;
+var MAX_SIZE = 2e4;
+function nameScore(fileName) {
+  const dot = fileName.lastIndexOf(".");
+  const base = (dot === -1 ? fileName : fileName.slice(0, dot)).toLowerCase();
+  return KEY_NAMES.has(base) ? 40 : 0;
+}
+function locationScore(folders) {
+  const first = folders[0]?.toLowerCase() ?? "";
+  if (folders.length === 0) return 30;
+  if (folders.length === 1) return KEY_FOLDERS.has(first) ? 20 : 0;
+  if (folders.length === 2) return KEY_FOLDERS.has(first) ? 10 : 0;
+  return 0;
+}
+function sizeScore(size) {
+  const ratio = (size - MIN_SIZE) / (MAX_SIZE - MIN_SIZE);
+  return 30 * Math.min(1, Math.max(0, ratio));
+}
+function keyScore(entry) {
+  const parts = entry.path.split("/");
+  const fileName = parts.pop() ?? "";
+  return nameScore(fileName) + locationScore(parts) + sizeScore(entry.size);
+}
+function rankKeyFiles(entries) {
+  return entries.filter((entry) => isEligible(entry.path)).map((entry) => ({ entry, score: keyScore(entry) })).sort((a, b) => {
+    if (a.score !== b.score) return b.score - a.score;
+    if (a.entry.path < b.entry.path) return -1;
+    if (a.entry.path > b.entry.path) return 1;
+    return 0;
+  }).map((item) => item.entry);
+}
+
+// ../core/src/ghost-detection/repoUrl.ts
+var INVALID_URL_MESSAGE = "That does not look like a GitHub repository URL. Example: https://github.com/owner/repo";
+var OWNER_PATTERN = /^[A-Za-z0-9-]+$/;
+var REPO_PATTERN = /^[A-Za-z0-9._-]+$/;
+function parseRepoUrl(text) {
+  if (typeof text !== "string") {
+    return fail("INVALID_URL", INVALID_URL_MESSAGE);
+  }
+  let rest = text.trim();
+  rest = rest.split("#")[0] ?? "";
+  rest = rest.split("?")[0] ?? "";
+  rest = rest.replace(/^https?:\/\//i, "");
+  rest = rest.replace(/^www\./i, "");
+  const hostMatch = /^github\.com\//i.exec(rest);
+  if (hostMatch === null) {
+    return fail("INVALID_URL", INVALID_URL_MESSAGE);
+  }
+  const [owner, rawRepo] = rest.slice(hostMatch[0].length).split("/");
+  if (owner === void 0 || !OWNER_PATTERN.test(owner)) {
+    return fail("INVALID_URL", INVALID_URL_MESSAGE);
+  }
+  if (rawRepo === void 0 || !REPO_PATTERN.test(rawRepo)) {
+    return fail("INVALID_URL", INVALID_URL_MESSAGE);
+  }
+  const repo = rawRepo.endsWith(".git") ? rawRepo.slice(0, -4) : rawRepo;
+  if (repo === "" || repo === "." || repo === "..") {
+    return fail("INVALID_URL", INVALID_URL_MESSAGE);
+  }
+  return ok({ owner, repo });
+}
+
+// ../core/src/ghost-detection/report.ts
+function buildReport(input) {
+  const ghosts = input.ghosts.map((file) => {
+    const score = difficultyScore(file.factors);
+    return {
+      path: file.path,
+      language: file.language,
+      difficultyScore: score,
+      floor: floorOf(score),
+      factors: { ...file.factors },
+      reason: reasonFor(file.factors)
+    };
+  });
+  ghosts.sort((a, b) => {
+    if (a.difficultyScore !== b.difficultyScore) {
+      return a.difficultyScore - b.difficultyScore;
+    }
+    if (a.path < b.path) return -1;
+    if (a.path > b.path) return 1;
+    return 0;
+  });
+  const picked = ghosts.length;
+  const fewFiles = picked === 1 || picked === 2;
+  return {
+    overview: {
+      owner: input.owner,
+      repo: input.repo,
+      ref: input.ref,
+      analysed: input.analysed,
+      picked,
+      truncated: input.truncated,
+      fewFiles,
+      partial: input.partial,
+      skipped: input.skipped.map((s) => ({ ...s })),
+      message: fewFiles ? `This looks like a small project, so only ${picked} file(s) were picked.` : null
+    },
+    ghosts
+  };
+}
+
+// ../core/src/ghost-detection/detectGhosts.ts
+var MAX_TREE_ENTRIES = 5e3;
+var MAX_FILE_BYTES = 102400;
+var MAX_GHOSTS = 5;
+var MAX_CONTENT_REQUESTS = 6;
+function isRegularBlob(entry) {
+  return entry.type === "blob" && entry.mode.startsWith("100");
+}
+function skippedMessage(skipped) {
+  const list = skipped.map(
+    (s) => `${s.path} (${s.reason === "TOO_LARGE" ? "too large" : "not text"})`
+  ).join(", ");
+  return `All supported files were skipped: ${list}. Nothing could be analysed.`;
+}
+async function detectGhosts(url, opts = {}) {
+  const parsed = parseRepoUrl(url);
+  if (!parsed.ok) return parsed;
+  const { owner, repo } = parsed.value;
+  try {
+    const client = createGitHubClient(opts);
+    const { defaultBranch } = await client.getRepo(owner, repo);
+    const ref = opts.ref ?? defaultBranch;
+    if (ref === null) {
+      throw new DetectError(
+        "EMPTY_REPO",
+        "This repository is empty. Add some code and try again."
+      );
+    }
+    const tree = await client.getTree(owner, repo, ref);
+    let entries = tree.entries;
+    let truncated = tree.truncated;
+    if (entries.length > MAX_TREE_ENTRIES) {
+      entries = entries.slice(0, MAX_TREE_ENTRIES);
+      truncated = true;
+    }
+    const files = entries.filter(isRegularBlob).map((e) => ({ path: e.path, size: e.size ?? 0 }));
+    const candidates = rankKeyFiles(files);
+    if (candidates.length === 0) {
+      return fail(
+        "NO_SUPPORTED_FILES",
+        "No supported source files found. Supported languages: TypeScript, JavaScript, Java and Python. Test files alone are not analysed."
+      );
+    }
+    const scored = [];
+    const skipped = [];
+    let used = 0;
+    let partial2 = false;
+    for (const c of candidates) {
+      if (scored.length === MAX_GHOSTS) break;
+      if (c.size > MAX_FILE_BYTES) {
+        skipped.push({ path: c.path, reason: "TOO_LARGE" });
+        continue;
+      }
+      if (used === MAX_CONTENT_REQUESTS) break;
+      used++;
+      try {
+        const text = await client.getFileText(owner, repo, ref, c.path);
+        const language = languageOf(c.path);
+        if (language === null) continue;
+        scored.push({ path: c.path, language, factors: measureFactors(text) });
+      } catch (e) {
+        if (isCode(e, "NOT_TEXT")) {
+          skipped.push({ path: c.path, reason: "NOT_TEXT" });
+          continue;
+        }
+        if (isCode(e, "RATE_LIMITED") && scored.length > 0) {
+          partial2 = true;
+          break;
+        }
+        throw e;
+      }
+    }
+    if (scored.length === 0) {
+      return fail("NO_SUPPORTED_FILES", skippedMessage(skipped));
+    }
+    return ok(
+      buildReport({
+        owner,
+        repo,
+        ref,
+        analysed: candidates.length,
+        truncated,
+        partial: partial2,
+        skipped,
+        ghosts: scored
+      })
+    );
+  } catch (e) {
+    if (e instanceof DetectError) return { ok: false, error: e.info };
+    throw e;
+  }
+}
+
+// ../core/src/ghost-detection/parseReport.ts
+var LANGUAGES = ["TypeScript", "JavaScript", "Java", "Python"];
+var FLOORS = ["attic", "middle floor", "basement"];
+var SKIP_REASONS = ["TOO_LARGE", "NOT_TEXT"];
+function isObj(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function isCount(value) {
+  return Number.isInteger(value) && value >= 0;
+}
+function isOneOf(value, options) {
+  return typeof value === "string" && options.includes(value);
+}
+function isFactors(value) {
+  return isObj(value) && isCount(value.lines) && isCount(value.branches) && isCount(value.maxIndent) && isCount(value.imports);
+}
+function isGhost(value) {
+  if (!isObj(value)) return false;
+  const score = value.difficultyScore;
+  return typeof value.path === "string" && isOneOf(value.language, LANGUAGES) && Number.isInteger(score) && score >= 0 && score <= 100 && isOneOf(value.floor, FLOORS) && isFactors(value.factors) && typeof value.reason === "string";
+}
+function isSkipped(value) {
+  return isObj(value) && typeof value.path === "string" && isOneOf(value.reason, SKIP_REASONS);
+}
+function isOverview(value) {
+  return isObj(value) && typeof value.owner === "string" && typeof value.repo === "string" && typeof value.ref === "string" && isCount(value.analysed) && isCount(value.picked) && typeof value.truncated === "boolean" && typeof value.fewFiles === "boolean" && typeof value.partial === "boolean" && Array.isArray(value.skipped) && value.skipped.every(isSkipped) && (value.message === null || typeof value.message === "string");
+}
+function isReport(value) {
+  return isObj(value) && isOverview(value.overview) && Array.isArray(value.ghosts) && value.ghosts.every(isGhost);
+}
+function parseReport(jsonText) {
+  let data;
+  try {
+    data = JSON.parse(jsonText);
+  } catch {
+    return invalid();
+  }
+  return isReport(data) ? ok(data) : invalid();
+}
+function invalid() {
+  return fail(
+    "INVALID_REPORT",
+    "This text is not a valid Haunted Repo report."
+  );
+}
+
+// ../core/src/exorcism/errors.ts
+function ok2(value) {
+  return { ok: true, value };
+}
+function fail2(code, message) {
+  return { ok: false, error: { code, message } };
+}
+
+// ../core/src/exorcism/event.ts
+var ALLOWED_EVENTS = {
+  choosing: ["pick-ghost"],
+  explaining: ["explanation-done", "leave-ghost"],
+  asking: ["answer-rated", "dont-know", "leave-ghost"],
+  simplifying: ["explanation-done", "leave-ghost"],
+  "model-answer": ["explanation-done", "leave-ghost"],
+  "self-check": ["self-check-answered"],
+  failed: ["retry-ghost", "pick-ghost"],
+  "house-clean": []
+};
+
+// ../core/src/exorcism/questions.ts
+var QUESTION_SETS = {
+  "data-shape": [
+    "what the file is for",
+    "what data one record carries",
+    "what happens when one piece of data is missing"
+  ],
+  logic: [
+    "what the file does",
+    "what goes in and what comes out",
+    "when it fails or what can go wrong"
+  ],
+  "entry-point": [
+    "what the file starts or connects",
+    "which other parts it uses and in what order",
+    "what happens if one of those parts fails"
+  ],
+  general: [
+    "what the file is for",
+    "what you would notice in the project if the file did not exist",
+    "what could go wrong in it"
+  ]
+};
+
+// ../core/src/exorcism/rules.ts
+var RULE_SENTENCES = {
+  "simple-english": "Write in English, with simple words and short sentences.",
+  "no-jargon": "Avoid jargon. Define any technical term you must use in one sentence, with an everyday analogy.",
+  "what-before-how": "Say first WHAT the file does in the project, and only then HOW it does it, in small pieces.",
+  "no-question": "Do not ask any question in this message.",
+  "no-lines": "Never ask about specific lines, line numbers or syntax details. A question may ask the student to predict a behaviour, but not about one specific line.",
+  "max-words": "Use at most about 150 words and leave out secondary details.",
+  "java-allowed": "You may compare with Java.",
+  "java-forbidden": "Do not compare with Java. Use everyday analogies only.",
+  "probable-reasons": 'Present every reason for why the code does something as the probable reason ("probably", "most likely"), never as a sure fact.',
+  "separate-what-why": "Separate what the code does (it can be read in the file) from why the author wrote it that way (a guess).",
+  "admit-unknown": "If you cannot tell the reason from the file, say so instead of inventing one.",
+  "not-wrong-other-reason": "Do not give the verdict `wrong` only because the answer gives a different probable reason than yours.",
+  "one-question": "Write exactly one question in your message.",
+  "concrete-file": "Write the question about this concrete file, using its real names, data and behaviour.",
+  "different-questions": "These questions were already asked about this file:",
+  "same-question": "Ask the student exactly this question again:",
+  "new-analogy": "Use a new everyday analogy, different from the one used before.",
+  "only-this-part": "Explain only the part that the question is about, and add the details the first explanation left out.",
+  "model-answer-short": "Show a short model answer to the question.",
+  "judge-behaviour": "Judge the behaviour that the answer describes, not the exact words used.",
+  "reason-then-verdict": "Give a short reason in plain language, and then the verdict.",
+  "verdict-format": "End your judgement with one last line that is exactly `VERDICT: right`, `VERDICT: half-right`, `VERDICT: wrong` or `VERDICT: dont-know`.",
+  "one-verdict": "Give exactly one verdict per message and per question, never the verdicts of several questions in one message.",
+  "ask-then-wait": "First write only the question and stop. Wait for the student's answer. Only then write your judgement: a short reason and the VERDICT line. Never answer the question yourself, and never put the question and the verdict in the same message.",
+  "dont-know-verdict": 'If the answer means "I don\'t know" in any language, or is empty, or does not try to answer, the verdict is `dont-know`.',
+  "self-check-options": 'Ask the student whether the file is now understood, with the options "yes", "half" and "no".'
+};
+function differentQuestionsSentence(questions) {
+  return `${RULE_SENTENCES["different-questions"]} ${questions.map((q) => `"${q}"`).join(" ")} Write different questions that keep the same objective.`;
+}
+function sameQuestionSentence(question) {
+  return `${RULE_SENTENCES["same-question"]} "${question}"`;
+}
+
+// ../core/src/exorcism/suggest.ts
+function hauntedPaths(progress) {
+  return new Set(
+    progress.ghosts.filter((g) => g.state === "haunted").map((g) => g.path)
+  );
+}
+function suggestGhost(ghosts, progress) {
+  const haunted = hauntedPaths(progress);
+  let best = null;
+  for (const ghost of ghosts) {
+    if (!haunted.has(ghost.path)) continue;
+    if (best === null || ghost.difficultyScore < best.difficultyScore || ghost.difficultyScore === best.difficultyScore && ghost.path < best.path) {
+      best = ghost;
+    }
+  }
+  return best;
+}
+
+// ../core/src/exorcism/instructions.ts
+function fenceFor(text) {
+  let longest = 0;
+  for (const run of text.match(/`+/g) ?? []) {
+    if (run.length > longest) longest = run.length;
+  }
+  return "`".repeat(Math.max(3, longest + 1));
+}
+function fenced(text) {
+  const fence = fenceFor(text);
+  return `${fence}
+${text}
+${fence}`;
+}
+function ghostBlock(current) {
+  return `Ghost: ${current.path}
+${fenced(current.text)}`;
+}
+function javaRule(state) {
+  return state.profile?.knowsJava === true ? "java-allowed" : "java-forbidden";
+}
+function render(step, title, blocks, rules, sentenceOverrides = {}) {
+  const bullets = rules.map((id) => `- ${sentenceOverrides[id] ?? RULE_SENTENCES[id]}`).join("\n");
+  const text = [title, ...blocks, `Rules:
+${bullets}`].join("\n\n");
+  return { step, text, rules };
+}
+function requireCurrent(state) {
+  if (state.current === null) {
+    throw new Error(`Step ${state.step} needs a current ghost`);
+  }
+  return state.current;
+}
+function describeGhost(ghost) {
+  return `${ghost.path} (${ghost.floor}): ${ghost.reason}`;
+}
+function buildChoosing(state) {
+  const haunted = new Set(
+    state.progress.ghosts.filter((g) => g.state === "haunted").map((g) => g.path)
+  );
+  const hauntedGhosts = state.ghosts.filter((g) => haunted.has(g.path));
+  const suggested = suggestGhost(state.ghosts, state.progress);
+  const message = suggested === null ? "Tell the student that there is no haunted ghost left to pick." : `Tell the student which ghost is suggested to start with: ${describeGhost(suggested)}. Say that any haunted ghost can be picked instead.`;
+  const list = hauntedGhosts.map((g) => `- ${describeGhost(g)}`).join("\n");
+  return render(
+    "choosing",
+    "Step: choosing a ghost",
+    [message, `Haunted ghosts:
+${list}`],
+    ["probable-reasons"]
+  );
+}
+function buildExplaining(state) {
+  const current = requireCurrent(state);
+  const retry = current.explanation !== "";
+  const rules = [
+    "simple-english",
+    "no-jargon",
+    "what-before-how",
+    "no-question",
+    "no-lines",
+    "max-words",
+    javaRule(state),
+    "probable-reasons",
+    "separate-what-why",
+    "admit-unknown"
+  ];
+  const blocks = [ghostBlock(current)];
+  if (retry) {
+    blocks.push(
+      `Explanation given before:
+${fenced(current.explanation)}`,
+      "Task: write another explanation of the same file, different from the one given before."
+    );
+    rules.push("new-analogy");
+  } else {
+    blocks.push("Task: explain this file to the student.");
+  }
+  return render("explaining", "Step: explaining the ghost", blocks, rules);
+}
+function buildSelfCheck() {
+  return render(
+    "self-check",
+    "Step: self-check",
+    [
+      "Tell the student that the ghost is exorcised. Then ask the student if the file is now understood."
+    ],
+    ["probable-reasons", "self-check-options"]
+  );
+}
+function buildFailed() {
+  return render(
+    "failed",
+    "Step: ghost not exorcised",
+    [
+      "Tell the student that the ghost stays haunted for now. The student can try the same ghost again after a new explanation, or pick another ghost."
+    ],
+    ["probable-reasons"]
+  );
+}
+function buildHouseClean() {
+  return render(
+    "house-clean",
+    "Step: house clean",
+    ["Tell the student that the house is clean: no haunted ghost is left."],
+    ["probable-reasons"]
+  );
+}
+function requirePending(current) {
+  if (current.pendingQuestion === null) {
+    throw new Error("This step needs a pending question");
+  }
+  return current.pendingQuestion;
+}
+function buildAsking(state) {
+  const current = requireCurrent(state);
+  const judging = [
+    "no-lines",
+    "judge-behaviour",
+    "reason-then-verdict",
+    "verdict-format",
+    "one-verdict",
+    "dont-know-verdict",
+    "not-wrong-other-reason",
+    "admit-unknown",
+    "probable-reasons",
+    "simple-english",
+    "no-jargon",
+    javaRule(state)
+  ];
+  if (current.pendingQuestion !== null) {
+    const rules2 = ["same-question", "ask-then-wait", ...judging];
+    return render(
+      "asking",
+      "Step: asking the same question again",
+      [
+        ghostBlock(current),
+        `Task: ask the question again, then judge the answer.
+Question: ${current.pendingQuestion}`
+      ],
+      rules2,
+      { "same-question": sameQuestionSentence(current.pendingQuestion) }
+    );
+  }
+  const objective = QUESTION_SETS[current.kind][current.questionIndex];
+  const earlier = (state.asked[current.path] ?? []).slice(
+    0,
+    current.attemptStart
+  );
+  const rules = ["one-question", "concrete-file", "ask-then-wait"];
+  const overrides = {};
+  if (earlier.length > 0) {
+    rules.push("different-questions");
+    overrides["different-questions"] = differentQuestionsSentence(earlier);
+  }
+  rules.push(...judging);
+  return render(
+    "asking",
+    "Step: asking a question",
+    [
+      ghostBlock(current),
+      `Task: ask one question about this file. Objective of the question: ${objective}.`
+    ],
+    rules,
+    overrides
+  );
+}
+function buildSimplifying(state) {
+  const current = requireCurrent(state);
+  const question = requirePending(current);
+  const blocks = [
+    ghostBlock(current),
+    `Question the student could not answer: ${question}`,
+    `Explanation given before:
+${fenced(current.explanation)}`
+  ];
+  if (current.simpler.length > 0) {
+    const list = current.simpler.map((s, i) => `Simpler explanation ${i + 1}:
+${fenced(s)}`).join("\n\n");
+    blocks.push(list);
+  }
+  blocks.push(
+    "Task: write a simpler explanation of the part of the file that the question is about."
+  );
+  return render("simplifying", "Step: simpler explanation", blocks, [
+    "new-analogy",
+    "only-this-part",
+    "max-words",
+    "no-question",
+    "no-lines",
+    "separate-what-why",
+    "simple-english",
+    "no-jargon",
+    javaRule(state),
+    "admit-unknown",
+    "probable-reasons"
+  ]);
+}
+function buildModelAnswer(state) {
+  const current = requireCurrent(state);
+  const question = requirePending(current);
+  return render(
+    "model-answer",
+    "Step: model answer",
+    [
+      ghostBlock(current),
+      `Question: ${question}`,
+      "Task: show a short model answer to this question."
+    ],
+    [
+      "model-answer-short",
+      "no-question",
+      "no-lines",
+      "simple-english",
+      "no-jargon",
+      javaRule(state),
+      "admit-unknown",
+      "probable-reasons"
+    ]
+  );
+}
+function buildInstructions(state) {
+  switch (state.step) {
+    case "choosing":
+      return buildChoosing(state);
+    case "explaining":
+      return buildExplaining(state);
+    case "self-check":
+      return buildSelfCheck();
+    case "failed":
+      return buildFailed();
+    case "house-clean":
+      return buildHouseClean();
+    case "asking":
+      return buildAsking(state);
+    case "simplifying":
+      return buildSimplifying(state);
+    case "model-answer":
+      return buildModelAnswer(state);
+  }
+}
+
+// ../core/src/exorcism/progress.ts
+var RATINGS = ["right", "half-right", "wrong"];
+var SELF_CHECKS = ["yes", "half", "no"];
+function isRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function entryProblem(entry, index) {
+  const where = `ghosts[${index}]`;
+  if (!isRecord(entry)) return `${where} must be an object.`;
+  if (typeof entry["path"] !== "string")
+    return `${where}.path must be a string.`;
+  if (entry["state"] !== "haunted" && entry["state"] !== "exorcised") {
+    return `${where}.state must be "haunted" or "exorcised".`;
+  }
+  const ratings = entry["ratings"];
+  if (!Array.isArray(ratings) || ratings.length !== 0 && ratings.length !== 3) {
+    return `${where}.ratings must be a list of 0 or 3 ratings.`;
+  }
+  if (!ratings.every((r) => typeof r === "string" && RATINGS.includes(r))) {
+    return `${where}.ratings must only contain "right", "half-right" or "wrong".`;
+  }
+  const selfCheck = entry["selfCheck"];
+  if (selfCheck !== null && !(typeof selfCheck === "string" && SELF_CHECKS.includes(selfCheck))) {
+    return `${where}.selfCheck must be "yes", "half", "no" or null.`;
+  }
+  return null;
+}
+function progressProblem(value) {
+  if (!isRecord(value)) return "The progress must be an object.";
+  const ghosts = value["ghosts"];
+  if (!Array.isArray(ghosts)) return "The progress must have a ghosts list.";
+  const seen = /* @__PURE__ */ new Set();
+  for (const [index, entry] of ghosts.entries()) {
+    const problem = entryProblem(entry, index);
+    if (problem !== null) return problem;
+    const path2 = entry.path;
+    if (seen.has(path2)) return `The path "${path2}" appears more than once.`;
+    seen.add(path2);
+  }
+  return null;
+}
+function normaliseProgress(ghosts, progress) {
+  const known = /* @__PURE__ */ new Map();
+  for (const entry of progress?.ghosts ?? []) {
+    if (!known.has(entry.path)) known.set(entry.path, entry);
+  }
+  return {
+    ghosts: ghosts.map((ghost) => {
+      const entry = known.get(ghost.path);
+      if (entry === void 0) {
+        return {
+          path: ghost.path,
+          state: "haunted",
+          ratings: [],
+          selfCheck: null
+        };
+      }
+      return {
+        path: entry.path,
+        state: entry.state,
+        ratings: [...entry.ratings],
+        selfCheck: entry.selfCheck
+      };
+    })
+  };
+}
+function parseProgress(jsonText) {
+  let raw;
+  try {
+    raw = JSON.parse(jsonText);
+  } catch {
+    return fail2("INVALID_PROGRESS", "The progress is not valid JSON text.");
+  }
+  const problem = progressProblem(raw);
+  if (problem !== null) return fail2("INVALID_PROGRESS", problem);
+  const value = raw;
+  return ok2({
+    ghosts: value.ghosts.map((g) => ({
+      path: g.path,
+      state: g.state,
+      ratings: [...g.ratings],
+      selfCheck: g.selfCheck
+    }))
+  });
+}
+function formatProgress(progress) {
+  return JSON.stringify(progress);
+}
+function hauntedShare(report, progress) {
+  if (report.ghosts.length === 0) return 0;
+  const normalised = normaliseProgress(report.ghosts, progress);
+  const haunted = normalised.ghosts.filter((g) => g.state === "haunted").length;
+  return haunted / normalised.ghosts.length;
+}
+
+// ../core/src/exorcism/engine.ts
+function dedupeByPath(ghosts) {
+  const seen = /* @__PURE__ */ new Set();
+  const result = [];
+  for (const ghost of ghosts) {
+    if (seen.has(ghost.path)) continue;
+    seen.add(ghost.path);
+    result.push({ ...ghost, factors: { ...ghost.factors } });
+  }
+  return result;
+}
+function startSession(report, options) {
+  const ghosts = dedupeByPath(report.ghosts);
+  const progress = normaliseProgress(ghosts, options?.progress ?? null);
+  const state = {
+    step: suggestGhost(ghosts, progress) === null ? "house-clean" : "choosing",
+    profile: { knowsJava: options?.profile?.knowsJava ?? false },
+    ghosts,
+    progress,
+    asked: {},
+    current: null
+  };
+  return { state, instructions: buildInstructions(state) };
+}
+
+// src/dataFile.ts
+var MARKER = "haunted-repo--";
+var OWNER_PATTERN2 = /^[a-z0-9-]+$/;
+var REPO_PATTERN2 = /^[a-z0-9._-]+$/;
+var OWN_FILE_PATTERN = /^haunted-repo--[a-z0-9-]+@[a-z0-9._-]+\.json$/;
+function dataFileName(owner, repo) {
+  const lowOwner = owner.toLowerCase();
+  const lowRepo = repo.toLowerCase();
+  if (!OWNER_PATTERN2.test(lowOwner)) {
+    throw new Error(`Invalid repository owner for a data file: "${owner}".`);
+  }
+  if (!REPO_PATTERN2.test(lowRepo)) {
+    throw new Error(`Invalid repository name for a data file: "${repo}".`);
+  }
+  return `${MARKER}${lowOwner}@${lowRepo}.json`;
+}
+function isOwnDataFile(name) {
+  return OWN_FILE_PATTERN.test(name);
+}
+function serialiseDataFile(report, progress) {
+  return `{"format":1,"report":${JSON.stringify(report)},"progress":${formatProgress(progress)}}`;
+}
+function isRecord2(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+function fail3(code, fileName, problem) {
+  return {
+    ok: false,
+    error: {
+      code,
+      message: `The saved file "${fileName}" is broken: ${problem}`
+    }
+  };
+}
+function parseDataFile(text, fileName) {
+  let raw;
+  try {
+    raw = JSON.parse(text);
+  } catch {
+    return fail3("INVALID_REPORT", fileName, "it is not valid JSON text.");
+  }
+  if (!isRecord2(raw) || raw["format"] !== 1) {
+    return fail3("INVALID_REPORT", fileName, "its format is not 1.");
+  }
+  if (!("report" in raw)) {
+    return fail3("INVALID_REPORT", fileName, "it has no report.");
+  }
+  const report = parseReport(JSON.stringify(raw["report"]));
+  if (!report.ok) {
+    return fail3("INVALID_REPORT", fileName, report.error.message);
+  }
+  if (!("progress" in raw)) {
+    return fail3("INVALID_PROGRESS", fileName, "it has no progress.");
+  }
+  const progress = parseProgress(JSON.stringify(raw["progress"]));
+  if (!progress.ok) {
+    return fail3("INVALID_PROGRESS", fileName, progress.error.message);
+  }
+  const { owner, repo } = report.value.overview;
+  let expected;
+  try {
+    expected = dataFileName(owner, repo);
+  } catch {
+    expected = "";
+  }
+  if (expected !== fileName) {
+    return fail3(
+      "INVALID_REPORT",
+      fileName,
+      `its report is for ${owner}/${repo}, which does not match the file name.`
+    );
+  }
+  return {
+    ok: true,
+    value: { report: report.value, progress: progress.value }
+  };
+}
+
 // src/messages.ts
 var NO_SESSION_MESSAGE = "There is no exorcism session yet. Call find_ghosts with a public GitHub repository URL, or continue_house to continue a saved house.";
 var INTERNAL_MESSAGE = "Something went wrong inside Haunted Repo. Please try again.";
+var REPO_NOT_FOUND_MESSAGE = "Repository not found. Haunted Repo only works with public GitHub repositories, so the repository may be private, or the URL may be wrong. Check the URL and try again.";
+var PARTIAL_WARNING = "The ghost list is incomplete: GitHub's rate limit was reached while reading the files. Try again later for the full list.";
+var ASK_BEFORE_REPLACE = "Ask the Student before calling find_ghosts again with replace: true, which replaces the saved ghosts and progress of this repository.";
+function dataExistsMessage(fileName) {
+  return `A saved house already exists for this repository (file "${fileName}"). Use continue_house to continue it. ${ASK_BEFORE_REPLACE}`;
+}
+function brokenDataMessage(problem) {
+  return `${problem} ${ASK_BEFORE_REPLACE}`;
+}
+function saveFailedWarning(problem) {
+  return `Your progress will not be saved: ${problem}`;
+}
+function ghostsFoundMessage(owner, repo, count, suggested) {
+  const ghosts = count === 1 ? "1 ghost" : `${count} ghosts`;
+  const start = suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
+  return `Found ${ghosts} in ${owner}/${repo}, from easy to hard.${start}`;
+}
+
+// src/power.ts
+function sessionAnswer(session, message, warning) {
+  const { state } = session;
+  const answer = {
+    ok: true,
+    step: state.step,
+    allowedEvents: ALLOWED_EVENTS[state.step],
+    instructions: buildInstructions(state).text,
+    hauntedShare: hauntedShare(session.report, state.progress),
+    message
+  };
+  if (warning !== void 0) answer.warning = warning;
+  return answer;
+}
+function errorAnswer(code, message, state) {
+  const answer = { ok: false, code, message };
+  if (state !== void 0) {
+    answer.step = state.step;
+    answer.allowedEvents = ALLOWED_EVENTS[state.step];
+  }
+  return answer;
+}
+var SerialQueue = class {
+  tail = Promise.resolve();
+  run(fn) {
+    const run = this.tail.then(fn);
+    this.tail = run.catch(() => {
+    });
+    return run;
+  }
+};
+var HauntedPower = class {
+  fetch;
+  store;
+  storageOk;
+  session = null;
+  queue = new SerialQueue();
+  constructor(options) {
+    this.fetch = options.fetch;
+    this.store = options.store;
+    this.storageOk = options.storageOk;
+  }
+  /**
+   * find_ghosts (Requirement 2). The Repository_Data_File is read before
+   * any network call; an existing file (valid or broken) is never changed
+   * unless `replace` is true.
+   */
+  findGhosts(input) {
+    return this.queue.run(() => this.doFindGhosts(input));
+  }
+  async doFindGhosts(input) {
+    const parsed = parseRepoUrl(input.url);
+    if (!parsed.ok) {
+      return errorAnswer(parsed.error.code, parsed.error.message);
+    }
+    const name = dataFileName(parsed.value.owner, parsed.value.repo);
+    if (input.replace !== true) {
+      const saved = await this.store.read(name);
+      if (saved.kind === "found") {
+        const content = parseDataFile(saved.text, name);
+        if (content.ok) {
+          return errorAnswer("DATA_EXISTS", dataExistsMessage(name));
+        }
+        return errorAnswer(
+          content.error.code,
+          brokenDataMessage(content.error.message)
+        );
+      }
+      if (saved.kind === "error") {
+        return errorAnswer("INVALID_REPORT", brokenDataMessage(saved.message));
+      }
+    }
+    const detected = await detectGhosts(input.url, { fetch: this.fetch });
+    if (!detected.ok) {
+      const { code, message: message2 } = detected.error;
+      return errorAnswer(
+        code,
+        code === "REPO_NOT_FOUND" ? REPO_NOT_FOUND_MESSAGE : message2
+      );
+    }
+    const report = detected.value;
+    const { state } = startSession(report, {
+      profile: { knowsJava: input.knowsJava ?? false }
+    });
+    const warnings = [];
+    if (report.overview.partial) warnings.push(PARTIAL_WARNING);
+    const saveProblem = await this.save(name, report, state.progress);
+    if (saveProblem !== null) warnings.push(saveFailedWarning(saveProblem));
+    const session = {
+      owner: report.overview.owner,
+      repo: report.overview.repo,
+      report,
+      state,
+      invalidCount: 0
+    };
+    this.session = session;
+    const suggested = suggestGhost(state.ghosts, state.progress)?.path ?? null;
+    let message = ghostsFoundMessage(
+      session.owner,
+      session.repo,
+      report.ghosts.length,
+      suggested
+    );
+    if (report.overview.fewFiles && report.overview.message !== null) {
+      message = `${message} ${report.overview.message}`;
+    }
+    const base = sessionAnswer(
+      session,
+      message,
+      warnings.length > 0 ? warnings.join(" ") : void 0
+    );
+    return {
+      ...base,
+      ghosts: report.ghosts.map((g) => ({
+        path: g.path,
+        floor: g.floor,
+        difficultyScore: g.difficultyScore,
+        reason: g.reason
+      })),
+      suggested
+    };
+  }
+  /**
+   * Saves report and progress in the Repository_Data_File. Returns null on
+   * success, or the English problem when the save failed; the session then
+   * continues in memory (Requirement 7.6).
+   */
+  async save(name, report, progress) {
+    const result = await this.store.write(
+      name,
+      serialiseDataFile(report, progress)
+    );
+    return result.ok ? null : result.message;
+  }
+  /** pick_ghost (task 7.1). For now only the NO_SESSION check. */
+  pickGhost() {
+    return this.queue.run(() => this.skeleton());
+  }
+  /** send_event (task 7.2). For now only the NO_SESSION check. */
+  sendEvent() {
+    return this.queue.run(() => this.skeleton());
+  }
+  /** judge_answer (task 7.3). For now only the NO_SESSION check. */
+  judgeAnswer() {
+    return this.queue.run(() => this.skeleton());
+  }
+  /** house_status (task 5.6). For now only the NO_SESSION check. */
+  houseStatus() {
+    return this.queue.run(() => this.skeleton());
+  }
+  // Session tools answer NO_SESSION without a session (Requirement 9.3).
+  // The other branch is a placeholder until each tool gets its real handler
+  // (tasks 5.6, 7.1, 7.2 and 7.3).
+  skeleton() {
+    if (this.session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    return errorAnswer("INTERNAL", INTERNAL_MESSAGE, this.session.state);
+  }
+};
+
+// src/store.ts
+import { randomUUID } from "node:crypto";
+import * as fsp from "node:fs/promises";
+import * as path from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
+var nodeFolderFs = {
+  readFile: (file) => fsp.readFile(file, "utf8"),
+  writeFile: (file, text) => fsp.writeFile(file, text, "utf8"),
+  rename: (from, to) => fsp.rename(from, to),
+  unlink: (file) => fsp.unlink(file),
+  wait: (ms) => sleep(ms)
+};
+var RENAME_RETRY_DELAYS_MS = [
+  50,
+  100,
+  200,
+  400,
+  800
+];
+var RETRYABLE_RENAME_CODES = /* @__PURE__ */ new Set([
+  "EPERM",
+  "EBUSY",
+  "EACCES"
+]);
+async function renameWithRetries(fs, from, to) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await fs.rename(from, to);
+      return;
+    } catch (error2) {
+      const code = errorCode(error2);
+      const delay = RENAME_RETRY_DELAYS_MS[attempt];
+      if (delay === void 0 || code === void 0 || !RETRYABLE_RENAME_CODES.has(code)) {
+        throw error2;
+      }
+      await fs.wait(delay);
+    }
+  }
+}
+var PROBE_NAME = "haunted-repo--probe.tmp";
+function errorCode(error2) {
+  if (typeof error2 === "object" && error2 !== null && "code" in error2) {
+    const code = error2.code;
+    return typeof code === "string" ? code : void 0;
+  }
+  return void 0;
+}
+function errorMessage(error2) {
+  return error2 instanceof Error ? error2.message : String(error2);
+}
+function notOwn(name) {
+  return `"${name}" is not a Haunted Repo data file name.`;
+}
+function createFolderStore(folder, fs = nodeFolderFs) {
+  return {
+    async read(name) {
+      if (!isOwnDataFile(name)) {
+        return { kind: "error", message: notOwn(name) };
+      }
+      try {
+        const text = await fs.readFile(path.join(folder, name));
+        return { kind: "found", text };
+      } catch (error2) {
+        if (errorCode(error2) === "ENOENT") {
+          return { kind: "missing" };
+        }
+        return {
+          kind: "error",
+          message: `The saved file "${name}" could not be read: ${errorMessage(error2)}`
+        };
+      }
+    },
+    async write(name, text) {
+      if (!isOwnDataFile(name)) {
+        return { ok: false, message: notOwn(name) };
+      }
+      const finalFile = path.join(folder, name);
+      const tempFile = path.join(folder, `${name}.${randomUUID()}.tmp`);
+      try {
+        await fs.writeFile(tempFile, text);
+        await renameWithRetries(fs, tempFile, finalFile);
+        return { ok: true };
+      } catch (error2) {
+        try {
+          await fs.unlink(tempFile);
+        } catch {
+        }
+        return {
+          ok: false,
+          message: `The file "${name}" could not be saved: ${errorMessage(error2)}`
+        };
+      }
+    }
+  };
+}
+function createMemoryStore() {
+  const files = /* @__PURE__ */ new Map();
+  return {
+    read(name) {
+      if (!isOwnDataFile(name)) {
+        return Promise.resolve({ kind: "error", message: notOwn(name) });
+      }
+      const text = files.get(name);
+      return Promise.resolve(
+        text === void 0 ? { kind: "missing" } : { kind: "found", text }
+      );
+    },
+    write(name, text) {
+      if (!isOwnDataFile(name)) {
+        return Promise.resolve({ ok: false, message: notOwn(name) });
+      }
+      files.set(name, text);
+      return Promise.resolve({ ok: true });
+    }
+  };
+}
+async function openStore(pluginData) {
+  if (pluginData === void 0 || pluginData === "") {
+    return { store: createMemoryStore(), storageOk: false };
+  }
+  try {
+    await fsp.mkdir(pluginData, { recursive: true });
+    const probe = path.join(pluginData, PROBE_NAME);
+    await fsp.writeFile(probe, "probe", "utf8");
+    await fsp.unlink(probe);
+  } catch {
+    return { store: createMemoryStore(), storageOk: false };
+  }
+  return { store: createFolderStore(pluginData), storageOk: true };
+}
+
+// src/createPower.ts
+async function createPower(pluginData, baseFetch) {
+  const { store, storageOk } = await openStore(pluginData);
+  return new HauntedPower({ fetch: guardFetch(baseFetch), store, storageOk });
+}
 
 // src/register.ts
-function errorResult(answer) {
+function toResult(answer) {
   return {
     content: [
       { type: "text", text: answer.message },
       { type: "text", text: JSON.stringify(answer) }
     ],
-    isError: true
+    isError: !answer.ok
   };
 }
 function safe(handler) {
@@ -29266,7 +30745,7 @@ function safe(handler) {
     try {
       return await handler(...args);
     } catch {
-      return errorResult({
+      return toResult({
         ok: false,
         code: "INTERNAL",
         message: INTERNAL_MESSAGE
@@ -29275,13 +30754,13 @@ function safe(handler) {
   };
 }
 async function noSession() {
-  return errorResult({
+  return toResult({
     ok: false,
     code: "NO_SESSION",
     message: NO_SESSION_MESSAGE
   });
 }
-function registerTools(server2) {
+function registerTools(server2, power2) {
   server2.registerTool(
     "find_ghosts",
     {
@@ -29292,7 +30771,12 @@ function registerTools(server2) {
         replace: boolean2().optional()
       }
     },
-    safe(noSession)
+    safe(async ({ url, knowsJava, replace }) => {
+      const input = { url };
+      if (knowsJava !== void 0) input.knowsJava = knowsJava;
+      if (replace !== void 0) input.replace = replace;
+      return toResult(await power2.findGhosts(input));
+    })
   );
   server2.registerTool(
     "continue_house",
@@ -29351,7 +30835,7 @@ function registerTools(server2) {
 }
 
 // src/server.ts
-var pluginData = process.env.PLUGIN_DATA;
+var power = await createPower(process.env.PLUGIN_DATA, globalThis.fetch);
 var server = new McpServer({ name: "haunted-repo", version: "0.0.0" });
-registerTools(server);
+registerTools(server, power);
 await server.connect(new StdioServerTransport());

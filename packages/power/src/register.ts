@@ -1,20 +1,23 @@
-// Registers the six Power_Tools (design section 4). For now every handler is
-// a stub that answers NO_SESSION; the real handlers arrive in later tasks.
+// Registers the six Power_Tools (design section 4). Handlers stay thin: they
+// call HauntedPower and turn its answer into an MCP result. Tools without
+// their real handler yet are stubs that answer NO_SESSION.
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import * as z from "zod";
 import { INTERNAL_MESSAGE, NO_SESSION_MESSAGE } from "./messages.js";
+import type { Answer, HauntedPower } from "./power.js";
 
-type ErrorAnswer = { ok: false; code: string; message: string };
-
-/** Two text items: a short message for the Student, then the JSON data. */
-function errorResult(answer: ErrorAnswer): CallToolResult {
+/**
+ * Two text items: a short message for the Student, then the JSON data.
+ * A refused or failed call sets isError.
+ */
+export function toResult(answer: Answer): CallToolResult {
   return {
     content: [
       { type: "text", text: answer.message },
       { type: "text", text: JSON.stringify(answer) },
     ],
-    isError: true,
+    isError: !answer.ok,
   };
 }
 
@@ -26,7 +29,7 @@ function safe<A extends unknown[]>(
     try {
       return await handler(...args);
     } catch {
-      return errorResult({
+      return toResult({
         ok: false,
         code: "INTERNAL",
         message: INTERNAL_MESSAGE,
@@ -36,14 +39,14 @@ function safe<A extends unknown[]>(
 }
 
 async function noSession(): Promise<CallToolResult> {
-  return errorResult({
+  return toResult({
     ok: false,
     code: "NO_SESSION",
     message: NO_SESSION_MESSAGE,
   });
 }
 
-export function registerTools(server: McpServer): void {
+export function registerTools(server: McpServer, power: HauntedPower): void {
   server.registerTool(
     "find_ghosts",
     {
@@ -55,7 +58,12 @@ export function registerTools(server: McpServer): void {
         replace: z.boolean().optional(),
       },
     },
-    safe(noSession),
+    safe(async ({ url, knowsJava, replace }) => {
+      const input: Parameters<HauntedPower["findGhosts"]>[0] = { url };
+      if (knowsJava !== undefined) input.knowsJava = knowsJava;
+      if (replace !== undefined) input.replace = replace;
+      return toResult(await power.findGhosts(input));
+    }),
   );
 
   server.registerTool(

@@ -6,3 +6,39 @@ export const NO_SESSION_MESSAGE =
 
 export const INTERNAL_MESSAGE =
   "Something went wrong inside Haunted Repo. Please try again.";
+
+/** REPO_NOT_FOUND (Requirement 2.4): public repositories only, never a token. */
+export const REPO_NOT_FOUND_MESSAGE =
+  "Repository not found. Haunted Repo only works with public GitHub repositories, so the repository may be private, or the URL may be wrong. Check the URL and try again.";
+
+/** Warning of a partial report (Requirement 2.5). */
+export const PARTIAL_WARNING =
+  "The ghost list is incomplete: GitHub's rate limit was reached while reading the files. Try again later for the full list.";
+
+/** Added to a refusal when a saved file exists (Requirements 2.7, 7.5). */
+const ASK_BEFORE_REPLACE =
+  "Ask the Student before calling find_ghosts again with replace: true, which replaces the saved ghosts and progress of this repository.";
+
+export function dataExistsMessage(fileName: string): string {
+  return `A saved house already exists for this repository (file "${fileName}"). Use continue_house to continue it. ${ASK_BEFORE_REPLACE}`;
+}
+
+export function brokenDataMessage(problem: string): string {
+  return `${problem} ${ASK_BEFORE_REPLACE}`;
+}
+
+export function saveFailedWarning(problem: string): string {
+  return `Your progress will not be saved: ${problem}`;
+}
+
+export function ghostsFoundMessage(
+  owner: string,
+  repo: string,
+  count: number,
+  suggested: string | null,
+): string {
+  const ghosts = count === 1 ? "1 ghost" : `${count} ghosts`;
+  const start =
+    suggested === null ? "" : ` The easiest one to start with is ${suggested}.`;
+  return `Found ${ghosts} in ${owner}/${repo}, from easy to hard.${start}`;
+}

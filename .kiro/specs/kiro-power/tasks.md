@@ -125,7 +125,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: `NO_SESSION` for each session method; the queue runs two calls in order.
     - _Requirements: 4.1, 4.2, 9.3, 11.5_
 
-  - [ ] 5.3 Implement the `find_ghosts` tool
+  - [x] 5.3 Implement the `find_ghosts` tool
     - `parseRepoUrl`; read the Repository_Data_File before any network call; refuse with `DATA_EXISTS`, `INVALID_REPORT` or `INVALID_PROGRESS` (message names the file and says to ask the Student before `replace: true`) when a file exists and `replace` is not `true`.
     - Otherwise `detectGhosts`, save `{ report, progress }` with all ghosts `haunted`, `startSession(report, { profile: { knowsJava: knowsJava ?? false } })`, and return the ghosts (path, floor, score, reason, report order), `hauntedShare`, `suggested` (`suggestGhost`), and the `choosing` instructions. `partial` adds the incomplete-list warning; `fewFiles` adds the report `message`.
     - Detection errors return their code with the English message; `REPO_NOT_FOUND` says only public repositories work and the URL may be wrong, never asks for a token.
