@@ -181,7 +181,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: `explanation-done`, `self-check-answered` (progress saved), `retry-ghost`, `leave-ghost`, an event the step does not allow, `failed`, `house-clean`.
     - _Requirements: 4.4, 4.5, 4.10, 4.11, 4.12, 6.3, 6.4, 7.3, 9.4_
 
-  - [ ] 7.3 Implement `src/verdictGate.ts` and the `judge_answer` tool
+  - [x] 7.3 Implement `src/verdictGate.ts` and the `judge_answer` tool
     - `MAX_VERDICT_RETRIES = 2`. The strict flow of design section 7: no session gives `NO_SESSION`; step not `asking` gives `INVALID_EVENT` before `parseVerdict` and leaves the count unchanged; `parseVerdict(judgement)` with the text exactly as received (no `trim`, no search, no default).
     - Accepted: count to 0; question is `pendingQuestion` when not `null`, otherwise the Tutor's text; send `answer-rated` (`right`, `half-right`, `wrong`) or `dont-know`; save if progress changed. A refusal by `advance` (blank question) gives `INVALID_EVENT`, state unchanged.
     - Rejected: count + 1; at most 2 gives a Verdict_Retry (`INVALID_VERDICT`, `retry: true`, `triesLeft = 3 - count`, the message of `parseVerdict`, the four allowed lines, "do not ask the Student again"); 3 gives a Verdict_Failure (`VERDICT_FAILED`, `retry: false`, count to 0, step, allowed events and instructions of the unchanged state).
@@ -190,7 +190,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: table-driven invalid judgements of 5.10 (empty, only spaces, bold, leading space, full stop, two `VERDICT:` lines; trailing spaces accepted; an indented `VERDICT:` line is not a second line); first and second "I don't know" with the `pendingQuestion` check; retry texts and `triesLeft`; Verdict_Failure.
     - _Requirements: 4.6, 4.7, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.10, 5.11, 6.2, 6.3, 6.4, 9.4_
 
-  - [ ] 7.4 Write the property test for the strict verdict, and see it fail once
+  - [x] 7.4 Write the property test for the strict verdict, and see it fail once
     - **Property 1: Strict verdict**
     - Drive `HauntedPower` directly with the `tinyRecording` report. Generator: valid judgements (random reason, then one of the four `VERDICT:` lines, optional trailing spaces, optional CRLF) mixed with near misses (leading space, bold, full stop, lowercase `verdict: right`, two `VERDICT:` lines with an invalid last one, empty, only spaces). The check compares the step and the ratings of the Session_State after the call with what `parseVerdict` returns for the same text; the return code alone is not enough.
     - Mutation check: temporarily add `.trim()` before `parseVerdict` in the gate, run the test and see Property 1 fail on a leading-space near miss; revert the change; write one line with the result in `docs/kiro-usage-log.md`.

@@ -1,0 +1,65 @@
+
+ RUN  v5.1.0 C:/proyectos/haunted-repo
+
+ ❯ packages/power/src/judgeAnswer.property.test.ts (2 tests | 1 failed) 32ms
+   ❯ judge_answer: Property 1, strict verdict (2)
+     × an Event is sent iff parseVerdict accepts the text, with its Verdict 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  packages/power/src/judgeAnswer.property.test.ts > judge_answer: Property 1, strict verdict > an Event is sent iff parseVerdict accepts the text, with its Verdict
+Error: Property failed after 35 tests
+{ seed: 814832803, path: "34:0:0:0:0", endOnFailure: true }
+Counterexample: [" VERDICT: right"]
+Shrunk 4 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: expected { step: 'asking', …(5) } to be { step: 'asking', …(5) } // Object.is equality
+
+- Expected
++ Received
+
+@@ -1,16 +1,22 @@
+  {
+-   "asked": {},
++   "asked": {
++     "src/a.ts": [
++       "What does this file give to the rest of the project?",
++     ],
++   },
+    "current": {
+      "attemptStart": 0,
+      "dontKnowCount": 0,
+      "explanation": "This file stores the number one.",
+      "kind": "general",
+      "path": "src/a.ts",
+      "pendingQuestion": null,
+-     "questionIndex": 0,
+-     "ratings": [],
++     "questionIndex": 1,
++     "ratings": [
++       "right",
++     ],
+      "simpler": [],
+      "text": "export const a = 1;",
+    },
+    "ghosts": [
+      {
+
+ ❯ packages/power/src/judgeAnswer.property.test.ts:138:27
+ ❯ AsyncProperty.run node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ packages/power/src/judgeAnswer.property.test.ts:121:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:40:53
+   Duration  416ms (import 42%, transform 39%, tests 15%, worker 3%)
+

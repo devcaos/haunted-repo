@@ -33,7 +33,8 @@ import {
   ghostTextUnreadableMessage,
   houseContinuedMessage,
   houseStatusMessage,
-  INTERNAL_MESSAGE,
+  judgeNotAllowedMessage,
+  judgementAcceptedMessage,
   MEMORY_MODE_WARNING,
   noDataMessage,
   NO_SESSION_MESSAGE,
@@ -43,8 +44,16 @@ import {
   REPO_NOT_FOUND_MESSAGE,
   saveFailedWarning,
   sendEventTypeMessage,
+  VERDICT_FAILED_MESSAGE,
+  verdictRetryMessage,
 } from "./messages.js";
 import type { Store } from "./store.js";
+import {
+  ALLOWED_VERDICT_LINES,
+  gateJudgement,
+  questionFor,
+  verdictEvent,
+} from "./verdictGate.js";
 
 /** The answer of a session tool when the call is accepted. */
 export interface SessionAnswer {
@@ -134,6 +143,22 @@ export function coreMessage(error: unknown): string | null {
   }
   return null;
 }
+
+export interface JudgeAnswerInput {
+  question: string;
+  judgement: string;
+}
+
+/** Verdict_Retry (INVALID_VERDICT) and Verdict_Failure (VERDICT_FAILED). */
+export interface VerdictErrorAnswer extends ErrorAnswer {
+  retry: boolean;
+  /** Verdict_Retry only: MAX_VERDICT_RETRIES + 1 minus the count. */
+  triesLeft?: number;
+  /** Verdict_Failure only: the instructions of the unchanged state. */
+  instructions?: string;
+}
+
+export type JudgeAnswer = SessionAnswer | ErrorAnswer | VerdictErrorAnswer;
 
 export interface ContinueHouseInput {
   url: string;
@@ -563,9 +588,67 @@ export class HauntedPower {
     }
   }
 
-  /** judge_answer (task 7.3). For now only the NO_SESSION check. */
-  judgeAnswer(): Promise<Answer> {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * judge_answer (Requirements 4.6, 5, 6.2 to 6.4, 9.4): the strict verdict
+   * flow of design section 7. The step is checked before parseVerdict; a
+   * rejected judgement never reaches advance, so the state stays the same.
+   */
+  judgeAnswer(input: JudgeAnswerInput): Promise<JudgeAnswer> {
+    return this.queue.run(() => this.doJudgeAnswer(input));
+  }
+
+  private async doJudgeAnswer(input: JudgeAnswerInput): Promise<JudgeAnswer> {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    // 5.11: outside asking, refuse before parseVerdict; the count stays.
+    if (state.step !== "asking" || state.current === null) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        judgeNotAllowedMessage(state.step),
+        state,
+      );
+    }
+
+    const decision = gateJudgement(input.judgement, session.invalidCount);
+    session.invalidCount = decision.count;
+    if (decision.kind === "retry") {
+      return {
+        ...errorAnswer(
+          "INVALID_VERDICT",
+          verdictRetryMessage(
+            decision.reason,
+            ALLOWED_VERDICT_LINES,
+            decision.triesLeft,
+          ),
+          state,
+        ),
+        retry: true,
+        triesLeft: decision.triesLeft,
+      };
+    }
+    if (decision.kind === "failure") {
+      return {
+        ...errorAnswer("VERDICT_FAILED", VERDICT_FAILED_MESSAGE, state),
+        retry: false,
+        instructions: buildInstructions(state).text,
+      };
+    }
+
+    const question = questionFor(state.current.pendingQuestion, input.question);
+    const transition = advance(state, verdictEvent(decision.verdict, question));
+    if (!transition.ok) {
+      // Only a blank question gets here; the count is already 0.
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    await this.accept(session, transition.state);
+    return sessionAnswer(
+      session,
+      judgementAcceptedMessage(session.state.step),
+      this.withStorageWarning(),
+    );
   }
 
   /**
@@ -600,15 +683,5 @@ export class HauntedPower {
       ),
       ghosts,
     };
-  }
-
-  // Session tools answer NO_SESSION without a session (Requirement 9.3).
-  // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 7.2 and 7.3).
-  private skeleton(): Answer {
-    if (this.session === null) {
-      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
-    }
-    return errorAnswer("INTERNAL", INTERNAL_MESSAGE, this.session.state);
   }
 }

@@ -30648,6 +30648,41 @@ function decide(ratings) {
   return good >= 2 && ratings[0] !== "wrong";
 }
 
+// ../core/src/exorcism/verdict.ts
+var VERDICTS = [
+  "right",
+  "half-right",
+  "wrong",
+  "dont-know"
+];
+var PREFIX = "VERDICT:";
+function parseVerdict(text) {
+  const lines = text.split("\n").map((l) => l.replace(/\r$/, ""));
+  let last = -1;
+  for (let i = lines.length - 1; i >= 0; i--) {
+    if ((lines[i] ?? "").trimEnd() !== "") {
+      last = i;
+      break;
+    }
+  }
+  const lastLine = last === -1 ? "" : (lines[last] ?? "").trimEnd();
+  const found = VERDICTS.find((v) => lastLine === `${PREFIX} ${v}`);
+  if (found === void 0) {
+    return fail2(
+      "INVALID_VERDICT",
+      "The last line must be exactly one of: VERDICT: right, VERDICT: half-right, VERDICT: wrong, VERDICT: dont-know."
+    );
+  }
+  const others = lines.filter((l, i) => i !== last && l.startsWith(PREFIX));
+  if (others.length > 0) {
+    return fail2(
+      "INVALID_VERDICT",
+      "There is more than one VERDICT line; give one verdict per question."
+    );
+  }
+  return ok2(found);
+}
+
 // src/dataFile.ts
 var MARKER = "haunted-repo--";
 var OWNER_PATTERN2 = /^[a-z0-9-]+$/;
@@ -30798,6 +30833,66 @@ function eventAcceptedMessage(step) {
     default:
       return "Follow the instructions of this step.";
   }
+}
+function judgeNotAllowedMessage(step) {
+  return `A judgement cannot be sent in the step "${step}". Send one of the allowed events instead.`;
+}
+function verdictRetryMessage(problem, lines, triesLeft) {
+  return [
+    `Your judgement was not accepted. ${problem}`,
+    "Write the judgement again (do not ask the Student again). Allowed last lines:",
+    lines.join(" | "),
+    `Tries left: ${triesLeft}.`
+  ].join("\n");
+}
+var VERDICT_FAILED_MESSAGE = [
+  "The Tutor could not give a valid verdict for this answer. No rating was recorded.",
+  'The step is still "asking". The Student can continue with the same question or leave the ghost.'
+].join("\n");
+function judgementAcceptedMessage(step) {
+  switch (step) {
+    case "simplifying":
+      return "The Student does not know yet. Give a simpler explanation, then ask the same question again.";
+    case "model-answer":
+      return "Give the Student a short model answer to the question.";
+    case "asking":
+      return "Ask the Student the next question the instructions describe, then wait for the answer.";
+    default:
+      return eventAcceptedMessage(step);
+  }
+}
+
+// src/verdictGate.ts
+var MAX_VERDICT_RETRIES = 2;
+var ALLOWED_VERDICT_LINES = [
+  "VERDICT: right",
+  "VERDICT: half-right",
+  "VERDICT: wrong",
+  "VERDICT: dont-know"
+];
+function gateJudgement(judgement, count) {
+  const parsed = parseVerdict(judgement);
+  if (parsed.ok) {
+    return { kind: "accepted", verdict: parsed.value, count: 0 };
+  }
+  const next = count + 1;
+  if (next <= MAX_VERDICT_RETRIES) {
+    return {
+      kind: "retry",
+      count: next,
+      triesLeft: MAX_VERDICT_RETRIES + 1 - next,
+      reason: parsed.error.message
+    };
+  }
+  const afterFailure = 0;
+  return { kind: "failure", count: afterFailure, reason: parsed.error.message };
+}
+function questionFor(pendingQuestion, tutorQuestion) {
+  return pendingQuestion ?? tutorQuestion;
+}
+function verdictEvent(verdict, question) {
+  if (verdict === "dont-know") return { type: "dont-know", question };
+  return { type: "answer-rated", rating: verdict, question };
 }
 
 // src/power.ts
@@ -31164,9 +31259,62 @@ var HauntedPower = class {
       );
     }
   }
-  /** judge_answer (task 7.3). For now only the NO_SESSION check. */
-  judgeAnswer() {
-    return this.queue.run(() => this.skeleton());
+  /**
+   * judge_answer (Requirements 4.6, 5, 6.2 to 6.4, 9.4): the strict verdict
+   * flow of design section 7. The step is checked before parseVerdict; a
+   * rejected judgement never reaches advance, so the state stays the same.
+   */
+  judgeAnswer(input) {
+    return this.queue.run(() => this.doJudgeAnswer(input));
+  }
+  async doJudgeAnswer(input) {
+    const session = this.session;
+    if (session === null) {
+      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
+    }
+    const { state } = session;
+    if (state.step !== "asking" || state.current === null) {
+      return errorAnswer(
+        "INVALID_EVENT",
+        judgeNotAllowedMessage(state.step),
+        state
+      );
+    }
+    const decision = gateJudgement(input.judgement, session.invalidCount);
+    session.invalidCount = decision.count;
+    if (decision.kind === "retry") {
+      return {
+        ...errorAnswer(
+          "INVALID_VERDICT",
+          verdictRetryMessage(
+            decision.reason,
+            ALLOWED_VERDICT_LINES,
+            decision.triesLeft
+          ),
+          state
+        ),
+        retry: true,
+        triesLeft: decision.triesLeft
+      };
+    }
+    if (decision.kind === "failure") {
+      return {
+        ...errorAnswer("VERDICT_FAILED", VERDICT_FAILED_MESSAGE, state),
+        retry: false,
+        instructions: buildInstructions(state).text
+      };
+    }
+    const question = questionFor(state.current.pendingQuestion, input.question);
+    const transition = advance(state, verdictEvent(decision.verdict, question));
+    if (!transition.ok) {
+      return errorAnswer("INVALID_EVENT", transition.error.message, state);
+    }
+    await this.accept(session, transition.state);
+    return sessionAnswer(
+      session,
+      judgementAcceptedMessage(session.state.step),
+      this.withStorageWarning()
+    );
   }
   /**
    * house_status (Requirements 10.1, 10.2). Every ghost of the current
@@ -31196,15 +31344,6 @@ var HauntedPower = class {
       ),
       ghosts
     };
-  }
-  // Session tools answer NO_SESSION without a session (Requirement 9.3).
-  // The other branch is a placeholder until each tool gets its real handler
-  // (tasks 7.2 and 7.3).
-  skeleton() {
-    if (this.session === null) {
-      return errorAnswer("NO_SESSION", NO_SESSION_MESSAGE);
-    }
-    return errorAnswer("INTERNAL", INTERNAL_MESSAGE, this.session.state);
   }
 };
 
@@ -31368,13 +31507,6 @@ function safe(handler) {
     }
   };
 }
-async function noSession() {
-  return toResult({
-    ok: false,
-    code: "NO_SESSION",
-    message: NO_SESSION_MESSAGE
-  });
-}
 function registerTools(server2, power2) {
   server2.registerTool(
     "find_ghosts",
@@ -31447,7 +31579,9 @@ function registerTools(server2, power2) {
         judgement: string2()
       }
     },
-    safe(noSession)
+    safe(
+      async ({ question, judgement }) => toResult(await power2.judgeAnswer({ question, judgement }))
+    )
   );
   server2.registerTool(
     "house_status",
