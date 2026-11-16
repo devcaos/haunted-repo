@@ -271,3 +271,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** usar `;` para encadenar e `if ($?) { ... }` cuando el segundo comando solo debe correr si el primero funcionó.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-16 — En modo Supervised no se pudo reescribir `mcp.json` entero
+
+- **Qué intentaba:** cambiar `packages/power/mcp.json` para que apunte al bundle (tarea 1.2 de `kiro-power`).
+
+- **Qué pasó:** en modo Supervised la herramienta se negó a reescribir el archivo entero, porque tiene un `$schema` remoto (una URL).
+
+- **Cómo lo rodeé:** editar solo las líneas que cambiaban, con reemplazos pequeños. Eso sí funcionó.
+
+- **Estado:** resuelto con rodeo.
