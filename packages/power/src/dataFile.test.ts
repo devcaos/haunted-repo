@@ -94,6 +94,15 @@ describe("serialiseDataFile and parseDataFile", () => {
     expect(result.error.message).toContain(NAME);
   });
 
+  it("refuses an empty file as INVALID_REPORT and names the file", () => {
+    const result = parseDataFile("", NAME);
+    expect(result).toMatchObject({
+      ok: false,
+      error: { code: "INVALID_REPORT" },
+    });
+    if (!result.ok) expect(result.error.message).toContain(NAME);
+  });
+
   it("refuses a wrong format", () => {
     const text = JSON.stringify({ format: 2, report, progress });
     const result = parseDataFile(text, NAME);
