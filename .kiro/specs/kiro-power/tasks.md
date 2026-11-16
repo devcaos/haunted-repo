@@ -72,7 +72,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: invalid JSON, wrong `format`, invalid report, invalid progress, owner mismatch, mixed-case names.
     - _Requirements: 7.1, 7.2, 7.4, 7.5, 7.11_
 
-  - [ ]* 3.2 Write the property test for safe file names
+  - [x]* 3.2 Write the property test for safe file names
     - **Property 5: Safe file names**
     - Owners and repos accepted by `parseRepoUrl` in any letter case; the name is lowercase, matches the own-file pattern, has no path separator, `path.join(folder, name)` stays inside `folder`, and references that differ in more than letter case give different names.
     - **Validates: Requirements 7.1, 7.11**
