@@ -361,3 +361,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** volver a escribir el test a mano y hacer el commit. Para la próxima: lanzar la copia de seguridad sola y esperar a que acabe antes de editar.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-17 — Las comillas dobles rompen `git commit -m` en PowerShell 5
+
+- **Qué intentaba:** hacer un commit con un mensaje que llevaba comillas dobles, con `git commit -m "..."` desde Windows PowerShell 5.
+
+- **Qué pasó:** PowerShell 5 pasa mal las comillas dobles de dentro del mensaje a los programas externos: el mensaje llegó a git partido en varios argumentos y el commit falló.
+
+- **Cómo lo rodeé:** escribir el mensaje en un archivo temporal fuera del repositorio, hacer `git commit -F <archivo>` y borrar el archivo después.
+
+- **Estado:** resuelto con rodeo.
