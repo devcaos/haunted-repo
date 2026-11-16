@@ -65,7 +65,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 2: Data file, store and network guard
 
 - [ ] 3. Pure modules and the store
-  - [ ] 3.1 Implement `src/dataFile.ts` (name, serialise, parse)
+  - [x] 3.1 Implement `src/dataFile.ts` (name, serialise, parse)
     - `dataFileName(owner, repo)`: `haunted-repo--<owner>@<repo>.json` in lowercase; re-checks owner `[a-z0-9-]+` and repo `[a-z0-9._-]+` and throws if one fails. `isOwnDataFile(name)` with `^haunted-repo--[a-z0-9-]+@[a-z0-9._-]+\.json$`.
     - `serialiseDataFile(report, progress)`: `{ format: 1, report, progress }` built from `JSON.stringify(report)` and `formatProgress(progress)`, no other keys.
     - `parseDataFile(text, fileName)`: `JSON.parse`, `format === 1`, `parseReport`, `parseProgress`, and owner/repo of the report (lowercase) equal to the file name; otherwise `INVALID_REPORT` or `INVALID_PROGRESS` with a message that names the file.
