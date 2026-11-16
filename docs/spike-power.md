@@ -139,3 +139,8 @@ Respuesta del spike: el servidor **no puede encontrar el Workspace por sí solo*
 - Cambios: se quitan 7.1 a 7.3, 7.5, 7.6, 7.8 (y su test de propiedad en 11.4), 9.2, 2.7 y los Edge Cases de archivos. 7.4, 7.7 y 7.9 se quedan.
 
 **Recomendación: opción A.** Es la que usa lo que Kiro ya da, sin pasos extra ni rutas que dependan del modelo, y conserva el progreso entre sesiones. Si `PLUGIN_DATA` falta, el servidor pasa al comportamiento de la opción C y avisa (el nuevo 7.10).
+
+## Folder-import check (task 1.6, 2026-11-16)
+
+Luis Miguel imported the Power in Kiro IDE with "Import power from a folder" from `packages/power/` of the branch `feat/kiro-power-store`: it loads and the six tools appear.
+A call to `house_status` from the chat answered `NO_SESSION`, as expected with no saved house.

@@ -21,7 +21,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 1: Bundle first (biggest risk)
 
-- [ ] 1. Bundled server, smoke test and CI check
+- [x] 1. Bundled server, smoke test and CI check
   - [x] 1.1 Add the dependencies, the bundle script and a stub server
     - In `packages/power/package.json`: dependencies `@haunted-repo/core` `0.0.0`, `@modelcontextprotocol/sdk` `1.32.2`, `zod` `4.6.7`; development dependency `esbuild` `0.28.2`; script `"build": "tsc --noEmit && node scripts/bundle.ts"` (design section 2).
     - Run `npm install` from the root and commit `package-lock.json`; check that the lockfile contains the Linux esbuild entry (`@esbuild/linux-x64`) so `npm ci` works in CI.
@@ -54,7 +54,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - One rule block in `eslint.config.js` for `packages/power/src/**/*.ts`, so nothing writes to the stdio output by mistake (design doubt 6). Logs, if any, use `process.stderr.write`.
     - _Requirements: 1.7, 4.7_
 
-  - [ ] 1.6 Quick check in Kiro (done by the director, not automatable)
+  - [x] 1.6 Quick check in Kiro (done by the director, not automatable)
     - Uninstall the spike Power, install with "Import power from a folder" from `packages/power/` of the PR 1 branch, check that the six tools appear and that `house_status` answers `NO_SESSION`.
     - Write two lines in `docs/spike-power.md`.
     - _Requirements: 1.5, 1.9_
