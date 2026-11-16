@@ -22,7 +22,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 1: Bundle first (biggest risk)
 
 - [ ] 1. Bundled server, smoke test and CI check
-  - [ ] 1.1 Add the dependencies, the bundle script and a stub server
+  - [x] 1.1 Add the dependencies, the bundle script and a stub server
     - In `packages/power/package.json`: dependencies `@haunted-repo/core` `0.0.0`, `@modelcontextprotocol/sdk` `1.32.2`, `zod` `4.6.7`; development dependency `esbuild` `0.28.2`; script `"build": "tsc --noEmit && node scripts/bundle.ts"` (design section 2).
     - Run `npm install` from the root and commit `package-lock.json`; check that the lockfile contains the Linux esbuild entry (`@esbuild/linux-x64`) so `npm ci` works in CI.
     - `packages/power/tsconfig.json`: remove `outDir` and `rootDir`, add `"noEmit": true`, include `src` and `scripts`.
