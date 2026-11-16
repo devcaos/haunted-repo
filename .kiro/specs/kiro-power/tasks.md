@@ -108,7 +108,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status
 
-- [ ] 5. Session and house tools
+- [x] 5. Session and house tools
   - [x] 5.1 Add the strict fake GitHub helper
     - The `core-testutil/` alias already exists (task 3.5).
     - `src/testGitHub.testutil.ts`: wraps the strict fake of `core-testutil/ghost-detection/fakeGitHub.testutil.js` and adds only `User-Agent: vitest`, like `detectGhosts.test.ts`; strict in every other way.
@@ -158,7 +158,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
     - Unit tests: no `PLUGIN_DATA`; `PLUGIN_DATA` is a file; a save that fails after start-up (warning once, session kept); a later save that works clears the state; `continue_house` works within one run in memory mode.
     - _Requirements: 7.6, 7.10_
 
-- [ ] 6. Checkpoint: PR 3
+- [x] 6. Checkpoint: PR 3
   - Ensure all tests pass, ask the user if questions arise.
 
 ### PR 4: Exorcism tools and the strict verdict
