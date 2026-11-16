@@ -17,6 +17,7 @@ import {
   eventAcceptedMessage,
   GHOST_FAILED_MESSAGE,
   HOUSE_CLEAN_MESSAGE,
+  saveFailedWarning,
   sendEventTypeMessage,
 } from "./messages.js";
 import {
@@ -50,6 +51,10 @@ class TestPower extends HauntedPower {
   current(): Session | null {
     return this.session;
   }
+
+  storageWorks(): boolean {
+    return this.storageOk;
+  }
 }
 
 const noFetch = (() =>
@@ -67,6 +72,31 @@ function setup() {
   };
   const power = new TestPower({ fetch: noFetch, store, storageOk: true });
   return { power, store, writes };
+}
+
+/** Like setup, but the writes fail while `failing` is true. */
+function failingSetup() {
+  const memory = createMemoryStore();
+  let failing = true;
+  const writes: string[] = [];
+  const store: Store = {
+    read: (name) => memory.read(name),
+    write: (name, text) => {
+      writes.push(name);
+      return failing
+        ? Promise.resolve({ ok: false, message: "disk is full" })
+        : memory.write(name, text);
+    },
+  };
+  const power = new TestPower({ fetch: noFetch, store, storageOk: true });
+  return {
+    power,
+    store,
+    writes,
+    setFailing(on: boolean) {
+      failing = on;
+    },
+  };
 }
 
 /** Runs events through the Engine from a start state. */
@@ -282,6 +312,59 @@ describe("send_event", () => {
     expect(answer.allowedEvents).toEqual([]);
     expect(answer.hauntedShare).toBe(0);
     expect(answer.message).toBe(HOUSE_CLEAN_MESSAGE);
+    expect(await savedProgress(store)).toEqual(power.current()!.state.progress);
+  });
+});
+
+describe("send_event: a save that fails (Requirements 7.3, 7.6)", () => {
+  it("warns once, keeps the session, and saves again with the next accepted event", async () => {
+    const { power, store, writes, setFailing } = failingSetup();
+    // src/b.ts in model-answer: the next explanation-done fails the ghost.
+    const q3 = "Can b be changed?";
+    power.setSession(
+      walk([
+        { type: "pick-ghost", path: "src/b.ts", text: "export const b = 2;" },
+        { type: "explanation-done", text: "It holds two." },
+        { type: "answer-rated", rating: "wrong", question: "What is b?" },
+        { type: "answer-rated", rating: "wrong", question: "Who uses b?" },
+        { type: "dont-know", question: q3 },
+        { type: "explanation-done", text: "b is a box." },
+        { type: "dont-know", question: q3 },
+      ]),
+    );
+
+    // The save fails: one warning, the session goes on in memory.
+    const failed = ok(
+      await power.sendEvent({ type: "explanation-done", text: "Yes, it can." }),
+    );
+    expect(failed.step).toBe("failed");
+    expect(failed.warning).toBe(saveFailedWarning("disk is full"));
+    expect(power.current()!.state.progress.ghosts[1]?.ratings).toEqual([
+      "wrong",
+      "wrong",
+      "wrong",
+    ]);
+    expect(power.storageWorks()).toBe(false);
+    expect(writes).toEqual([FILE]);
+    expect((await store.read(FILE)).kind).toBe("missing");
+
+    // Still failing: the save is tried again, but no new warning.
+    const again = ok(await power.sendEvent({ type: "retry-ghost" }));
+    expect(again.step).toBe("explaining");
+    expect(again.warning).toBeUndefined();
+    expect(power.storageWorks()).toBe(false);
+    expect(writes).toEqual([FILE, FILE]);
+    expect((await store.read(FILE)).kind).toBe("missing");
+
+    // The store works again: the next accepted event saves the progress.
+    setFailing(false);
+    const recovered = ok(
+      await power.sendEvent({ type: "explanation-done", text: "A new way." }),
+    );
+    expect(recovered.step).toBe("asking");
+    expect(recovered.warning).toBeUndefined();
+    expect(power.storageWorks()).toBe(true);
+    expect(writes).toEqual([FILE, FILE, FILE]);
     expect(await savedProgress(store)).toEqual(power.current()!.state.progress);
   });
 });

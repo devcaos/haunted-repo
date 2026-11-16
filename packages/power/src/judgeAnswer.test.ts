@@ -16,6 +16,7 @@ import { dataFileName, parseDataFile } from "./dataFile.js";
 import {
   judgeNotAllowedMessage,
   judgementAcceptedMessage,
+  saveFailedWarning,
   VERDICT_FAILED_MESSAGE,
   verdictRetryMessage,
 } from "./messages.js";
@@ -56,6 +57,10 @@ class TestPower extends HauntedPower {
     if (this.session === null) throw new Error("no session");
     return this.session;
   }
+
+  storageWorks(): boolean {
+    return this.storageOk;
+  }
 }
 
 const noFetch = (() =>
@@ -73,6 +78,31 @@ function setup() {
   };
   const power = new TestPower({ fetch: noFetch, store, storageOk: true });
   return { power, store, writes };
+}
+
+/** Like setup, but the writes fail while `failing` is true. */
+function failingSetup() {
+  const memory = createMemoryStore();
+  let failing = true;
+  const writes: string[] = [];
+  const store: Store = {
+    read: (name) => memory.read(name),
+    write: (name, text) => {
+      writes.push(name);
+      return failing
+        ? Promise.resolve({ ok: false, message: "disk is full" })
+        : memory.write(name, text);
+    },
+  };
+  const power = new TestPower({ fetch: noFetch, store, storageOk: true });
+  return {
+    power,
+    store,
+    writes,
+    setFailing(on: boolean) {
+      failing = on;
+    },
+  };
 }
 
 /** The state after the first `n` events of the tiny recording. */
@@ -299,5 +329,49 @@ describe("judge_answer: the strict flow", () => {
       state: "exorcised",
     });
     expect(await savedProgress(store)).toEqual(state.progress);
+  });
+});
+
+describe("judge_answer: a save that fails (Requirements 7.3, 7.6)", () => {
+  it("warns once, keeps the session, and saves again with the next accepted judgement", async () => {
+    const { power, store, writes, setFailing } = failingSetup();
+    power.setSession(tiny(13)); // src/b.ts, third question, two wrong so far
+
+    // The save fails: one warning, the session goes on in memory.
+    const failed = ok(
+      await power.judgeAnswer({
+        question: "Can b be changed?",
+        judgement: "Not quite.\nVERDICT: wrong",
+      }),
+    );
+    expect(failed.step).toBe("failed");
+    expect(failed.warning).toBe(saveFailedWarning("disk is full"));
+    expect(power.storageWorks()).toBe(false);
+    expect(writes).toEqual([FILE]);
+    expect((await store.read(FILE)).kind).toBe("missing");
+
+    // Still failing: the next accepted events try the save again, with no
+    // new warning.
+    expect(ok(await power.sendEvent({ type: "retry-ghost" })).warning).toBe(
+      undefined,
+    );
+    const asking = ok(
+      await power.sendEvent({ type: "explanation-done", text: "A new way." }),
+    );
+    expect(asking.step).toBe("asking");
+    expect(asking.warning).toBeUndefined();
+    expect(power.storageWorks()).toBe(false);
+    expect(writes).toEqual([FILE, FILE, FILE]);
+
+    // The store works again: the next accepted judgement saves the progress.
+    setFailing(false);
+    const recovered = ok(
+      await power.judgeAnswer({ question: Q, judgement: "VERDICT: right" }),
+    );
+    expect(recovered.step).toBe("asking");
+    expect(recovered.warning).toBeUndefined();
+    expect(power.storageWorks()).toBe(true);
+    expect(writes).toEqual([FILE, FILE, FILE, FILE]);
+    expect(await savedProgress(store)).toEqual(power.current().state.progress);
   });
 });
