@@ -109,7 +109,7 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 ### PR 3: HauntedPower, find_ghosts, continue_house, house_status
 
 - [ ] 5. Session and house tools
-  - [ ] 5.1 Add the strict fake GitHub helper
+  - [x] 5.1 Add the strict fake GitHub helper
     - The `core-testutil/` alias already exists (task 3.5).
     - `src/testGitHub.testutil.ts`: wraps the strict fake of `core-testutil/ghost-detection/fakeGitHub.testutil.js` and adds only `User-Agent: vitest`, like `detectGhosts.test.ts`; strict in every other way.
     - A small test that the wrapper still rejects what the fake rejects (for example an unknown path).
