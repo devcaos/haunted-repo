@@ -70,6 +70,63 @@ describe("folder store", () => {
     expect(await readdir(folder)).toEqual([NAME]);
   });
 
+  it("keeps the old file and removes the temporary one when writeFile fails after writing", async () => {
+    await createFolderStore(folder).write(NAME, "old");
+    const failing = createFolderStore(folder, {
+      ...nodeFolderFs,
+      writeFile: async (file, text) => {
+        // Half of the text reaches the disk, then the write fails.
+        await nodeFolderFs.writeFile(file, text.slice(0, 2));
+        throw Object.assign(new Error("disk full"), { code: "ENOSPC" });
+      },
+    });
+    const result = await failing.write(NAME, "new text");
+    expect(result.ok).toBe(false);
+    expect(await readFile(join(folder, NAME), "utf8")).toBe("old");
+    expect(await readdir(folder)).toEqual([NAME]);
+  });
+
+  it("leaves one valid file and no temporary file after two concurrent writes", async () => {
+    const store = createFolderStore(folder);
+    const results = await Promise.all([
+      store.write(NAME, "first"),
+      store.write(NAME, "second"),
+    ]);
+    expect(results.some((r) => r.ok)).toBe(true);
+    expect(["first", "second"]).toContain(
+      await readFile(join(folder, NAME), "utf8"),
+    );
+    expect(await readdir(folder)).toEqual([NAME]);
+  });
+
+  it("fails with ENOENT and does not retry when the folder is deleted after opening", async () => {
+    const data = join(folder, "data");
+    const opened = await openStore(data);
+    expect(opened.storageOk).toBe(true);
+    let renames = 0;
+    const waits: number[] = [];
+    const spied = createFolderStore(data, {
+      ...nodeFolderFs,
+      rename: (from, to) => {
+        renames++;
+        return nodeFolderFs.rename(from, to);
+      },
+      wait: (ms) => {
+        waits.push(ms);
+        return Promise.resolve();
+      },
+    });
+    await rm(data, { recursive: true, force: true });
+    for (const store of [opened.store, spied]) {
+      const result = await store.write(NAME, "x");
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.message).toContain("ENOENT");
+    }
+    expect(renames).toBe(0);
+    expect(waits).toEqual([]);
+    expect(await readdir(folder)).toEqual([]);
+  });
+
   it("refuses names that are not Haunted Repo data files", async () => {
     await writeFile(join(folder, "other.json"), "foreign");
     const store = createFolderStore(folder);
