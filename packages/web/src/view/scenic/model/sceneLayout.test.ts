@@ -329,3 +329,31 @@ describe("Property 2", () => {
     );
   });
 });
+
+describe("Property 3", () => {
+  // Feature: scenic-web, Property 3: Start controls exist only for startable Cards of the focused floor
+  // **Validates: Requirements 3.10, 6.6, 8.4, 8.5, 23.4**
+  it("start controls exist only for startable Cards of the focused floor", () => {
+    fc.assert(
+      fc.property(viewModelArbWith({ paths: "unique" }), (model) => {
+        const layout = sceneLayout(model);
+        if (model.scene.kind !== "floor" || model.house === null) {
+          expect(layout.startControls).toEqual([]);
+          expect(layout.nameplates).toEqual([]);
+          return;
+        }
+        const focusedFloor = model.scene.floor;
+        const cards =
+          model.house.floors.find((view) => view.floor === focusedFloor)
+            ?.ghosts ?? [];
+        expect(layout.nameplates.map((n) => n.hasStart)).toEqual(
+          cards.map((card) => card.canStart),
+        );
+        expect(layout.startControls).toEqual(
+          cards.filter((card) => card.canStart).map((card) => card.path),
+        );
+      }),
+      { numRuns: 200 },
+    );
+  });
+});

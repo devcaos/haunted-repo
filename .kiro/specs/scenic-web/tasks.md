@@ -330,7 +330,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.3_
     - _Design: "Correctness Properties", Property 2_
 
-  - [ ] 3.7 Property test for start controls
+  - [x] 3.7 Property test for start controls
     - **Property 3: Start controls exist only for startable Cards of the focused floor**
     - **Validates: Requirements 3.10, 6.6, 8.4, 8.5, 23.4**
     - Generator: `viewModelArb` with `uniquePathReportArb`, at least 100 runs.
