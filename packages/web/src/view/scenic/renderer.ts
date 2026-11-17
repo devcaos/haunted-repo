@@ -1,14 +1,18 @@
 import type { ActionSink } from "../../logic/actions.js";
 import type { Renderer, ViewModel } from "../../logic/viewModel.js";
-import { el } from "./dom.js";
+import { el, setText } from "./dom.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
+import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
 import { hudView } from "./model/hudView.js";
+import { sceneLayout } from "./model/sceneLayout.js";
+import { watchMedia } from "./motion.js";
+import { createStage, type StageView } from "./stage.js";
 
 /**
  * Builds the Scenic shell once inside `root`, in document order: header, aside,
- * announcer, an empty `main.stage` and the footer last (the Licence_Notice link
- * is the last Tab stop). Every action goes through the guard, so only
+ * announcer, `main.stage` and the footer last (the Licence_Notice link is the
+ * last Tab stop). Every action goes through the guard, so only
  * Available_Actions of the newest model are dispatched (Requirements 2.7, 2.8).
  */
 export function createScenicRenderer(
@@ -24,21 +28,49 @@ export function createScenicRenderer(
       guard.send({ type: "show-sample" });
     },
   });
-  const stage = el("main", { class: "stage" });
-  root.replaceChildren(
-    el("div", { class: "scenic", "data-scene": "house" }, [
-      hud.header,
-      hud.aside,
-      hud.announcer,
-      stage,
-      hud.footer,
-    ]),
+  const stage = createStage();
+  // The Scene_Heading is a focus target, never a Tab stop.
+  const heading = el("h2", { class: "scene-heading", tabindex: "-1" });
+  stage.sceneBar.append(heading);
+  const shell = el("div", { class: "scenic", "data-scene": "house" }, [
+    hud.header,
+    hud.aside,
+    hud.announcer,
+    stage.element,
+    hud.footer,
+  ]);
+  root.replaceChildren(shell);
+
+  let lastView: StageView | null = null;
+  const viewportOf = (wide: boolean): ViewportClass =>
+    wide ? "wide" : "narrow";
+  // A new viewport class reframes the current Scene at once, with no reload.
+  let viewport = viewportOf(
+    watchMedia(WIDE_QUERY, (wide) => {
+      viewport = viewportOf(wide);
+      if (lastView !== null) {
+        lastView = { ...lastView, viewport };
+        stage.update(lastView);
+      }
+    }),
   );
+
   return {
     render(model: ViewModel): void {
       // Never awaits: timers of later tasks check the newest model themselves.
       guard.setModel(model);
       hud.update(hudView(model));
+      const layout = sceneLayout(model);
+      shell.setAttribute("data-scene", model.scene.kind);
+      // No Camera transition exists yet, so the first render never animates.
+      lastView = {
+        layout,
+        scene: model.scene,
+        busy: model.live.busy,
+        viewport,
+      };
+      stage.update(lastView);
+      setText(heading, layout.heading);
     },
   };
 }

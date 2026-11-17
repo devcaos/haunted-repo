@@ -399,7 +399,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Estado:** abierto. Es de Kiro IDE, no del Power, pero puede confundir al Student en la demo. Valorar si la skill debe decirlo (sin cambiar nada todavía).
 ## 17 nov 2026: Un fantasma con 2 buenas de 3 acaba en failed si la pregunta principal da dos I dont know
 - **Qué intentaba:** Seguir la skill con el guion: dos "I don't know" seguidos en la pregunta 1 y bien las preguntas 2 y 3 (tercera ronda de la 11.1).
-- **Qué pasó:** El paso model-answer apareció bien. Pero al final el fantasma quedó en ailed con 2 ight de 3: el motor guarda el segundo "I don't know" como wrong y la pregunta principal (la primera) no puede ser wrong (decide en engine.ts; coincide con product.md).
+- **Qué pasó:** El paso model-answer apareció bien. Pero al final el fantasma quedó en failed con 2 right de 3: el motor guarda el segundo "I don't know" como wrong y la pregunta principal (la primera) no puede ser wrong (decide en engine.ts; coincide con product.md).
 - **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md como comportamiento esperado, y como Low en PLAN.md. Para la próxima ronda con self-check, no usar I don't know en la pregunta 1.
 - **Estado:** abierto (sin cambiar nada; valorar un aviso en la skill)
 

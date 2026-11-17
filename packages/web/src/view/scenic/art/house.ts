@@ -182,6 +182,7 @@ export function houseLayer(): ShapeNode {
     g("oculus", [
       circle("oculus-frame tone-mist", 790, 262, 24),
       circle("oculus-glass tone-slate", 790, 262, 19),
+      circle("oculus-light", 790, 262, 19),
       strokePath("oculus-bars", "M771 262 H809 M790 243 V281"),
     ]),
     floorGroup("attic", attic()),

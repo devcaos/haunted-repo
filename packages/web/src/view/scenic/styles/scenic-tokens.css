@@ -76,6 +76,7 @@
   --sc-line: 1px;
   --sc-line-heavy: 2px;
   --sc-hud-width: 22rem;
+  --sc-stage-wide: min(100vw, 160dvh);
   --sc-viewport-height: 100vh;
   --sc-icon-size: 1.25rem;
   --sc-meter-height: 0.75rem;
@@ -121,6 +122,11 @@
   --sc-dur-flame-flicker: 1.6s;
   --sc-dur-ring: 2s;
   --sc-dur-beam-sweep: 2.5s;
+  /* Distances of the looping motions, in viewBox units */
+  --sc-rain-step-x: -40px;
+  --sc-rain-step-y: 200px;
+  --sc-fog-shift: 60px;
+  --sc-bob-rise: -6px;
   /* Delays of the Animation Catalogue */
   --sc-delay-spiral: 400ms;
   --sc-delay-sparks: 1000ms;

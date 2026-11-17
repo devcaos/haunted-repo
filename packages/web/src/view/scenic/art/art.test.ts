@@ -11,9 +11,22 @@ import {
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
-import { FLOOR_RECT } from "../model/sceneLayout.js";
+import type { Floor } from "@haunted-repo/core";
+import type { GhostState } from "../../../logic/viewModel.js";
+import {
+  FLOOR_RECT,
+  GHOST_BOX,
+  GHOST_TYPE_OF,
+  SLOT_BAND,
+  floorGhostScale,
+  slotRects,
+  type SlotPlacement,
+  type VariantNumber,
+} from "../model/sceneLayout.js";
+import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import { FLOOR_CLASS, houseLayer } from "./house.js";
-import { foregroundLayer, skyLayers, weatherLayer } from "./sky.js";
+import { chainedDoorArt, slotArt } from "./props.js";
+import { foregroundLayer, rainPath, skyLayers, weatherLayer } from "./sky.js";
 
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
@@ -182,6 +195,23 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
   });
 });
 
+describe("rain loop (Requirement 3.3)", () => {
+  it("one step of rain-fall lands every streak on another, so the loop never jumps", () => {
+    const starts = [...rainPath().matchAll(/M(-?[\d.]+) (-?[\d.]+)/g)].map(
+      (m) => [Number(m[1]), Number(m[2])] as const,
+    );
+    const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
+    for (const [x, y] of starts) {
+      // Moved by one step (-40, 200): either another streak or below the scene.
+      if (y + 200 < 1000) expect(seen.has(`${x - 40},${y + 200}`)).toBe(true);
+      // Every visible streak was filled in from one step before.
+      if (y >= 0) expect(seen.has(`${x + 40},${y - 200}`)).toBe(true);
+    }
+    // Columns start right of the scene, so the leftward drift leaves no gap.
+    expect(Math.max(...starts.map(([x]) => x))).toBeGreaterThan(1600 + 200);
+  });
+});
+
 /**
  * The x, y points a node and its children name: rect corners, centres, polygon
  * points and path numbers read in pairs (rough for relative path data, which is
@@ -233,6 +263,139 @@ describe("house (Requirements 3.1, 3.4)", () => {
     const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
     expect(roof?.points?.[2]).toBeLessThan(800); // the ridge is left of centre
     expect(tower?.transform?.translate?.[0]).toBeGreaterThan(800);
+  });
+});
+
+describe("the Wisp, Variant 0 (Requirements 5.1, 5.4, 6.1)", () => {
+  const wisp = ghostArt("wisp", 0, "haunted");
+  const parts = nodesOf(wisp).flatMap((n) =>
+    n.part === undefined ? [] : [n.part],
+  );
+
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(wisp)).toEqual([]);
+  });
+
+  it("has a round hem, a cobweb and a glow, and no tail, hood or horns", () => {
+    expect(parts).toEqual(
+      expect.arrayContaining(["outline", "hem-round", "cobweb", "glow"]),
+    );
+    for (const other of ["tail-spiral", "hood", "horns"]) {
+      expect(parts).not.toContain(other);
+    }
+    const idle = nodesOf(wisp).find((n) => n.cls === "ghost-idle");
+    expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
+  });
+
+  it("eye height over body height is 11/64", () => {
+    const eyes = nodesOf(wisp).filter((n) => n.part === "eye");
+    expect(eyes).toHaveLength(2);
+    for (const eye of eyes) {
+      expect((2 * (eye.ry ?? 0)) / GHOST_BOX.wisp.h).toBe(11 / 64);
+    }
+    expect(GHOST_TYPES.wisp.eyeHeight / GHOST_TYPES.wisp.box.h).toBe(11 / 64);
+  });
+
+  it("its outline box equals the Wisp box of the Scene_Layout", () => {
+    const outline = nodesOf(wisp).find((n) => n.part === "outline");
+    const points = outline === undefined ? [] : pointsOf(outline);
+    const xs = points.map(([x]) => x);
+    const ys = points.map(([, y]) => y);
+    expect(Math.min(...xs)).toBe(0);
+    expect(Math.min(...ys)).toBe(0);
+    expect({ w: Math.max(...xs), h: Math.max(...ys) }).toEqual(GHOST_BOX.wisp);
+    expect(GHOST_TYPES.wisp.box).toEqual(GHOST_BOX.wisp);
+  });
+});
+
+describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
+  const FLOORS = ["attic", "middle floor", "basement"] as const;
+  const STATES = ["haunted", "locked", "exorcised"] as const;
+  /** Slot `index` of `count` on a floor, as the Scene_Layout would place it. */
+  const slotOf = (
+    floor: Floor,
+    state: GhostState,
+    index = 0,
+    count = 1,
+  ): SlotPlacement => {
+    const rect = slotRects(floor, count)[index];
+    if (rect === undefined) throw new Error("no such slot");
+    return {
+      key: `${floor}#${index}`,
+      floor,
+      index,
+      variant: (index % 5) as VariantNumber,
+      ghostType: GHOST_TYPE_OF[floor],
+      path: `src/${index}.ts`,
+      state,
+      rect,
+      ghostScale: floorGhostScale(floor, count),
+    };
+  };
+  const allSlots = FLOORS.flatMap((floor) =>
+    STATES.flatMap((state) =>
+      [1, 2, 3, 4, 5].flatMap((count) =>
+        Array.from({ length: count }, (_, i) => slotOf(floor, state, i, count)),
+      ),
+    ),
+  );
+
+  it("every slot and chained door passes the Shape_Data rules", () => {
+    for (const slot of allSlots)
+      expect(shapeProblems(slotArt(slot))).toEqual([]);
+    for (const floor of FLOORS) {
+      expect(shapeProblems(chainedDoorArt(floor))).toEqual([]);
+    }
+  });
+
+  it("the pane is lit exactly for Exorcised slots", () => {
+    for (const slot of allSlots) {
+      const classes = classesOf(slotArt(slot));
+      expect(classes).toContain("pane");
+      expect(classes.includes("pane-lit")).toBe(slot.state === "exorcised");
+      expect(classes.includes("pane-unlit")).toBe(slot.state !== "exorcised");
+    }
+  });
+
+  it("the pane is centred on its slot with its top 4 units below the slot top", () => {
+    for (const slot of allSlots) {
+      const frame = nodesOf(slotArt(slot)).find((n) => n.cls === "pane-frame");
+      const { x = 0, y = 0, width = 0 } = frame ?? {};
+      expect(x + width / 2).toBeCloseTo(slot.rect.x + slot.rect.w / 2, 1);
+      expect(y).toBe(slot.rect.y + 4);
+    }
+  });
+
+  it("a Haunted attic slot draws the Wisp with its glow; other slots draw no ghost yet", () => {
+    for (const slot of allSlots) {
+      const tree = slotArt(slot);
+      const ghost = slot.floor === "attic" && slot.state === "haunted";
+      const parts = nodesOf(tree).map((n) => n.part);
+      expect(parts.includes("glow")).toBe(ghost);
+      expect(classesOf(tree).includes("ghost--wisp")).toBe(ghost);
+      if (ghost) {
+        const holder = nodesOf(tree).find((n) => n.cls === "slot-ghost");
+        expect(holder?.transform?.scale).toBeCloseTo(slot.ghostScale, 2);
+      }
+    }
+  });
+
+  it("the chained door has no padlock and sits inside its slot band", () => {
+    for (const floor of FLOORS) {
+      const door = chainedDoorArt(floor);
+      const names = [
+        ...classesOf(door),
+        ...nodesOf(door).flatMap((n) => (n.part === undefined ? [] : [n.part])),
+      ];
+      expect(names.some((name) => name.includes("padlock"))).toBe(false);
+      expect(names).toEqual(
+        expect.arrayContaining(["chained-door", "door-chain"]),
+      );
+      const panel = nodesOf(door).find((n) => n.cls === "door-panel");
+      const band = SLOT_BAND[floor];
+      expect(panel).toMatchObject({ width: 70, height: band.h - 10 });
+      expect((panel?.x ?? 0) + 35).toBeCloseTo(band.x + band.w / 2, 1);
+    }
   });
 });
 

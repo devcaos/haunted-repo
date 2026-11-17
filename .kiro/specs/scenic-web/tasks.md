@@ -467,12 +467,12 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 5. PR 1e — Stage, slots and the finished Wisp
+- [x] 5. PR 1e — Stage, slots and the finished Wisp
   - Branch: `feat/scenic-web-1e`. Stacks on: `feat/scenic-web-1d`.
   - Estimate: ~820 changed lines. Model: Opus.
   - _Design: "PR Split" row 1e_
 
-  - [ ] 5.1 Draw the Wisp, Variant 0
+  - [x] 5.1 Draw the Wisp, Variant 0
     - Create `packages/web/src/view/scenic/art/ghosts.ts` with the Wisp entry of `GHOST_TYPES` and `ghostArt("wisp", 0, "haunted")`, exactly as in "The Wisp, Variant 0": outline (parts `outline`, `hem-round`), inner shade, eyes, glints, mouth, cobweb (part `cobweb`), rim, glow (part `glow`), floor shadow, inside a `g.ghost-idle` wrapper.
     - Extend `art.test.ts`: the tree passes the rules; it has the parts `outline`, `hem-round`, `cobweb` and `glow`, and no `tail-spiral`, `hood` or `horns`; eye height over body height is 11/64; its box equals the Wisp box of the Scene_Layout.
     - Verify: `npm run check` exits `0`.
@@ -480,7 +480,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.1, 5.4, 6.1, 22.1_
     - _Design: "The Wisp, Variant 0 (the vertical-slice ghost)", "Ghost types"_
 
-  - [ ] 5.2 Draw slots, windows and chained doors
+  - [x] 5.2 Draw slots, windows and chained doors
     - Create `packages/web/src/view/scenic/art/props.ts` with `slotArt(slot)` and `chainedDoorArt(floor)`: every slot has its back-wall window (sizes of the "Slot layout rule"), lit for Exorcised Cards and unlit otherwise; a Haunted attic slot draws the Wisp scaled by its `ghostScale`; until task 9.3, middle-floor and basement slots draw only their window, and attic Cards always use Variant 0 (Q15); a floor with no Card gets the chained door (no padlock).
     - Extend `art.test.ts`: window lit exactly for Exorcised slots; a Haunted attic slot has a `glow` part; the chained door has no padlock part; all trees pass the rules.
     - Verify: `npm run check` exits `0`.
@@ -488,49 +488,49 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.5, 6.1, 8.6, 12.5, 22.1_
     - _Design: "Slot layout rule", "Ghost states", "Props and panels" (Chained door)_
 
-  - [ ] 5.3 Watch the media queries
+  - [x] 5.3 Watch the media queries
     - Create `packages/web/src/view/scenic/motion.ts`: `watchMedia(query, onChange)` with `matchMedia(...).addEventListener("change", ...)`, used for `WIDE_QUERY` and `(prefers-reduced-motion: reduce)`. Task 16.3 completes the Reduced_Motion handling.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): watch the viewport and motion settings`
     - _Requirements: 18.9, 19.2_
     - _Design: "motion.ts" row of "DOM modules"_
 
-  - [ ] 5.4 Build the stage
+  - [x] 5.4 Build the stage
     - Create `packages/web/src/view/scenic/stage.ts`: `.stage` > `.world` > `svg.house` (layers in the "Art System" order: sky, moon-clouds, hills, house, slots, dims, telephone placeholder group, weather, foreground, effects) plus `.world-overlay`; the slot layer is rebuilt only when `slotSignature` changes; one `rect.dim` per floor; sets `data-scene`, `data-floor`, `data-finale` and `data-busy` on `.stage`; sets `style.transform` (from `cssTransform(cameraFor(...))`) and `--cam-counter` on `.world`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): build the scenic stage and camera wrapper`
     - _Requirements: 3.1, 3.5, 3.9, 8.9, 17.2_
     - _Design: "Art System", "stage.ts" row of "DOM modules", "Camera frames"_
 
-  - [ ] 5.5 Style the stage
+  - [x] 5.5 Style the stage
     - Create `packages/web/src/view/scenic/styles/stage.css` (tokens only): wide stage `width: min(100vw, 160dvh)` at 16:10, narrow square stage, `.world` with `transform-origin: 0 0`, `.world-overlay`, layer classes (sky, moon, clouds, hills, walls, rooms, rim with its opacity token, foreground), dims with `--sc-dim`, `.scene-bar` heading.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): style the scenic stage and house`
     - _Requirements: 3.1, 19.1, 19.2, 19.4_
     - _Design: "Camera frames", "Depth layers", "House composition"_
 
-  - [ ] 5.6 Style the Wisp
+  - [x] 5.6 Style the Wisp
     - Create `packages/web/src/view/scenic/styles/ghosts.css` (tokens only) with the Wisp classes (body Spectral, shade, eyes, glints, cobweb, rim), the cold-blue glow gradient stops, the lit and unlit window classes and the chained door.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): colour the wisp from the tokens`
     - _Requirements: 5.4, 6.1, 12.5_
     - _Design: "Palette", "Ghost states", "Glows"_
 
-  - [ ] 5.7 Add the first ambient motion
+  - [x] 5.7 Add the first ambient motion
     - In `motion.css`, inside `@media (prefers-reduced-motion: no-preference)`: `rain-fall`, `fog-drift`, `window-flicker` (oculus) and `wisp-bob`, with the durations of the "Animation Catalogue". Under `@media (prefers-reduced-motion: reduce)`: rain still at `--sc-rain-still`, fog at `--sc-fog-still`, oculus still (no animation).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate rain, fog and the wisp`
     - _Requirements: 5.7, 6.2, 18.4_
     - _Design: "Animation Catalogue", D9_
 
-  - [ ] 5.8 Wire the stage into the renderer
+  - [x] 5.8 Wire the stage into the renderer
     - In `renderer.ts`: every render computes `sceneLayout(model)`, updates the stage (slots, dims, empty floors, camera frame for the current viewport class from `watchMedia(WIDE_QUERY)`, no animation on the first render), and shows the Scene_Heading (`h2.scene-heading`, `tabindex="-1"`) with `layout.heading` in `.scene-bar`. Import `stage.css` and `ghosts.css` from `entry.ts`.
     - Verify: `npm run check` exits `0`; `?view=scenic` in `npm run dev -w @haunted-repo/web` (run by the director) shows the house with Wisps in the attic.
     - Commit message: `feat(web): draw the house scene in the scenic view`
     - _Requirements: 3.1, 3.5, 3.8, 3.9, 8.10_
     - _Design: "One render, step by step", "Vertical Slice Gate"_
 
-  - [ ] 5.9 Checkpoint and PR 1e
+  - [x] 5.9 Checkpoint and PR 1e
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is task 6.1 for the director, then PR 1f, task 7.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1e`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1d -- . ':(exclude)package-lock.json'`.
