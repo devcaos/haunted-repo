@@ -1,0 +1,134 @@
+/*
+ * Design tokens of the Scenic_Renderer.
+ * This is the only scenic CSS file with literal colours, sizes, fonts,
+ * durations and easings. Change a value here and the whole page follows.
+ */
+:root {
+  /* Palette: the nine colours of the house */
+  --sc-night: #0b111b;
+  --sc-slate: #202d3b;
+  --sc-mist: #6f7f92;
+  --sc-bone: #d5d0c5;
+  --sc-spectral: #b9cce6;
+  --sc-candle: #e6a25c;
+  --sc-pumpkin: #ff7a1a;
+  --sc-brass: #c47b3d;
+  --sc-rust: #6e2a1e;
+  /* Named lights */
+  --sc-cold-blue: #6e9bd8;
+  --sc-warm-orange: #f59a45;
+  --sc-dawn: #e9894a;
+  /* Roles */
+  --sc-text: var(--sc-bone);
+  --sc-text-heading: var(--sc-candle);
+  --sc-text-muted: var(--sc-mist);
+  --sc-text-link: var(--sc-spectral);
+  --sc-backing: var(--sc-night);
+  --sc-backing-raised: var(--sc-slate);
+  --sc-border: var(--sc-brass);
+  --sc-accent: var(--sc-pumpkin);
+  --sc-focus-ring: var(--sc-pumpkin);
+  --sc-focus-halo: var(--sc-night);
+  --sc-rim: var(--sc-spectral);
+  --sc-rim-ghost: var(--sc-bone);
+  /* Opacity */
+  --sc-depth-cloud: 0.35;
+  --sc-depth-hill-far: 0.45;
+  --sc-depth-hill-near: 1;
+  --sc-rim-opacity: 0.6;
+  --sc-fg-rim-opacity: 0.35;
+  --sc-dim: 0.65;
+  --sc-rain: 0.35;
+  --sc-rain-still: 0.25;
+  --sc-fog: 0.4;
+  --sc-fog-still: 0.35;
+  --sc-locked: 0.45;
+  /* Fonts: the display fonts come first, then a safe fallback stack */
+  --font-logo: "Creepster", Impact, "Arial Black", sans-serif;
+  --font-title: "IM Fell English", Georgia, "Times New Roman", serif;
+  --font-body:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-code:
+    ui-monospace, "Cascadia Mono", Consolas, Menlo, "Liberation Mono", monospace;
+  /* Text sizes, weights and line heights */
+  --sc-text-logo: 2.25rem;
+  --sc-text-logo-narrow: 1.75rem;
+  --sc-text-tagline: 1.0625rem;
+  --sc-text-h2: 1.5rem;
+  --sc-text-h3: 1.125rem;
+  --sc-text-banner: 1.75rem;
+  --sc-text-body: 1rem;
+  --sc-text-small: 0.875rem;
+  --sc-text-code: 0.875rem;
+  --sc-leading-body: 1.5;
+  --sc-leading-title: 1.15;
+  --sc-weight-body: 400;
+  --sc-weight-button: 600;
+  /* Spacing and sizes */
+  --sc-space-1: 0.25rem;
+  --sc-space-2: 0.5rem;
+  --sc-space-3: 1rem;
+  --sc-space-4: 1.5rem;
+  --sc-space-5: 2rem;
+  --sc-touch: 2.75rem;
+  --sc-full: 100%;
+  --sc-line: 1px;
+  --sc-line-heavy: 2px;
+  --sc-hud-width: 22rem;
+  --sc-hud-max-height: 100vh;
+  /* Focus */
+  --sc-focus-width: 2px;
+  --sc-focus-offset: 2px;
+  --sc-focus-halo-width: 6px;
+  /* Durations of the Animation Catalogue */
+  --sc-dur-camera: 700ms;
+  --sc-dur-room-enter: 500ms;
+  --sc-dur-room-enter-delay: 200ms;
+  --sc-dur-room-leave: 300ms;
+  --sc-dur-candle-light: 300ms;
+  --sc-dur-vigour: 300ms;
+  --sc-dur-ring-pop: 250ms;
+  --sc-dur-bubble-in: 200ms;
+  --sc-dur-banner-in: 400ms;
+  --sc-dur-meter: 800ms;
+  --sc-dur-press: 80ms;
+  --sc-dur-slot-point: 150ms;
+  --sc-dur-window-light-up: 800ms;
+  --sc-dur-room-warm: 1200ms;
+  --sc-dur-finale-rain-stop: 1200ms;
+  --sc-dur-finale-clouds: 2000ms;
+  --sc-dur-finale-dawn: 2000ms;
+  --sc-dur-intro: 1500ms;
+  --sc-dur-lightning: 600ms;
+  --sc-dur-react-recoil: 400ms;
+  --sc-dur-react-shudder: 500ms;
+  --sc-dur-react-laugh: 600ms;
+  --sc-dur-react-puzzle: 700ms;
+  --sc-dur-smoke-question: 700ms;
+  --sc-dur-exorcise-spiral: 600ms;
+  --sc-dur-exorcise-sparks: 400ms;
+  --sc-dur-rain-fall: 800ms;
+  --sc-dur-fog-drift: 24s;
+  --sc-dur-bats-fly: 22s;
+  --sc-dur-window-flicker: 3.2s;
+  --sc-dur-wisp-bob: 2.4s;
+  --sc-dur-wraith-sway: 4.2s;
+  --sc-dur-brute-heave: 3.2s;
+  --sc-dur-flame-flicker: 1.6s;
+  --sc-dur-ring: 2s;
+  --sc-dur-beam-sweep: 2.5s;
+  /* Delays of the Animation Catalogue */
+  --sc-delay-spiral: 400ms;
+  --sc-delay-sparks: 1000ms;
+  --sc-delay-finale: 800ms;
+  /* Reduced_Motion fades, never longer than 200 ms */
+  --sc-rm-fade: 150ms;
+  --sc-rm-fade-long: 200ms;
+  /* Easings */
+  --sc-ease-camera: cubic-bezier(0.65, 0, 0.35, 1);
+  --sc-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --sc-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --sc-ease-in-out: ease-in-out;
+  --sc-ease-linear: linear;
+}

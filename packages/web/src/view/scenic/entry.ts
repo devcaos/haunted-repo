@@ -1,4 +1,4 @@
+import "./styles/scenic-tokens.css";
 import { createScenicRenderer } from "./renderer.js";
-
-// The CSS and the fonts are imported here from PR 1b on.
+// The other CSS and the fonts are imported here from the next tasks on.
 export const createRenderer = createScenicRenderer;

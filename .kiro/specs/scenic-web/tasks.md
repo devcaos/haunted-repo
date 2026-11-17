@@ -184,7 +184,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~880 changed lines. Model: Auto.
   - _Design: "PR Split" row 1b_
 
-  - [ ] 2.1 Add the Scenic_Tokens and the contrast test
+  - [x] 2.1 Add the Scenic_Tokens and the contrast test
     - Create `packages/web/src/view/scenic/styles/scenic-tokens.css` with every token of the design "Style Guide": the nine palette colours with exact hex values, `--sc-cold-blue`, `--sc-warm-orange`, `--sc-dawn`, the role tokens, the opacity tokens, the typography tokens (`--font-logo`, `--font-title`, `--font-body`, `--font-code`, sizes, leading), spacing, `--sc-touch`, the focus tokens, and the durations and easings of the "Animation Catalogue". Import it from `entry.ts`.
     - Create `packages/web/src/view/scenic/model/contrast.test.ts` (reads the tokens file with `node:fs`): the nine palette values are exact (letter case ignored); the named cold-blue, warm-orange and dawn tokens exist; every text pair of the design's contrast table is at least 4.5:1 and every UI pair at least 3:1 (WCAG formula); every font token ends with a generic family; the duration tokens match the catalogue (room-warm 1200 ms, Intro 1500 ms, every reduced fade 200 ms or less).
     - Verify: `npm run check` exits `0`.
