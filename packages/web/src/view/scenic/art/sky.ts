@@ -61,16 +61,27 @@ export function skyLayers(): ShapeNode {
   ]);
 }
 
-/** The rain pattern repeats every this many units downwards, so moving it by that much loops without a jump. */
-const RAIN_PERIOD = 250;
+/**
+ * Each column of streaks repeats every (-40, 200) units, the step of the
+ * `rain-fall` animation (`--sc-rain-step-x`, `--sc-rain-step-y`), so one step
+ * lands every streak where another was and the loop never jumps.
+ */
+const RAIN_STEP_X = -40;
+const RAIN_STEP_Y = 200;
+/** Columns start this far right of the scene, so the leftward drift never leaves a gap. */
+const RAIN_SPAN = 1600 + 6 * -RAIN_STEP_X;
 
 /** Short slanted streaks spread over the scene, one path for all of them. */
-function rainPath(): string {
+export function rainPath(): string {
   let d = "";
-  for (let i = 0; i < 48; i += 1) {
-    const x = ((i * 263) % 1600) + 6;
-    const first = ((i * 97) % RAIN_PERIOD) - RAIN_PERIOD;
-    for (let y = first; y < 1000; y += RAIN_PERIOD) d += `M${x} ${y}l-6 22`;
+  const columns = 56;
+  for (let i = 0; i < columns; i += 1) {
+    // Evenly spread over the span, with a small jitter so they do not line up.
+    let x = Math.round((i * RAIN_SPAN) / columns) + ((i * 7) % 13) + 6;
+    let y = ((i * 97) % RAIN_STEP_Y) - RAIN_STEP_Y;
+    for (; y < 1000; x += RAIN_STEP_X, y += RAIN_STEP_Y) {
+      d += `M${x} ${y}l-6 22`;
+    }
   }
   return d;
 }

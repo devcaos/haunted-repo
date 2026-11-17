@@ -516,7 +516,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.4, 6.1, 12.5_
     - _Design: "Palette", "Ghost states", "Glows"_
 
-  - [ ] 5.7 Add the first ambient motion
+  - [x] 5.7 Add the first ambient motion
     - In `motion.css`, inside `@media (prefers-reduced-motion: no-preference)`: `rain-fall`, `fog-drift`, `window-flicker` (oculus) and `wisp-bob`, with the durations of the "Animation Catalogue". Under `@media (prefers-reduced-motion: reduce)`: rain still at `--sc-rain-still`, fog at `--sc-fog-still`, oculus still (no animation).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate rain, fog and the wisp`

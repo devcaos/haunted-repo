@@ -160,6 +160,12 @@
   stroke-width: 3;
 }
 
+/* The oculus glows faintly cold; motion.css makes it flicker. */
+.house .oculus-light {
+  fill: var(--sc-cold-blue);
+  opacity: 0.8;
+}
+
 .house .chain-link {
   stroke: var(--sc-mist);
   stroke-width: 2;

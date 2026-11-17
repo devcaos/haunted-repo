@@ -26,7 +26,7 @@ import {
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import { FLOOR_CLASS, houseLayer } from "./house.js";
 import { chainedDoorArt, slotArt } from "./props.js";
-import { foregroundLayer, skyLayers, weatherLayer } from "./sky.js";
+import { foregroundLayer, rainPath, skyLayers, weatherLayer } from "./sky.js";
 
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
@@ -192,6 +192,23 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(
       classesOf(foregroundLayer()).filter((c) => c === "grave"),
     ).toHaveLength(3);
+  });
+});
+
+describe("rain loop (Requirement 3.3)", () => {
+  it("one step of rain-fall lands every streak on another, so the loop never jumps", () => {
+    const starts = [...rainPath().matchAll(/M(-?[\d.]+) (-?[\d.]+)/g)].map(
+      (m) => [Number(m[1]), Number(m[2])] as const,
+    );
+    const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
+    for (const [x, y] of starts) {
+      // Moved by one step (-40, 200): either another streak or below the scene.
+      if (y + 200 < 1000) expect(seen.has(`${x - 40},${y + 200}`)).toBe(true);
+      // Every visible streak was filled in from one step before.
+      if (y >= 0) expect(seen.has(`${x + 40},${y - 200}`)).toBe(true);
+    }
+    // Columns start right of the scene, so the leftward drift leaves no gap.
+    expect(Math.max(...starts.map(([x]) => x))).toBeGreaterThan(1600 + 200);
   });
 });
 
