@@ -24,7 +24,6 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 ## Pendientes (Low, ideas, "después si da tiempo")
 - Low (scenic-web PR 1d, 17 nov): el diseño dice a la vez "room backs Night" y paredes del sótano Slate. En la PR 1d el fondo de cada habitación es Slate y los detalles son Night. Revisarlo en la parada de capturas (Vertical Slice Gate).
-- [ ] Comprobación a mano de la PR 1e (la hace Luis Miguel): `npm run dev -w @haunted-repo/web`, abre `?view=scenic` y comprueba que se ve la casa con cielo, lluvia, niebla y los Wisps en el ático (los fantasmas bloqueados solo enseñan su ventana hasta la tarea 9.3). Con "reducir movimiento" activado en el sistema, la lluvia, la niebla y el Wisp quedan quietos.
 - [ ] Comprobación a mano de la PR 1b (la hace Luis Miguel): con `npm run dev` abre `?view=scenic` y en DevTools, pestaña Network, comprueba que se cargan dos archivos `.woff2` (Creepster e IM Fell English) desde el propio sitio; bloquéalos y comprueba que el texto sigue visible.
 - Low (spec kiro-power, 15 nov): `tech.md` dice que un Power es "`POWER.md` + steering + servidor MCP"; la documentación actual de Kiro dice `plugin.json` + `skills/` + `mcp.json`. Corregirlo en una rama de docs aparte.
 - Low (tarea 11.1, 17 nov): la skill pregunta "does the Student know Java?" como sí o no, pero el Student contestó "I don't know" y la skill no dice qué hacer (el Tutor lo tomó como `false`). Añadir una línea a la skill ("if unsure, use false").

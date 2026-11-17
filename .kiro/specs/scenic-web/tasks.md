@@ -539,11 +539,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 6. Director setup before PR 1f (by hand, once)
+- [ ] 6. Setup before PR 1f (Kiro, once, with the director's permission)
   - [ ] 6.1 Install Chromium for Playwright
-    - **For the director (Luis Miguel), done by hand, not by Kiro, before the screenshot tasks of PR 1f (7.7, 7.8).** Run once in PowerShell from the repository root: `npx playwright install chromium`. It downloads about 150 MB, once per machine. If it is run before task 7.6 adds the pinned `playwright` package, use `npx playwright@1.65.1 install chromium` so the browser matches the pinned version.
+    - **Kiro runs this itself, and asks the director's permission once, before the screenshot tasks of PR 1f (7.7, 7.8).** Command, from the repository root: `npx playwright@1.65.1 install chromium`. It downloads about 150 MB, once per machine. The version is pinned so the browser matches the `playwright` package that task 7.6 adds.
     - `npm ci` never downloads a browser, neither in CI nor in the deploy job nor on this machine (decision Q27). Without this step, `npm run shots` stops with `Chromium for Playwright is not installed. Run: npx playwright install chromium`.
-    - No commit of its own; Kiro marks it `[x]` in the next commit after the director confirms.
+    - No commit of its own; Kiro marks it `[x]` in the next commit after the install succeeds.
     - _Requirements: 24.2, 24.3_
     - _Design: "Shots_Script (npm run shots)", decision Q27_
 
