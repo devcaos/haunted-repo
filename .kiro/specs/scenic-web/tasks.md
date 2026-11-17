@@ -55,7 +55,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 1
 
-- [ ] 1. PR 1a — Renderer choice and HUD shell
+- [x] 1. PR 1a — Renderer choice and HUD shell
   - Branch: `feat/scenic-web-1a`. Stacks on: `main` (created from an up-to-date `main`).
   - Estimate: ~850 changed lines. Model: Auto.
   - _Design: "PR Split" row 1a_
@@ -170,7 +170,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.11, 2.10, 25.11_
     - _Design: "Simple_Renderer change (Scenic_View_Link)"_
 
-  - [ ] 1.13 Checkpoint and PR 1a
+  - [x] 1.13 Checkpoint and PR 1a
     - Update `PLAN.md` ("En curso": scenic-web PR 1a open; "Pendientes"; "Para retomar": next is PR 1b, task 2.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
