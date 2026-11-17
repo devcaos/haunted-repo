@@ -2,7 +2,8 @@
 // Hand-run only: npm run check, npm test and CI never run this file.
 // Needs Chromium for Playwright, installed once with:
 //   npx playwright@1.65.1 install chromium
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   chromium,
@@ -16,10 +17,17 @@ import {
   type PreviewServer,
   type ViteDevServer,
 } from "vite";
+import {
+  SHOT_SIZES,
+  shotFileName,
+  type ShotSize,
+  type ShotState,
+} from "../src/tooling/shotList.ts";
 import { createFakeGitHub } from "../../core/src/ghost-detection/fakeGitHub.testutil.ts";
 
 const webDir = fileURLToPath(new URL("..", import.meta.url));
 const configFile = fileURLToPath(new URL("../vite.config.ts", import.meta.url));
+const shotsDir = fileURLToPath(new URL("../shots", import.meta.url));
 const PREVIEW_PORT = 4179;
 const DEV_PORT = 5179;
 export const PREVIEW_ORIGIN = `http://localhost:${PREVIEW_PORT}`;
@@ -134,6 +142,64 @@ async function routeNonLocal(
   });
 }
 
+/** True when no finite animation or transition is still running. */
+function noFiniteMotion(): boolean {
+  return document
+    .getAnimations()
+    .every(
+      (a) =>
+        a.playState !== "running" ||
+        !Number.isFinite(a.effect?.getComputedTiming().endTime as number),
+    );
+}
+
+interface CheckResult {
+  problems: string[];
+  warnings: string[];
+}
+
+/** Runs inside the page: the required checks and the warnings of the design. */
+function runChecks(): CheckResult {
+  const problems: string[] = [];
+  const warnings: string[] = [];
+  const running = document
+    .getAnimations()
+    .filter((a) => a.playState === "running").length;
+  if (running > 15)
+    problems.push(`${running} animations are running (max 15).`);
+  for (const node of document.querySelectorAll("*")) {
+    const filtered =
+      node.hasAttribute("filter") || getComputedStyle(node).filter !== "none";
+    if (filtered && node.getAnimations({ subtree: true }).length > 0) {
+      problems.push(`A filtered element has animations: <${node.localName}>.`);
+    }
+  }
+  for (const svg of document.querySelectorAll("svg")) {
+    if (svg.getAttribute("aria-hidden") !== "true") {
+      warnings.push("An svg has no aria-hidden.");
+    }
+    if (svg.querySelector("a[href], button, input, [tabindex]") !== null) {
+      warnings.push("A focusable element is inside an svg.");
+    }
+  }
+  for (const node of document.querySelectorAll("button, a[href]")) {
+    const box = node.getBoundingClientRect();
+    if (box.width === 0 && box.height === 0) continue;
+    if (
+      getComputedStyle(node).display !== "inline" &&
+      (box.width < 44 || box.height < 44)
+    ) {
+      warnings.push(
+        `Small target (${Math.round(box.width)}x${Math.round(box.height)}): ${node.textContent?.trim().slice(0, 30) ?? ""}`,
+      );
+    }
+  }
+  const root = document.documentElement;
+  if (window.innerWidth <= 390 && root.scrollWidth > root.clientWidth) {
+    warnings.push("The page scrolls horizontally.");
+  }
+  return { problems, warnings };
+}
 async function main(): Promise<void> {
   if (!existsSync(fileURLToPath(new URL("../dist", import.meta.url)))) {
     console.error("packages/web/dist was not found. Run npm run build first.");
@@ -173,14 +239,68 @@ async function main(): Promise<void> {
   cleanup.browser = browser;
   const files = await step("read the sample files", loadSirvFiles);
   const fake = createFakeGitHub([{ owner: "lukeed", repo: "sirv", files }]);
-  const context = await step("open a browser context", async () => {
-    const created = await browser.newContext();
-    created.setDefaultTimeout(10_000);
-    await routeNonLocal(created, fake);
-    return created;
-  });
-  await context.close();
+  mkdirSync(shotsDir, { recursive: true });
+  let written = 0;
+  let failedChecks = 0;
+  const shoot = async (
+    context: BrowserContext,
+    state: ShotState,
+    size: ShotSize,
+    url: string,
+    ready: string,
+  ): Promise<void> => {
+    const fileName = shotFileName(state, size);
+    await step(fileName, async () => {
+      const page = await context.newPage();
+      page.setDefaultTimeout(10_000);
+      await page.goto(url);
+      await page.waitForSelector(ready);
+      await page.waitForFunction(noFiniteMotion);
+      const result = await page.evaluate(runChecks);
+      for (const warning of result.warnings) {
+        console.warn(`Warning in ${fileName}: ${warning}`);
+      }
+      for (const problem of result.problems) {
+        console.error(`Check failed in ${fileName}: ${problem}`);
+        failedChecks++;
+      }
+      await page.screenshot({
+        path: join(shotsDir, fileName),
+        animations: "disabled",
+      });
+      written++;
+      await page.close();
+    });
+  };
+  for (const size of SHOT_SIZES) {
+    const viewport = { width: size.width, height: size.height };
+    const normal = await browser.newContext({
+      viewport,
+      reducedMotion: "no-preference",
+    });
+    const reduced = await browser.newContext({
+      viewport,
+      reducedMotion: "reduce",
+    });
+    for (const context of [normal, reduced]) {
+      context.setDefaultTimeout(10_000);
+      await routeNonLocal(context, fake);
+    }
+    const house = `${PREVIEW_ORIGIN}/haunted-repo/?view=scenic`;
+    await shoot(normal, "01-house", size, house, "svg.house");
+    await shoot(reduced, "16-reduced-house", size, house, "svg.house");
+    await shoot(
+      normal,
+      "19-gallery",
+      size,
+      `${DEV_ORIGIN}/haunted-repo/gallery.html`,
+      "svg.gallery-art",
+    );
+    await normal.close();
+    await reduced.close();
+  }
   await closeAll();
+  console.log(`Wrote ${written} PNG files to packages/web/shots/`);
+  if (failedChecks > 0) process.exit(1);
 }
-
 await main();

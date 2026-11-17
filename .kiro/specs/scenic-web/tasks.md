@@ -539,8 +539,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 6. Setup before PR 1f (Kiro, once, with the director's permission)
-  - [ ] 6.1 Install Chromium for Playwright
+- [x] 6. Setup before PR 1f (Kiro, once, with the director's permission)
+  - [x] 6.1 Install Chromium for Playwright
     - **Kiro runs this itself, and asks the director's permission once, before the screenshot tasks of PR 1f (7.7, 7.8).** Command, from the repository root: `npx playwright@1.65.1 install chromium`. It downloads about 150 MB, once per machine. The version is pinned so the browser matches the `playwright` package that task 7.6 adds.
     - `npm ci` never downloads a browser, neither in CI nor in the deploy job nor on this machine (decision Q27). Without this step, `npm run shots` stops with `Chromium for Playwright is not installed. Run: npx playwright install chromium`.
     - No commit of its own; Kiro marks it `[x]` in the next commit after the install succeeds.
@@ -613,7 +613,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.11, 24.13, 24.14, 24.15_
     - _Design: "Shots_Script (npm run shots)" (Servers, No real GitHub, Timeouts and errors)_
 
-  - [ ] 7.8 Take the stage-1 screenshots
+  - [x] 7.8 Take the stage-1 screenshots
     - In `shots.ts`: for each size, open `/haunted-repo/?view=scenic` (dark launch) and take `01-house`; a second context with `reducedMotion: "reduce"` takes `16-reduced-house`; the Gallery page on the dev server takes `19-gallery`. Before each shot wait until no finite animation or transition runs, run the required checks (at most 15 running animations; no filtered element with animations in its subtree) and the warnings (svg without `aria-hidden`, focusable element in an svg, small targets, horizontal scroll at 390 px), then `page.screenshot({ path, animations: "disabled" })` into `packages/web/shots/`. At the end print the number of PNG files written; exit `1` after writing every file if a required check failed.
     - Verify: `npm run check` exits `0`; `npm run shots` (needs task 6.1) writes 6 PNG files and exits `0`.
     - Commit message: `feat(web): take the first scenic screenshots`
