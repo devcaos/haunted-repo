@@ -571,7 +571,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.7, 20.9_
     - _Design: "Correctness Properties", Property 18_
 
-  - [ ] 7.3 Add the `npm run size` script
+  - [x] 7.3 Add the `npm run size` script
     - Create `packages/web/scripts/size.ts` (I/O only, Node built-ins `node:fs`, `node:path`, `node:url`, `node:zlib`): resolves `packages/web/dist` from its own URL, walks it, gzips each counted file at the default level, reads HTML, CSS and SVG as text, calls `checkDist`, prints the report and exits `0` or `1`. It imports `../src/tooling/distRules.ts`.
     - Root `package.json`: add `"size": "node packages/web/scripts/size.ts"`; `check` becomes `npm run lint && npm run format:check && npm run build && npm run size && npm test`.
     - Verify: `npm run check` exits `0` and prints the measured total.

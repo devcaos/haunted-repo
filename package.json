@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:live": "vitest run --config vitest.live.config.ts",
     "sample:make": "npm run build -w @haunted-repo/core && node packages/web/scripts/make-sample.ts",
-    "check": "npm run lint && npm run format:check && npm run build && npm test"
+    "size": "node packages/web/scripts/size.ts",
+    "check": "npm run lint && npm run format:check && npm run build && npm run size && npm test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
