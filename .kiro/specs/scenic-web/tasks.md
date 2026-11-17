@@ -75,7 +75,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.7, 1.8_
     - _Design: "Renderer choice and CSS loading", "Dark launch (director decision Q14)"_
 
-  - [ ] 1.3 Property test for the View_Choice
+  - [x] 1.3 Property test for the View_Choice
     - **Property 12: The view is simple only for an exact first value**
     - **Validates: Requirements 1.1, 1.2, 1.3** (in its final form after task 16.8; until then it checks the dark-launch rule of decision Q14)
     - Generator of the design: query strings from random parameters (names `view`, `View`, `x`; values `simple`, `SIMPLE`, `simple `, ``, `scenic` and `fc.string()`; repeated `view` parameters in any order; optional leading `?`), at least 100 runs.
