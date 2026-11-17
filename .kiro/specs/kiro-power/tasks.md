@@ -243,17 +243,17 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 - [x] 10. Checkpoint: PR 5
   - Ensure all tests pass, ask the user if questions arise.
 
-### Final: manual check in Kiro (planned for about 22 Nov 2026)
+### Final: manual check in Kiro (planned for 17 Nov 2026)
 
 - [ ] 11. Manual end-to-end check in Kiro IDE (done by the director with Kiro; not automatable)
-  - [ ] 11.1 Install from GitHub `main` and run the whole check
+  - [x] 11.1 Install from GitHub `main` and run the whole check
     - Install from `https://github.com/devcaos/haunted-repo/tree/main/packages/power` (done together with 11.2, after the merge).
     - Run `find_ghosts` on `https://github.com/lukeed/sirv`, exorcise one ghost, answer "I don't know" once, and see at least one Verdict_Retry (the check may force one by asking the Tutor to end a judgement with a full stop).
     - Also check: the Tutor writes in English only, one question per message, does not leak the model answer, tells the Student about a `warning` once, and asks before sending `replace: true`.
     - Write the result in `docs/spike-power-e2e.md` (own docs commit).
     - _Requirements: 1.5, 1.8, 4.3, 5.4, 6.3, 11.7_
 
-  - [ ] 11.2 Repeat one call from the same GitHub `main` install
+  - [x] 11.2 Repeat one call from the same GitHub `main` install
     - In the same install as 11.1 (from GitHub `main`, not before merging), repeat one `find_ghosts` call.
     - Add the result to `docs/spike-power-e2e.md` (own docs commit).
     - _Requirements: 1.5, 11.7_
