@@ -595,7 +595,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.8, 24.9, 25.2, 25.3, 25.4_
     - _Design: "Gallery (dev only)"_
 
-  - [ ] 7.6 Add Playwright and the `shots` script entry
+  - [x] 7.6 Add Playwright and the `shots` script entry
     - Check the current Playwright docs. Add `playwright` 1.65.1 (exact) to the root `devDependencies`; commit `package-lock.json` in the same commit. No `@playwright/browser-chromium`.
     - Root `package.json`: `"shots": "npm run build -w @haunted-repo/core && npm run build -w @haunted-repo/web && node packages/web/scripts/shots.ts"` (D12). `check`, `test` and `.github/workflows/*` do not run it.
     - Add `packages/web/shots/` to `.gitignore` and `.prettierignore`.

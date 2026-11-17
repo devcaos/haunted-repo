@@ -12,3 +12,6 @@ dist/
 build/
 target/
 
+
+# Hand-run screenshots (npm run shots)
+packages/web/shots/
