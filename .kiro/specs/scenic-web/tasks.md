@@ -235,7 +235,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 17.6, 17.11, 17.13, 19.4, 21.3_
     - _Design: "Style Guide" (Typography), "Accessibility Design" (Focus, Touch targets)_
 
-  - [ ] 2.7 Add `hud.css`, the press transition and the wide breakpoint rule
+  - [x] 2.7 Add `hud.css`, the press transition and the wide breakpoint rule
     - Create `packages/web/src/view/scenic/styles/hud.css` (tokens only): solid Night HUD panels with a Brass line (never translucent), `.hud-logo` and `.hud-tagline` in `--font-logo`, `h1` to `h3` in `--font-title`, Haunt_Meter (Night track, Brass frame, cold-blue fill with `transform-origin` left), Ghost_Icons, Live_Plaque, Status_Region, warnings, Power line, `show-sample` button, Simple_View_Link; the HUD overlays the stage edges at `(min-width: 64rem)` and stacks above and below it under that width (Q9); the HUD column scrolls inside itself (Q22).
     - Create `packages/web/src/view/scenic/styles/motion.css` with the `press` transition (`button:active`) inside `@media (prefers-reduced-motion: no-preference)`.
     - Create `packages/web/src/view/scenic/model/camera.ts` with only `ViewportClass` and `WIDE_QUERY = "(min-width: 64rem)"`; task 3.13 adds the Camera functions.

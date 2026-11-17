@@ -1,0 +1,14 @@
+/*
+ * Motion of the Scenic_Renderer. Animations and transitions live only inside
+ * the two prefers-reduced-motion blocks, so nothing moves by accident.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  /* press: a small, quick push on every button (Game-feel rule 1). */
+  .scenic button {
+    transition: transform var(--sc-dur-press) var(--sc-ease-out);
+  }
+
+  .scenic button:active {
+    transform: translateY(var(--sc-line)) scale(0.98);
+  }
+}

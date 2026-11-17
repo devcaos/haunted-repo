@@ -77,6 +77,9 @@
   --sc-line-heavy: 2px;
   --sc-hud-width: 22rem;
   --sc-viewport-height: 100vh;
+  --sc-icon-size: 1.25rem;
+  --sc-meter-height: 0.75rem;
+  --sc-field-min: 12rem;
   /* Focus */
   --sc-focus-width: 2px;
   --sc-focus-offset: 2px;

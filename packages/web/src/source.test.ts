@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { WIDE_QUERY } from "./view/scenic/model/camera.js";
 
 // Scans the source text of the Web_Package. Scanned: every non-test `.ts`,
 // `.css` and `.svg` file under `src/`, plus `index.html`. Test files
@@ -831,5 +832,129 @@ describe("gallery page (Requirement 25.8)", () => {
   it("is part of the presentation files only when it exists", () => {
     const listed = presentationFiles.some((f) => f.path === "gallery.html");
     expect(listed).toBe(galleryFiles.length > 0);
+  });
+});
+
+// Scenic fonts and breakpoint (Requirements 21.1 to 21.3, 19.1).
+const FONT_LOGO = "var(--font-logo)";
+const FONT_TITLE = "var(--font-title)";
+
+interface FontRule {
+  selectors: string[];
+  family: string;
+}
+
+/** Every rule that sets font-family, with its selector list split. */
+function fontRules(css: string): FontRule[] {
+  const rules: FontRule[] = [];
+  walkCss(parseCss(css), (node) => {
+    const family = node.decls.find((d) => d.property === "font-family");
+    if (family && !node.prelude.startsWith("@")) {
+      rules.push({
+        selectors: node.prelude.split(",").map((s) => s.trim()),
+        family: family.value,
+      });
+    }
+  });
+  return rules;
+}
+
+const LOGO_SELECTOR = /(?:^|\s)\.(?:hud-logo|hud-tagline)(?:$|[\s:.[])/;
+const HEADING_SELECTOR = /(?:^|\s)h[123]$/;
+const BANNER_LINE_SELECTOR = /\.finale-banner\s+\.line-1$/;
+
+/** Item 12: where Creepster and IM Fell English may be used. */
+function fontRoleBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  for (const { selectors, family } of fontRules(css)) {
+    for (const selector of selectors) {
+      if (family.includes(FONT_LOGO) && !LOGO_SELECTOR.test(selector)) {
+        breaks.push(`${selector} uses the logo font`);
+      }
+      const isTitle =
+        HEADING_SELECTOR.test(selector) || BANNER_LINE_SELECTOR.test(selector);
+      const isLogo = LOGO_SELECTOR.test(selector);
+      if (isTitle && !isLogo && family !== FONT_TITLE) {
+        breaks.push(`${selector} does not use the title font`);
+      }
+    }
+  }
+  return breaks;
+}
+
+/** The text of every @media query with a width in a CSS text. */
+function widthQueries(css: string): string[] {
+  const queries: string[] = [];
+  walkCss(parseCss(css), (node) => {
+    if (/^@media\b/i.test(node.prelude) && /-width/.test(node.prelude)) {
+      queries.push(
+        node.prelude.replace(/^@media\s*/i, "").replace(/\s+/g, " "),
+      );
+    }
+  });
+  return queries;
+}
+
+describe("scenic fonts and breakpoint (Requirements 21.1 to 21.3, 19.1)", () => {
+  const scenicStyles = [...scenicCssFiles];
+
+  it("the logo font is used only for the logo and the tagline", () => {
+    expect(
+      scenicStyles
+        .map((f) => ({ path: f.path, breaks: fontRoleBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("h1, h2 and h3 use the title font", () => {
+    const rules = scenicStyles.flatMap((f) => fontRules(f.text));
+    const headings = rules.filter((r) =>
+      r.selectors.some((s) => HEADING_SELECTOR.test(s)),
+    );
+    expect(headings.length).toBeGreaterThan(0);
+    expect(headings.every((r) => r.family === FONT_TITLE)).toBe(true);
+    const logo = rules.filter((r) => r.family.includes(FONT_LOGO));
+    expect(logo.length).toBeGreaterThan(0);
+  });
+
+  it("every width media query equals WIDE_QUERY", () => {
+    const queries = scenicStyles.flatMap((f) => widthQueries(f.text));
+    expect(queries.length).toBeGreaterThan(0);
+    expect(queries.filter((q) => q !== WIDE_QUERY)).toEqual([]);
+  });
+
+  it("self-check: item 12 catches a misused font", () => {
+    expect(
+      fontRoleBreaks(".scenic p { font-family: var(--font-logo); }"),
+    ).toHaveLength(1);
+    expect(
+      fontRoleBreaks(".scenic h2 { font-family: var(--font-body); }"),
+    ).toHaveLength(1);
+    expect(
+      fontRoleBreaks(
+        ".finale-banner .line-1 { font-family: var(--font-body); }",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("self-check: item 12 accepts the intended uses", () => {
+    expect(
+      fontRoleBreaks(
+        ".scenic h1, .scenic h2 { font-family: var(--font-title); }\n" +
+          ".scenic .hud-logo, .scenic .hud-tagline { font-family: var(--font-logo); }\n" +
+          ".finale-banner .line-1 { font-family: var(--font-title); }\n" +
+          ".scenic { font-family: var(--font-body); }",
+      ),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 18 sees a different width query", () => {
+    expect(widthQueries("@media (min-width: 48rem) { a { top: 0; } }")).toEqual(
+      ["(min-width: 48rem)"],
+    );
+    expect(
+      widthQueries("@media (prefers-reduced-motion: reduce) { a { top: 0; } }"),
+    ).toEqual([]);
+    expect(WIDE_QUERY).toBe("(min-width: 64rem)");
   });
 });
