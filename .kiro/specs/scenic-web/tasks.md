@@ -285,7 +285,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.8_
     - _Design: "Generators"_
 
-  - [ ] 3.2 Source_Scan item 10
+  - [x] 3.2 Source_Scan item 10
     - In `source.test.ts`: `src/view/scenic/model/**` and `src/view/scenic/art/**` use no DOM name (`document`, `window`, `HTMLElement`) and import no CSS and no `?url` asset. Negative self-check.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): keep the scenic model free of the DOM`
