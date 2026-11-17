@@ -407,10 +407,10 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué intentaba:** Probar que el Tutor avisa una sola vez de un warning (tercera ronda de la 11.1).
 - **Qué pasó:** La skill solo dice qué hacer si llega un warning. En el código solo sale cuando la carpeta de datos no se puede escribir (MEMORY_MODE_WARNING) o falla un guardado (saveFailedWarning). El Student no puede provocarlo con ninguna respuesta.
 - **Cómo lo rodeé:** Lo dejé como no probado en docs/spike-power-e2e.md y como Low en PLAN.md. Queda el test automático de power.test.ts.
-- **Estado:** abierto (hacería falta ejecutar el Power con una carpeta de datos sin permiso de escritura)
+- **Estado:** abierto (haría falta ejecutar el Power con una carpeta de datos sin permiso de escritura)
 
 ## 17 nov 2026: El Tutor no trata igual una respuesta en español en cada ronda
 - **Qué intentaba:** Comprobar la regla de la skill de escribir solo en inglés (tercera ronda de la 11.1).
 - **Qué pasó:** El Student contestó la pregunta 3 en español. En la primera ronda el Tutor le pidió inglés; esta vez la aceptó y juzgó el contenido. La skill obliga al Tutor a escribir en inglés, pero no dice nada de las respuestas del Student.
-- **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md y ampliado el Low que ya estaba en PLAN.md.
+- **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md y amplié el Low que ya estaba en PLAN.md.
 - **Estado:** abierto (sin cambiar la skill todavía)
