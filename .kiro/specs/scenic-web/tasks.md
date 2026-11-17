@@ -276,7 +276,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~860 changed lines. Model: Auto.
   - _Design: "PR Split" row 1c_
 
-  - [ ] 3.1 Complete the generators
+  - [x] 3.1 Complete the generators
     - In `packages/web/src/view/scenic/model/viewModelArb.testutil.ts` replace the minimal `viewModelArb` of task 1.5 with the full one of the design (same export name): report from `reportArb` or `uniquePathReportArb` with option `maxPerFloor`; `house` from `buildLiveHouse(report)` or `buildSampleHouse(report, { progress, step, scripted, startAllowed })` with `progressArb(report.ghosts)`, `fc.subarray` of the paths, `fc.constantFrom` of the 8 steps and `fc.boolean()`; `house: null` in about 1 run in 20; `scene` from house, floor and ghost; `available` built with the rules of `page.ts` (and `ghostActions` for the ghost scene); `status.kind` from the 5 kinds; an option that biases about a third of the sample houses to have every Card Locked or Exorcised (for P6).
     - Add `pageRunArb`: runs the real `createPage` with the committed `report.json`, `files.json` and either the committed `demo-script.json` or `fullScriptFor(report)`, a recording renderer, and a `detect` that returns a live report from `uniquePathReportArb`, an error or a throw; each number from `choicesArb` picks one action of `model.available` (a fixed URL for `submit-live`); it yields the list of consecutive models.
     - Create `packages/web/src/view/scenic/model/viewModelArb.test.ts`: one test with `fc.statistics` that logs the share of each `house.source`, Scene kind and GhostState, and asserts that each value appears.
@@ -285,14 +285,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.8_
     - _Design: "Generators"_
 
-  - [ ] 3.2 Source_Scan item 10
+  - [x] 3.2 Source_Scan item 10
     - In `source.test.ts`: `src/view/scenic/model/**` and `src/view/scenic/art/**` use no DOM name (`document`, `window`, `HTMLElement`) and import no CSS and no `?url` asset. Negative self-check.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): keep the scenic model free of the DOM`
     - _Requirements: 23.1_
     - _Design: "Source_Scan additions" item 10, "Layers"_
 
-  - [ ] 3.3 Add the floor geometry and `slotRects`
+  - [x] 3.3 Add the floor geometry and `slotRects`
     - Create `packages/web/src/view/scenic/model/sceneLayout.ts` with the types (`GhostType`, `VariantNumber`, `Rect`, `SlotPlacement`, `FloorButtonView`, `NameplateView`, `Frame`, `SceneLayout`), `GHOST_TYPE_OF`, the floor rectangles and slot bands of the design "World geometry", the ghost boxes of the "Ghost types" table, and `slotRects(floor, count)` by the "Slot layout rule" (gap 8).
     - Create `packages/web/src/view/scenic/model/sceneLayout.test.ts` with examples: with 5 Cards the slots are 88 × 97 (attic), 72 × 207 (middle floor) and 100 × 142 (basement); `GHOST_TYPE_OF` maps attic, middle floor and basement to Wisp, Lantern_Wraith and Chained_Brute.
     - Verify: `npm run check` exits `0`.
@@ -300,7 +300,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.3, 5.5_
     - _Design: "scenic/model/sceneLayout.ts (Scene_Layout)", "World geometry", "Slot layout rule"_
 
-  - [ ] 3.4 Add `sceneLayout`
+  - [x] 3.4 Add `sceneLayout`
     - In `sceneLayout.ts` add `sceneLayout(model)` with every rule of the design: slots by position, Variant `index % 5`, one `ghostScale` per floor, empty and dimmed floors, floor buttons, back button, Nameplates and empty line (Floor_Scene only), start controls (first Card of a repeated path), Telephone_Target in floor order then report order, Finale, heading, frame, close-up.
     - Extend `sceneLayout.test.ts` with examples: headings for house, `house` null (`TEXTS.pageTitle`), floor and ghost (3.8, 8.12, D1); a repeated path gives the first Card the start control and the Telephone_Target (23.9); the close-up falls back to Variant 0 when no Card matches; the close-up Ghost_Type follows `ghost.floor` (5.5).
     - Verify: `npm run check` exits `0`.
@@ -308,7 +308,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.5, 3.6, 3.8, 3.9, 3.10, 5.5, 5.8, 5.11, 8.3, 8.4, 8.5, 8.6, 8.7, 8.12, 9.9, 13.1, 23.2, 23.4, 23.5, 23.6, 23.7, 23.9_
     - _Design: "scenic/model/sceneLayout.ts (Scene_Layout)"_
 
-  - [ ] 3.5 Property test for the Ghost_Slots
+  - [x] 3.5 Property test for the Ghost_Slots
     - **Property 1: Every Card gets exactly one Ghost_Slot on its own floor**
     - **Validates: Requirements 3.5, 10.13, 12.5, 23.2**
     - Generator: `viewModelArb` with `reportArb` (repeated paths allowed), at least 100 runs. Checks one slot per Card position with the Card's floor, path and state; window lit exactly when the state is `"exorcised"`; no slot in the Ghost_Scene or when `house` is `null`.
@@ -319,7 +319,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.5, 10.13, 12.5, 23.2_
     - _Design: "Correctness Properties", Property 1_
 
-  - [ ] 3.6 Property test for slot fit
+  - [x] 3.6 Property test for slot fit
     - **Property 2: Ghost_Slots fit their floor and never overlap**
     - **Validates: Requirements 23.3**
     - Generator: `fc.constantFrom` of the 3 floors and `fc.integer({ min: 1, max: 5 })`, plus `viewModelArb` with `maxPerFloor: 5` through `sceneLayout`, at least 100 runs. Checks every rectangle lies inside its floor rectangle and any two share an area of 0.
@@ -330,7 +330,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.3_
     - _Design: "Correctness Properties", Property 2_
 
-  - [ ] 3.7 Property test for start controls
+  - [x] 3.7 Property test for start controls
     - **Property 3: Start controls exist only for startable Cards of the focused floor**
     - **Validates: Requirements 3.10, 6.6, 8.4, 8.5, 23.4**
     - Generator: `viewModelArb` with `uniquePathReportArb`, at least 100 runs.
@@ -341,7 +341,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.10, 6.6, 8.4, 8.5, 23.4_
     - _Design: "Correctness Properties", Property 3_
 
-  - [ ] 3.8 Property test for Variants
+  - [x] 3.8 Property test for Variants
     - **Property 4: The Variant depends only on the floor position**
     - **Validates: Requirements 5.8, 5.10, 5.11, 23.5**
     - Generator: `viewModelArb` with `maxPerFloor: 5`, and a mapper that rewrites the Cards' `path`, `score`, `reason`, `state` and `canStart` while keeping floors and order, at least 100 runs.
@@ -352,7 +352,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.8, 5.10, 5.11, 23.5_
     - _Design: "Correctness Properties", Property 4_
 
-  - [ ] 3.9 Property test for the Telephone_Target
+  - [x] 3.9 Property test for the Telephone_Target
     - **Property 5: The Telephone_Target is the first startable Card**
     - **Validates: Requirements 9.9, 23.6**
     - Generator: `viewModelArb` with `uniquePathReportArb`, at least 100 runs. Checks floor order then report order, `null` when none or `house` null, and that `start-ghost` for the target is in `available`.
@@ -363,7 +363,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.9, 23.6_
     - _Design: "Correctness Properties", Property 5_
 
-  - [ ] 3.10 Property test for the Finale decision
+  - [x] 3.10 Property test for the Finale decision
     - **Property 6: The Finale depends only on the current ViewModel**
     - **Validates: Requirements 13.1, 13.2, 13.6, 23.7**
     - Generator: `viewModelArb` with the Finale bias of task 3.1, at least 100 runs. Checks the exact condition and that two deep-equal ViewModels give the same value.
@@ -374,7 +374,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 13.1, 13.2, 13.6, 23.7_
     - _Design: "Correctness Properties", Property 6_
 
-  - [ ] 3.11 Property test for navigation controls
+  - [x] 3.11 Property test for navigation controls
     - **Property 7: Navigation controls follow Available_Actions**
     - **Validates: Requirements 3.6, 8.2, 8.7, 8.13, 14.3**
     - Generator: `viewModelArb` restricted to House and Floor Scenes, `live.busy` true and false, at least 100 runs.
@@ -385,7 +385,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.6, 8.2, 8.7, 8.13, 14.3_
     - _Design: "Correctness Properties", Property 7_
 
-  - [ ] 3.12 Property test for Nameplates
+  - [x] 3.12 Property test for Nameplates
     - **Property 8: Nameplates show every Card of the focused floor**
     - **Validates: Requirements 6.4, 6.5, 6.9, 8.3, 8.6, 17.3**
     - Generator: `viewModelArb` restricted to Floor_Scenes, at least 100 runs. Checks the fields, the accessible name with the locked line for Locked Cards, `emptyLine` and `emptyFloors`.
@@ -396,7 +396,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.4, 6.5, 6.9, 8.3, 8.6, 17.3_
     - _Design: "Correctness Properties", Property 8_
 
-  - [ ] 3.13 Add the Camera
+  - [x] 3.13 Add the Camera
     - In `packages/web/src/view/scenic/model/camera.ts` add `CameraTransform`, `frameRect`, `sceneArea`, `cameraFor` and `cssTransform` with the formulas and the "Camera frames" table of the design.
     - Create `packages/web/src/view/scenic/model/camera.test.ts`: every frame of the table, for both viewport classes, maps its floor (or the whole house) inside the scene area; the wide house frame is the identity; the scales match the design within 0.01; the camera duration token in `scenic-tokens.css` is 700 ms.
     - Verify: `npm run check` exits `0`.
@@ -404,7 +404,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 8.1, 8.8, 19.2_
     - _Design: "scenic/model/camera.ts", "Camera frames"_
 
-  - [ ] 3.14 Checkpoint and PR 1c
+  - [x] 3.14 Checkpoint and PR 1c
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 1d, task 4.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1c`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1b -- . ':(exclude)package-lock.json'`.

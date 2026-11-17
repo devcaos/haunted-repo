@@ -820,6 +820,50 @@ describe("scenic imports and network (Requirements 22.10, 25.2 to 25.4)", () => 
   });
 });
 
+// Item 10 (Requirement 23.1): the pure model and the art have no DOM and no assets.
+const CSS_OR_URL_IMPORT =
+  /\b(?:from|import)\s*\(?\s*["'][^"']*(?:\.css(?:\?[^"']*)?|\?url)["']/;
+const pureScenicFiles = scenicTsFiles.filter(
+  (f) =>
+    f.path.startsWith(`${SCENIC_DIR}model/`) ||
+    f.path.startsWith(`${SCENIC_DIR}art/`),
+);
+
+describe("scenic model and art stay pure (Requirement 23.1)", () => {
+  it("scans the files of model/ and art/", () => {
+    expect(
+      pureScenicFiles.some((f) => f.path.startsWith(`${SCENIC_DIR}model/`)),
+    ).toBe(true);
+  });
+
+  it("they use no DOM name", () => {
+    expect(
+      pureScenicFiles
+        .filter((f) => DOM_NAMES.test(withoutComments(f.text)))
+        .map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("they import no CSS and no ?url asset", () => {
+    expect(offenders(pureScenicFiles, CSS_OR_URL_IMPORT)).toEqual([]);
+  });
+
+  it("self-check: the rules catch DOM names and asset imports", () => {
+    expect(
+      DOM_NAMES.test(withoutComments("const w = window.innerWidth;")),
+    ).toBe(true);
+    expect(DOM_NAMES.test(withoutComments("// the document is not used"))).toBe(
+      false,
+    );
+    expect(CSS_OR_URL_IMPORT.test('import "./a.css";')).toBe(true);
+    expect(CSS_OR_URL_IMPORT.test('import u from "./a.woff2?url";')).toBe(true);
+    expect(CSS_OR_URL_IMPORT.test('import("../styles/a.css?inline")')).toBe(
+      true,
+    );
+    expect(CSS_OR_URL_IMPORT.test('import { a } from "./b.js";')).toBe(false);
+  });
+});
+
 describe("gallery page (Requirement 25.8)", () => {
   it("follows the presentation rules when it exists", () => {
     expect(offenders(galleryFiles, STORAGE)).toEqual([]);
