@@ -254,7 +254,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 21.1, 21.2, 21.4, 21.5, 21.7_
     - _Design: "scenic/fonts.ts" row of "DOM modules", "Facts checked for this design" (Fontsource)_
 
-  - [ ] 2.9 Add the font credits and licence texts
+  - [x] 2.9 Add the font credits and licence texts
     - Create `packages/web/public/fonts/CREDITS.txt` (Creepster: Copyright (c) 2011, Font Diner, Inc; IM Fell English: Copyright (c) 2010, Igino Marini; both SIL Open Font Licence), `OFL-creepster.txt` and `OFL-im-fell-english.txt` (the upstream OFL texts, decision Q11).
     - Create `packages/web/src/view/scenic/fonts.test.ts` (`node:fs`): the three files exist; the credits name both fonts, both holders and the SIL Open Font Licence.
     - Verify: `npm run check` exits `0`; `npm run build` copies the three files into `packages/web/dist/fonts/`.
