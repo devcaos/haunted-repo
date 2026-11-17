@@ -126,7 +126,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.2, 4.3, 4.4, 4.5, 4.6, 4.11, 4.17_
     - _Design: "scenic/model/hudView.ts and scenic/model/grimoireView.ts", "scenic/model/renderMemory.ts"_
 
-  - [ ] 1.8 Property test for the HUD view
+  - [x] 1.8 Property test for the HUD view
     - **Property 9: The HUD view follows the ViewModel**
     - **Validates: Requirements 4.8, 4.10, 4.13, 4.14, 4.15, 4.16, 14.4**
     - Generator: `viewModelArb` (minimal until task 3.1), at least 100 runs. Checks `statusText`, `plaque.visible`, `plaque.submitEnabled`, `showSample`, `powerLine` and `warnings` exactly as in the design.

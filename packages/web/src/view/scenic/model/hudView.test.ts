@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
+import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { buildLiveHouse } from "../../../logic/houseView.js";
 import { createPage } from "../../../logic/page.js";
@@ -9,6 +10,7 @@ import type { ViewModel } from "../../../logic/viewModel.js";
 import { loadSample } from "../../../sample/sampleData.js";
 import { hudView } from "./hudView.js";
 import { meterScale } from "./renderMemory.js";
+import { viewModelArb } from "./viewModelArb.testutil.js";
 
 function readCommitted(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -128,5 +130,40 @@ describe("hudView", () => {
       live: { formVisible: false, busy: false },
     });
     expect(hidden.plaque.visible).toBe(false);
+  });
+});
+
+describe("hudView properties", () => {
+  // Feature: scenic-web, Property 9: The HUD view follows the ViewModel
+  // **Validates: Requirements 4.8, 4.10, 4.13, 4.14, 4.15, 4.16, 14.4**
+  it("Property 9: the HUD view follows the ViewModel", () => {
+    fc.assert(
+      fc.property(viewModelArb, (model) => {
+        const hud = hudView(model);
+        const listed = (type: string): boolean =>
+          model.available.some((entry) => entry.type === type);
+        expect(hud.statusText).toBe(
+          model.status.kind === "none" ? "" : model.status.text,
+        );
+        expect(hud.plaque.visible).toBe(model.live.formVisible);
+        expect(hud.plaque.submitEnabled).toBe(listed("submit-live"));
+        expect(hud.showSample).toBe(listed("show-sample"));
+        expect(hud.powerLine).toBe(model.house?.powerLine ?? null);
+        const warnings = model.house?.warnings ?? null;
+        if (
+          warnings === null ||
+          (warnings.lines.length === 0 && warnings.skippedTitle === null)
+        ) {
+          expect(hud.warnings).toBeNull();
+        } else {
+          expect(hud.warnings?.lines).toEqual(warnings.lines);
+          expect(hud.warnings?.skippedTitle).toBe(warnings.skippedTitle);
+          expect(hud.warnings?.skipped).toEqual(
+            warnings.skipped.map(({ path, reason }) => ({ path, reason })),
+          );
+        }
+      }),
+      { numRuns: 100 },
+    );
   });
 });
