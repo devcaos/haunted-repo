@@ -391,3 +391,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** (1) repetir la llamada después de que el Student volviera a elegir fantasma. (2) El Tutor lo tomó como `knowsJava: false` y lo dijo en voz alta. Los dos están como Low en `PLAN.md`.
 
 - **Estado:** abierto (sin cambiar la skill todavía).
+
+## 17 nov 2026: Kiro IDE no deja llamar a una herramienta sin cargarla antes
+- **Qué intentaba:** en la segunda ronda de la 11.1, llamar a `pick_ghost` justo después de `continue_house`.
+- **Qué pasó:** `Tool "...::pick_ghost" has not been loaded yet`. Hay que cargar el esquema de cada herramienta del Power (`load_resource`) antes de poder llamarla con `tool_call`; las otras herramientas también.
+- **Cómo lo rodeé:** cargar `send_event`, `judge_answer` y `pick_ghost` y repetir la llamada. No se perdió estado.
+- **Estado:** abierto. Es de Kiro IDE, no del Power, pero puede confundir al Student en la demo. Valorar si la skill debe decirlo (sin cambiar nada todavía).
