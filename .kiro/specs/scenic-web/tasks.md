@@ -560,7 +560,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.9, 1.10, 20.6, 20.7, 20.8, 20.9, 24.9_
     - _Design: "Size_Check (npm run size)"_
 
-  - [ ] 7.2 Property test for the Size_Check
+  - [x] 7.2 Property test for the Size_Check
     - **Property 18: The Size_Check fails exactly on budget or address problems**
     - **Validates: Requirements 20.7, 20.9**
     - Generator: lists of generated dist files (random names with extensions from the counted list, `.html`, `.txt` and `.map`; random gzipped sizes; texts that may contain `https://`, a protocol-relative `//` in `url(...)`, or the SVG namespace), at least 100 runs.

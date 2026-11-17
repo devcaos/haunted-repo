@@ -1,8 +1,11 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
+  COUNTED_EXTENSIONS,
   SIZE_LIMIT,
   checkDist,
   formatReport,
+  hasExternalAddress,
   MISSING_DIST_MESSAGE,
   type DistFile,
 } from "./distRules.js";
@@ -69,5 +72,49 @@ describe("checkDist (Requirements 1.9, 20.6 to 20.9, 24.9)", () => {
   it("does not scan JavaScript for addresses", () => {
     const js = 'fetch("https://api.github.com/x")';
     expect(checkDist([file("assets/a.js", 1, js)]).problems).toEqual([]);
+  });
+});
+
+describe("checkDist properties", () => {
+  const countedName = fc
+    .tuple(
+      fc.stringMatching(/^[a-z]{1,8}$/).filter((s) => s !== "gallery"),
+      fc.constantFrom(...COUNTED_EXTENSIONS, ".html", ".txt", ".map"),
+    )
+    .map(([stem, ext]) => `assets/${stem}${ext}`);
+  const text = fc.oneof(
+    fc.constant(undefined),
+    fc.constantFrom(
+      "plain text",
+      "see https://example.com/a",
+      "a{background:url(//cdn.example/a.png)}",
+      '<svg xmlns="http://www.w3.org/2000/svg"></svg>',
+    ),
+  );
+  const distFile = fc
+    .tuple(countedName, fc.integer({ min: 0, max: 120_000 }), text)
+    .map(([path, bytes, t]) => file(path, bytes, t));
+
+  // Feature: scenic-web, Property 18: The Size_Check fails exactly on budget or address problems
+  // **Validates: Requirements 20.7, 20.9**
+  it("fails exactly when over the budget or an address is found", () => {
+    fc.assert(
+      fc.property(fc.array(distFile, { maxLength: 12 }), (files) => {
+        const report = checkDist(files);
+        const total = files
+          .filter((f) => COUNTED_EXTENSIONS.some((e) => f.path.endsWith(e)))
+          .reduce((sum, f) => sum + f.gzipBytes, 0);
+        const overBudget = total >= SIZE_LIMIT;
+        const address = files.some(
+          (f) =>
+            /\.(?:html|css|svg)$/.test(f.path) &&
+            f.text !== undefined &&
+            hasExternalAddress(f.text),
+        );
+        expect(report.total).toBe(total);
+        expect(report.problems.length > 0).toBe(overBudget || address);
+      }),
+      { numRuns: 200 },
+    );
   });
 });
