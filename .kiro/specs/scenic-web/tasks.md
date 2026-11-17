@@ -552,7 +552,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~800 changed lines. Model: Auto.
   - _Design: "PR Split" row 1f, "Tooling"_
 
-  - [ ] 7.1 Add the pure Size_Check rules
+  - [x] 7.1 Add the pure Size_Check rules
     - Create `packages/web/src/tooling/distRules.ts` (no relative import, no Node import): move `hasExternalAddress` and `SVG_NAMESPACES` here from `source.test.ts`, which now imports them with its self-check cases unchanged; add `checkDist(files)` returning `{ total, limit: 307200, counted, problems }` and the report and missing-dist messages, by the rules of the design "Size_Check".
     - Create `packages/web/src/tooling/distRules.test.ts` with examples: the missing-dist message names `npm run build` (20.6); the report line prints the total and the 307,200-byte limit (20.8); exactly 307,200 bytes fails; a `gallery` file name or the `data-scenic-gallery` marker is a problem (24.9); `index.html` with `rel="stylesheet"` is a problem (1.9).
     - Verify: `npm run check` exits `0`.
