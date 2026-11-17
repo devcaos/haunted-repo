@@ -41,8 +41,9 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-16 | "Not yet" = opción 1: una explicación más simple y las preguntas repetidas una vez | Decidido por Luis Miguel. Necesita código, así que va en cola después del Power y necesita su spec. El motivo detallado no se anotó | Otras opciones de "Not yet" propuestas el 16 nov (no quedaron escritas) |
 | 2026-11-16 | Web multilingüe: solo idea de FUTURO. No antes del 4 dic. Se menciona en el README y en Devpost con una sola línea | Decidido por Luis Miguel. Traducir la web y el Tutor no cabe antes de la entrega | Hacerla multilingüe en esta versión |
 | 2026-11-16 | Presentarse como estudiante individual (Best Student Project) | El organizador confirmó en el foro de Devpost que un ciclo de FP en un centro reconocido cuenta. Hay que añadir LinkedIn, correo de estudiante, curso y titulación, y nombre del centro. Pueden pedir prueba de matrícula | — |
-
 | 2026-11-17 | Eslogan: "Your repo is haunted. Let's fix that." | Decidido por el director el 17 nov. El director eligió "Let's fix that." porque es una redacción propia y segura, sin cita directa de una película. El riesgo de marca de terceros en las reglas del concurso no se comprobó, así que se evitó. | "Your repo is haunted. Who you gonna call?" (ver "Rechazado") |
+| 2026-11-17 | For the Scenic_Renderer, scenic-web Requirements 3, 5, 21 and 22 replace web-demo 11.1, 11.2, 11.4, 11.6 and the drawing/animation line of its Out of Scope; those web-demo rules keep binding the Simple_Renderer only | Decided by the director on 16-17 Nov (animated SVG view) | Editing the web-demo spec to say Simple_Renderer |
+
 ## Rechazado (no volver a proponer sin evidencia nueva)
 
 | Fecha | Propuesta | Quién la hizo | Por qué no |
