@@ -60,14 +60,14 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~850 changed lines. Model: Auto.
   - _Design: "PR Split" row 1a_
 
-  - [ ] 1.1 Create the branch from an up-to-date main
+  - [x] 1.1 Create the branch from an up-to-date main
     - Check that the pull request "docs(scenic-web): tasks" (branch `feat/scenic-web-tasks`, which commits `tasks.md` and `tasks.meta.json` if it exists) is merged into `main`.
     - Run `git switch main`, then `git pull --ff-only`, then check that `git status --short` prints nothing.
     - Run `git switch -c feat/scenic-web-1a`.
     - This task makes no commit of its own. It is marked `[x]` in the commit of task 1.2.
     - _Requirements: none (git workflow)_
 
-  - [ ] 1.2 Add the View_Choice with the dark-launch rule
+  - [x] 1.2 Add the View_Choice with the dark-launch rule
     - Create `packages/web/src/viewChoice.ts`: `ViewName` and `chooseView(search)`. During the dark launch it returns `"scenic"` only when `new URLSearchParams(search).get("view") === "scenic"`, and `"simple"` otherwise. It reads only the query string, never changes the address and stores nothing.
     - Create `packages/web/src/viewChoice.test.ts` with examples of the interim rule: no `view` gives `"simple"`; `?view=scenic` gives `"scenic"`; `?view=SCENIC` and `?view=` give `"simple"`; `?view=scenic&view=simple` gives `"scenic"`; `?view=simple&view=scenic` gives `"simple"`; a hash and other parameters do not change the choice.
     - Verify: `npm run check` exits `0`.
