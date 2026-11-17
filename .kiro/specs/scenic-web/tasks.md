@@ -300,7 +300,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.3, 5.5_
     - _Design: "scenic/model/sceneLayout.ts (Scene_Layout)", "World geometry", "Slot layout rule"_
 
-  - [ ] 3.4 Add `sceneLayout`
+  - [x] 3.4 Add `sceneLayout`
     - In `sceneLayout.ts` add `sceneLayout(model)` with every rule of the design: slots by position, Variant `index % 5`, one `ghostScale` per floor, empty and dimmed floors, floor buttons, back button, Nameplates and empty line (Floor_Scene only), start controls (first Card of a repeated path), Telephone_Target in floor order then report order, Finale, heading, frame, close-up.
     - Extend `sceneLayout.test.ts` with examples: headings for house, `house` null (`TEXTS.pageTitle`), floor and ghost (3.8, 8.12, D1); a repeated path gives the first Card the start control and the Telephone_Target (23.9); the close-up falls back to Variant 0 when no Card matches; the close-up Ghost_Type follows `ghost.floor` (5.5).
     - Verify: `npm run check` exits `0`.
