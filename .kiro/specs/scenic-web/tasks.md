@@ -179,7 +179,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 2. PR 1b — Tokens, base and HUD CSS, fonts, Source_Scan rules
+- [x] 2. PR 1b — Tokens, base and HUD CSS, fonts, Source_Scan rules
   - Branch: `feat/scenic-web-1b`. Stacks on: `feat/scenic-web-1a`.
   - Estimate: ~880 changed lines. Model: Auto.
   - _Design: "PR Split" row 1b_
@@ -262,7 +262,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 21.8_
     - _Design: "Folder layout" (public/fonts), "Facts checked for this design" (IM Fell English licence)_
 
-  - [ ] 2.10 Checkpoint and PR 1b
+  - [x] 2.10 Checkpoint and PR 1b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 1c, task 3.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1a -- . ':(exclude)package-lock.json' ':(exclude)packages/web/public/fonts/OFL-*.txt'`.
