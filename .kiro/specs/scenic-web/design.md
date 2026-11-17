@@ -20,12 +20,12 @@ Key decisions:
 
 | Fact | Where | Effect |
 | --- | --- | --- |
-| `page.ts` builds `available` by walking `house.floors` (attic, middle floor, basement) and pushes `start-ghost` in that order | `src/logic/page.ts`, `available()` | The ViewModel does not carry report order across floors. Telephone_Target uses floor order, then report order inside a floor (open question Q3). |
+| `page.ts` builds `available` by walking `house.floors` (attic, middle floor, basement) and pushes `start-ghost` in that order | `src/logic/page.ts`, `available()` | The ViewModel does not carry report order across floors. Telephone_Target uses floor order, then report order inside a floor (decision Q3, Requirement 23.6). |
 | `FloorView.ghosts` holds only that floor's Cards, in report order | `houseView.ts`, `buildFloors` | A Card's Variant is its index in `house.floors[i].ghosts`. |
 | `ghostActions` gives no navigation action in the Ghost_Scene | `src/logic/exorcism.ts` | No floor button, back button or start control in the Ghost_Scene. |
 | `focusAfterRender(prev, next, before)` returns `keep`, `ghost-heading`, `list-heading` or `key` | `src/view/simple/focus.ts` | Moved unchanged to `src/view/shared/focus.ts`; the scenic rule wraps it. |
 | Core's client aborts each request after 10 s (`AbortSignal.timeout(10_000)`) and sends `X-GitHub-Api-Version` | `githubClient.ts` | The Shots_Script must take the "busy" shot within 10 s of holding the request; the header causes a CORS preflight that the script answers. |
-| `reportArb` builds `fc.array(ghostArb)` with no maximum of 5 | `reportArb.testutil.ts` | Generators cap each floor at 5 Cards where a property needs it (open question Q4). |
+| `reportArb` builds `fc.array(ghostArb)` with no maximum of 5 | `reportArb.testutil.ts` | Generators cap each floor at 5 Cards where a property needs it (decision Q4). |
 | The strict fake GitHub has no imports and only erasable TypeScript | `fakeGitHub.testutil.ts` | Node 24 runs it directly from the Shots_Script with a `.ts` import. |
 | Vitest includes only `packages/*/src/**/*.test.ts` | `vitest.config.ts` | Pure tooling code goes in `packages/web/src/tooling/` so its tests run; the scripts in `packages/web/scripts/` stay thin. |
 | Test files in `src/` reference Node types, so Node's global `setTimeout` type is in the web `tsc` program | `source.test.ts`, `focus.test.ts` | Scenic code calls `window.setTimeout` and stores a `number`. |
@@ -180,7 +180,7 @@ entry.then(
 - `src/view/scenic/entry.ts` imports the scenic CSS files, calls `loadScenicFonts()` and exports `createRenderer = createScenicRenderer`.
 - Vite turns each `import()` into its own chunk and moves the CSS of that chunk into its own CSS file, linked only when the chunk loads. `main.ts` imports no CSS, so `dist/index.html` links no stylesheet. The Size_Check fails if it ever does (guard for Requirements 1.9 and 1.10).
 - `index.html` gets `<meta name="color-scheme" content="dark">`, so the browser paints a dark canvas before a renderer's CSS arrives. This is not a CSS rule, so neither renderer leaks styles into the other.
-- **Dark launch (director decision, open question Q14).** In stages 1 to 3 `chooseView` returns `"scenic"` only for `?view=scenic` and the Simple_Renderer stays the default, so `main` never shows a half-built scene. Stage 4 switches to the rule above (Requirement 1) in one small commit. The Scenic_View_Link of the Simple_Renderer points to `?view=scenic` until then, and to `./` afterwards.
+- **Dark launch (director decision Q14).** In stages 1 to 3 `chooseView` returns `"scenic"` only for `?view=scenic` and the Simple_Renderer stays the default, so `main` never shows a half-built scene. PR 4b switches to the rule above (Requirement 1) in one small commit. The Scenic_View_Link of the Simple_Renderer points to `?view=scenic` until then, and to `./` afterwards.
 
 ### Purely visual state of the Scenic_Renderer
 
@@ -190,7 +190,7 @@ Everything below lives in the `createScenicRenderer` closure. None of it is stor
 | --- | --- | --- | --- |
 | `guard` (last model) | `ActionGuard` | every `render` | dispatch only actions in Available_Actions (2.7, 2.8) |
 | `memory` | `VisualMemory` | `nextMemory` in every render | Haunt_Meter values of the last list render, Exorcised_Moments of this Ghost_Scene visit, Finale animation, previous model |
-| `phone` | `PhoneState` | `phoneStep` | Opening_Rings, 20 s Rings, ring after Return_Glow, Live_Call, "answered once" flag |
+| `phone` | `PhoneState` | `phoneStep` | Opening_Rings, 20 s Rings, ring after Return_Glow, Live_Call, "started once" flag |
 | `phoneTimer`, `ringTimer` | `number \| null` | phone effects | `setTimeout` handles |
 | `phoneBubble` | `string \| null` | Answer_Button | caller's words or "The line is quiet." until the next Scene change or activation (9.11) |
 | `intro` | `"pending" \| "playing" \| "done"` | first House_Scene render, any input, timer | Intro and the start of the Opening_Rings (D13) |
@@ -294,7 +294,7 @@ Rules:
 - **Slots:** for each `house.floors[i]` with `n` Cards, `slotRects(floor, n)[j]` is the rectangle of Card `j` (rule in "Data Models", slot layout). Placement is by position, so repeated paths still give one slot each (Requirement 23.2 edge case).
 - **Variant:** `index % 5`. It reads nothing else from the Card (Requirements 5.8, 5.10).
 - **Start controls:** only when `scene.kind === "floor"`, only for Cards of `scene.floor` with `canStart`, and for a repeated path only the first Card (Requirement 23.9).
-- **Telephone_Target:** the first Card with `canStart`, walking `house.floors` in order and each floor in report order; `null` when `house` is `null` or none (Requirement 23.6 as amended by Q3).
+- **Telephone_Target:** the first Card with `canStart`, walking `house.floors` in order and each floor in report order; `null` when `house` is `null` or none (Requirement 23.6).
 - **Finale:** `house !== null && house.source === "sample" && no Card is "haunted" && some Card is "exorcised" && scene.kind !== "ghost"` (Requirement 13.1).
 - **Heading:** `TEXTS.houseHeading(house.repoName)` in the House_Scene, `TEXTS.pageTitle` when `house` is `null`, the focused floor's `title` in a Floor_Scene, `TEXTS.ghostHeading(ghost.path)` in the Ghost_Scene.
 - **Close-up:** the Ghost_Type of `ghost.floor` and the Variant of the first Card of that floor with `path === ghost.path` (Requirement 5.11); Variant 0 if no Card matches.
@@ -360,6 +360,7 @@ export type PhoneEvent =
   | { type: "ring-ended" }
   | { type: "wait-ended" }
   | { type: "answered" }
+  | { type: "ghost-started" }        // any start-ghost was dispatched, whatever control sent it (Answer_Button or start button)
   | { type: "exorcised-moment" }
   | { type: "return-glow-ended" };
 export type PhoneEffect =
@@ -370,7 +371,7 @@ export type PhoneEffect =
   | { type: "cancel-wait" };
 export interface PhoneState {
   mode: "before-start" | "idle" | "ringing" | "live-call";
-  answered: boolean;                 // Answer_Button used at least once in this load
+  started: boolean;                  // a start-ghost was dispatched or the Answer_Button was used, at least once in this load (9.3, 9.4)
   exorcisedSinceRing: boolean;
   last: PhoneInputs | null;
 }
@@ -382,11 +383,11 @@ export function callWaiting(state: PhoneState): boolean; // accessible name suff
 stateDiagram-v2
   [*] --> BeforeStart
   BeforeStart --> Ringing: intro-ended, sample, target (ring x3)
-  BeforeStart --> Idle: intro-ended, no target (wait 20 s if not answered)
-  Ringing --> Idle: ring-ended (wait 20 s if not answered)
-  Idle --> Ringing: wait-ended, not answered, sample, target, scene not ghost (ring x1)
+  BeforeStart --> Idle: intro-ended, no target (wait 20 s if not started)
+  Ringing --> Idle: ring-ended (wait 20 s if not started)
+  Idle --> Ringing: wait-ended, not started, sample, target, scene not ghost (ring x1)
   Idle --> Idle: wait-ended, no target or ghost scene (wait 20 s again)
-  Idle --> Ringing: return-glow-ended, answered, exorcised since last Ring, target (ring x1)
+  Idle --> Ringing: return-glow-ended, started, exorcised since last Ring, target (ring x1)
   Idle --> LiveCall: render live + done after busy
   Ringing --> LiveCall: render live + done after busy
   LiveCall --> Idle: answered, other report, status error or busy
@@ -394,6 +395,8 @@ stateDiagram-v2
 ```
 
 `callWaiting` is true when the last inputs have `source === "sample"` and a target, or the mode is `live-call`.
+
+The renderer sends `ghost-started` whenever it dispatches a `start-ghost`, from the Answer_Button or from a Nameplate start button, so the 20 s Rings stop after the first start of the page load, whatever started it (decision Q17). The post-exorcism Ring of 9.4 uses the same `started` flag. `answered` still yields `stop` and also sets `started`.
 
 ### `scenic/model/lightningClock.ts`
 
@@ -405,10 +408,11 @@ export function nextFlashDelay(random: number): number; // FLASH_MIN_MS + Math.f
 export function flashAllowed(input: {
   toggleOn: boolean; reducedMotion: boolean;
   scene: "house" | "floor" | "ghost"; introPlaying: boolean; finale: boolean;
-}): boolean; // toggleOn && !reducedMotion && scene !== "ghost" && !introPlaying && !finale (D7, D8)
+  ringPlaying: boolean; exorcisedMomentPlaying: boolean;
+}): boolean; // toggleOn && !reducedMotion && scene !== "ghost" && !introPlaying && !finale && !ringPlaying && !exorcisedMomentPlaying (D7, D8, Q7)
 ```
 
-The renderer schedules the next due time from the previous due time (`due + nextFlashDelay(Math.random())`), never from a render (15.1). A due flash that is not allowed is skipped and the next one is scheduled (15.2).
+The renderer schedules the next due time from the previous due time (`due + nextFlashDelay(Math.random())`), never from a render (15.1). A due flash that is not allowed, including one that falls during a Ring or an Exorcised_Moment, is skipped and the next one is scheduled (15.2, decision Q7).
 
 ### `scenic/model/reactions.ts`
 
@@ -530,14 +534,13 @@ export function mountShape(node: ShapeNode, idPrefix: string): SVGElement;
 | `motion.ts` | `watchMedia(query, onChange)` for `(prefers-reduced-motion: reduce)` and `WIDE_QUERY` | Applies changes within the same task (18.9). |
 | `fonts.ts` | `loadScenicFonts()` | `new FontFace(family, \`url("${url}") format("woff2")\`, { weight: "400", style: "normal", display: "swap" })`, `document.fonts.add(face)`, `face.load().catch(() => undefined)`. A failed font only leaves the fallback stack (21.7). |
 
-The shell, in document order (this is also the tab order of Requirement 17):
+The shell, in document order (this is also the tab order of Requirement 17, with the footer last):
 
 ```html
 <div class="scenic" data-scene="house">
   <header class="hud-top">h1 logo, p tagline, Haunt_Meter, Ghost_Icons, Lightning_Toggle (+ reason), Simple_View_Link</header>
   <aside class="hud-side">Live_Plaque form, p.status (role=status, aria-live=polite), show-sample button,
     p.power-line, div.report-warnings, section.bestiary</aside>
-  <footer class="hud-foot">Licence_Notice</footer>
   <p class="announcer" aria-live="polite"></p>                       (Scenic_Announcer, visually hidden)
   <main class="stage" data-scene data-floor>
     <div class="scene-bar">h2.scene-heading, button "Back to the house"</div>
@@ -548,6 +551,7 @@ The shell, in document order (this is also the tab order of Requirement 17):
     <div class="finale-banner" hidden></div>
     <div class="room" hidden> svg.room + section.grimoire </div>
   </main>
+  <footer class="hud-foot">Licence_Notice</footer>                  (last in the DOM, drawn bottom left on wide screens by grid areas)
 </div>
 ```
 
@@ -757,7 +761,7 @@ Role tokens (also in the tokens file, all `var(...)` of the palette): `--sc-text
 
 Opacity tokens: `--sc-depth-cloud: 0.35`, `--sc-depth-hill-far: 0.45`, `--sc-depth-hill-near: 1`, `--sc-rim-opacity: 0.6`, `--sc-fg-rim-opacity: 0.35`, `--sc-dim: 0.65`, `--sc-rain: 0.35`, `--sc-rain-still: 0.25`, `--sc-fog: 0.4`, `--sc-fog-still: 0.35`, `--sc-locked: 0.45`.
 
-Colour meaning: cold blue means code you do not understand yet (Haunted glow, unlit windows, Haunt_Meter fill, cold room light). Warm orange means code that is yours (lit windows, Exorcised candle, warm room light, the Ghost_Icon of an Exorcised ghost). The Chained_Brute's Pumpkin eyes are an accent required by Requirement 5.3, not a meaning (open question Q30).
+Colour meaning: cold blue means code you do not understand yet (Haunted glow, unlit windows, Haunt_Meter fill, cold room light). Warm orange means code that is yours (lit windows, Exorcised candle, warm room light, the Ghost_Icon of an Exorcised ghost). The Chained_Brute's Pumpkin eyes are an accent required by Requirement 5.3, not a meaning (decision Q30).
 
 ### Depth layers (back to front)
 
@@ -840,7 +844,7 @@ Creepster is used only by `.hud-logo` and `.hud-tagline`; IM Fell English by eve
 ### Game-feel rules
 
 1. **Every action answers within 100 ms.** Buttons get a pressed look on `:active` (transform 80 ms); the Logic_Layer renders synchronously inside `dispatch`, so the new state is on screen in the same frame; Reactions start in that render.
-2. **One eye-catching anomaly at a time.** Anomalies are the Intro, a Ring, the Live_Call, the Search_Beam, the Exorcised_Moment, the Return_Glow and the Finale change. They are queued: the Opening_Rings start after the Intro (D13); the Ring after an exorcism starts after the Return_Glow (9.4); the Finale change starts after a Return_Glow of the same render (animation delay of 0.8 s). Rain, fog, idle animations and Lightning are ambience, not anomalies (open question Q7).
+2. **One eye-catching anomaly at a time.** Anomalies are the Intro, a Ring, the Live_Call, the Search_Beam, the Exorcised_Moment, the Return_Glow and the Finale change. They are queued: the Opening_Rings start after the Intro (D13); the Ring after an exorcism starts after the Return_Glow (9.4); the Finale change starts after a Return_Glow of the same render (animation delay of 0.8 s; a delayed start still counts as shown, decision Q8). Rain, fog, idle animations and Lightning are ambience, not anomalies; a flash that falls due during a Ring or an Exorcised_Moment is skipped and counting goes on (decision Q7).
 3. **At least 40 % deep shadow** in every Scene (see composition).
 4. **Nothing symmetric** (see composition).
 5. **One main light per scene:** the moon outside, the window light in the room.
@@ -913,11 +917,11 @@ Notes:
 
 | Scene | Order |
 | --- | --- |
-| House | HUD (Lightning_Toggle, Simple_View_Link, Live_Plaque field and button, `show-sample` button if shown, Bestiary button on narrow screens, Licence_Notice link) → Answer_Button → floor buttons (attic, middle floor, basement) (17.4) |
-| Floor | HUD → "Back to the house" → Answer_Button (pinned or docked) → floor buttons of the dimmed floors → start buttons of the focused floor in report order (17.5) |
-| Ghost | HUD (Lightning_Toggle, Simple_View_Link, Bestiary button, Licence_Notice link of the footer) → Grimoire heading (focus target only) → Answer_Box → ghost-action buttons → Code_Block (`tabindex="0"`) → Licence_Notice link of the Grimoire (17.6) |
+| House | HUD (Lightning_Toggle, Simple_View_Link, Live_Plaque field and button, `show-sample` button if shown, Bestiary button on narrow screens) → Answer_Button → floor buttons (attic, middle floor, basement) → Licence_Notice link of the footer (17.4) |
+| Floor | HUD → "Back to the house" → Answer_Button (pinned or docked) → floor buttons of the dimmed floors → start buttons of the focused floor in report order → Licence_Notice link of the footer (17.5) |
+| Ghost | HUD (Lightning_Toggle, Simple_View_Link, Bestiary button) → Grimoire heading (focus target only) → Answer_Box → ghost-action buttons → Code_Block (`tabindex="0"`) → Licence_Notice link of the Grimoire → Licence_Notice link of the footer (17.6) |
 
-The HUD footer comes before the stage in the DOM because Requirement 17.4 puts every HUD control before the scene. On wide screens the footer is drawn at the bottom left, so its visual place and its tab place differ (open question Q16).
+The HUD footer is the last element of the shell in the DOM, so its Licence_Notice link is the last Tab stop in every Scene, as Requirements 17.4 to 17.6 say (decision Q16). On wide screens it is drawn at the bottom left and on narrow screens under the stage, so tab order follows visual order. Grid areas, not DOM order, place the footer.
 
 ### Accessible names
 
@@ -1013,19 +1017,19 @@ The house's loops are paused in the Ghost_Scene, Bestiary drawings are still, cl
 
 ### Shots_Script (`npm run shots`)
 
-- Dependency: `playwright` **1.65.1** (exact), root `devDependencies`, `package-lock.json` updated in the same commit (24.2). The browser is installed by hand once: `npx playwright install chromium`. No `@playwright/browser-chromium` helper is added, so `npm ci` (CI and deploy) never downloads a browser.
+- Dependency: `playwright` **1.65.1** (exact), root `devDependencies`, `package-lock.json` updated in the same commit (24.2). The browser is installed by hand once: `npx playwright install chromium`. No `@playwright/browser-chromium` helper is added, so `npm ci` (CI, the deploy job and the director's machine) never downloads a browser. Browsers are installed only by hand with `npx playwright install chromium`; the command is documented for the director in the PR 1f body and in the message the script prints when Chromium is missing (decision Q27).
 - Root script (D12): `"shots": "npm run build -w @haunted-repo/core && npm run build -w @haunted-repo/web && node packages/web/scripts/shots.ts"`. The build always runs first, so screenshots never show an old `dist/`. If the script is started directly and `dist/` is missing, it stops with a message that names `npm run build`.
 - Files: `packages/web/scripts/shots.ts` (Playwright and servers) and `packages/web/src/tooling/shotList.ts` (pure: states, sizes, file names; tested).
 - **Servers, in process.** `preview({ root: webDir, configFile, preview: { port: 4179, strictPort: true } })` for the built page and `createServer({ root: webDir, configFile, server: { port: 5179, strictPort: true } })` plus `listen()` for the Gallery. Both run inside the script's own Node process. A `try/finally` closes the browser, `devServer.close()` and the preview `httpServer` (`closeAllConnections()` then `close()`), on success and on failure; a `SIGINT` handler runs the same cleanup. No child server process exists, so nothing is left running on Windows (24.15).
 - **No real GitHub, no network.** `context.route` handles every request whose origin is not `http://localhost:4179` or `http://localhost:5179`:
   - `https://api.github.com/...`: `OPTIONS` gets 204 with `Access-Control-Allow-Origin: *`, `Access-Control-Allow-Methods: GET`, `Access-Control-Allow-Headers: accept, x-github-api-version` (what GitHub answered in the web-demo check). Other requests go to Core's strict fake `createFakeGitHub([{ owner: "lukeed", repo: "sirv", files: texts }])`, where `texts` comes from the committed `src/sample/files.json`. The handler adds `User-Agent: playwright-shots` only when the browser's request headers lack one, as `fakeDetect.testutil.ts` does, and fulfils with the fake's status, headers and body plus `Access-Control-Allow-Origin: *` and `Access-Control-Expose-Headers: x-ratelimit-remaining, x-ratelimit-reset, retry-after`.
   - Any other address: `route.abort()`.
-  - For `14-live-busy` the handler waits on a promise before answering; the script takes the shot and then resolves it. Core aborts after 10 s, so the hold is always shorter (open question Q21).
+  - For `14-live-busy` the handler waits on a promise before answering; the script takes the shot and then resolves it. Core aborts after 10 s, so the hold is always shorter (decision Q21).
 - **Flow per viewport** (one browser context per size; `reducedMotion: "no-preference"`): open `/haunted-repo/?view=scenic` (stage 4: `/haunted-repo/`), press `Shift` once to end the Intro, activate the Lightning_Toggle (off), wait for the Opening_Rings to end, then: house; attic, middle floor, basement; attic; start `bench/static.js`: explaining; Continue: asking; I don't know (`10`), Continue; Show the model answer + Missed it (`09`); Show + Partly (`08`); Show + Missed it on question 3: failed (`11`); Try again, Continue, Show + Got it (`07`); Show + Got it twice: self-check and Exorcised_Moment (`12`); Yes; start `builder.js`, exorcise it the same way, Yes: Finale (`13`); type `https://github.com/lukeed/sirv` in the Live_Plaque, hold the request: busy (`14`); release: live report (`15`). Then a second context with `reducedMotion: "reduce"` for `16` to `18`, and the Gallery page for `19`.
 - **Stable frames.** Before each shot the script waits until no finite animation or transition is running (`page.waitForFunction` over `document.getAnimations()`), runs the checks below, then calls `page.screenshot({ path, animations: "disabled" })`, which ends finite animations and resets loops to their first frame (24.6).
 - **Checks in every captured state.** Required: at most 15 `document.getAnimations()` with `playState === "running"` (20.4); for every element whose computed `filter` is not `none` or that has a `filter` attribute, `el.getAnimations({ subtree: true }).length === 0` (20.2). Reported as warnings: any `svg` without `aria-hidden="true"`, any focusable element inside an `svg`, any button or non-inline link smaller than 44 × 44, horizontal page scroll at 390 px.
 - **Timeouts and errors** (24.13): `page.setDefaultTimeout(10_000)`; every step runs in `step(name, fn)`, which on failure prints `Shots failed at step "<name>": <message>`, runs the cleanup and exits 1. PNG files already written stay. A missing Chromium prints `Chromium for Playwright is not installed. Run: npx playwright install chromium`.
-- **End** (24.12): the script prints `Wrote 38 PNG files to packages/web/shots/` and exits 0 when every shot was saved and every required check passed; it exits 1 when a required check failed, after writing all files (open question Q13).
+- **End** (24.12): the script prints `Wrote 38 PNG files to packages/web/shots/` and exits 0 when every shot was saved and every required check passed; it exits 1 when a required check failed, after writing all files (Requirement 24.12 as amended, decision Q13).
 - `packages/web/shots/` is added to `.gitignore` and `.prettierignore`; ESLint only lints JavaScript and TypeScript, so PNG files never affect `npm run lint` (24 edge case).
 
 ### Gallery (dev only)
@@ -1082,7 +1086,7 @@ Generator: `viewModelArb` with `maxPerFloor: 5`, and a mapper that rewrites the 
 
 *For any* ViewModel built from `uniquePathReportArb` with a non-null `house`, `telephoneTarget` is the path of the first Card with `canStart` true, walking `house.floors` in order and each floor in report order, or `null` when there is none; when it is not `null`, `{ type: "start-ghost", path: telephoneTarget }` is in `available`. When `house` is `null`, it is `null`.
 
-**Validates: Requirements 9.9, 23.6** (with the floor-order reading of open question Q3)
+**Validates: Requirements 9.9, 23.6** (floor order, then report order inside each floor)
 
 ### Property 6: The Finale depends only on the current ViewModel
 
@@ -1140,9 +1144,9 @@ Generator: `viewModelArb`, biased so that about a third of the sample houses hav
 
 **Validates: Requirements 11.2, 11.3, 11.4, 11.5, 11.7**
 
-### Property 15: After the first answer the Telephone rings only for an exorcism
+### Property 15: After the first start the Telephone rings only for an exorcism
 
-*For any* sequence of `PhoneEvent` values (renders with random inputs, timer ends, answers, exorcised moments, return-glow ends): before the first `answered`, a `wait-ended` gives a one-Ring effect exactly when the last inputs have `source` `"sample"`, a target and a scene other than `"ghost"`; after the first `answered`, every one-Ring effect follows a `return-glow-ended` that had an `exorcised-moment` since the previous Ring and a target, and there is at most one such Ring per `return-glow-ended`; an `answered` event always yields `stop`.
+*For any* sequence of `PhoneEvent` values (renders with random inputs, timer ends, answers, ghost starts, exorcised moments, return-glow ends): before the first `answered` or `ghost-started`, a `wait-ended` gives a one-Ring effect exactly when the last inputs have `source` `"sample"`, a target and a scene other than `"ghost"`; after the first `answered` or `ghost-started`, no `wait-ended` gives a Ring and every one-Ring effect follows a `return-glow-ended` that had an `exorcised-moment` since the previous Ring and a target, and there is at most one such Ring per `return-glow-ended`; an `answered` event always yields `stop`.
 
 **Validates: Requirements 9.3, 9.4, 9.12**
 
@@ -1180,7 +1184,7 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 | The element with focus is removed, hidden or made inert | The safety net focuses the Scene_Heading before `render` returns (17.9). |
 | Reduced_Motion changes while open | `motion.ts` updates the state at once: one-shots jump to their end, loops stop through the media query, Lightning stops and its toggle is disabled (18.9, 15.9). |
 | The viewport crosses the 64rem breakpoint | The Camera is recomputed for the new viewport class without animation. |
-| More than 5 Cards on a floor (not produced by Core) | Slots still fit (thinner cells), Variants repeat modulo 5 (open question Q4). |
+| More than 5 Cards on a floor (not produced by Core) | Slots still fit (thinner cells), Variants repeat modulo 5 (decision Q4). |
 | Live analysis errors | The Logic_Layer's status texts are shown in the Status_Region; the Search_Beam stops when `live.busy` is false; no Live_Call starts. |
 | Size_Check: `dist/` missing, over budget, external address, Gallery code in `dist/`, stylesheet linked from `index.html` | Clear message, exit 1. |
 | Shots_Script: Chromium missing, port busy, step timeout, required check failed | Message naming the cause or step, both servers and the browser closed, PNG files kept, exit 1. |
@@ -1204,8 +1208,8 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 | `src/view/scenic/model/sceneLayout.test.ts` | P1 to P8; unit tests: 23.9 (repeated path, first wins), headings (3.8, 8.12, D1), close-up Variant fallback, Ghost_Type per floor (5.5). |
 | `src/view/scenic/model/camera.test.ts` | Every frame of the table, for both viewport classes, maps its floor (or the whole house) inside the scene area (8.1, 8.8, 3.1, 19.2 geometry); identity on the wide house frame; the camera duration token is 700 ms (8.1). |
 | `src/view/scenic/model/renderMemory.test.ts` | P10, P11; examples: "Show the sample again" with exorcised Cards shows them lit without a moment or meter move (12 edge case), "Not yet" keeps the Card Exorcised and still gives a Return_Glow. |
-| `src/view/scenic/model/phoneBell.test.ts` | P15; examples for 9.2 (Opening_Rings after `intro-ended`), 9.5 (Live_Call starts on busy → done with a live report; stops on answer, other report, error or busy; not on Scene changes), 9.12, 9.14 (`callWaiting`), first render without target (no Opening_Rings). |
-| `src/view/scenic/model/lightningClock.test.ts` | P16; `flashAllowed` table (15.2, 18.5, D7, D8). |
+| `src/view/scenic/model/phoneBell.test.ts` | P15; examples for 9.2 (Opening_Rings after `intro-ended`), 9.3 (the 20 s Rings stop after a `ghost-started` that did not come from the Answer_Button), 9.5 (Live_Call starts on busy → done with a live report; stops on answer, other report, error or busy; not on Scene changes), 9.12, 9.14 (`callWaiting`), first render without target (no Opening_Rings). |
+| `src/view/scenic/model/lightningClock.test.ts` | P16; `flashAllowed` table (15.2, 18.5, D7, D8, Ring and Exorcised_Moment skips). |
 | `src/view/scenic/model/reactions.test.ts` | P14; `reactionFor` (only `rate` and `dont-know`), `vigourAfterRender` reset on entering `failed` (11.6), `REACTION_MS` all ≤ 1000 (11.10). |
 | `src/view/scenic/model/scenicFocus.test.ts` | Real controller (as `focus.test.ts`): house → floor gives the Scene_Heading; ghost → floor after `leave-ghost` gives `start-ghost:<path>`; after an exorcism gives the Scene_Heading; transition `null` delegates to `focusAfterRender` (17.7, 17.8). |
 | `src/view/scenic/model/hudView.test.ts` | P9; logo and tagline (4.2), licence (4.11), toggle texts and `aria-pressed` values for on, off and Reduced_Motion (15.5, 15.9). |
@@ -1271,7 +1275,7 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 
 ## PR Split
 
-`git-workflow.md` asks for a warning above about 500 changed lines and a proposal to split. The whole spec is about **10,000 changed lines** (excluding `package-lock.json` and the two copied OFL texts of about 95 lines each). Four PRs of at most about 900 lines would hold only about 3,600, so the four stages the director asked for cannot each be one PR within that limit. The proposal keeps the four stages, in the requested order, and makes each stage a stack of PRs of at most about 900 lines, merged in order with "Create a merge commit", as for web-demo (decision of 14 Nov). The other option is four PRs of about 1,000 to 5,100 lines each (open question Q1).
+`git-workflow.md` asks for a warning above about 500 changed lines and a proposal to split. The whole spec is about **10,000 changed lines** (excluding `package-lock.json` and the two copied OFL texts of about 95 lines each). Four PRs of at most about 900 lines would hold only about 3,600, so the four stages the director asked for cannot each be one PR within that limit. The split keeps the four stages, in the requested order, and makes each stage a stack of PRs of at most about 900 lines, merged in order with "Create a merge commit", as for web-demo (decision of 14 Nov). The director chose this split (decision Q1): 13 stacked PRs, 1a to 4b, merged in order. Reviews happen per stage, not per PR.
 
 | Stage | PR (branch) | Content | Estimate | Breakdown |
 | --- | --- | --- | --- | --- |
@@ -1295,6 +1299,10 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 
 Every PR body carries the size warning and the line count measured with `git diff --shortstat` (lockfile excluded). Tests are never cut to fit.
 
+**Model note for the tasks:** PRs 1d, 1e, 2a, 2c and 3a (art and the trickiest state) are built with Opus; the others may use Auto.
+
+**Time check:** if stage 2 is not merged by 23 Nov 2026, apply cuts 1 to 3 of the Cut List at once (the director already agreed). Cut 4 still needs a new decision.
+
 ### Requirements per stage
 
 | Stage | Fully met at the end of the stage | Partly met (finished later) |
@@ -1304,7 +1312,7 @@ Every PR body carries the size warning and the line count measured with `git dif
 | 3 | 9.4, 10, 11, 12 | 4 (Lightning_Toggle of 4.12 comes in 4a); 18; 24 (adds `05` to `12`, `18`) |
 | 4 | 1, 4, 13, 14, 15, 16, 17, 18, 19, 24 (all 38 files), 25 | — |
 
-**Point for the director:** Requirements 24.4 (18 states), 24.8 (3 × 5 × 3 Gallery) and 24.12 (exit 0 only when every shot is saved) are fully met only after stage 4. In stages 1 to 3, `shotList.ts` lists only the states that exist, and each PR body lists the shots it adds (open question Q2).
+**Accepted by the director (decision Q2):** Requirements 24.4 (18 states), 24.8 (3 × 5 × 3 Gallery) and 24.12 (exit 0 only when every shot is saved) are fully met only after stage 4. In stages 1 to 3, `shotList.ts` lists only the states that exist, and each PR body lists the shots it adds.
 
 ## Vertical Slice Gate
 
@@ -1314,7 +1322,7 @@ Stage 1 must end (PR 1f) with:
 - **one finished Wisp** (Variant 0, Haunted look, cold glow, rim light, cobweb, `wisp-bob` idle) drawn in the attic slots;
 - the screenshots of `npm run shots` for that stage: `01-house` and `16-reduced-house` at 1440 × 900 and 390 × 844, and the Gallery with the Wisp.
 
-Luis Miguel reviews those screenshots before stage 2 starts. Changes to the look are cheapest at that point, because every later ghost, prop and Scene reuses the same tokens, layering and rim-light rules. Until stage 2a, every attic Card draws Variant 0 and the middle-floor and basement slots show only their window; this temporary state exists only behind `?view=scenic` (open question Q15).
+Luis Miguel reviews those screenshots before stage 2 starts. Changes to the look are cheapest at that point, because every later ghost, prop and Scene reuses the same tokens, layering and rim-light rules. Until stage 2a, every attic Card draws Variant 0 and the middle-floor and basement slots show only their window; this temporary state exists only behind `?view=scenic` (decision Q15).
 
 ## Cut List
 
@@ -1327,6 +1335,8 @@ If time runs short before the code freeze (27 Nov 2026), cut in this order:
 | 3 | Intro | None: Requirement 16 is "WHERE the Intro is built". 18.2 and the Intro part of 17.14 become empty. D13: the Opening_Rings start at the first House_Scene render. Shots lose nothing. | A director "yes" and a short `docs/decisiones.md` line (scope choice), no requirement text change. |
 | 4 | Fallback "one ghost body with three costumes": one shared body outline per type size, with the costume parts (cobweb; hood, spiral tail and lantern; horns, drips and chains) on top | 5.6 can still be met because the costume parts are part of each outline; the "different outlines" intent of the 16 Nov decision ("un diseño de fantasma distinto para cada planta") is weakened. 5.1 to 5.3 stay met. | Yes: it softens a recorded decision, so it needs a new row in `docs/decisiones.md`. |
 
+Cuts 1 to 3 are pre-approved by the director for the 23 Nov time check (see "PR Split"); the `docs/decisiones.md` lines for cuts 1 and 3 are still written when they are applied. Cut 4 needs a new decision.
+
 ## Decisions Left to the Design (D1 to D14)
 
 | Item | Decision | Reason |
@@ -1338,7 +1348,7 @@ If time runs short before the code freeze (27 Nov 2026), cut in this order:
 | D5 | A render during the Exorcised_Moment lets it play; a Scene change jumps it to the end. Haunt_Meter move 800 ms. Named tokens `--sc-cold-blue` and `--sc-warm-orange`. Windows are lit in House and Floor Scenes. | As answered. |
 | D6 | "Got it" Reaction first (0 to 400 ms), then spiral (400 to 1000 ms) and sparks (1000 to 1400 ms); the warm room light runs 0 to 1200 ms from the render. | The judge sees the hit, then the ghost leaving; both limits hold (11.10, 12.4). |
 | D7 | Lightning only in House and Floor Scenes, never during the Intro or in the Ghost_Scene. | As answered. |
-| D8 | No Lightning while the Finale is shown: a due flash is skipped and counting goes on. | The storm is over when the rain stops and dawn comes; it also keeps one anomaly at a time. It narrows 15.1 (open question Q20). |
+| D8 | No Lightning while the Finale is shown: a due flash is skipped and counting goes on. | The storm is over when the rain stops and dawn comes; it also keeps one anomaly at a time. Requirement 15.1 and 15.2 list the Finale as an exception (decision Q20). |
 | D9 | Under Reduced_Motion rain is drawn still at 0.25 opacity and fog at 0.35. | As answered. |
 | D10 | Below 64rem (1024 px) the Grimoire goes under the drawing. | Under 1024 px a 45 % wide Grimoire column would be too narrow for the Code_Block; 64rem is also the HUD breakpoint, so there is one breakpoint. |
 | D11 | Code and paths `--font-code`; only Latin 400 normal of each font; other scenic text body stack, except headings and the first Finale banner line (IM Fell English). | As answered. |
@@ -1346,50 +1356,49 @@ If time runs short before the code freeze (27 Nov 2026), cut in this order:
 | D13 | The Opening_Rings wait for the Intro to end (or start at the first House_Scene render when there is no Intro or Reduced_Motion is on). | One eye-catching anomaly at a time. |
 | D14 | In the attic and basement frames the phone widget moves from the world overlay to the scene dock (bottom right of the stage, beside the floor stair on wide screens; in the control row under the stage on narrow ones). Same element, same label and name, same place in the tab order. | The Telephone is outside those frames; docking keeps the Answer_Button shown and reachable (9.7, 17.5). |
 
-## Open Questions and Contradictions
+## Decisions on open questions
 
-Each item says what conflicts and what this design does until the director decides.
+Each item records the director's answer. The sections above already carry the changes.
 
-1. **Q1 PR size.** Four PRs of at most about 900 lines cannot hold about 10,000 lines; `git-workflow.md` warns at about 500. Proposal: 13 stacked PRs in the 4 stages (section "PR Split"). Alternative: 4 PRs of about 1,000 to 5,100 lines. Director decision.
-2. **Q2 Shots list vs PR order.** The full 18 states, the 3 × 5 × 3 Gallery and the exit-0 rule of 24.12 only exist after stage 4. Intermediate PRs ship a partial list. Director to accept.
-3. **Q3 Telephone_Target order.** Requirement 23.6, 23.9 and the glossary say "report order across all floors", but the ViewModel only has Cards grouped by floor (`page.ts` also lists `start-ghost` in floor order), and 2.5 forbids a new field. Design: floor order, then report order inside each floor. For the committed sample the result is the same (`bench/static.js`). Needs a wording change in the requirements.
-4. **Q4 More than 5 Cards on a floor.** 23.5 says two Cards of one floor always get different Variants, but only 5 Variants exist and `reportArb` can produce up to 10 ghosts on one floor. Core never returns more than 5 ghosts. Design: Variant = index modulo 5; the "different" part of P4 runs with `maxPerFloor: 5`.
-5. **Q5 Filters vs rim light.** Resolved: no filters at all; the rim light is a stroke path. 20.2 holds trivially; the Shots_Script still runs its check.
-6. **Q6 15-animation limit vs rain, fog and idle loops.** Resolved by the budget table: one group per weather loop, still clouds and Bestiary, house loops paused in the Ghost_Scene. Worst case 15 in House and Floor Scenes, 14 in the shots (Lightning off).
-7. **Q7 Lightning vs "one eye-catching anomaly at a time".** 15.1 fixes a 10 to 15 s rhythm and 9.3 a 20 s Ring rhythm, so a flash can fall during a Ring. Design: Lightning counts as ambience, not as an anomaly. Director to confirm.
-8. **Q8 Finale and Return_Glow in the same render.** 13.1 says the Finale is shown while its condition holds; the design sets the Finale state in that render but delays its animation (and banner fade) by 0.8 s so the Return_Glow plays first. Director to confirm that a delayed start still counts as "shown".
-9. **Q9 HUD "placed over the scene" (4.1) on narrow screens.** On wide screens the HUD overlays the stage edges; below 64rem it stacks above and below the stage, because overlays would cover most of a 390 px house. It is still real HTML outside the SVG. Director to confirm the reading.
-10. **Q10 "Relative path" for fonts (21.5).** Fonts are loaded with `FontFace` from `?url` imports, so the built CSS has no font source at all; Vite writes base-prefixed paths such as `/haunted-repo/assets/creepster-….woff2` (same site, no scheme or host). Design reads 21.5 as "same-site path, never `http:`, `https:` or `//`".
-11. **Q11 IM Fell English copyright.** Fontsource's `LICENSE` names "Google Inc."; the upstream OFL names Igino Marini. The credits file and the copied OFL use the upstream text.
-12. **Q12 OFL texts hold `http://scripts.sil.org/OFL`.** They are `.txt` files in `public/`, which the Size_Check does not scan (20.9) and the Source_Scan does not read. No conflict, noted for review.
-13. **Q13 Shots exit code.** 24.12 says exit 0 when every screenshot is saved; the design also exits 1 when a required check (20.2, 20.4) fails, after writing every file. Director to confirm.
-14. **Q14 Dark launch.** Requirement 1.1 (scenic by default) is applied only in stage 4; stages 1 to 3 keep the Simple_Renderer as default and open the scenic view with `?view=scenic`, so the public page never shows a half-built scene. Alternative: no dark launch, and merge the whole stack only after stage 3. Director decision.
-15. **Q15 Temporary art in stage 1.** Until 2a, every attic Card is Variant 0 and other floors show empty windows (5.8, 5.9 unmet on those branches). Only visible behind `?view=scenic`.
-16. **Q16 Tab order vs visual order.** 17.4 to 17.6 put every HUD control, including the footer's Licence_Notice link, before the scene; on wide screens the footer is drawn at the bottom, so visual and tab order differ (WCAG 2.4.3 tension). The design follows 17.4.
-17. **Q17 Endless Rings.** By 9.3, a judge who never presses the Answer_Button (and starts ghosts from Nameplates) hears a Ring every 20 s for the whole visit. The design follows 9.3; the director may prefer to stop the 20 s Rings after the first `start-ghost` too.
-18. **Q18 Exorcised_Moment outside the Ghost_Scene.** 12.1 is written for any two renders, but today the change only happens in the Ghost_Scene. If it ever happens in a House or Floor Scene, the design plays only the Return_Glow for that Card.
-19. **Q19 "About 35 % brightness" (8.2).** A Night overlay at 0.65 opacity gives about 35 % of the original light; it is not an exact luminance value.
-20. **Q20 D8 narrows 15.1.** 15.1 lists only the Ghost_Scene and the Intro as exceptions; D8 adds the Finale.
-21. **Q21 Busy shot and Core's timeout.** Core aborts a request after 10 s and 24.13 allows 10 s per step; the script takes the busy shot right after the Status_Region shows `TEXTS.busy` and releases the request at once.
-22. **Q22 Fit at 1440 × 900 (19.1).** It holds for the sample. A live report with many warnings or skipped files makes the HUD column scroll inside itself.
-23. **Q23 Floor button name punctuation.** "Attic. Go to this floor" keeps the existing label unchanged after the title; the full stop is a design choice.
-24. **Q24 Ghost_Icons order.** Requirement 4.4 gives counts only; the design shows exorcised icons first.
-25. **Q25 Telephone "not drawn" in the Ghost_Scene (9.1).** The house SVG stays in the DOM behind the room; the Telephone group is `visibility: hidden` and the whole world is hidden and inert there.
-26. **Q26 Disabled Lightning_Toggle.** Under Reduced_Motion it is `disabled`, so it leaves the tab order; its reason stays visible text.
-27. **Q27 Playwright in CI.** `npm ci` installs the `playwright` package (no browser) in CI and in the deploy job. It adds install time only; nothing in the page depends on it.
-28. **Q28 Extra Size_Check guards.** The Gallery-code check (for 24.9) and the "no stylesheet in `index.html`" check (for 1.9, 1.10) go beyond the text of Requirement 20; they are additions, not changes.
-29. **Q29 Node timer types.** Test files bring Node's global types into the web `tsc` program, so scenic code uses `window.setTimeout` to keep `number` handles.
-30. **Q30 Chained_Brute eyes.** 5.3 requires Pumpkin eyes on a Haunted ghost, while the style rule says warm orange means "yours". The eyes are a small accent; the glow around the ghost stays cold blue.
-31. **Q31 Bestiary entry names.** The 21 edge case says Bestiary titles use the body stack, while 21.2 puts every `h1` to `h3` in IM Fell English. Resolved: entry names are not headings (`strong` in a list); only the panel title "Bestiary" is an `h2`.
-32. **Q32 New error text.** `TEXTS.viewLoadFailed` covers a failed dynamic import, a case the requirements do not mention.
-33. **Q33 Where the other two Ghost_Types are seen.** With the committed Demo_Script only Wisps can be exorcised; the Lantern_Wraith (sample middle floor) is seen in the house, its Floor_Scene, the Bestiary and the Gallery; the Chained_Brute only in the Bestiary, the Gallery and live reports.
-
+1. **Q1 PR size.** Decided: 13 stacked PRs (1a to 4b), merged in order with "Create a merge commit"; reviews happen per stage, not per PR.
+2. **Q2 Shots list vs PR order.** Decided: intermediate PRs ship a partial shot list, and each PR body lists the shots it adds.
+3. **Q3 Telephone_Target order.** Decided: floor order (attic, middle floor, basement), then report order inside each floor; 23.6, 23.9, the edge case and the glossary say so.
+4. **Q4 More than 5 Cards on a floor.** Decided: Variant = index modulo 5; the "different" part of P4 runs with `maxPerFloor` 5; 23.5 says Core never returns more than 5 ghosts.
+5. **Q5 Filters vs rim light.** Decided: resolved, no filters; the rim light is a stroke path.
+6. **Q6 15-animation limit.** Decided: resolved by the budget table (worst case 15 in House and Floor Scenes, 14 in the shots).
+7. **Q7 Lightning vs "one anomaly at a time".** Decided: rain, fog, idle loops and Lightning are ambience; a flash due during a Ring or an Exorcised_Moment is skipped and counting goes on (15.2).
+8. **Q8 Finale and Return_Glow in the same render.** Decided: a start delayed by 0.8 s counts as "shown".
+9. **Q9 HUD over the scene on narrow screens.** Decided: the HUD overlays the stage edges on wide screens and stacks above and below it under 64rem.
+10. **Q10 "Relative path" for fonts.** Decided: 21.5 now says "same-site path, never `http:`, `https:` or `//`".
+11. **Q11 IM Fell English copyright.** Decided: the credits file and the copied OFL use the upstream text (Igino Marini).
+12. **Q12 OFL texts hold `http://scripts.sil.org/OFL`.** Decided: accepted; the `.txt` files are not scanned.
+13. **Q13 Shots exit code.** Decided: exit 1 when a required check (20.2, 20.4) fails, after writing every file; 24.12 says so.
+14. **Q14 Dark launch.** Decided: scenic only at `?view=scenic` until PR 4b switches the default.
+15. **Q15 Temporary art in stage 1.** Decided: accepted; only visible behind `?view=scenic`.
+16. **Q16 Tab order vs visual order.** Decided: the Licence_Notice link of the HUD footer is last in the tab order in every Scene; 17.4 to 17.6 say so.
+17. **Q17 Endless Rings.** Decided: the 20 s Rings stop after the first `start-ghost` of the page load, whatever started it; 9.3, 9.4 and Property 15 say so.
+18. **Q18 Exorcised_Moment outside the Ghost_Scene.** Decided: accepted; only the Return_Glow plays for that Card.
+19. **Q19 "About 35 % brightness".** Decided: accepted; the Night overlay at 0.65 opacity is the reading.
+20. **Q20 D8 narrows 15.1.** Decided: D8 accepted; the Finale is an exception in 15.1 and 15.2.
+21. **Q21 Busy shot and Core's timeout.** Decided: accepted; the script takes the shot at once and releases the request.
+22. **Q22 Fit at 1440 × 900.** Decided: accepted; the HUD column scrolls inside itself for large live reports.
+23. **Q23 Floor button name punctuation.** Decided: accepted; "Attic. Go to this floor".
+24. **Q24 Ghost_Icons order.** Decided: accepted; exorcised icons first.
+25. **Q25 Telephone "not drawn" in the Ghost_Scene.** Decided: accepted; the group is `visibility: hidden` and the world is inert there.
+26. **Q26 Disabled Lightning_Toggle.** Decided: accepted; it is `disabled` under Reduced_Motion and its reason stays visible.
+27. **Q27 Playwright in CI.** Decided: accepted; `npm ci` never downloads a browser, and browsers are installed only by hand with `npx playwright install chromium`, documented for the director.
+28. **Q28 Extra Size_Check guards.** Decided: accepted as additions to Requirement 20.
+29. **Q29 Node timer types.** Decided: accepted; scenic code uses `window.setTimeout`.
+30. **Q30 Chained_Brute eyes.** Decided: accepted; the Pumpkin eyes are a small accent and the glow stays cold blue.
+31. **Q31 Bestiary entry names.** Decided: accepted; entry names are `strong` in a list, only "Bestiary" is an `h2`.
+32. **Q32 New error text.** Decided: accepted; `TEXTS.viewLoadFailed`.
+33. **Q33 Where the other two Ghost_Types are seen.** Decided: accepted as described in the sample flow.
 ## Durability (until 29 January 2027)
 
 - The demo stays static files on GitHub Pages: no server code, no database, no key, no environment variable, no paid API.
 - Fonts are bundled woff2 files under the site's own base path; nothing comes from a CDN (21.5, 25.3), and the Size_Check fails on any external address in built HTML, CSS or SVG.
 - The sample still needs no network: the scenic view adds no request of its own (25.6, 25.8).
-- Playwright and the Gallery are development tools only; they are never deployed and never run in CI.
+- Playwright and the Gallery are development tools only; they are never deployed and never run in CI, and `npm ci` downloads no browser (decision Q27).
 - The deploy workflow is unchanged; `npm run check` (now with `npm run size`) runs before every deploy.
 - Before the code freeze (27 Nov 2026): open the public link in a clean browser, at both default and `?view=simple`, with Reduced_Motion on and off.
 
