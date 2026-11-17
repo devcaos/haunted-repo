@@ -849,6 +849,9 @@ describe("scenic model and art stay pure (Requirement 23.1)", () => {
 });
 
 describe("gallery page (Requirement 25.8)", () => {
+  it("exists (item 17)", () => {
+    expect(galleryFiles.map((f) => f.path)).toEqual(["gallery.html"]);
+  });
   it("follows the presentation rules when it exists", () => {
     expect(offenders(galleryFiles, STORAGE)).toEqual([]);
     expect(offenders(galleryFiles, RAW_HTML)).toEqual([]);

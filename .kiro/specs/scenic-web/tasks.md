@@ -587,7 +587,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5, 24.10_
     - _Design: "Shots (Requirement 24.4, 24.5, 24.10)"_
 
-  - [ ] 7.5 Add the dev-only Gallery
+  - [x] 7.5 Add the dev-only Gallery
     - Create `packages/web/gallery.html` (head, `<div id="gallery" data-scenic-gallery></div>`, module script `/src/view/scenic/gallery/gallery.ts`) and `packages/web/src/view/scenic/gallery/gallery.ts`: imports the scenic CSS and fonts, sets `data-motion="still"`, and draws the art that exists now (the Wisp, Variant 0, Haunted) with HTML labels as plain strings. Task 9.8 fills the full grid.
     - In `source.test.ts` make the existence of `gallery.html` an assertion of item 17.
     - Verify: `npm run check` exits `0`; `npm run size` reports no Gallery problem (the build input stays `index.html`).

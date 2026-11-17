@@ -1,0 +1,35 @@
+﻿/*
+ * Layout of the dev-only gallery page. Tokens only.
+ */
+.gallery {
+  padding: var(--sc-space-4);
+  color: var(--sc-text);
+  background-color: var(--sc-backing);
+  font-family: var(--font-body);
+  font-size: var(--sc-text-body);
+}
+.gallery h1 {
+  margin: 0 0 var(--sc-space-3);
+  color: var(--sc-text-heading);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-h2);
+  font-weight: var(--sc-weight-body);
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--sc-field-min), 1fr));
+  gap: var(--sc-space-3);
+}
+.gallery-cell {
+  margin: 0;
+  padding: var(--sc-space-2);
+  background-color: var(--sc-backing-raised);
+}
+.gallery-art {
+  display: block;
+  width: var(--sc-field-min);
+}
+.gallery-cell figcaption {
+  color: var(--sc-text-muted);
+  font-size: var(--sc-text-small);
+}

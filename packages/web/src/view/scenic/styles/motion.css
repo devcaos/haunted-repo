@@ -76,6 +76,10 @@
     transform-origin: center;
     animation: wisp-bob var(--sc-dur-wisp-bob) var(--sc-ease-in-out) infinite;
   }
+  /* The dev-only gallery draws every ghost in its resting pose. */
+  [data-motion="still"] .ghost-idle {
+    animation: none;
+  }
 }
 
 /* Reduced_Motion: rain, fog and the oculus are drawn still (D9). */
