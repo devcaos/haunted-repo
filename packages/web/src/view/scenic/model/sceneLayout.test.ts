@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import type { Floor, Ghost, HauntedReport } from "@haunted-repo/core";
 import { describe, expect, it } from "vitest";
 import type { AvailableAction } from "../../../logic/actions.js";
@@ -10,6 +11,7 @@ import type {
   ViewModel,
 } from "../../../logic/viewModel.js";
 import { GHOST_TYPE_OF, sceneLayout, slotRects } from "./sceneLayout.js";
+import { viewModelArbWith } from "./viewModelArb.testutil.js";
 
 function ghost(path: string, floor: Floor): Ghost {
   return {
@@ -234,5 +236,44 @@ describe("sceneLayout", () => {
     );
     expect(layout.closeUp).toEqual({ ghostType: "lantern-wraith", variant: 1 });
     expect(layout.frame.kind).toBe("slot");
+  });
+});
+
+describe("Property 1", () => {
+  // Feature: scenic-web, Property 1: Every Card gets exactly one Ghost_Slot on its own floor
+  // **Validates: Requirements 3.5, 10.13, 12.5, 23.2**
+  it("every Card gets exactly one Ghost_Slot on its own floor", () => {
+    fc.assert(
+      fc.property(viewModelArbWith({ paths: "any" }), (model) => {
+        const layout = sceneLayout(model);
+        if (model.house === null || model.scene.kind === "ghost") {
+          expect(layout.slots).toEqual([]);
+          return;
+        }
+        const expected = model.house.floors.flatMap((view) =>
+          view.ghosts.map((card, index) => ({
+            key: `${view.floor}#${index}`,
+            floor: view.floor,
+            path: card.path,
+            state: card.state,
+          })),
+        );
+        expect(
+          layout.slots.map(({ key, floor, path, state }) => ({
+            key,
+            floor,
+            path,
+            state,
+          })),
+        ).toEqual(expected);
+        // The window is lit exactly for the slots whose state is "exorcised".
+        const lit = layout.slots.filter((slot) => slot.state === "exorcised");
+        const cards = model.house.floors.flatMap((view) => view.ghosts);
+        expect(lit).toHaveLength(
+          cards.filter((card) => card.state === "exorcised").length,
+        );
+      }),
+      { numRuns: 200 },
+    );
   });
 });

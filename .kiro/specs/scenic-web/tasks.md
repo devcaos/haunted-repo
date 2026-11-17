@@ -308,7 +308,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.5, 3.6, 3.8, 3.9, 3.10, 5.5, 5.8, 5.11, 8.3, 8.4, 8.5, 8.6, 8.7, 8.12, 9.9, 13.1, 23.2, 23.4, 23.5, 23.6, 23.7, 23.9_
     - _Design: "scenic/model/sceneLayout.ts (Scene_Layout)"_
 
-  - [ ] 3.5 Property test for the Ghost_Slots
+  - [x] 3.5 Property test for the Ghost_Slots
     - **Property 1: Every Card gets exactly one Ghost_Slot on its own floor**
     - **Validates: Requirements 3.5, 10.13, 12.5, 23.2**
     - Generator: `viewModelArb` with `reportArb` (repeated paths allowed), at least 100 runs. Checks one slot per Card position with the Card's floor, path and state; window lit exactly when the state is `"exorcised"`; no slot in the Ghost_Scene or when `house` is `null`.
