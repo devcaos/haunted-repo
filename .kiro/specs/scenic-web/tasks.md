@@ -509,7 +509,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 19.1, 19.2, 19.4_
     - _Design: "Camera frames", "Depth layers", "House composition"_
 
-  - [ ] 5.6 Style the Wisp
+  - [x] 5.6 Style the Wisp
     - Create `packages/web/src/view/scenic/styles/ghosts.css` (tokens only) with the Wisp classes (body Spectral, shade, eyes, glints, cobweb, rim), the cold-blue glow gradient stops, the lit and unlit window classes and the chained door.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): colour the wisp from the tokens`

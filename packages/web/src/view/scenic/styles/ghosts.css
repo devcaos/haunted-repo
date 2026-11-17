@@ -1,0 +1,108 @@
+/*
+ * Ghost, slot and chained door colours of the Scenic_Renderer. Tokens only.
+ * Cold blue means code not understood yet; warm orange means code that is
+ * yours (design "Palette").
+ */
+
+/* The Wisp: Spectral body, Mist shade, Night eyes with Bone glints. */
+.ghost .ghost-body {
+  fill: var(--sc-spectral);
+}
+
+.ghost .ghost-shade {
+  fill: var(--sc-mist);
+  opacity: 0.3;
+}
+
+.ghost .ghost-eye {
+  fill: var(--sc-night);
+}
+
+.ghost .ghost-glint {
+  fill: var(--sc-bone);
+}
+
+.ghost .ghost-mouth {
+  fill: var(--sc-night);
+  opacity: 0.8;
+}
+
+.ghost .ghost-cobweb {
+  stroke: var(--sc-bone);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+/* Rim light on the moon-facing edge of the ghost, in Bone. */
+.ghost .ghost-rim {
+  stroke: var(--sc-rim-ghost);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: var(--sc-rim-opacity);
+}
+
+.ghost .ghost-shadow {
+  fill: var(--sc-night);
+  opacity: 0.5;
+}
+
+/* Haunted glow: the named cold blue, fading out to the edge (Requirement 6.1). */
+.ghost .stop-cold-0 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: 0.55;
+}
+
+.ghost .stop-cold-1 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: 0;
+}
+
+/* Slot panes: unlit is Slate glass in a Mist frame; lit is Candle glass with a warm halo (Requirement 12.5). */
+.pane .pane-frame {
+  fill: var(--sc-mist);
+}
+
+.pane .pane-bars {
+  stroke: var(--sc-mist);
+  stroke-width: 2;
+}
+
+.pane-unlit .pane-glass {
+  fill: var(--sc-slate);
+}
+
+.pane-lit .pane-glass {
+  fill: var(--sc-candle);
+}
+
+.pane-lit .stop-warm-0 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0.5;
+}
+
+.pane-lit .stop-warm-1 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0;
+}
+
+/* Chained door of an empty floor: Rust door, Mist chains, Night hook, no padlock. */
+.chained-door .door-panel {
+  fill: var(--sc-rust);
+}
+
+.chained-door .door-planks {
+  stroke: var(--sc-night);
+  stroke-width: 2;
+}
+
+.chained-door .door-chain-link {
+  stroke: var(--sc-mist);
+  stroke-width: 2;
+}
+
+.chained-door .door-hook {
+  stroke: var(--sc-night);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
