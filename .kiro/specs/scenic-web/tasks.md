@@ -404,7 +404,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 8.1, 8.8, 19.2_
     - _Design: "scenic/model/camera.ts", "Camera frames"_
 
-  - [ ] 3.14 Checkpoint and PR 1c
+  - [x] 3.14 Checkpoint and PR 1c
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 1d, task 4.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1c`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1b -- . ':(exclude)package-lock.json'`.
