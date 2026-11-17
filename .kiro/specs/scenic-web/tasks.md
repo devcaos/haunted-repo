@@ -495,7 +495,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 18.9, 19.2_
     - _Design: "motion.ts" row of "DOM modules"_
 
-  - [ ] 5.4 Build the stage
+  - [x] 5.4 Build the stage
     - Create `packages/web/src/view/scenic/stage.ts`: `.stage` > `.world` > `svg.house` (layers in the "Art System" order: sky, moon-clouds, hills, house, slots, dims, telephone placeholder group, weather, foreground, effects) plus `.world-overlay`; the slot layer is rebuilt only when `slotSignature` changes; one `rect.dim` per floor; sets `data-scene`, `data-floor`, `data-finale` and `data-busy` on `.stage`; sets `style.transform` (from `cssTransform(cameraFor(...))`) and `--cam-counter` on `.world`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): build the scenic stage and camera wrapper`
