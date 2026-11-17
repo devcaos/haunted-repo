@@ -447,3 +447,31 @@ describe("Property 5", () => {
     );
   });
 });
+
+describe("Property 6", () => {
+  // Feature: scenic-web, Property 6: The Finale depends only on the current ViewModel
+  // **Validates: Requirements 13.1, 13.2, 13.6, 23.7**
+  it("the Finale depends only on the current ViewModel", () => {
+    let shown = 0;
+    let hidden = 0;
+    fc.assert(
+      fc.property(viewModelArbWith({ finaleBias: true }), (model) => {
+        const cards = (model.house?.floors ?? []).flatMap((v) => v.ghosts);
+        const expected =
+          model.house !== null &&
+          model.house.source === "sample" &&
+          !cards.some((card) => card.state === "haunted") &&
+          cards.some((card) => card.state === "exorcised") &&
+          (model.scene.kind === "house" || model.scene.kind === "floor");
+        const finale = sceneLayout(model).finale;
+        expect(finale).toBe(expected);
+        expect(sceneLayout(structuredClone(model)).finale).toBe(finale);
+        if (finale) shown += 1;
+        else hidden += 1;
+      }),
+      { numRuns: 300 },
+    );
+    expect(shown).toBeGreaterThan(0);
+    expect(hidden).toBeGreaterThan(0);
+  });
+});

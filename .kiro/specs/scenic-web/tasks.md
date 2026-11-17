@@ -363,7 +363,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.9, 23.6_
     - _Design: "Correctness Properties", Property 5_
 
-  - [ ] 3.10 Property test for the Finale decision
+  - [x] 3.10 Property test for the Finale decision
     - **Property 6: The Finale depends only on the current ViewModel**
     - **Validates: Requirements 13.1, 13.2, 13.6, 23.7**
     - Generator: `viewModelArb` with the Finale bias of task 3.1, at least 100 runs. Checks the exact condition and that two deep-equal ViewModels give the same value.
