@@ -413,3 +413,37 @@ describe("Property 4", () => {
     );
   });
 });
+
+describe("Property 5", () => {
+  // Feature: scenic-web, Property 5: The Telephone_Target is the first startable Card
+  // **Validates: Requirements 9.9, 23.6**
+  it("the Telephone_Target is the first startable Card", () => {
+    fc.assert(
+      fc.property(viewModelArbWith({ paths: "unique" }), (model) => {
+        const target = sceneLayout(model).telephoneTarget;
+        if (model.house === null) {
+          expect(target).toBeNull();
+          return;
+        }
+        let expected: string | null = null;
+        for (const floor of FLOORS_IN_ORDER) {
+          const view = model.house.floors.find((v) => v.floor === floor);
+          const card = view?.ghosts.find((c) => c.canStart);
+          if (card !== undefined) {
+            expected = card.path;
+            break;
+          }
+        }
+        expect(target).toBe(expected);
+        if (target !== null) {
+          expect(
+            model.available.some(
+              (a) => a.type === "start-ghost" && a.path === target,
+            ),
+          ).toBe(true);
+        }
+      }),
+      { numRuns: 200 },
+    );
+  });
+});

@@ -352,7 +352,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.8, 5.10, 5.11, 23.5_
     - _Design: "Correctness Properties", Property 4_
 
-  - [ ] 3.9 Property test for the Telephone_Target
+  - [x] 3.9 Property test for the Telephone_Target
     - **Property 5: The Telephone_Target is the first startable Card**
     - **Validates: Requirements 9.9, 23.6**
     - Generator: `viewModelArb` with `uniquePathReportArb`, at least 100 runs. Checks floor order then report order, `null` when none or `house` null, and that `start-ghost` for the target is in `available`.
