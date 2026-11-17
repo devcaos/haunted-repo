@@ -467,7 +467,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 5. PR 1e — Stage, slots and the finished Wisp
+- [x] 5. PR 1e — Stage, slots and the finished Wisp
   - Branch: `feat/scenic-web-1e`. Stacks on: `feat/scenic-web-1d`.
   - Estimate: ~820 changed lines. Model: Opus.
   - _Design: "PR Split" row 1e_
@@ -530,7 +530,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 3.5, 3.8, 3.9, 8.10_
     - _Design: "One render, step by step", "Vertical Slice Gate"_
 
-  - [ ] 5.9 Checkpoint and PR 1e
+  - [x] 5.9 Checkpoint and PR 1e
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is task 6.1 for the director, then PR 1f, task 7.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1e`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1d -- . ':(exclude)package-lock.json'`.
