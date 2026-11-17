@@ -579,7 +579,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.5, 20.6, 20.7, 20.8, 20.9, 20.10, 25.10_
     - _Design: "Size_Check (npm run size)"_
 
-  - [ ] 7.4 Add the shot list
+  - [x] 7.4 Add the shot list
     - Create `packages/web/src/tooling/shotList.ts` (pure): state ids, the two sizes `1440x900` and `390x844`, and `<state>-<width>x<height>.png` file names. In this PR it lists only the stage-1 states `01-house`, `16-reduced-house` and `19-gallery` (decision Q2).
     - Create `packages/web/src/tooling/shotList.test.ts`: the names are unique and each contains its state id and its size; the current list has 3 states × 2 sizes. Task 16.7 changes the expectation to 19 × 2 = 38.
     - Verify: `npm run check` exits `0`.
