@@ -271,7 +271,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 3. PR 1c — Scene_Layout and Camera with properties
+- [x] 3. PR 1c — Scene_Layout and Camera with properties
   - Branch: `feat/scenic-web-1c`. Stacks on: `feat/scenic-web-1b`.
   - Estimate: ~860 changed lines. Model: Auto.
   - _Design: "PR Split" row 1c_
@@ -413,7 +413,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 4. PR 1d — Art system and the house
+- [x] 4. PR 1d — Art system and the house
   - Branch: `feat/scenic-web-1d`. Stacks on: `feat/scenic-web-1c`.
   - Estimate: ~900 changed lines. Model: Opus.
   - _Design: "PR Split" row 1d_
@@ -458,7 +458,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 3.2, 22.1_
     - _Design: "House composition"_
 
-  - [ ] 4.6 Checkpoint and PR 1d
+  - [x] 4.6 Checkpoint and PR 1d
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 1e, task 5.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1d`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1c -- . ':(exclude)package-lock.json'`.
