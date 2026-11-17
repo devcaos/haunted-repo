@@ -10,7 +10,13 @@ import type {
   Scene,
   ViewModel,
 } from "../../../logic/viewModel.js";
-import { GHOST_TYPE_OF, sceneLayout, slotRects } from "./sceneLayout.js";
+import {
+  FLOOR_RECT,
+  GHOST_TYPE_OF,
+  sceneLayout,
+  slotRects,
+} from "./sceneLayout.js";
+import type { Rect } from "./sceneLayout.js";
 import { viewModelArbWith } from "./viewModelArb.testutil.js";
 
 function ghost(path: string, floor: Floor): Ghost {
@@ -274,6 +280,52 @@ describe("Property 1", () => {
         );
       }),
       { numRuns: 200 },
+    );
+  });
+});
+
+describe("Property 2", () => {
+  const floorArb = fc.constantFrom<Floor>("attic", "middle floor", "basement");
+  const overlap = (a: Rect, b: Rect): number =>
+    Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) *
+    Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+  const inside = (inner: Rect, outer: Rect): boolean =>
+    inner.x >= outer.x &&
+    inner.y >= outer.y &&
+    inner.x + inner.w <= outer.x + outer.w &&
+    inner.y + inner.h <= outer.y + outer.h;
+  function expectFitAndApart(floor: Floor, rects: Rect[]): void {
+    for (const rect of rects)
+      expect(inside(rect, FLOOR_RECT[floor])).toBe(true);
+    for (let i = 0; i < rects.length; i += 1) {
+      for (let j = i + 1; j < rects.length; j += 1) {
+        expect(overlap(rects[i] as Rect, rects[j] as Rect)).toBe(0);
+      }
+    }
+  }
+
+  // Feature: scenic-web, Property 2: Ghost_Slots fit their floor and never overlap
+  // **Validates: Requirements 23.3**
+  it("Ghost_Slots fit their floor and never overlap", () => {
+    fc.assert(
+      fc.property(floorArb, fc.integer({ min: 1, max: 5 }), (floor, count) => {
+        const rects = slotRects(floor, count);
+        expect(rects).toHaveLength(count);
+        expectFitAndApart(floor, rects);
+      }),
+      { numRuns: 100 },
+    );
+    fc.assert(
+      fc.property(viewModelArbWith({ maxPerFloor: 5 }), (model) => {
+        const slots = sceneLayout(model).slots;
+        for (const floor of ["attic", "middle floor", "basement"] as const) {
+          expectFitAndApart(
+            floor,
+            slots.filter((s) => s.floor === floor).map((s) => s.rect),
+          );
+        }
+      }),
+      { numRuns: 100 },
     );
   });
 });

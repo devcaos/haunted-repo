@@ -319,7 +319,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.5, 10.13, 12.5, 23.2_
     - _Design: "Correctness Properties", Property 1_
 
-  - [ ] 3.6 Property test for slot fit
+  - [x] 3.6 Property test for slot fit
     - **Property 2: Ghost_Slots fit their floor and never overlap**
     - **Validates: Requirements 23.3**
     - Generator: `fc.constantFrom` of the 3 floors and `fc.integer({ min: 1, max: 5 })`, plus `viewModelArb` with `maxPerFloor: 5` through `sceneLayout`, at least 100 runs. Checks every rectangle lies inside its floor rectangle and any two share an area of 0.
