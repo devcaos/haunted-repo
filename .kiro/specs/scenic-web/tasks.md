@@ -154,7 +154,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.5, 2.7, 2.8, 4.1, 4.7, 4.8, 4.9, 4.12, 4.15_
     - _Design: "One render, step by step", "Purely visual state of the Scenic_Renderer"_
 
-  - [ ] 1.11 Wire the renderer choice in `main.ts`
+  - [x] 1.11 Wire the renderer choice in `main.ts`
     - Create `packages/web/src/view/simpleEntry.ts`: imports `./simple/simple.css` and re-exports `createSimpleRenderer` as `createRenderer`.
     - Rewrite `packages/web/src/main.ts`: `chooseView(window.location.search)`, one dynamic `import()` of `./view/simpleEntry.js` or `./view/scenic/entry.js`, then one `createPage` with the same `PageDeps` for both, then `page.start()`; on import failure write `TEXTS.viewLoadFailed` into `#root` with `textContent`. `main.ts` imports no CSS.
     - In `packages/web/index.html` add `<meta name="color-scheme" content="dark">`.
