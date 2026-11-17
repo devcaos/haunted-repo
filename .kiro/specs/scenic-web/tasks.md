@@ -163,7 +163,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.4, 1.5, 1.9, 1.10, 25.6_
     - _Design: "Renderer choice and CSS loading"_
 
-  - [ ] 1.12 Add the Scenic_View_Link to the Simple_Renderer
+  - [x] 1.12 Add the Scenic_View_Link to the Simple_Renderer
     - In `packages/web/src/view/simple/renderer.ts` add after the `h1` the link `a.view-link` with text `TEXTS.viewLinks.scenic` and `href` `?view=scenic` (dark launch; task 16.8 changes it to `./`). No other change to the Simple_Renderer.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): link the simple view to the scenic view`
