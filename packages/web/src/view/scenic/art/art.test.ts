@@ -11,6 +11,7 @@ import {
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
+import { foregroundLayer, skyLayers, weatherLayer } from "./sky.js";
 
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
@@ -85,6 +86,16 @@ function shapeProblems(tree: ShapeNode): string[] {
   return problems;
 }
 
+/** Every node of the tree, depth first. */
+function nodesOf(tree: ShapeNode): ShapeNode[] {
+  return [tree, ...(tree.children ?? []).flatMap(nodesOf)];
+}
+
+/** The class names of the tree, one entry per node and name. */
+function classesOf(tree: ShapeNode): string[] {
+  return nodesOf(tree).flatMap((n) => n.cls?.split(" ") ?? []);
+}
+
 describe("Shape_Data rules", () => {
   it("accepts a tree made with every builder", () => {
     const tree = g("example", [
@@ -137,5 +148,34 @@ describe("Shape_Data rules", () => {
     expect(shapeProblems(circle("c", 0, Number.NaN, 1))).toEqual([
       "number on circle",
     ]);
+  });
+});
+
+describe("sky, weather and foreground (Requirement 3.3)", () => {
+  it("every tree passes the Shape_Data rules", () => {
+    for (const tree of [skyLayers(), weatherLayer(), foregroundLayer()]) {
+      expect(shapeProblems(tree)).toEqual([]);
+    }
+  });
+
+  it("draws the depth layers back to front and the groups motion needs", () => {
+    const layers = skyLayers()
+      .children?.filter((n) => n.kind === "g")
+      .map((n) => n.cls);
+    expect(layers).toEqual(["sky", "moon-clouds", "hills-far", "hills-near"]);
+    expect(classesOf(skyLayers())).toEqual(
+      expect.arrayContaining(["moon", "clouds-left", "clouds-right"]),
+    );
+    const wrap = weatherLayer().children?.find((n) => n.cls === "rain-wrap");
+    expect(wrap?.children?.map((n) => n.cls)).toEqual(["rain"]);
+    expect(classesOf(weatherLayer()).filter((c) => c === "fog")).toHaveLength(
+      2,
+    );
+    expect(classesOf(foregroundLayer())).toEqual(
+      expect.arrayContaining(["fence", "dead-tree", "rim-fg"]),
+    );
+    expect(
+      classesOf(foregroundLayer()).filter((c) => c === "grave"),
+    ).toHaveLength(3);
   });
 });

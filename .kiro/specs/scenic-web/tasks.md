@@ -434,7 +434,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 17.2, 22.2, 22.3_
     - _Design: "svg.ts (DOM)", "Accessibility Design" (Structure)_
 
-  - [ ] 4.3 Draw the sky, weather and foreground
+  - [x] 4.3 Draw the sky, weather and foreground
     - Create `packages/web/src/view/scenic/art/sky.ts`: `skyLayers()` (L0 sky gradient, moon and halo, cloud bands in `clouds-left` and `clouds-right` groups, far and near hills), `weatherLayer()` (`rain-wrap` > `rain`, two fog bands) and `foregroundLayer()` (fence and 3 gravestones on the left, dead tree on the right, rim paths), following "Depth layers" and "World geometry".
     - Extend `art.test.ts`: the three trees pass the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
