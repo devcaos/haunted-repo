@@ -137,7 +137,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.8, 4.10, 4.13, 4.14, 4.15, 4.16, 14.4_
     - _Design: "Correctness Properties", Property 9_
 
-  - [ ] 1.9 Build the HUD DOM
+  - [x] 1.9 Build the HUD DOM
     - Create `packages/web/src/view/scenic/dom.ts`: `el(tag, attrs, children)`, text only through `textContent`.
     - Create `packages/web/src/view/scenic/hud.ts`, built once, with `update(hudView)` that changes only text, `hidden` and `disabled`: header (`h1.hud-logo`, `p.hud-tagline`, Haunt_Meter, Ghost_Icons as empty `aria-hidden` `span` elements with a `data-icon-state` attribute until task 9.7, Simple_View_Link `?view=simple`); aside (Live_Plaque form with the labelled field and submit button, `p.status` with `role="status"` and `aria-live="polite"`, `show-sample` button, Power line, report warnings); `footer` with the Licence_Notice; the Scenic_Announcer `p` with `aria-live="polite"`. The URL field is never replaced.
     - Imports from Core are `import type` only. No `innerHTML`. No test file: covered by the build, the Source_Scan and the PR manual checks.
