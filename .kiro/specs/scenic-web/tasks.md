@@ -146,7 +146,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.6, 4.1, 4.2, 4.5, 4.6, 4.9, 4.10, 4.11, 4.13, 4.14, 4.15, 4.16, 25.9_
     - _Design: "DOM modules (scenic/*.ts)", shell layout, "Accessibility Design" (Structure)_
 
-  - [ ] 1.10 Add the scenic renderer shell and entry
+  - [x] 1.10 Add the scenic renderer shell and entry
     - Create `packages/web/src/view/scenic/renderer.ts`: `createScenicRenderer(root, onAction)` builds the shell once in the design's document order (`div.scenic` > header, aside, announcer, empty `main.stage`, `footer` last), owns the guard, and on `render(model)` calls `guard.setModel(model)` and `hud.update(hudView(model))`; it returns `void` and never awaits. Submitting the Live_Plaque (button or Enter) sends one `{ type: "submit-live", url }` with the field text as typed, through the guard; the button is disabled when `submit-live` is not available. The `show-sample` button sends through the guard.
     - Create `packages/web/src/view/scenic/entry.ts`: exports `createRenderer = createScenicRenderer` (CSS and fonts come in PR 1b).
     - Verify: `npm run check` exits `0`.
