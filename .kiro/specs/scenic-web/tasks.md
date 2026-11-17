@@ -228,7 +228,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.10, 25.2, 25.3, 25.4, 25.8_
     - _Design: "Source_Scan additions" items 15 to 17, "Layers" (dependency rules)_
 
-  - [ ] 2.6 Add `base.css`
+  - [x] 2.6 Add `base.css`
     - Create `packages/web/src/view/scenic/styles/base.css` (tokens only): page styles for `.scenic`, grid areas so the `footer` (last in the DOM) is drawn bottom left on wide screens and under the stage on narrow ones, body font `--font-body`, paths in `--font-code` with `overflow-wrap: anywhere`, the focus ring (2 px Pumpkin outline, offset and Night halo), touch targets of `--sc-touch` for buttons and non-inline links, the visually hidden Scenic_Announcer. Import it from `entry.ts`.
     - Verify: `npm run check` exits `0` (items 4 and 5 now scan this file).
     - Commit message: `feat(web): add the scenic base styles`

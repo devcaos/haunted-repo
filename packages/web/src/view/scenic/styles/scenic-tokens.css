@@ -76,7 +76,7 @@
   --sc-line: 1px;
   --sc-line-heavy: 2px;
   --sc-hud-width: 22rem;
-  --sc-hud-max-height: 100vh;
+  --sc-viewport-height: 100vh;
   /* Focus */
   --sc-focus-width: 2px;
   --sc-focus-offset: 2px;
