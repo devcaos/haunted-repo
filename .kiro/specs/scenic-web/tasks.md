@@ -292,7 +292,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 23.1_
     - _Design: "Source_Scan additions" item 10, "Layers"_
 
-  - [ ] 3.3 Add the floor geometry and `slotRects`
+  - [x] 3.3 Add the floor geometry and `slotRects`
     - Create `packages/web/src/view/scenic/model/sceneLayout.ts` with the types (`GhostType`, `VariantNumber`, `Rect`, `SlotPlacement`, `FloorButtonView`, `NameplateView`, `Frame`, `SceneLayout`), `GHOST_TYPE_OF`, the floor rectangles and slot bands of the design "World geometry", the ghost boxes of the "Ghost types" table, and `slotRects(floor, count)` by the "Slot layout rule" (gap 8).
     - Create `packages/web/src/view/scenic/model/sceneLayout.test.ts` with examples: with 5 Cards the slots are 88 × 97 (attic), 72 × 207 (middle floor) and 100 × 142 (basement); `GHOST_TYPE_OF` maps attic, middle floor and basement to Wisp, Lantern_Wraith and Chained_Brute.
     - Verify: `npm run check` exits `0`.
