@@ -42,7 +42,7 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-16 | Web multilingüe: solo idea de FUTURO. No antes del 4 dic. Se menciona en el README y en Devpost con una sola línea | Decidido por Luis Miguel. Traducir la web y el Tutor no cabe antes de la entrega | Hacerla multilingüe en esta versión |
 | 2026-11-16 | Presentarse como estudiante individual (Best Student Project) | El organizador confirmó en el foro de Devpost que un ciclo de FP en un centro reconocido cuenta. Hay que añadir LinkedIn, correo de estudiante, curso y titulación, y nombre del centro. Pueden pedir prueba de matrícula | — |
 
-| 2026-11-17 | Eslogan: "Your repo is haunted. Let's fix that." | Decidido por el director el 17 nov. | "Your repo is haunted. Who you gonna call?" (ver "Rechazado") |
+| 2026-11-17 | Eslogan: "Your repo is haunted. Let's fix that." | Decidido por el director el 17 nov. El director eligió "Let's fix that." porque es una redacción propia y segura, sin cita directa de una película. El riesgo de marca de terceros en las reglas del concurso no se comprobó, así que se evitó. | "Your repo is haunted. Who you gonna call?" (ver "Rechazado") |
 ## Rechazado (no volver a proponer sin evidencia nueva)
 
 | Fecha | Propuesta | Quién la hizo | Por qué no |
@@ -54,4 +54,4 @@ Una línea por decisión importante: qué se eligió y por qué.
 | 2026-11-05 | Idea "Exorcista" (app Android para limpiar el móvil de mayores) | Claude | Android no deja ver lo necesario sin permisos especiales; instalarla fuera de Play Store sería un mal ejemplo de seguridad |
 | 2026-11-05 | Ideas "Cementerio de Internet", "Kit de comunidad", "Muro Frankenstein" | Hilo de ideas | Poco originales, doble de trabajo o demo frágil |
 | 2026-11-11 | Aplicar `npm audit fix` a los 10 avisos moderados de minimatch (solo dev) | Ya decidido; el motivo no se anotó en su día (sale del aviso de la tarea 1.1) | Bajaría ESLint a 9 (PR #4). Revisar cuando typescript-eslint/eslint publiquen una versión corregida (`PLAN.md`) |
-| 2026-11-17 | Eslogan "Your repo is haunted. Who you gonna call?" | Director | Descartado el 17 nov en favor de "Let's fix that." |
+| 2026-11-17 | Eslogan "Your repo is haunted. Who you gonna call?" | Director | Descartado el 17 nov en favor de "Let's fix that." Motivo: ver la fila de la tabla principal (sin cita directa de una película). |
