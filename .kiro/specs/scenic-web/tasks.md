@@ -218,7 +218,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.1, 20.2, 20.3, 18.4_
     - _Design: "Source_Scan additions" items 6 to 9, "Animation Catalogue"_
 
-  - [ ] 2.5 Source_Scan items 15, 16 and 17
+  - [x] 2.5 Source_Scan items 15, 16 and 17
     - Item 15: no scenic file imports `view/assets/` or `view/simple/`, and no simple file imports `view/scenic/`.
     - Item 16: no `fetch(` in scenic files.
     - Item 17: `packages/web/gallery.html` joins the presentation files (storage, raw HTML, external address, inline style, "Power"), read only if it exists; task 7.5 turns its existence into an assertion.

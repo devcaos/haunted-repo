@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -32,12 +32,16 @@ const srcFiles: SourceFile[] = readdirSync(join(WEB_DIR, "src"), {
   .sort()
   .map(read);
 const indexHtml = read("index.html");
-const allFiles = [...srcFiles, indexHtml];
+// The dev-only gallery page (task 7.5 turns its existence into an assertion).
+const galleryFiles = existsSync(join(WEB_DIR, "gallery.html"))
+  ? [read("gallery.html")]
+  : [];
+const allFiles = [...srcFiles, indexHtml, ...galleryFiles];
 const logicFiles = srcFiles.filter(
   (f) => f.path.startsWith("src/logic/") || f.path.startsWith("src/sample/"),
 );
 const viewFiles = srcFiles.filter((f) => f.path.startsWith("src/view/"));
-const presentationFiles = [indexHtml, ...viewFiles];
+const presentationFiles = [indexHtml, ...galleryFiles, ...viewFiles];
 const SCENIC_DIR = "src/view/scenic/";
 const TOKENS_CSS = "src/view/simple/tokens.css";
 const simpleCssFiles = viewFiles.filter(
@@ -752,5 +756,80 @@ describe("scenic motion rules (Requirements 18.4, 20.1 to 20.3)", () => {
     expect(filterBreaks("a { filter: none; mix-blend-mode: none; }")).toEqual(
       [],
     );
+  });
+});
+
+// Scenic imports and network (Requirements 22.10, 25.2 to 25.4, 25.8).
+const SCENIC_FORBIDDEN_IMPORT =
+  /\b(?:from|import)\s*\(?\s*["'][^"']*(?:\bassets|\bsimple)\/[^"']*["']/;
+const SIMPLE_FORBIDDEN_IMPORT =
+  /\b(?:from|import)\s*\(?\s*["'][^"']*\bscenic\/[^"']*["']/;
+const FETCH_CALL = /\bfetch\s*\(/;
+
+describe("scenic imports and network (Requirements 22.10, 25.2 to 25.4)", () => {
+  const simpleFiles = viewFiles.filter((f) =>
+    f.path.startsWith("src/view/simple/"),
+  );
+
+  it("no scenic file imports view/assets or view/simple", () => {
+    expect(offenders(scenicTsFiles, SCENIC_FORBIDDEN_IMPORT)).toEqual([]);
+  });
+
+  it("no simple file imports view/scenic", () => {
+    expect(simpleFiles.length).toBeGreaterThan(0);
+    expect(offenders(simpleFiles, SIMPLE_FORBIDDEN_IMPORT)).toEqual([]);
+  });
+
+  it("no scenic file calls fetch", () => {
+    expect(
+      scenicTsFiles
+        .filter((f) => FETCH_CALL.test(withoutComments(f.text)))
+        .map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("self-check: the import rules catch the forbidden paths", () => {
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import { a } from "../assets/resolve.js";'),
+    ).toBe(true);
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import { a } from "../simple/dom.js";'),
+    ).toBe(true);
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import("../../view/assets/x.js")'),
+    ).toBe(true);
+    expect(SCENIC_FORBIDDEN_IMPORT.test('import { a } from "./dom.js";')).toBe(
+      false,
+    );
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import { a } from "../shared/focus.js";'),
+    ).toBe(false);
+    expect(
+      SIMPLE_FORBIDDEN_IMPORT.test('import { a } from "../scenic/hud.js";'),
+    ).toBe(true);
+    expect(
+      SIMPLE_FORBIDDEN_IMPORT.test('import { a } from "../shared/focus.js";'),
+    ).toBe(false);
+  });
+
+  it("self-check: the fetch rule catches a call", () => {
+    expect(FETCH_CALL.test('const r = await fetch("/a");')).toBe(true);
+    expect(FETCH_CALL.test("window.fetch (url)")).toBe(true);
+    expect(FETCH_CALL.test("const prefetched = 1;")).toBe(false);
+  });
+});
+
+describe("gallery page (Requirement 25.8)", () => {
+  it("follows the presentation rules when it exists", () => {
+    expect(offenders(galleryFiles, STORAGE)).toEqual([]);
+    expect(offenders(galleryFiles, RAW_HTML)).toEqual([]);
+    expect(offenders(galleryFiles, POWER_WORD)).toEqual([]);
+    expect(offenders(galleryFiles, INLINE_STYLE)).toEqual([]);
+    expect(galleryFiles.filter((f) => hasExternalAddress(f.text))).toEqual([]);
+  });
+
+  it("is part of the presentation files only when it exists", () => {
+    const listed = presentationFiles.some((f) => f.path === "gallery.html");
+    expect(listed).toBe(galleryFiles.length > 0);
   });
 });
