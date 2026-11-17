@@ -516,3 +516,53 @@ describe("Property 7", () => {
     expect(busyRuns).toEqual(new Set([true, false]));
   });
 });
+
+describe("Property 8", () => {
+  // Feature: scenic-web, Property 8: Nameplates show every Card of the focused floor
+  // **Validates: Requirements 6.4, 6.5, 6.9, 8.3, 8.6, 17.3**
+  it("Nameplates show every Card of the focused floor", () => {
+    fc.assert(
+      fc.property(
+        viewModelArbWith({ paths: "any" }).filter(
+          (model) => model.scene.kind === "floor" && model.house !== null,
+        ),
+        (model) => {
+          if (model.scene.kind !== "floor" || model.house === null) return;
+          const focus = model.scene.floor;
+          const view = model.house.floors.find((v) => v.floor === focus);
+          const cards = view?.ghosts ?? [];
+          const layout = sceneLayout(model);
+          expect(layout.nameplates).toHaveLength(cards.length);
+          cards.forEach((card, i) => {
+            const plate = layout.nameplates[i];
+            const label = TEXTS.ghostStateLabels[card.state];
+            expect(plate).toMatchObject({
+              index: i,
+              path: card.path,
+              reason: card.reason,
+              scoreLine: TEXTS.scoreLine(card.score),
+              stateLabel: label,
+              state: card.state,
+              lockedLine: card.lockedLine,
+            });
+            const locked =
+              card.lockedLine === null ? "" : `, ${card.lockedLine}`;
+            expect(plate?.accessibleName).toBe(
+              `${card.path}, ${view?.title}, difficulty ${card.score} of 100, ${label}${locked}`,
+            );
+            if (card.state === "locked") {
+              expect(plate?.accessibleName).toContain(card.lockedLine ?? "");
+            }
+          });
+          expect(layout.emptyLine).toBe(view?.emptyLine ?? null);
+          expect(layout.emptyFloors).toEqual(
+            model.house.floors
+              .filter((v) => v.emptyLine !== null)
+              .map((v) => v.floor),
+          );
+        },
+      ),
+      { numRuns: 200 },
+    );
+  });
+});

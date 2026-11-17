@@ -385,7 +385,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.6, 8.2, 8.7, 8.13, 14.3_
     - _Design: "Correctness Properties", Property 7_
 
-  - [ ] 3.12 Property test for Nameplates
+  - [x] 3.12 Property test for Nameplates
     - **Property 8: Nameplates show every Card of the focused floor**
     - **Validates: Requirements 6.4, 6.5, 6.9, 8.3, 8.6, 17.3**
     - Generator: `viewModelArb` restricted to Floor_Scenes, at least 100 runs. Checks the fields, the accessible name with the locked line for Locked Cards, `emptyLine` and `emptyFloors`.
