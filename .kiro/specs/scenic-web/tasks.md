@@ -523,7 +523,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.7, 6.2, 18.4_
     - _Design: "Animation Catalogue", D9_
 
-  - [ ] 5.8 Wire the stage into the renderer
+  - [x] 5.8 Wire the stage into the renderer
     - In `renderer.ts`: every render computes `sceneLayout(model)`, updates the stage (slots, dims, empty floors, camera frame for the current viewport class from `watchMedia(WIDE_QUERY)`, no animation on the first render), and shows the Scene_Heading (`h2.scene-heading`, `tabindex="-1"`) with `layout.heading` in `.scene-bar`. Import `stage.css` and `ghosts.css` from `entry.ts`.
     - Verify: `npm run check` exits `0`; `?view=scenic` in `npm run dev -w @haunted-repo/web` (run by the director) shows the house with Wisps in the attic.
     - Commit message: `feat(web): draw the house scene in the scenic view`
