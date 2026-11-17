@@ -212,8 +212,8 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 
 1. THE HUD SHALL be real HTML placed over the scene, outside the SVG, in the House_Scene, the Floor_Scene and the Ghost_Scene.
 2. THE HUD SHALL show the logo text `TEXTS.pageTitle` ("Haunted Repo") and the tagline "Your repo is haunted. Let's fix that." (a new text in `texts.ts`).
-3. WHILE `house` is not `null` and `house.progress` is not `null`, THE Haunt_Meter SHALL show `house.progress.line` as text, and a bar whose filled width divided by its full width equals `house.progress.share` (0 to 1) within 0.01, except while `scene.kind` is `"ghost"` (see Open question 1 and Requirement 12.6).
-4. WHILE `house` is not `null` and `house.progress` is not `null`, THE HUD SHALL show exactly `house.progress.total` Ghost_Icons (one per Card of the sample, 5 for sirv): `house.progress.haunted` of them shown as haunted and `house.progress.total - house.progress.haunted` shown as exorcised, with the same exception as criterion 3 (see Open question 1).
+3. WHILE `house` is not `null` and `house.progress` is not `null`, THE Haunt_Meter SHALL show `house.progress.line` as text, and a bar whose filled width divided by its full width equals `house.progress.share` (0 to 1) within 0.01, except while `scene.kind` is `"ghost"`: then the Haunt_Meter keeps showing the text and the bar of the last House_Scene or Floor_Scene render, and moves to the new values in the first House_Scene or Floor_Scene render after the Ghost_Scene (Requirement 12.6).
+4. WHILE `house` is not `null` and `house.progress` is not `null`, THE HUD SHALL show exactly `house.progress.total` Ghost_Icons (one per Card of the sample, 5 for sirv): `house.progress.haunted` of them shown as haunted and `house.progress.total - house.progress.haunted` shown as exorcised, with the same exception as criterion 3: while `scene.kind` is `"ghost"` the Ghost_Icons keep the haunted and exorcised states of the last House_Scene or Floor_Scene render, and change to the new states in the first House_Scene or Floor_Scene render after the Ghost_Scene.
 5. WHILE `live.formVisible` is true, THE HUD SHALL show the Live_Plaque with a field labelled `TEXTS.formLabel` and a submit button labelled `TEXTS.actionLabels["submit-live"]`.
 6. WHILE `live.formVisible` is false, THE HUD SHALL hide the Live_Plaque.
 7. WHEN the judge submits the Live_Plaque (by clicking the submit button or by pressing Enter in the field, as in the Simple_Renderer form), THE Scenic_Renderer SHALL dispatch exactly one `{ type: "submit-live", url }`, where `url` is the field text as typed, with no trimming or other change.
@@ -231,6 +231,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 
 #### Edge cases
 
+- The judge exorcises a ghost: in the render where the step becomes `self-check`, `house.progress` already holds the new values, but while the Ghost_Scene is open the Haunt_Meter and the Ghost_Icons still show the values of the last House_Scene or Floor_Scene render (criteria 3 and 4).
 - A live report is shown: the Haunt_Meter and the Ghost_Icons are hidden (criterion 17) and the Power line is shown (criterion 14).
 - The sample failed to load: `house` and `licence` are `null`. The HUD shows the logo, the tagline, the Status_Region, the Simple_View_Link, the Lightning_Toggle and the Bestiary. The Live_Plaque follows `live.formVisible` (the Logic_Layer decides); its button is disabled because Available_Actions is empty.
 - The Ghost_Scene is open: the Live_Plaque is hidden (`live.formVisible` false) and the rest of the HUD stays. When the judge leaves the Ghost_Scene, the field still holds the text typed before (criterion 9).
@@ -354,7 +355,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 1. THE Scenic_Renderer SHALL draw the Telephone on the telephone table of the Entrance_Hall as an original antique desk telephone, with no logo, no film character and no sound, WHILE `scene.kind` is `"house"` or `"floor"`. WHILE `scene.kind` is `"ghost"`, THE Scenic_Renderer SHALL NOT draw the Telephone.
 2. WHEN the Scenic_Renderer draws the House_Scene for the first time in a page load, and `house.source` is `"sample"` and the Telephone_Target exists, THE Telephone SHALL play the Opening_Rings: three Rings in a row, about 6 s in total.
 3. WHILE `house.source` is `"sample"`, the Telephone_Target exists, the Opening_Rings have ended and the judge has not yet activated the Answer_Button in this page load, THE Telephone SHALL play one Ring every 20 s, counted from the end of the previous Ring.
-4. WHEN the judge has activated the Answer_Button at least once in this page load, an Exorcised_Moment has played since the last Ring, and a Telephone_Target exists, THE Telephone SHALL play exactly one Ring (for the exact moment, see Open question 2). Apart from this criterion and criterion 5, THE Telephone SHALL NOT ring after the first answer.
+4. WHEN the judge has activated the Answer_Button at least once in this page load, an Exorcised_Moment has played since the last Ring, and a Telephone_Target exists, THE Telephone SHALL play exactly one Ring, in the first House_Scene or Floor_Scene render after the Ghost_Scene in which that Exorcised_Moment played, after the Return_Glow (Requirement 12.6) has ended. Apart from this criterion and criterion 5, THE Telephone SHALL NOT ring after the first answer.
 5. WHEN the Scenic_Renderer receives a ViewModel with `house.source` `"live"` and `status.kind` `"done"`, and the ViewModel it received just before had `status.kind` `"busy"`, THE Telephone SHALL start the Live_Call and keep Ringing without a pause until one of these happens: the judge activates the Answer_Button; a later ViewModel shows a different report (a different `house.source` or a different list of Card paths); a later ViewModel has `status.kind` `"error"` or `"busy"`. A change of Scene between the House_Scene and a Floor_Scene SHALL neither stop nor restart the Live_Call.
 6. WHILE no Ring and no Live_Call plays, THE Telephone SHALL be still: no shake, no vibration lines, no orange glow and no "RING!" bubble.
 7. WHILE `scene.kind` is `"house"` or `"floor"`, THE Scenic_Renderer SHALL show the Answer_Button over the Telephone: a real HTML button with the visible label "Answer the phone" (a new text in `texts.ts`), the same whether the Telephone is Ringing or still. WHILE `scene.kind` is `"ghost"`, THE Scenic_Renderer SHALL NOT show the Answer_Button and SHALL NOT include it in the tab order.
@@ -369,13 +370,15 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 #### Edge cases
 
 - At load the sample has 2 Cards with `canStart`, so the Opening_Rings play, then one Ring every 20 s until the judge answers.
-- The judge answers at once: the Ring stops, the first Telephone_Target (`bench/static.js` in the sirv report order, if it is first) opens, and from then on the Telephone rings only once after each Exorcised_Moment.
+- The judge answers at once: the Ring stops, the first Telephone_Target (`bench/static.js` in the sirv report order, if it is first) opens, and from then on the Telephone rings only once per Ghost_Scene visit with an Exorcised_Moment, after the Return_Glow.
 - While a live analysis runs (`status.kind` `"busy"`), every `canStart` is false (`startAllowed` is false while busy), so there is no Telephone_Target: no Ring, and answering shows "The line is quiet."
 - After both Scripted_Ghosts are exorcised, no Card has `canStart`: no Ring follows the second Exorcised_Moment, and answering shows "The line is quiet."
 - A Scripted_Ghost ended in `failed` and the judge went back to the floor: its Card has `canStart` true again (step `failed` accepts `pick-ghost`), so a Telephone_Target exists. Before the first answer the 20 s Rings go on; after it, no Ring plays, because no Exorcised_Moment happened.
 - The judge walks between floors during the Live_Call: it keeps ringing (criterion 5).
 - A live analysis ends with a show-message error (`status.kind` `"error"`) or the fallback (`status.kind` `"fallback"`): no Live_Call starts. After the fallback the sample rules apply, with the answers already given in this page load.
 - The judge starts a new live analysis during a Live_Call: the `"busy"` ViewModel stops it (criterion 5).
+- The judge exorcises a ghost, then walks back to the House_Scene or a Floor_Scene: the Return_Glow plays first, then one Ring, only if a Telephone_Target exists at that render. If none exists (for example after the second Scripted_Ghost), no Ring plays.
+- The Exorcised_Moment plays but the judge never leaves the Ghost_Scene: no Ring plays, because the Telephone is not drawn there.
 - The sample cannot be loaded (`house` is `null`, Available_Actions is empty): the Telephone is still, and answering shows "The line is quiet." and dispatches nothing.
 - The judge activates the Answer_Button with the keyboard (Enter or Space): the result is the same as a pointer activation (criteria 8 to 10).
 - The first House_Scene render has no Telephone_Target (for example an invalid Demo_Script): no Opening_Rings.
@@ -650,7 +653,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 6. IF `packages/web/dist/` does not exist, THEN THE Size_Check SHALL fail with a non-zero exit code and a message that names `npm run build`.
 7. IF the size total of the files in `packages/web/dist/` and all its subfolders is 300 KB (307,200 bytes) or more, THEN THE Size_Check SHALL fail with a non-zero exit code. The size total is the sum of the gzipped sizes of every `.js`, `.css`, `.svg`, `.woff2`, `.woff`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.avif` and `.ico` file, each file gzipped separately at the default level of Node's zlib.
 8. WHEN the Size_Check runs, THE Size_Check SHALL print the measured total in bytes and the 307,200-byte limit, whether it passes or fails.
-9. THE Size_Check SHALL also fail when a built file in `packages/web/dist/` contains an external address, by the rule of the Source_Scan (the SVG namespaces are allowed) (see Open question 3).
+9. THE Size_Check SHALL also fail when a built file in `packages/web/dist/` contains an external address, by the rule of the Source_Scan (the SVG namespaces are allowed), but only for the built HTML, CSS and SVG files. THE Size_Check SHALL NOT check JavaScript or `.txt` files for external addresses.
 10. THE Size_Check SHALL run on Windows PowerShell and on Linux using only Node.js built-in modules and the project's npm dependencies, with no shell-specific commands and no network access.
 
 #### Edge cases
@@ -660,6 +663,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - woff2 fonts barely shrink with gzip, so their gzipped size is close to their file size.
 - Image files in `dist/` count (criterion 7), even though the Scenic_Renderer adds none.
 - A total of exactly 307,200 bytes fails.
+- The built JavaScript bundle and `sirv-license.txt` hold `https://api.github.com`, `https://github.com/owner/repo` and `https://lukeed.com`. They are not checked for external addresses, so the Size_Check passes on them (criterion 9).
 - Files with other extensions (`.html`, `.txt` such as `sirv-license.txt` and the font licences, `.map`) do not count in the size.
 - `npm test` alone on a clean checkout does not need `dist/`, because the Size_Check is a separate script (web-demo Requirement 13.2 still holds).
 - Under Reduced_Motion the same 15-animation limit applies. The count is expected to be lower.
@@ -842,7 +846,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 | "Simple view", "Scenic view", "Answer the phone", the "call waiting" addition, "The line is quiet.", "Lightning: on/off", the Lightning reason, the tagline, the Finale lines, the Bestiary texts, the Nameplate accessible name | no | — | New texts to add to `texts.ts` (and `powerTexts.ts` for the Finale line that names the Power). |
 | Telephone_Target for a live report | no | — | A live report has no Card with `canStart`, so there is never a target; the Live_Call (Requirement 9.5) covers it. |
 | A "demo complete" field | no | — | Derived from Card states and the Scene (Requirement 13.6), no new field. |
-| External addresses in the build | yes | `dist/` JS and `sirv-license.txt` | `https://api.github.com` (`githubClient.ts`), `https://github.com/owner/repo` (`repoUrl.ts` message) and `https://lukeed.com` (sirv copyright). See Open question 3. |
+| External addresses in the build | yes | `dist/` JS and `sirv-license.txt` (not checked, by the director's answer) | `https://api.github.com` (`githubClient.ts`), `https://github.com/owner/repo` (`repoUrl.ts` message) and `https://lukeed.com` (sirv copyright). Only built HTML, CSS and SVG files are checked (Requirement 20.9). |
 
 ## Left to the design
 
@@ -862,11 +866,3 @@ The director answered these on 17 Nov. They are constraints for `design.md`, not
 - **D12.** Whether the Shots_Script runs the build itself before `vite preview`, or stops with a message naming `npm run build` when `dist/` is missing.
 - **D13.** Whether the Opening_Rings wait for the Intro to end ("one eye-catching anomaly at a time").
 - **D14.** Where the Answer_Button sits when the Camera frames a floor other than the middle floor; it stays shown and reachable there (Requirements 9.7 and 17.5), like the floor buttons of dimmed floors.
-
-## Open Questions
-
-The director answered every question on 17 Nov. These three remain because an answer clashes with another answer or with the code.
-
-1. **Haunt_Meter and Ghost_Icons during the Ghost_Scene.** Answer 5 says the Haunt_Meter animates when the judge comes back to the house or a floor (Requirement 12.6). But the HUD, with the Haunt_Meter and the Ghost_Icons, is shown in the Ghost_Scene too (Requirements 4.1, 4.3 and 4.4), and `house.progress` already holds the new share in the render where the step becomes `self-check`, while the room is still open. If the meter followed `house.progress` there, it would move in the room, not on return. Options: (A) while `scene.kind` is `"ghost"`, the Haunt_Meter and the Ghost_Icons keep showing the values of the last House_Scene or Floor_Scene render; (B) the Haunt_Meter and the Ghost_Icons are hidden in the Ghost_Scene. Requirements 4.3 and 4.4 point here until this is decided.
-2. **The Ring "right after each Exorcised_Moment".** The extra change says that after the first answer the Telephone rings once right after each Exorcised_Moment. But the Exorcised_Moment plays in the Ghost_Scene (answer 5), and the Telephone is not drawn in the Ghost_Scene (answer 28). So the Ring cannot play right after the Exorcised_Moment. Options: (A) the Ring plays once in the first House_Scene or Floor_Scene render after that Ghost_Scene, after the Return_Glow; (B) the Ring plays once at the same time as the Return_Glow. Requirement 9.4 points here until this is decided.
-3. **External-address check on `dist/`.** Answer 44 asks `npm run size` to fail if any built file in `dist/` contains an external address, by the Source_Scan rule. The build of today already holds three: `https://api.github.com` (the live analysis needs it, `packages/core/src/ghost-detection/githubClient.ts`), `https://github.com/owner/repo` (an example in the error message of `repoUrl.ts`) and `https://lukeed.com` (the sirv copyright line, in the JavaScript bundle and in `sirv-license.txt`). As written, the check would fail on the current build. The Source_Scan rule avoids this today because it scans only `index.html` and `src/view/`. Options: (A) check only the built HTML, CSS and SVG files (the ones that load fonts, images, style sheets and scripts), not the JavaScript or `.txt` files; (B) check every file, with a fixed allow-list of these three addresses; (C) check only loading positions (`url(...)`, `src=`, `href=` and `@import`) in every built file. Requirement 20.9 points here until this is decided.
