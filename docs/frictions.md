@@ -414,3 +414,27 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** El Student contestó la pregunta 3 en español. En la primera ronda el Tutor le pidió inglés; esta vez la aceptó y juzgó el contenido. La skill obliga al Tutor a escribir en inglés, pero no dice nada de las respuestas del Student.
 - **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md y amplié el Low que ya estaba en PLAN.md.
 - **Estado:** abierto (sin cambiar la skill todavía)
+
+## 17 nov 2026: PowerShell 5 estropeó los caracteres de tasks.md al editarlo con un script
+- **Qué intentaba:** Marcar la tarea 4.5 de `scenic-web` con un script de PowerShell (`Get-Content -Raw` y `WriteAllText`).
+- **Qué pasó:** PowerShell 5 lee un archivo UTF-8 sin BOM como si fuera ANSI. Los símbolos ×, − y ° de 22 líneas de `tasks.md` quedaron rotos y entraron en el commit de la tarea 4.5, que aún no estaba subido.
+- **Cómo lo rodeé:** Restauré `tasks.md` desde el commit anterior, marqué la tarea con la herramienta de edición de Kiro y corregí el commit con `--amend` antes de subirlo. Para archivos con caracteres no ASCII, no usar `Get-Content -Raw` sin `-Encoding utf8`.
+- **Estado:** cerrado
+
+## 17 nov 2026: La regla de "sin nombres del DOM" salta con una clase CSS
+- **Qué intentaba:** Dibujar la torre de la casa (tarea 4.4) con una ventana de clase `tower-window`.
+- **Qué pasó:** El elemento 10 del Source_Scan busca la palabra `window` en `model/` y `art/`, y el guion de `tower-window` cuenta como límite de palabra. El test falló.
+- **Cómo lo rodeé:** Cambié la clase a `tower-slit`. La tarea 5.2 dibujará las ventanas de los huecos en `art/` y tendrá el mismo problema; lo anoté en "Pendientes" de PLAN.md.
+- **Estado:** abierto (falta decidir un nombre de clase o afinar la regla)
+
+## 17 nov 2026: Un test de propiedad del Power pasó de 5 s una vez
+- **Qué intentaba:** Pasar `npm run check` después de la tarea 4.4 de `scenic-web`.
+- **Qué pasó:** `packages/power/src/dataFile.roundtrip.property.test.ts` (Property 3, guardado en una carpeta real) superó el límite de 5000 ms. El cambio no tocaba el Power.
+- **Cómo lo rodeé:** Volví a ejecutar `npm run check` y pasó. Las siguientes ejecuciones también pasaron.
+- **Estado:** abierto (si se repite, subir el tiempo límite de ese test o bajar sus ejecuciones)
+
+## 17 nov 2026: frictions.md tiene caracteres de control que confunden la edición
+- **Qué intentaba:** Añadir estas entradas a `docs/frictions.md` con la herramienta de edición de Kiro.
+- **Qué pasó:** Una entrada anterior (la de "2 buenas de 3") tiene un salto de página y un retorno de carro sueltos donde iban `` `f `` y `` `r `` (escapes de PowerShell). La edición borró una línea de otra entrada.
+- **Cómo lo rodeé:** Restauré el archivo desde git y añadí las entradas al final con Node. Los caracteres de control siguen ahí.
+- **Estado:** abierto (arreglar esa entrada a mano en una limpieza de docs)
