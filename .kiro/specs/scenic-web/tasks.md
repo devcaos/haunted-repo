@@ -442,7 +442,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.3, 22.1_
     - _Design: "Depth layers (back to front)", "World geometry"_
 
-  - [ ] 4.4 Draw the house shell
+  - [x] 4.4 Draw the house shell
     - Create `packages/web/src/view/scenic/art/house.ts` with `houseLayer()`: walls, roof with the off-centre ridge, chimney, crooked tower, attic oculus, cut ground line, rim paths, with one group per floor whose rectangle matches the Scene_Layout floor rectangles.
     - Extend `art.test.ts`: the tree passes the rules; the house layers are not a mirror image about the vertical centre line (3.4); each floor group's rectangle equals the Scene_Layout floor rectangle.
     - Verify: `npm run check` exits `0`.

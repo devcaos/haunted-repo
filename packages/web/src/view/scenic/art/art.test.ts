@@ -11,6 +11,8 @@ import {
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
+import { FLOOR_RECT } from "../model/sceneLayout.js";
+import { FLOOR_CLASS, houseLayer } from "./house.js";
 import { foregroundLayer, skyLayers, weatherLayer } from "./sky.js";
 
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
@@ -177,5 +179,55 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(
       classesOf(foregroundLayer()).filter((c) => c === "grave"),
     ).toHaveLength(3);
+  });
+});
+
+/** The x, y points a node and its children name (rect corners, centres, polygon and path numbers). */
+function pointsOf(tree: ShapeNode): [number, number][] {
+  return nodesOf(tree).flatMap((n): [number, number][] => {
+    if (n.kind === "rect") {
+      const { x = 0, y = 0, width = 0, height = 0 } = n;
+      return [
+        [x, y],
+        [x + width, y + height],
+      ];
+    }
+    if (n.cx !== undefined && n.cy !== undefined) return [[n.cx, n.cy]];
+    const numbers =
+      n.points ?? (n.d?.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+    const pairs: [number, number][] = [];
+    for (let i = 0; i + 1 < numbers.length; i += 2) {
+      pairs.push([numbers[i] ?? 0, numbers[i + 1] ?? 0]);
+    }
+    return pairs;
+  });
+}
+
+describe("house (Requirements 3.1, 3.4)", () => {
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(houseLayer())).toEqual([]);
+  });
+
+  it("each floor group's room back is the Scene_Layout floor rectangle", () => {
+    for (const floor of ["attic", "middle floor", "basement"] as const) {
+      const group = nodesOf(houseLayer()).find(
+        (n) => n.part === FLOOR_CLASS[floor],
+      );
+      const back = group?.children?.find((n) => n.part === "room-back");
+      const { x, y, w, h } = FLOOR_RECT[floor];
+      expect(back).toMatchObject({ kind: "rect", x, y, width: w, height: h });
+    }
+  });
+
+  it("is not a mirror image about the vertical centre line", () => {
+    const scene = [skyLayers(), houseLayer(), foregroundLayer()];
+    const points = scene.flatMap(pointsOf);
+    const seen = new Set(points.map(([x, y]) => `${x},${y}`));
+    const twins = points.filter(([x, y]) => seen.has(`${1600 - x},${y}`));
+    expect(twins.length).toBeLessThan(points.length / 2);
+    const roof = nodesOf(houseLayer()).find((n) => n.part === "roof");
+    const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
+    expect(roof?.points?.[2]).toBeLessThan(800); // the ridge is left of centre
+    expect(tower?.transform?.translate?.[0]).toBeGreaterThan(800);
   });
 });
