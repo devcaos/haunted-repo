@@ -402,3 +402,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** El paso model-answer apareció bien. Pero al final el fantasma quedó en ailed con 2 ight de 3: el motor guarda el segundo "I don't know" como wrong y la pregunta principal (la primera) no puede ser wrong (decide en engine.ts; coincide con product.md).
 - **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md como comportamiento esperado, y como Low en PLAN.md. Para la próxima ronda con self-check, no usar I don't know en la pregunta 1.
 - **Estado:** abierto (sin cambiar nada; valorar un aviso en la skill)
+
+## 17 nov 2026: La skill no tiene forma de provocar un warning
+- **Qué intentaba:** Probar que el Tutor avisa una sola vez de un warning (tercera ronda de la 11.1).
+- **Qué pasó:** La skill solo dice qué hacer si llega un warning. En el código solo sale cuando la carpeta de datos no se puede escribir (MEMORY_MODE_WARNING) o falla un guardado (saveFailedWarning). El Student no puede provocarlo con ninguna respuesta.
+- **Cómo lo rodeé:** Lo dejé como no probado en docs/spike-power-e2e.md y como Low en PLAN.md. Queda el test automático de power.test.ts.
+- **Estado:** abierto (hacería falta ejecutar el Power con una carpeta de datos sin permiso de escritura)
