@@ -182,7 +182,11 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
   });
 });
 
-/** The x, y points a node and its children name (rect corners, centres, polygon and path numbers). */
+/**
+ * The x, y points a node and its children name: rect corners, centres, polygon
+ * points and path numbers read in pairs (rough for relative path data, which is
+ * enough to tell a mirrored drawing from one that is not).
+ */
 function pointsOf(tree: ShapeNode): [number, number][] {
   return nodesOf(tree).flatMap((n): [number, number][] => {
     if (n.kind === "rect") {
@@ -229,5 +233,47 @@ describe("house (Requirements 3.1, 3.4)", () => {
     const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
     expect(roof?.points?.[2]).toBeLessThan(800); // the ridge is left of centre
     expect(tower?.transform?.translate?.[0]).toBeGreaterThan(800);
+  });
+});
+
+describe("rooms (Requirements 3.1, 3.2)", () => {
+  const part = (name: string): ShapeNode | undefined =>
+    nodesOf(houseLayer()).find((n) => n.part === name);
+  // Left and right edges of the rects, circles and ellipses of a part. Paths
+  // are skipped: the books (relative path data) sit inside their bookcase rect.
+  const xs = (name: string): number[] =>
+    nodesOf(part(name) ?? g("none", [])).flatMap((n) => {
+      if (n.kind === "rect") return [n.x ?? 0, (n.x ?? 0) + (n.width ?? 0)];
+      const r = n.rx ?? n.r ?? 0;
+      return n.cx === undefined ? [] : [n.cx - r, n.cx + r];
+    });
+
+  it("the Entrance_Hall, with the front door and the table, is left of the Parlour", () => {
+    expect(Math.max(...xs("entrance-hall"))).toBeLessThanOrEqual(760);
+    expect(Math.min(...xs("parlour"))).toBeGreaterThanOrEqual(760);
+    const hall = part("entrance-hall");
+    expect(hall === undefined ? [] : classesOf(hall)).toEqual(
+      expect.arrayContaining(["door", "telephone-table"]),
+    );
+  });
+
+  it("each floor holds its furniture", () => {
+    const furniture = {
+      attic: ["beams", "cobweb", "trunk"],
+      "middle floor": [
+        "door",
+        "telephone-table",
+        "fireplace",
+        "shelves",
+        "portrait-frame",
+      ],
+      basement: ["stone-joints", "boiler", "pipe", "chain"],
+    } as const;
+    for (const [floor, names] of Object.entries(furniture)) {
+      const group = part(FLOOR_CLASS[floor as keyof typeof furniture]);
+      expect(group === undefined ? [] : classesOf(group)).toEqual(
+        expect.arrayContaining([...names]),
+      );
+    }
   });
 });

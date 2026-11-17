@@ -450,7 +450,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 3.4, 22.1_
     - _Design: "House composition", "World geometry"_
 
-  - [ ] 4.5 Draw the rooms
+  - [x] 4.5 Draw the rooms
     - In `house.ts` add the room contents: attic (rafters, cobwebs, trunk), Entrance_Hall (front door, transom window, telephone table), Parlour (fireplace, shelves, portrait), basement (stone walls, boiler, pipes, chains).
     - Extend `art.test.ts`: the tree still passes the rules; the Entrance_Hall is left of the Parlour (3.2).
     - Verify: `npm run check` exits `0`.
