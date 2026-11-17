@@ -24,6 +24,8 @@ inclusion: always
 | Hosting | GitHub Pages (public repo) |
 | Lint / format | ESLint + Prettier |
 | Tests | Vitest, plus fast-check for property-based tests |
+| Visual review (planned, scenic-web spec) | Playwright at an exact version, only for the hand-run `npm run shots` screenshots. Not part of `npm run check` and not run in CI |
+| Display fonts (planned, scenic-web spec) | `@fontsource/creepster` and `@fontsource/im-fell-english` at exact versions, bundled locally (Latin subset, regular weight). SIL Open Font Licence |
 
 ## Layout
 - `packages/core/`: ghost detection and the exorcism engine, used by the web and the Power
