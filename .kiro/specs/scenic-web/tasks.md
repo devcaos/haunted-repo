@@ -480,7 +480,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.1, 5.4, 6.1, 22.1_
     - _Design: "The Wisp, Variant 0 (the vertical-slice ghost)", "Ghost types"_
 
-  - [ ] 5.2 Draw slots, windows and chained doors
+  - [x] 5.2 Draw slots, windows and chained doors
     - Create `packages/web/src/view/scenic/art/props.ts` with `slotArt(slot)` and `chainedDoorArt(floor)`: every slot has its back-wall window (sizes of the "Slot layout rule"), lit for Exorcised Cards and unlit otherwise; a Haunted attic slot draws the Wisp scaled by its `ghostScale`; until task 9.3, middle-floor and basement slots draw only their window, and attic Cards always use Variant 0 (Q15); a floor with no Card gets the chained door (no padlock).
     - Extend `art.test.ts`: window lit exactly for Exorcised slots; a Haunted attic slot has a `glow` part; the chained door has no padlock part; all trees pass the rules.
     - Verify: `npm run check` exits `0`.
