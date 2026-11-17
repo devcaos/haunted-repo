@@ -11,6 +11,8 @@ import { renderHouse } from "./house.js";
 import { renderLicence } from "./licence.js";
 import { type FocusBefore, focusAfterRender, focusKeyOf } from "./focus.js";
 
+// Dark launch (decision Q14): task 16.8 changes this to "./".
+const SCENIC_HREF = "?view=scenic";
 /** Where focus is now, seen from the rebuilt `main` element. */
 function focusBefore(main: HTMLElement): FocusBefore {
   const active = document.activeElement;
@@ -82,7 +84,14 @@ export function createSimpleRenderer(
   const footer = el("footer");
 
   root.replaceChildren(
-    el("header", {}, [el("h1", {}, [TEXTS.pageTitle]), form, status]),
+    el("header", {}, [
+      el("h1", {}, [TEXTS.pageTitle]),
+      el("a", { class: "view-link", href: SCENIC_HREF }, [
+        TEXTS.viewLinks.scenic,
+      ]),
+      form,
+      status,
+    ]),
     main,
     footer,
   );

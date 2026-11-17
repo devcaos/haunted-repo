@@ -66,4 +66,17 @@ export const TEXTS = {
   progress: (haunted: number, total: number) =>
     `${haunted} of ${total} ghosts still haunting`,
   engineError: "Something went wrong in the demo. You are back at the list.",
+  // Scenic view (scenic-web spec): shell texts.
+  tagline: "Your repo is haunted. Let's fix that.",
+  viewLinks: { simple: "Simple view", scenic: "Scenic view" },
+  viewLoadFailed: "The page could not be loaded. Please reload it.",
+  floorButtonName: (title: string, action: string) => `${title}. ${action}`,
+  nameplateName: (
+    path: string,
+    floor: string,
+    score: number,
+    state: string,
+    lockedLine: string | null,
+  ) =>
+    `${path}, ${floor}, difficulty ${score} of 100, ${state}${lockedLine === null ? "" : `, ${lockedLine}`}`,
 } as const;

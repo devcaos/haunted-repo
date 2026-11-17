@@ -55,19 +55,19 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 1
 
-- [ ] 1. PR 1a — Renderer choice and HUD shell
+- [x] 1. PR 1a — Renderer choice and HUD shell
   - Branch: `feat/scenic-web-1a`. Stacks on: `main` (created from an up-to-date `main`).
   - Estimate: ~850 changed lines. Model: Auto.
   - _Design: "PR Split" row 1a_
 
-  - [ ] 1.1 Create the branch from an up-to-date main
+  - [x] 1.1 Create the branch from an up-to-date main
     - Check that the pull request "docs(scenic-web): tasks" (branch `feat/scenic-web-tasks`, which commits `tasks.md` and `tasks.meta.json` if it exists) is merged into `main`.
     - Run `git switch main`, then `git pull --ff-only`, then check that `git status --short` prints nothing.
     - Run `git switch -c feat/scenic-web-1a`.
     - This task makes no commit of its own. It is marked `[x]` in the commit of task 1.2.
     - _Requirements: none (git workflow)_
 
-  - [ ] 1.2 Add the View_Choice with the dark-launch rule
+  - [x] 1.2 Add the View_Choice with the dark-launch rule
     - Create `packages/web/src/viewChoice.ts`: `ViewName` and `chooseView(search)`. During the dark launch it returns `"scenic"` only when `new URLSearchParams(search).get("view") === "scenic"`, and `"simple"` otherwise. It reads only the query string, never changes the address and stores nothing.
     - Create `packages/web/src/viewChoice.test.ts` with examples of the interim rule: no `view` gives `"simple"`; `?view=scenic` gives `"scenic"`; `?view=SCENIC` and `?view=` give `"simple"`; `?view=scenic&view=simple` gives `"scenic"`; `?view=simple&view=scenic` gives `"simple"`; a hash and other parameters do not change the choice.
     - Verify: `npm run check` exits `0`.
@@ -75,7 +75,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.7, 1.8_
     - _Design: "Renderer choice and CSS loading", "Dark launch (director decision Q14)"_
 
-  - [ ] 1.3 Property test for the View_Choice
+  - [x] 1.3 Property test for the View_Choice
     - **Property 12: The view is simple only for an exact first value**
     - **Validates: Requirements 1.1, 1.2, 1.3** (in its final form after task 16.8; until then it checks the dark-launch rule of decision Q14)
     - Generator of the design: query strings from random parameters (names `view`, `View`, `x`; values `simple`, `SIMPLE`, `simple `, ``, `scenic` and `fc.string()`; repeated `view` parameters in any order; optional leading `?`), at least 100 runs.
@@ -87,7 +87,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.1, 1.2, 1.3_
     - _Design: "Correctness Properties", Property 12_
 
-  - [ ] 1.4 Add the first scenic texts
+  - [x] 1.4 Add the first scenic texts
     - In `packages/web/src/logic/texts.ts` add, as new keys only: `tagline`, `viewLinks` (`simple`, `scenic`), `viewLoadFailed`, `floorButtonName(title, action)` and `nameplateName(path, floor, score, state, lockedLine)`, with the English values of the design section "New texts".
     - No existing key changes. Check with `git diff --numstat -- packages/web/src/logic/texts.ts`: 0 deleted lines.
     - Verify: `npm run check` exits `0`.
@@ -95,7 +95,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 4.2, 1.11, 3.6, 17.3_
     - _Design: "New texts"_
 
-  - [ ] 1.5 Add the action guard and the first generators
+  - [x] 1.5 Add the action guard and the first generators
     - Create `packages/web/src/view/scenic/model/actionGuard.ts`: `ActionGuard` and `createActionGuard(onAction)` with `setModel`, `current` and `send` (forwards only when a model exists and `isAvailable(model, action)` is true; returns whether it sent).
     - Create `packages/web/src/view/scenic/model/viewModelArb.testutil.ts` with:
       - `actionArb`, complete as in the design "Generators" (13 `UserAction` types, model paths and free strings, the 3 floors, ratings, self-check answers, free URLs).
@@ -106,7 +106,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.7, 2.8_
     - _Design: "scenic/model/actionGuard.ts", "Generators"_
 
-  - [ ] 1.6 Property test for the action guard
+  - [x] 1.6 Property test for the action guard
     - **Property 13: The renderer sends only available actions**
     - **Validates: Requirements 2.7, 2.8, 11.1**
     - Generator: sequences of `setModel` calls (from `viewModelArb`, minimal until task 3.1) and `send(action)` calls (from `actionArb`), at least 100 runs. Checks: an action is forwarded exactly when a model was set and `isAvailable(lastModel, action)` is true; nothing is forwarded before the first model.
@@ -117,7 +117,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.7, 2.8, 11.1_
     - _Design: "Correctness Properties", Property 13_
 
-  - [ ] 1.7 Add the HUD view
+  - [x] 1.7 Add the HUD view
     - Create `packages/web/src/view/scenic/model/renderMemory.ts` with only `MeterView` and `meterScale(share)` (share clamped to 0..1, 4 decimals). Task 14.3 adds the rest of the module.
     - Create `packages/web/src/view/scenic/model/hudView.ts`: `HudView` without the Lightning_Toggle fields (task 15.5 adds them) and `hudView(model)`, which takes the meter from `house.progress` with `from` always `null`. Task 14.6 changes it to `hudView(model, effects)`.
     - Create `packages/web/src/view/scenic/model/hudView.test.ts` with examples: logo `TEXTS.pageTitle` and the tagline (4.2); licence (4.11); meter line and `meterScale` within 0.01 of `share` for the sample (4.3); no meter and no icons when `house` or `house.progress` is `null` (4.17); `total` icons with `total - haunted` exorcised icons first (4.4); `plaque.visible` follows `live.formVisible` (4.5, 4.6).
@@ -126,7 +126,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.2, 4.3, 4.4, 4.5, 4.6, 4.11, 4.17_
     - _Design: "scenic/model/hudView.ts and scenic/model/grimoireView.ts", "scenic/model/renderMemory.ts"_
 
-  - [ ] 1.8 Property test for the HUD view
+  - [x] 1.8 Property test for the HUD view
     - **Property 9: The HUD view follows the ViewModel**
     - **Validates: Requirements 4.8, 4.10, 4.13, 4.14, 4.15, 4.16, 14.4**
     - Generator: `viewModelArb` (minimal until task 3.1), at least 100 runs. Checks `statusText`, `plaque.visible`, `plaque.submitEnabled`, `showSample`, `powerLine` and `warnings` exactly as in the design.
@@ -137,7 +137,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.8, 4.10, 4.13, 4.14, 4.15, 4.16, 14.4_
     - _Design: "Correctness Properties", Property 9_
 
-  - [ ] 1.9 Build the HUD DOM
+  - [x] 1.9 Build the HUD DOM
     - Create `packages/web/src/view/scenic/dom.ts`: `el(tag, attrs, children)`, text only through `textContent`.
     - Create `packages/web/src/view/scenic/hud.ts`, built once, with `update(hudView)` that changes only text, `hidden` and `disabled`: header (`h1.hud-logo`, `p.hud-tagline`, Haunt_Meter, Ghost_Icons as empty `aria-hidden` `span` elements with a `data-icon-state` attribute until task 9.7, Simple_View_Link `?view=simple`); aside (Live_Plaque form with the labelled field and submit button, `p.status` with `role="status"` and `aria-live="polite"`, `show-sample` button, Power line, report warnings); `footer` with the Licence_Notice; the Scenic_Announcer `p` with `aria-live="polite"`. The URL field is never replaced.
     - Imports from Core are `import type` only. No `innerHTML`. No test file: covered by the build, the Source_Scan and the PR manual checks.
@@ -146,7 +146,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.6, 4.1, 4.2, 4.5, 4.6, 4.9, 4.10, 4.11, 4.13, 4.14, 4.15, 4.16, 25.9_
     - _Design: "DOM modules (scenic/*.ts)", shell layout, "Accessibility Design" (Structure)_
 
-  - [ ] 1.10 Add the scenic renderer shell and entry
+  - [x] 1.10 Add the scenic renderer shell and entry
     - Create `packages/web/src/view/scenic/renderer.ts`: `createScenicRenderer(root, onAction)` builds the shell once in the design's document order (`div.scenic` > header, aside, announcer, empty `main.stage`, `footer` last), owns the guard, and on `render(model)` calls `guard.setModel(model)` and `hud.update(hudView(model))`; it returns `void` and never awaits. Submitting the Live_Plaque (button or Enter) sends one `{ type: "submit-live", url }` with the field text as typed, through the guard; the button is disabled when `submit-live` is not available. The `show-sample` button sends through the guard.
     - Create `packages/web/src/view/scenic/entry.ts`: exports `createRenderer = createScenicRenderer` (CSS and fonts come in PR 1b).
     - Verify: `npm run check` exits `0`.
@@ -154,7 +154,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.5, 2.7, 2.8, 4.1, 4.7, 4.8, 4.9, 4.12, 4.15_
     - _Design: "One render, step by step", "Purely visual state of the Scenic_Renderer"_
 
-  - [ ] 1.11 Wire the renderer choice in `main.ts`
+  - [x] 1.11 Wire the renderer choice in `main.ts`
     - Create `packages/web/src/view/simpleEntry.ts`: imports `./simple/simple.css` and re-exports `createSimpleRenderer` as `createRenderer`.
     - Rewrite `packages/web/src/main.ts`: `chooseView(window.location.search)`, one dynamic `import()` of `./view/simpleEntry.js` or `./view/scenic/entry.js`, then one `createPage` with the same `PageDeps` for both, then `page.start()`; on import failure write `TEXTS.viewLoadFailed` into `#root` with `textContent`. `main.ts` imports no CSS.
     - In `packages/web/index.html` add `<meta name="color-scheme" content="dark">`.
@@ -163,14 +163,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.4, 1.5, 1.9, 1.10, 25.6_
     - _Design: "Renderer choice and CSS loading"_
 
-  - [ ] 1.12 Add the Scenic_View_Link to the Simple_Renderer
+  - [x] 1.12 Add the Scenic_View_Link to the Simple_Renderer
     - In `packages/web/src/view/simple/renderer.ts` add after the `h1` the link `a.view-link` with text `TEXTS.viewLinks.scenic` and `href` `?view=scenic` (dark launch; task 16.8 changes it to `./`). No other change to the Simple_Renderer.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): link the simple view to the scenic view`
     - _Requirements: 1.11, 2.10, 25.11_
     - _Design: "Simple_Renderer change (Scenic_View_Link)"_
 
-  - [ ] 1.13 Checkpoint and PR 1a
+  - [x] 1.13 Checkpoint and PR 1a
     - Update `PLAN.md` ("En curso": scenic-web PR 1a open; "Pendientes"; "Para retomar": next is PR 1b, task 2.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
