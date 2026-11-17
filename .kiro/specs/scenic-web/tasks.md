@@ -547,7 +547,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.2, 24.3_
     - _Design: "Shots_Script (npm run shots)", decision Q27_
 
-- [ ] 7. PR 1f — Size_Check, Shots_Script, Gallery
+- [x] 7. PR 1f — Size_Check, Shots_Script, Gallery
   - Branch: `feat/scenic-web-1f`. Stacks on: `feat/scenic-web-1e`.
   - Estimate: ~800 changed lines. Model: Auto.
   - _Design: "PR Split" row 1f, "Tooling"_
@@ -620,7 +620,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.2, 20.4, 24.4, 24.5, 24.6, 24.10, 24.12_
     - _Design: "Shots_Script (npm run shots)" (Flow per viewport, Stable frames, Checks, End)_
 
-  - [ ] 7.9 Checkpoint and PR 1f
+  - [x] 7.9 Checkpoint and PR 1f
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is the Vertical Slice Gate, task 8.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1f`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1e -- . ':(exclude)package-lock.json'`.
