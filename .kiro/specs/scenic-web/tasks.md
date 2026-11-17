@@ -418,7 +418,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~900 changed lines. Model: Opus.
   - _Design: "PR Split" row 1d_
 
-  - [ ] 4.1 Add Shape_Data and its rules test
+  - [x] 4.1 Add Shape_Data and its rules test
     - Create `packages/web/src/view/scenic/art/shapes.ts`: `SVG_NS`, `ShapeKind`, `Keyword`, `ShapeNode` (as in "Data Models") and the builders `g`, `path`, `rect`, `circle`, `ellipse`, `poly`.
     - Create `packages/web/src/view/scenic/art/art.test.ts` with a tree walker that checks the Shape_Data rules: allowed kinds; class names and path data match the design regexes; `fill` and `stroke` only the four keywords; ids unique per tree; every `paint` and `clip` points to an id in the same tree. Example trees from the builders pass; a bad class and a bad path fail.
     - Verify: `npm run check` exits `0`.

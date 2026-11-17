@@ -1,0 +1,141 @@
+import { describe, expect, it } from "vitest";
+import {
+  circle,
+  defs,
+  ellipse,
+  g,
+  gradient,
+  path,
+  poly,
+  rect,
+  strokePath,
+  type ShapeNode,
+} from "./shapes.js";
+
+// The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
+// prettier-ignore
+const KINDS = new Set<string>([
+  "g", "path", "rect", "circle", "ellipse", "polygon", "polyline", "line",
+  "defs", "linearGradient", "radialGradient", "stop", "clipPath",
+]);
+// prettier-ignore
+const ID_KINDS = new Set<string>(["linearGradient", "radialGradient", "clipPath"]);
+// prettier-ignore
+const KEYWORDS = new Set<string>(["transparent", "currentColor", "none", "inherit"]);
+const CLASS_NAMES = /^[a-z][a-z0-9-]*( [a-z][a-z0-9-]*)*$/;
+const PATH_DATA = /^[MmLlHhVvCcSsQqTtAaZz0-9.,\s-]+$/;
+const ID = /^[a-z][a-z0-9-]*$/;
+// prettier-ignore
+const NUMBER_KEYS = [
+  "x", "y", "width", "height", "rx", "ry", "cx", "cy", "r", "fx", "fy",
+  "x1", "y1", "x2", "y2", "offset",
+] as const;
+const KNOWN_KEYS = new Set<string>([
+  ...NUMBER_KEYS,
+  ...["kind", "cls", "id", "part", "d", "points", "transform", "units"],
+  ...["paint", "clip", "fill", "stroke", "children"],
+]);
+
+/** Every Shape_Data rule the tree breaks, as short readable lines. */
+function shapeProblems(tree: ShapeNode): string[] {
+  const problems: string[] = [];
+  const ids = new Set<string>();
+  const refs: string[] = [];
+  const walk = (node: ShapeNode): void => {
+    if (!KINDS.has(node.kind)) problems.push(`kind ${node.kind}`);
+    for (const key of Object.keys(node)) {
+      if (!KNOWN_KEYS.has(key)) problems.push(`field ${key}`);
+    }
+    if (node.cls !== undefined && !CLASS_NAMES.test(node.cls)) {
+      problems.push(`class "${node.cls}"`);
+    }
+    if (node.d !== undefined && !PATH_DATA.test(node.d)) {
+      problems.push(`path "${node.d}"`);
+    }
+    for (const value of [node.fill, node.stroke]) {
+      if (value !== undefined && !KEYWORDS.has(value)) {
+        problems.push(`paint "${value}"`);
+      }
+    }
+    const numbers = [
+      ...NUMBER_KEYS.map((key) => node[key]),
+      ...(node.points ?? []),
+      ...(node.transform?.translate ?? []),
+      node.transform?.rotate,
+      node.transform?.scale,
+    ];
+    if (numbers.some((n) => n !== undefined && !Number.isFinite(n))) {
+      problems.push(`number on ${node.kind}`);
+    }
+    if (node.id !== undefined) {
+      if (!ID.test(node.id) || !ID_KINDS.has(node.kind)) {
+        problems.push(`id "${node.id}" on ${node.kind}`);
+      }
+      if (ids.has(node.id)) problems.push(`repeated id "${node.id}"`);
+      ids.add(node.id);
+    }
+    if (node.paint !== undefined) refs.push(node.paint);
+    if (node.clip !== undefined) refs.push(node.clip);
+    node.children?.forEach(walk);
+  };
+  walk(tree);
+  for (const ref of refs) {
+    if (!ids.has(ref)) problems.push(`missing id "${ref}"`);
+  }
+  return problems;
+}
+
+describe("Shape_Data rules", () => {
+  it("accepts a tree made with every builder", () => {
+    const tree = g("example", [
+      defs([
+        gradient("radialGradient", "glow", [
+          ["stop-cold-0", 0],
+          ["stop-cold-1", 1],
+        ]),
+        { kind: "clipPath", id: "cut", children: [rect("box", 0, 0, 10, 10)] },
+      ]),
+      path("ghost-body", "M30 0 C47 0 60 13 60 31 L60 54 Z", {
+        part: "outline",
+      }),
+      strokePath("rim", "M34 1 C49 3 59 15 59.5 31", {
+        stroke: "currentColor",
+      }),
+      rect("wall tone-slate", 0, 0, 100, 50, { clip: "cut" }),
+      circle("glow", 30, 34, 52, { paint: "glow" }),
+      ellipse("shadow", 30, 72, 20, 4, { fill: "transparent" }),
+      poly("roof", [0, 10, 5, 0, 10, 10], { transform: { rotate: -3 } }),
+    ]);
+    expect(shapeProblems(tree)).toEqual([]);
+  });
+
+  it("catches a bad class and bad path data", () => {
+    expect(shapeProblems(rect("Wall", 0, 0, 1, 1))).toEqual(['class "Wall"']);
+    expect(shapeProblems(rect("wall  slate", 0, 0, 1, 1))).toHaveLength(1);
+    expect(shapeProblems(path("p", "M0 0 L#fff 1"))).toEqual([
+      'path "M0 0 L#fff 1"',
+    ]);
+    expect(shapeProblems(path("p", "url(x)"))).toHaveLength(1);
+  });
+
+  it("catches colours, unknown fields, ids and broken references", () => {
+    const red = {
+      ...rect("a", 0, 0, 1, 1),
+      fill: "red",
+    } as unknown as ShapeNode;
+    expect(shapeProblems(red)).toEqual(['paint "red"']);
+    const styled = { ...rect("a", 0, 0, 1, 1), style: "x" } as ShapeNode;
+    expect(shapeProblems(styled)).toEqual(["field style"]);
+    expect(shapeProblems(rect("a", 0, 0, 1, 1, { id: "a" }))).toEqual([
+      'id "a" on rect',
+    ]);
+    const twice = gradient("linearGradient", "a", []);
+    expect(shapeProblems(g("t", [twice, twice]))).toEqual(['repeated id "a"']);
+    expect(shapeProblems(circle("c", 0, 0, 1, { paint: "gone" }))).toEqual([
+      'missing id "gone"',
+    ]);
+    expect(shapeProblems(circle("c", 0, Number.NaN, 1))).toEqual([
+      "number on circle",
+    ]);
+  });
+});
