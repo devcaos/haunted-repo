@@ -87,7 +87,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.1, 1.2, 1.3_
     - _Design: "Correctness Properties", Property 12_
 
-  - [ ] 1.4 Add the first scenic texts
+  - [x] 1.4 Add the first scenic texts
     - In `packages/web/src/logic/texts.ts` add, as new keys only: `tagline`, `viewLinks` (`simple`, `scenic`), `viewLoadFailed`, `floorButtonName(title, action)` and `nameplateName(path, floor, score, state, lockedLine)`, with the English values of the design section "New texts".
     - No existing key changes. Check with `git diff --numstat -- packages/web/src/logic/texts.ts`: 0 deleted lines.
     - Verify: `npm run check` exits `0`.
