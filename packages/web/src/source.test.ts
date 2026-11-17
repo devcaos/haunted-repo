@@ -38,6 +38,7 @@ const logicFiles = srcFiles.filter(
 );
 const viewFiles = srcFiles.filter((f) => f.path.startsWith("src/view/"));
 const presentationFiles = [indexHtml, ...viewFiles];
+const SCENIC_DIR = "src/view/scenic/";
 const TOKENS_CSS = "src/view/simple/tokens.css";
 const simpleCssFiles = viewFiles.filter(
   (f) =>
@@ -49,7 +50,7 @@ const simpleCssFiles = viewFiles.filter(
 const STORAGE =
   /\b(?:localStorage|sessionStorage|indexedDB)\b|\bdocument\.cookie\b/;
 const RAW_HTML =
-  /\b(?:innerHTML|outerHTML|insertAdjacentHTML)\b|\bdocument\.write/;
+  /\b(?:innerHTML|outerHTML|insertAdjacentHTML|DOMParser|createContextualFragment|setHTMLUnsafe)\b|\bdocument\.write/;
 const POWER_WORD = /\bPower\b/;
 const CHECK_BUTTON_TEXT = /Check GitHub connection/;
 const INLINE_STYLE = /<style[\s>]|\sstyle\s*=/i;
@@ -244,6 +245,10 @@ describe("raw HTML", () => {
   it("self-check: the pattern catches raw HTML", () => {
     expect(RAW_HTML.test("node.innerHTML = text")).toBe(true);
     expect(RAW_HTML.test("document.write(text)")).toBe(true);
+    expect(RAW_HTML.test("new DOMParser().parseFromString(a, b)")).toBe(true);
+    expect(RAW_HTML.test("range.createContextualFragment(text)")).toBe(true);
+    expect(RAW_HTML.test("node.setHTMLUnsafe(text)")).toBe(true);
+    expect(RAW_HTML.test("node.append(text)")).toBe(false);
   });
 });
 
@@ -401,5 +406,28 @@ describe("Simple_Renderer CSS (Requirements 11.2, 11.3)", () => {
     for (const css of allowed) {
       expect(cssBreaks(css)).toEqual([]);
     }
+  });
+});
+
+describe("scenic files (Requirements 2.6, 2.9, 22.3, 22.8, 22.11)", () => {
+  const scenicFiles = srcFiles.filter((f) => f.path.startsWith(SCENIC_DIR));
+
+  it("has at least one .ts and one .css file, all in viewFiles", () => {
+    expect(scenicFiles.some((f) => f.path.endsWith(".ts"))).toBe(true);
+    expect(scenicFiles.some((f) => f.path.endsWith(".css"))).toBe(true);
+    const viewPaths = viewFiles.map((f) => f.path);
+    for (const f of scenicFiles) {
+      expect(viewPaths).toContain(f.path);
+    }
+  });
+
+  it("has no .svg file", () => {
+    expect(
+      scenicFiles.filter((f) => f.path.endsWith(".svg")).map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("self-check: the scan would see an .svg file", () => {
+    expect(SCANNED.test(`${SCENIC_DIR}art/house.svg`)).toBe(true);
   });
 });

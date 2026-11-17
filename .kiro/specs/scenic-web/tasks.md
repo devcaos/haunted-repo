@@ -192,7 +192,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.4, 22.5, 17.11, 17.12, 21.6, 12.4, 16.1, 18.6_
     - _Design: "Style Guide" (Palette, Typography), "Contrast pairs"_
 
-  - [ ] 2.2 Source_Scan items 1 to 3
+  - [x] 2.2 Source_Scan items 1 to 3
     - In `packages/web/src/source.test.ts` (additions only): item 1, `src/view/scenic/` has at least one `.ts` and one `.css` file and every scenic file is in `viewFiles`, so the existing rule "src/view imports Core only with import type" covers them; item 2, the raw-HTML pattern adds `DOMParser`, `createContextualFragment` and `setHTMLUnsafe` for every scanned file, with negative self-checks; item 3, no `.svg` file under `src/view/scenic/`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): scan the scenic files for raw HTML and svg files`
