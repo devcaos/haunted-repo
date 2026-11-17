@@ -488,7 +488,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.5, 6.1, 8.6, 12.5, 22.1_
     - _Design: "Slot layout rule", "Ghost states", "Props and panels" (Chained door)_
 
-  - [ ] 5.3 Watch the media queries
+  - [x] 5.3 Watch the media queries
     - Create `packages/web/src/view/scenic/motion.ts`: `watchMedia(query, onChange)` with `matchMedia(...).addEventListener("change", ...)`, used for `WIDE_QUERY` and `(prefers-reduced-motion: reduce)`. Task 16.3 completes the Reduced_Motion handling.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): watch the viewport and motion settings`
