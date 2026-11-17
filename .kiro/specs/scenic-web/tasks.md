@@ -426,7 +426,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.1, 17.1_
     - _Design: "Shape_Data (ShapeNode)", "Art modules (scenic/art/)"_
 
-  - [ ] 4.2 Mount Shape_Data as SVG
+  - [x] 4.2 Mount Shape_Data as SVG
     - Create `packages/web/src/view/scenic/svg.ts`: `createSvgRoot(viewBox, className)` (the only place that creates an `svg`; sets `aria-hidden="true"`, `focusable="false"`, `viewBox`, `class`) and `mountShape(node, idPrefix)` (`document.createElementNS(SVG_NS, kind)` for every node; ids and `url(#...)` references prefixed; `part` written as `data-part`; no markup parsing).
     - No test file (DOM): covered by the build and the Source_Scan.
     - Verify: `npm run check` exits `0`.
