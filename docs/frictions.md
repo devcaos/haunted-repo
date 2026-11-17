@@ -371,3 +371,23 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Cómo lo rodeé:** escribir el mensaje en un archivo temporal fuera del repositorio, hacer `git commit -F <archivo>` y borrar el archivo después.
 
 - **Estado:** resuelto con rodeo.
+
+## 2026-11-17 — La prueba manual del Power no cerró la 11.1 en una sola ronda
+
+- **Qué intentaba:** hacer la tarea 11.1 de `kiro-power` (instalar desde GitHub `main`, exorcizar un fantasma, ver un `INVALID_VERDICT` y comprobar las reglas del Tutor) y la 11.2 en una sola sesión.
+
+- **Qué pasó:** el Power y la skill funcionaron (5 fantasmas, un "I don't know", un `INVALID_VERDICT` real, `DATA_EXISTS` al repetir). Pero las respuestas del Student fueron mal (wrong, wrong, right) y el fantasma terminó en `failed`. No se vieron `model-answer` (pide dos "I don't know" seguidos en la misma pregunta), `self-check`, ningún `warning` ni `replace: true`.
+
+- **Cómo lo rodeé:** dejé la 11.1 sin marcar y apunté en `docs/spike-power-e2e.md` la segunda ronda corta que falta. Para la próxima: escribir antes un guion con la respuesta que dará el Student a cada pregunta, para que cada paso del motor se vea.
+
+- **Estado:** abierto (falta la segunda ronda).
+
+## 2026-11-17 — Kiro pide aprobación en cada llamada del Power y la skill no cubre "I don't know" a la pregunta de Java
+
+- **Qué intentaba:** seguir la skill `exorcise-ghosts` en vivo, paso a paso.
+
+- **Qué pasó:** (1) la primera llamada a `pick_ghost` se canceló antes de aprobarse (`The tool call was cancelled before it was approved.`): Kiro IDE pide aprobación en cada llamada, lo que frena la prueba y el vídeo. (2) La skill pregunta "does the Student know Java?" (sí o no) y Luis Miguel contestó "I don't know"; la skill no dice qué hacer con eso.
+
+- **Cómo lo rodeé:** (1) repetir la llamada después de que el Student volviera a elegir fantasma. (2) El Tutor lo tomó como `knowsJava: false` y lo dijo en voz alta. Los dos están como Low en `PLAN.md`.
+
+- **Estado:** abierto (sin cambiar la skill todavía).
