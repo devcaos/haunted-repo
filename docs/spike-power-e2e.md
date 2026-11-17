@@ -89,3 +89,23 @@ A saved house already exists for this repository (file "haunted-repo--lukeed@sir
 ```
 
 JSON: `{"ok":false,"code":"DATA_EXISTS","message":"..."}`. El archivo guardado tiene el nombre con el repositorio (`haunted-repo--lukeed@sirv.json`), como pide el requisito 7.11.
+
+## Tercera ronda de la 11.1 (17 nov 2026)
+Misma instalación (Power desde GitHub `main`), sin cambiar código. Luis Miguel contestó según el guion: dos "I don't know" seguidos en la pregunta 1, y bien las otras dos. Sin `replace: true`.
+| Comprobación | Resultado |
+|---|---|
+| `continue_house` sobre lukeed/sirv (`knowsJava: false`), sin `replace` | **Pasó.** Paso `choosing`, `hauntedShare: 0.8` (un fantasma exorcizado antes, `builder.js`), 4 fantasmas en la lista |
+| `pick_ghost` `packages/sirv-cli/bin.js` | Pasó: paso `explaining` con el texto real del archivo |
+| Primer "I don't know" (P1, pregunta principal) | Pasó: paso `simplifying`, explicación más simple con otra analogía (un mando de televisión) y la misma pregunta |
+| Segundo "I don't know" seguido en la misma pregunta | **Pasó: apareció el paso `model-answer`**, solo después del segundo y nunca antes. El Tutor escribió la respuesta modelo y `send_event` `explanation-done` pasó a la pregunta 2 |
+| P2 (qué partes usa y en qué orden), P3 (qué pasa si `index.js` falla) | Pasaron: las dos `right`, una pregunta por mensaje, juicio con la línea `VERDICT:` al final |
+| Resultado del fantasma | Paso `failed`, con 2 `right` de 3 (ver la nota de abajo). `hauntedShare` se quedó en 0.8. No se vio `self-check` en esta ronda (ya se vio en la segunda) |
+| `warning` | **No apareció y no se pudo probar.** La skill no tiene ninguna forma de provocarlo: solo dice cómo avisar si llega. Según el código, sale cuando no hay carpeta de datos con permiso de escritura (`MEMORY_MODE_WARNING`) o falla un guardado (`saveFailedWarning`); eso depende del entorno, no de lo que haga el Student |
+| `house-clean` | No se llegó (quedan 4 fantasmas) |
+| `replace: true` tras un "yes" claro | No se probó (la orden era no usarlo) |
+| El Tutor escribe solo en inglés | Pasó para el Tutor. El Student contestó la P3 en español y esta vez el Tutor la aceptó sin pedir inglés (en la primera ronda sí lo pidió): la skill no fija qué hacer |
+Notas:
+- El fantasma quedó en `failed` aunque hubo 2 `right` de 3. No es un fallo: en el motor, el segundo "I don't know" en la misma pregunta se guarda como `wrong` (`engine.ts`), la P1 es la pregunta principal, y `decide` exige que la principal no sea `wrong`. Coincide con `product.md`. Para el Student puede sorprender.
+- Antes de empezar se cargaron a mano los esquemas de `pick_ghost`, `send_event` y `judge_answer`, así que no volvió a salir el error "has not been loaded yet".
+## Qué queda sin ver tras la tercera ronda
+`warning` (sin forma de provocarlo), `house-clean` y `replace: true` tras un "yes" claro. La 11.1 se marca porque `model-answer` apareció y funcionó, que era lo que faltaba de las rondas anteriores; esas tres comprobaciones siguen **sin probarse**.
