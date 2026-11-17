@@ -60,6 +60,26 @@ Fin del ghost, respuesta de `judge_answer` tras la tercera pregunta: `The ghost 
 
 Una segunda ronda corta, sin cambiar código: (a) dos "I don't know" seguidos en la misma pregunta, para ver el paso `model-answer`; (b) dos buenas respuestas, para llegar a `self-check` y a `house-clean`; (c) un `continue_house` y un `find_ghosts` con `replace: true` después de un "yes" claro; (d) forzar un `warning` si hay manera (por ejemplo, una carpeta de datos sin permiso de escritura).
 
+## Segunda ronda de la 11.1 (17 nov 2026)
+Misma instalación (Power desde GitHub `main`), sin cambiar código. Luis Miguel contestó bien; el Tutor siguió la skill. Sin `replace: true`.
+
+| Comprobación | Resultado |
+|---|---|
+| `continue_house` sobre lukeed/sirv (`knowsJava: false`) | **Pasó.** Mensaje: "Continuing the saved house of lukeed/sirv. Exorcised ghosts stay exorcised; an unfinished attempt starts again." Paso `choosing`, `hauntedShare: 1`, `bench/static.js` otra vez en la lista (el intento fallado se reinició) |
+| `pick_ghost` `builder.js` | Pasó: paso `explaining` con el texto real del archivo |
+| Tres preguntas, una por mensaje, con juicio en inglés | Pasó: P1 `right`, P2 `right`, P3 `half-right` |
+| Respuesta modelo (`model-answer`) | **No apareció y no se probó.** No hubo ningún "I don't know"; solo se comprobó que nunca se mostró antes de tiempo |
+| `warning` | **No apareció.** Ninguna respuesta de herramienta trajo `warning` |
+| `self-check` | **Pasó.** Tras la 3.ª pregunta, la herramienta dijo "The ghost is exorcised" y pidió el autojuicio; `hauntedShare` bajó de 1 a 0.8. El Student contestó "yes" y `send_event` `self-check-answered` devolvió el paso `choosing` con 4 fantasmas |
+| `house-clean` | No se llegó (quedan 4 fantasmas) |
+| `replace: true` tras un "yes" claro | No se probó (la orden era no usarlo) |
+
+Notas:
+- La 3.ª pregunta preguntaba qué pasa si `bundt` no está instalado. El Student dijo que se imprime `ERROR`. Probablemente no es así: la búsqueda de `bundt` (`require.resolve`) está fuera del bloque que captura errores, así que Node muestra su propio error. El Tutor lo juzgó `half-right`. Con 2 `right` ya bastaba para exorcizar.
+- Las preguntas pedidas por el motor fueron: qué hace el archivo, qué entra y sale, y cuándo falla.
+
+## Qué sigue faltando para cerrar la 11.1
+(a) `model-answer`: dos "I don't know" seguidos en la misma pregunta. (b) `warning`, si hay manera de forzarlo. (c) `house-clean`: exorcizar los 4 fantasmas que quedan. (d) `find_ghosts` con `replace: true` tras un "yes" claro. La 11.1 sigue sin marcar.
 ## Tarea 11.2: repetir una llamada en la misma instalación
 
 Misma instalación que la 11.1 (desde GitHub `main`), mismo día. Segunda llamada a `find_ghosts` con `url: "https://github.com/lukeed/sirv"` y `knowsJava: false`, sin `replace`. Resultado: **pasó**; la herramienta no pisó el progreso y devolvió `DATA_EXISTS`:
