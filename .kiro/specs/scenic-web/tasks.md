@@ -472,7 +472,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~820 changed lines. Model: Opus.
   - _Design: "PR Split" row 1e_
 
-  - [ ] 5.1 Draw the Wisp, Variant 0
+  - [x] 5.1 Draw the Wisp, Variant 0
     - Create `packages/web/src/view/scenic/art/ghosts.ts` with the Wisp entry of `GHOST_TYPES` and `ghostArt("wisp", 0, "haunted")`, exactly as in "The Wisp, Variant 0": outline (parts `outline`, `hem-round`), inner shade, eyes, glints, mouth, cobweb (part `cobweb`), rim, glow (part `glow`), floor shadow, inside a `g.ghost-idle` wrapper.
     - Extend `art.test.ts`: the tree passes the rules; it has the parts `outline`, `hem-round`, `cobweb` and `glow`, and no `tail-spiral`, `hood` or `horns`; eye height over body height is 11/64; its box equals the Wisp box of the Scene_Layout.
     - Verify: `npm run check` exits `0`.

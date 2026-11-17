@@ -11,7 +11,8 @@ import {
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
-import { FLOOR_RECT } from "../model/sceneLayout.js";
+import { FLOOR_RECT, GHOST_BOX } from "../model/sceneLayout.js";
+import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import { FLOOR_CLASS, houseLayer } from "./house.js";
 import { foregroundLayer, skyLayers, weatherLayer } from "./sky.js";
 
@@ -233,6 +234,48 @@ describe("house (Requirements 3.1, 3.4)", () => {
     const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
     expect(roof?.points?.[2]).toBeLessThan(800); // the ridge is left of centre
     expect(tower?.transform?.translate?.[0]).toBeGreaterThan(800);
+  });
+});
+
+describe("the Wisp, Variant 0 (Requirements 5.1, 5.4, 6.1)", () => {
+  const wisp = ghostArt("wisp", 0, "haunted");
+  const parts = nodesOf(wisp).flatMap((n) =>
+    n.part === undefined ? [] : [n.part],
+  );
+
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(wisp)).toEqual([]);
+  });
+
+  it("has a round hem, a cobweb and a glow, and no tail, hood or horns", () => {
+    expect(parts).toEqual(
+      expect.arrayContaining(["outline", "hem-round", "cobweb", "glow"]),
+    );
+    for (const other of ["tail-spiral", "hood", "horns"]) {
+      expect(parts).not.toContain(other);
+    }
+    const idle = nodesOf(wisp).find((n) => n.cls === "ghost-idle");
+    expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
+  });
+
+  it("eye height over body height is 11/64", () => {
+    const eyes = nodesOf(wisp).filter((n) => n.part === "eye");
+    expect(eyes).toHaveLength(2);
+    for (const eye of eyes) {
+      expect((2 * (eye.ry ?? 0)) / GHOST_BOX.wisp.h).toBe(11 / 64);
+    }
+    expect(GHOST_TYPES.wisp.eyeHeight / GHOST_TYPES.wisp.box.h).toBe(11 / 64);
+  });
+
+  it("its outline box equals the Wisp box of the Scene_Layout", () => {
+    const outline = nodesOf(wisp).find((n) => n.part === "outline");
+    const points = outline === undefined ? [] : pointsOf(outline);
+    const xs = points.map(([x]) => x);
+    const ys = points.map(([, y]) => y);
+    expect(Math.min(...xs)).toBe(0);
+    expect(Math.min(...ys)).toBe(0);
+    expect({ w: Math.max(...xs), h: Math.max(...ys) }).toEqual(GHOST_BOX.wisp);
+    expect(GHOST_TYPES.wisp.box).toEqual(GHOST_BOX.wisp);
   });
 });
 
