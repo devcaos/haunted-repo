@@ -1,0 +1,139 @@
+/*
+ * Base styles of the Scenic_Renderer: page, grid, text, focus, touch targets.
+ * Tokens only: every colour, size and font comes from scenic-tokens.css.
+ */
+body {
+  margin: 0;
+  background-color: var(--sc-backing);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/*
+ * Grid areas place the HUD parts. The footer is last in the DOM, so its
+ * Licence_Notice link is the last Tab stop. On narrow screens the parts stack
+ * (header, stage, aside, footer). On wide screens the HUD sits on the left
+ * edge over the stage and the footer is drawn at the bottom left.
+ */
+.scenic {
+  display: grid;
+  grid-template-columns: var(--sc-full);
+  grid-template-areas:
+    "top"
+    "stage"
+    "side"
+    "foot";
+  min-height: var(--sc-viewport-height);
+  color: var(--sc-text);
+  background-color: var(--sc-backing);
+  font-family: var(--font-body);
+  font-size: var(--sc-text-body);
+  font-weight: var(--sc-weight-body);
+  line-height: var(--sc-leading-body);
+}
+
+.scenic > .hud-top {
+  grid-area: top;
+}
+
+.scenic > .stage {
+  grid-area: stage;
+}
+
+.scenic > .hud-side {
+  grid-area: side;
+}
+
+.scenic > .hud-foot {
+  grid-area: foot;
+}
+
+@media (min-width: 64rem) {
+  .scenic {
+    grid-template-columns: var(--sc-hud-width) 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: none;
+    height: var(--sc-viewport-height);
+  }
+
+  .scenic > .stage {
+    grid-area: 1 / 1 / 4 / 3;
+  }
+
+  .scenic > .hud-top {
+    grid-area: 1 / 1;
+  }
+
+  .scenic > .hud-side {
+    grid-area: 2 / 1;
+  }
+
+  .scenic > .hud-foot {
+    grid-area: 3 / 1;
+  }
+}
+
+/* Paths and code use the code font and wrap anywhere, so nothing overflows. */
+.scenic code,
+.scenic .path {
+  font-family: var(--font-code);
+  font-size: var(--sc-text-code);
+  overflow-wrap: anywhere;
+}
+
+.scenic a {
+  color: var(--sc-text-link);
+}
+
+.scenic p {
+  overflow-wrap: anywhere;
+}
+
+/* Buttons and links that are not inside a sentence get a 44 px target. */
+.scenic button,
+.scenic a:not(.licence a) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--sc-touch);
+  min-height: var(--sc-touch);
+  box-sizing: border-box;
+}
+
+.scenic button {
+  padding: var(--sc-space-1) var(--sc-space-3);
+  border: var(--sc-focus-width) solid var(--sc-accent);
+  background-color: var(--sc-accent);
+  color: var(--sc-backing);
+  font-family: var(--font-body);
+  font-size: var(--sc-text-body);
+  font-weight: var(--sc-weight-button);
+  cursor: pointer;
+}
+
+.scenic button:disabled {
+  opacity: var(--sc-dim);
+  cursor: not-allowed;
+}
+
+/* The ring always has Night on both sides, whatever lies behind it. */
+.scenic :focus-visible {
+  outline: var(--sc-focus-width) solid var(--sc-focus-ring);
+  outline-offset: var(--sc-focus-offset);
+  box-shadow: 0 0 0 var(--sc-focus-halo-width) var(--sc-focus-halo);
+}
+
+/* The Scenic_Announcer is read by screen readers and never seen. */
+.scenic .announcer {
+  position: absolute;
+  width: var(--sc-line);
+  height: var(--sc-line);
+  margin: calc(-1 * var(--sc-line));
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

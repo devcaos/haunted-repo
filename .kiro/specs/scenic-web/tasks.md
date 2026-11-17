@@ -179,12 +179,12 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 2. PR 1b — Tokens, base and HUD CSS, fonts, Source_Scan rules
+- [x] 2. PR 1b — Tokens, base and HUD CSS, fonts, Source_Scan rules
   - Branch: `feat/scenic-web-1b`. Stacks on: `feat/scenic-web-1a`.
   - Estimate: ~880 changed lines. Model: Auto.
   - _Design: "PR Split" row 1b_
 
-  - [ ] 2.1 Add the Scenic_Tokens and the contrast test
+  - [x] 2.1 Add the Scenic_Tokens and the contrast test
     - Create `packages/web/src/view/scenic/styles/scenic-tokens.css` with every token of the design "Style Guide": the nine palette colours with exact hex values, `--sc-cold-blue`, `--sc-warm-orange`, `--sc-dawn`, the role tokens, the opacity tokens, the typography tokens (`--font-logo`, `--font-title`, `--font-body`, `--font-code`, sizes, leading), spacing, `--sc-touch`, the focus tokens, and the durations and easings of the "Animation Catalogue". Import it from `entry.ts`.
     - Create `packages/web/src/view/scenic/model/contrast.test.ts` (reads the tokens file with `node:fs`): the nine palette values are exact (letter case ignored); the named cold-blue, warm-orange and dawn tokens exist; every text pair of the design's contrast table is at least 4.5:1 and every UI pair at least 3:1 (WCAG formula); every font token ends with a generic family; the duration tokens match the catalogue (room-warm 1200 ms, Intro 1500 ms, every reduced fade 200 ms or less).
     - Verify: `npm run check` exits `0`.
@@ -192,14 +192,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.4, 22.5, 17.11, 17.12, 21.6, 12.4, 16.1, 18.6_
     - _Design: "Style Guide" (Palette, Typography), "Contrast pairs"_
 
-  - [ ] 2.2 Source_Scan items 1 to 3
+  - [x] 2.2 Source_Scan items 1 to 3
     - In `packages/web/src/source.test.ts` (additions only): item 1, `src/view/scenic/` has at least one `.ts` and one `.css` file and every scenic file is in `viewFiles`, so the existing rule "src/view imports Core only with import type" covers them; item 2, the raw-HTML pattern adds `DOMParser`, `createContextualFragment` and `setHTMLUnsafe` for every scanned file, with negative self-checks; item 3, no `.svg` file under `src/view/scenic/`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): scan the scenic files for raw HTML and svg files`
     - _Requirements: 2.6, 2.9, 22.3, 22.8, 22.9, 22.11, 25.9_
     - _Design: "Source_Scan additions" items 1 to 3_
 
-  - [ ] 2.3 Source_Scan items 4 and 5
+  - [x] 2.3 Source_Scan items 4 and 5
     - Item 4: the Simple_Renderer CSS rules (no literal colour, no literal size, no `font-family` without `var(`, same exemptions) run on every CSS file under `src/view/scenic/` except `styles/scenic-tokens.css`; the test names each failing file; it checks that the tokens file exists, is skipped, and would break the colour rule if scanned.
     - Item 5: no non-test scenic TypeScript string literal holds a hex colour or a colour function, or is exactly a CSS named colour; `transparent`, `currentColor`, `none`, `inherit` and names like `"ghost--red-eyes"` pass. Self-checks for a hex value, a colour function and a named colour.
     - Verify: `npm run check` exits `0`.
@@ -207,7 +207,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.5, 22.6, 22.7, 22.9_
     - _Design: "Source_Scan additions" items 4 and 5_
 
-  - [ ] 2.4 Source_Scan items 6, 7, 8 (placement) and 9
+  - [x] 2.4 Source_Scan items 6, 7, 8 (placement) and 9
     - Item 6: every `@keyframes` block in scenic CSS sets only `transform` and `opacity`; every `transition` and `transition-property` names only `transform` or `opacity`, never `all`.
     - Item 7: no `requestAnimationFrame` and no `setInterval` in non-test scenic TypeScript.
     - Item 8, placement part: `animation` and `transition` declarations appear only inside `@media (prefers-reduced-motion: no-preference)` or `@media (prefers-reduced-motion: reduce)` blocks. The rule on the content of `reduce` blocks comes in task 16.4.
@@ -218,7 +218,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.1, 20.2, 20.3, 18.4_
     - _Design: "Source_Scan additions" items 6 to 9, "Animation Catalogue"_
 
-  - [ ] 2.5 Source_Scan items 15, 16 and 17
+  - [x] 2.5 Source_Scan items 15, 16 and 17
     - Item 15: no scenic file imports `view/assets/` or `view/simple/`, and no simple file imports `view/scenic/`.
     - Item 16: no `fetch(` in scenic files.
     - Item 17: `packages/web/gallery.html` joins the presentation files (storage, raw HTML, external address, inline style, "Power"), read only if it exists; task 7.5 turns its existence into an assertion.
@@ -228,14 +228,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.10, 25.2, 25.3, 25.4, 25.8_
     - _Design: "Source_Scan additions" items 15 to 17, "Layers" (dependency rules)_
 
-  - [ ] 2.6 Add `base.css`
+  - [x] 2.6 Add `base.css`
     - Create `packages/web/src/view/scenic/styles/base.css` (tokens only): page styles for `.scenic`, grid areas so the `footer` (last in the DOM) is drawn bottom left on wide screens and under the stage on narrow ones, body font `--font-body`, paths in `--font-code` with `overflow-wrap: anywhere`, the focus ring (2 px Pumpkin outline, offset and Night halo), touch targets of `--sc-touch` for buttons and non-inline links, the visually hidden Scenic_Announcer. Import it from `entry.ts`.
     - Verify: `npm run check` exits `0` (items 4 and 5 now scan this file).
     - Commit message: `feat(web): add the scenic base styles`
     - _Requirements: 17.6, 17.11, 17.13, 19.4, 21.3_
     - _Design: "Style Guide" (Typography), "Accessibility Design" (Focus, Touch targets)_
 
-  - [ ] 2.7 Add `hud.css`, the press transition and the wide breakpoint rule
+  - [x] 2.7 Add `hud.css`, the press transition and the wide breakpoint rule
     - Create `packages/web/src/view/scenic/styles/hud.css` (tokens only): solid Night HUD panels with a Brass line (never translucent), `.hud-logo` and `.hud-tagline` in `--font-logo`, `h1` to `h3` in `--font-title`, Haunt_Meter (Night track, Brass frame, cold-blue fill with `transform-origin` left), Ghost_Icons, Live_Plaque, Status_Region, warnings, Power line, `show-sample` button, Simple_View_Link; the HUD overlays the stage edges at `(min-width: 64rem)` and stacks above and below it under that width (Q9); the HUD column scrolls inside itself (Q22).
     - Create `packages/web/src/view/scenic/styles/motion.css` with the `press` transition (`button:active`) inside `@media (prefers-reduced-motion: no-preference)`.
     - Create `packages/web/src/view/scenic/model/camera.ts` with only `ViewportClass` and `WIDE_QUERY = "(min-width: 64rem)"`; task 3.13 adds the Camera functions.
@@ -245,7 +245,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.18, 17.12, 17.13, 21.1, 21.2, 21.3, 19.1_
     - _Design: "Props and panels" (HUD panels, Haunt_Meter, Live_Plaque), "Source_Scan additions" items 12 and 18_
 
-  - [ ] 2.8 Bundle the display fonts
+  - [x] 2.8 Bundle the display fonts
     - Check the current Fontsource docs. Add `@fontsource/creepster` 5.3.0 and `@fontsource/im-fell-english` 5.3.0 to `packages/web/package.json` with exact versions; commit `package-lock.json` in the same commit.
     - Create `packages/web/src/view/scenic/fonts.ts`: `loadScenicFonts()` imports only `files/creepster-latin-400-normal.woff2?url` and `files/im-fell-english-latin-400-normal.woff2?url`, creates each `FontFace` with weight 400, style normal and `display: "swap"`, adds it to `document.fonts` and ignores load errors. `entry.ts` calls it.
     - Source_Scan item 13: every `@fontsource/` specifier in `src/` is one of those two paths.
@@ -254,7 +254,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 21.1, 21.2, 21.4, 21.5, 21.7_
     - _Design: "scenic/fonts.ts" row of "DOM modules", "Facts checked for this design" (Fontsource)_
 
-  - [ ] 2.9 Add the font credits and licence texts
+  - [x] 2.9 Add the font credits and licence texts
     - Create `packages/web/public/fonts/CREDITS.txt` (Creepster: Copyright (c) 2011, Font Diner, Inc; IM Fell English: Copyright (c) 2010, Igino Marini; both SIL Open Font Licence), `OFL-creepster.txt` and `OFL-im-fell-english.txt` (the upstream OFL texts, decision Q11).
     - Create `packages/web/src/view/scenic/fonts.test.ts` (`node:fs`): the three files exist; the credits name both fonts, both holders and the SIL Open Font Licence.
     - Verify: `npm run check` exits `0`; `npm run build` copies the three files into `packages/web/dist/fonts/`.
@@ -262,7 +262,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 21.8_
     - _Design: "Folder layout" (public/fonts), "Facts checked for this design" (IM Fell English licence)_
 
-  - [ ] 2.10 Checkpoint and PR 1b
+  - [x] 2.10 Checkpoint and PR 1b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 1c, task 3.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1a -- . ':(exclude)package-lock.json' ':(exclude)packages/web/public/fonts/OFL-*.txt'`.

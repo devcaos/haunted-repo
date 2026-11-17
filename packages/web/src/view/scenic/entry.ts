@@ -1,4 +1,8 @@
+import "./styles/scenic-tokens.css";
+import "./styles/base.css";
+import "./styles/hud.css";
+import "./styles/motion.css";
+import { loadScenicFonts } from "./fonts.js";
 import { createScenicRenderer } from "./renderer.js";
-
-// The CSS and the fonts are imported here from PR 1b on.
+loadScenicFonts();
 export const createRenderer = createScenicRenderer;

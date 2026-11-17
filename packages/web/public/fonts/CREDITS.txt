@@ -1,0 +1,16 @@
+Fonts bundled with the scenic view of Haunted Repo
+===================================================
+
+Creepster
+  Copyright (c) 2011, Font Diner, Inc (diner@fontdiner.com),
+  with Reserved Font Names "Creepster".
+  Licensed under the SIL Open Font License, Version 1.1.
+  Full text: OFL-creepster.txt
+
+IM Fell English
+  Copyright (c) 2010, Igino Marini (mail@iginomarini.com).
+  Licensed under the SIL Open Font License, Version 1.1.
+  Full text: OFL-im-fell-english.txt
+
+The font files are served from this site, taken from the Fontsource packages
+@fontsource/creepster and @fontsource/im-fell-english (version 5.3.0).

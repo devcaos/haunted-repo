@@ -1,8 +1,9 @@
 /// <reference types="node" />
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { WIDE_QUERY } from "./view/scenic/model/camera.js";
 
 // Scans the source text of the Web_Package. Scanned: every non-test `.ts`,
 // `.css` and `.svg` file under `src/`, plus `index.html`. Test files
@@ -32,12 +33,17 @@ const srcFiles: SourceFile[] = readdirSync(join(WEB_DIR, "src"), {
   .sort()
   .map(read);
 const indexHtml = read("index.html");
-const allFiles = [...srcFiles, indexHtml];
+// The dev-only gallery page (task 7.5 turns its existence into an assertion).
+const galleryFiles = existsSync(join(WEB_DIR, "gallery.html"))
+  ? [read("gallery.html")]
+  : [];
+const allFiles = [...srcFiles, indexHtml, ...galleryFiles];
 const logicFiles = srcFiles.filter(
   (f) => f.path.startsWith("src/logic/") || f.path.startsWith("src/sample/"),
 );
 const viewFiles = srcFiles.filter((f) => f.path.startsWith("src/view/"));
-const presentationFiles = [indexHtml, ...viewFiles];
+const presentationFiles = [indexHtml, ...galleryFiles, ...viewFiles];
+const SCENIC_DIR = "src/view/scenic/";
 const TOKENS_CSS = "src/view/simple/tokens.css";
 const simpleCssFiles = viewFiles.filter(
   (f) =>
@@ -49,7 +55,7 @@ const simpleCssFiles = viewFiles.filter(
 const STORAGE =
   /\b(?:localStorage|sessionStorage|indexedDB)\b|\bdocument\.cookie\b/;
 const RAW_HTML =
-  /\b(?:innerHTML|outerHTML|insertAdjacentHTML)\b|\bdocument\.write/;
+  /\b(?:innerHTML|outerHTML|insertAdjacentHTML|DOMParser|createContextualFragment|setHTMLUnsafe)\b|\bdocument\.write/;
 const POWER_WORD = /\bPower\b/;
 const CHECK_BUTTON_TEXT = /Check GitHub connection/;
 const INLINE_STYLE = /<style[\s>]|\sstyle\s*=/i;
@@ -244,6 +250,10 @@ describe("raw HTML", () => {
   it("self-check: the pattern catches raw HTML", () => {
     expect(RAW_HTML.test("node.innerHTML = text")).toBe(true);
     expect(RAW_HTML.test("document.write(text)")).toBe(true);
+    expect(RAW_HTML.test("new DOMParser().parseFromString(a, b)")).toBe(true);
+    expect(RAW_HTML.test("range.createContextualFragment(text)")).toBe(true);
+    expect(RAW_HTML.test("node.setHTMLUnsafe(text)")).toBe(true);
+    expect(RAW_HTML.test("node.append(text)")).toBe(false);
   });
 });
 
@@ -401,5 +411,580 @@ describe("Simple_Renderer CSS (Requirements 11.2, 11.3)", () => {
     for (const css of allowed) {
       expect(cssBreaks(css)).toEqual([]);
     }
+  });
+});
+
+describe("scenic files (Requirements 2.6, 2.9, 22.3, 22.8, 22.11)", () => {
+  const scenicFiles = srcFiles.filter((f) => f.path.startsWith(SCENIC_DIR));
+
+  it("has at least one .ts and one .css file, all in viewFiles", () => {
+    expect(scenicFiles.some((f) => f.path.endsWith(".ts"))).toBe(true);
+    expect(scenicFiles.some((f) => f.path.endsWith(".css"))).toBe(true);
+    const viewPaths = viewFiles.map((f) => f.path);
+    for (const f of scenicFiles) {
+      expect(viewPaths).toContain(f.path);
+    }
+  });
+
+  it("has no .svg file", () => {
+    expect(
+      scenicFiles.filter((f) => f.path.endsWith(".svg")).map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("self-check: the scan would see an .svg file", () => {
+    expect(SCANNED.test(`${SCENIC_DIR}art/house.svg`)).toBe(true);
+  });
+});
+
+// Scenic CSS (Requirements 22.5 to 22.7, 22.9): the Simple_Renderer rules run
+// on every scenic CSS file except its tokens file.
+const SCENIC_TOKENS_CSS = `${SCENIC_DIR}styles/scenic-tokens.css`;
+const scenicCssFiles = viewFiles.filter(
+  (f) =>
+    f.path.startsWith(SCENIC_DIR) &&
+    f.path.endsWith(".css") &&
+    f.path !== SCENIC_TOKENS_CSS,
+);
+const scenicTsFiles = viewFiles.filter(
+  (f) => f.path.startsWith(SCENIC_DIR) && f.path.endsWith(".ts"),
+);
+const SOURCE_TOKEN =
+  /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/g;
+const NAMED_COLOUR_EXACT = new RegExp(
+  `^(?:${CSS_NAMED_COLOURS.join("|")})$`,
+  "i",
+);
+
+/** The string literals of a TypeScript text, without their quotes. */
+function stringLiterals(ts: string): string[] {
+  return [...ts.matchAll(SOURCE_TOKEN)]
+    .map((m) => m[0])
+    .filter((token) => !token.startsWith("/"))
+    .map((token) => token.slice(1, -1));
+}
+
+/** The string literals that hold a colour value. */
+function colourStrings(ts: string): string[] {
+  return stringLiterals(ts).filter(
+    (s) =>
+      HEX_COLOUR.test(s) ||
+      COLOUR_FUNCTION.test(s) ||
+      NAMED_COLOUR_EXACT.test(s.trim()),
+  );
+}
+
+describe("scenic CSS (Requirements 22.5, 22.9)", () => {
+  it("scans every scenic CSS file except scenic-tokens.css", () => {
+    const paths = scenicCssFiles.map((f) => f.path);
+    expect(paths).not.toContain(SCENIC_TOKENS_CSS);
+    expect(paths).not.toContain(TOKENS_CSS);
+  });
+
+  it("no literal colour, size or font outside scenic-tokens.css", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: cssBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("self-check: scenic-tokens.css exists and would break the colour rule", () => {
+    const tokens = viewFiles.filter((f) => f.path === SCENIC_TOKENS_CSS);
+    expect(tokens).toHaveLength(1);
+    expect(cssBreaks(tokens[0]?.text ?? "")).toContain("colour");
+  });
+});
+
+describe("scenic strings (Requirements 22.6, 22.7)", () => {
+  it("scans scenic TypeScript", () => {
+    expect(scenicTsFiles.length).toBeGreaterThan(0);
+  });
+
+  it("no string literal holds a colour", () => {
+    expect(
+      scenicTsFiles
+        .map((f) => ({ path: f.path, found: colourStrings(f.text) }))
+        .filter((r) => r.found.length > 0),
+    ).toEqual([]);
+  });
+
+  it("self-check: the rule catches a hex value, a function and a name", () => {
+    expect(colourStrings('const a = "#ff7a1a";')).toEqual(["#ff7a1a"]);
+    expect(colourStrings("const a = '#fff';")).toEqual(["#fff"]);
+    expect(colourStrings('node.style = "rgb(0 0 0)";')).toEqual(["rgb(0 0 0)"]);
+    expect(colourStrings("const a = `hsl(0 0% 0%)`;")).toEqual([
+      "hsl(0 0% 0%)",
+    ]);
+    expect(colourStrings('const fill = "Red";')).toEqual(["Red"]);
+  });
+
+  it("self-check: allowed strings and comments pass", () => {
+    for (const ts of [
+      'const a = "transparent";',
+      'const a = "currentColor";',
+      'const a = "none";',
+      'const a = "inherit";',
+      'const a = "ghost--red-eyes";',
+      'const a = "var(--sc-night)";',
+      "// the colour is #fff or red\nconst a = 1;",
+      '/* "red" */ const a = 1;',
+    ]) {
+      expect(colourStrings(ts)).toEqual([]);
+    }
+  });
+});
+
+// Scenic motion rules (Requirements 18.4, 20.1 to 20.3). A small block parser
+// gives each declaration its @-rule ancestors.
+interface CssNode {
+  prelude: string;
+  decls: Declaration[];
+  children: CssNode[];
+}
+
+function parseCss(css: string): CssNode {
+  const clean = css
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\burl\([^)]*\)/gi, "url()");
+  const root: CssNode = { prelude: "", decls: [], children: [] };
+  const stack = [root];
+  let buf = "";
+  const flush = (): void => {
+    const at = buf.indexOf(":");
+    if (at > 0) {
+      stack[stack.length - 1]?.decls.push({
+        property: buf.slice(0, at).trim().toLowerCase(),
+        value: buf.slice(at + 1).trim(),
+      });
+    }
+    buf = "";
+  };
+  for (const ch of clean) {
+    if (ch === "{") {
+      const node: CssNode = { prelude: buf.trim(), decls: [], children: [] };
+      stack[stack.length - 1]?.children.push(node);
+      stack.push(node);
+      buf = "";
+    } else if (ch === ";") {
+      flush();
+    } else if (ch === "}") {
+      flush();
+      if (stack.length > 1) stack.pop();
+    } else {
+      buf += ch;
+    }
+  }
+  return root;
+}
+
+/** Every node with its chain of ancestors (outermost first). */
+function walkCss(
+  node: CssNode,
+  visit: (node: CssNode, ancestors: CssNode[]) => void,
+  ancestors: CssNode[] = [],
+): void {
+  for (const child of node.children) {
+    visit(child, ancestors);
+    walkCss(child, visit, [...ancestors, child]);
+  }
+}
+
+const ANIMATED_PROPERTY = /^(?:transform|opacity)$/;
+const REDUCED_MOTION_MEDIA =
+  /^@media[^{]*\(\s*prefers-reduced-motion\s*:\s*(?:no-preference|reduce)\s*\)/i;
+const MOTION_PROPERTY = /^(?:animation|transition)(?:-[\w-]+)?$/;
+const FILTER_PROPERTY = /^(?:-webkit-)?(?:filter|backdrop-filter)$/;
+
+/** Item 6: keyframes and transitions may only touch transform and opacity. */
+function animatedPropertyBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node, ancestors) => {
+    const inKeyframes =
+      /^@(?:-webkit-)?keyframes\b/i.test(node.prelude) ||
+      ancestors.some((a) => /^@(?:-webkit-)?keyframes\b/i.test(a.prelude));
+    for (const { property, value } of node.decls) {
+      if (inKeyframes && !ANIMATED_PROPERTY.test(property)) {
+        breaks.push(`keyframes sets ${property}`);
+      }
+      if (property === "transition" || property === "transition-property") {
+        for (const part of value.split(/,(?![^(]*\))/)) {
+          const name = part.trim().split(/\s+/)[0] ?? "";
+          if (name !== "none" && !ANIMATED_PROPERTY.test(name)) {
+            breaks.push(`${property} names ${name || "nothing"}`);
+          }
+        }
+      }
+    }
+  });
+  return breaks;
+}
+
+/** Item 8 (placement): animation and transition only in a motion @media. */
+function motionPlacementBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node, ancestors) => {
+    const inMotionMedia = [node, ...ancestors].some((n) =>
+      REDUCED_MOTION_MEDIA.test(n.prelude),
+    );
+    for (const { property } of node.decls) {
+      if (MOTION_PROPERTY.test(property) && !inMotionMedia) {
+        breaks.push(`${property} outside a prefers-reduced-motion block`);
+      }
+    }
+  });
+  return breaks;
+}
+
+/** Item 9: no filter, backdrop-filter or mix-blend-mode except none. */
+function filterBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node) => {
+    for (const { property, value } of node.decls) {
+      const isBlend = property === "mix-blend-mode";
+      if ((FILTER_PROPERTY.test(property) || isBlend) && value !== "none") {
+        breaks.push(`${property}: ${value}`);
+      }
+    }
+  });
+  return breaks;
+}
+
+const TIMER_CALL = /\b(?:requestAnimationFrame|setInterval)\b/;
+
+/** A TypeScript text with its comments removed. */
+function withoutComments(ts: string): string {
+  return ts.replace(SOURCE_TOKEN, (token) =>
+    token.startsWith("/") ? "" : token,
+  );
+}
+
+describe("scenic motion rules (Requirements 18.4, 20.1 to 20.3)", () => {
+  it("keyframes and transitions touch only transform and opacity", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: animatedPropertyBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("animation and transition sit only in a reduced-motion block", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: motionPlacementBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("no filter, backdrop-filter or mix-blend-mode", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: filterBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("no requestAnimationFrame and no setInterval", () => {
+    expect(
+      scenicTsFiles
+        .filter((f) => TIMER_CALL.test(withoutComments(f.text)))
+        .map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 6 catches other properties and all", () => {
+    expect(
+      animatedPropertyBreaks(
+        "@keyframes a { from { left: 0; } to { opacity: 1; } }",
+      ),
+    ).toEqual(["keyframes sets left"]);
+    expect(animatedPropertyBreaks("a { transition: all 80ms; }")).toEqual([
+      "transition names all",
+    ]);
+    expect(
+      animatedPropertyBreaks("a { transition: transform 80ms, color 1s; }"),
+    ).toEqual(["transition names color"]);
+    expect(animatedPropertyBreaks("a { transition-property: width; }")).toEqual(
+      ["transition-property names width"],
+    );
+  });
+
+  it("self-check: item 6 accepts transform and opacity", () => {
+    expect(
+      animatedPropertyBreaks(
+        "@keyframes a { 0% { transform: none; } 100% { opacity: 1; } }\n" +
+          "a { transition: transform 80ms ease-out, opacity var(--d); }\n" +
+          "a { transition-property: opacity; }",
+      ),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 7 catches both calls", () => {
+    expect(TIMER_CALL.test("requestAnimationFrame(tick);")).toBe(true);
+    expect(TIMER_CALL.test("window.setInterval(f, 10);")).toBe(true);
+    expect(TIMER_CALL.test("window.setTimeout(f, 10);")).toBe(false);
+    expect(
+      TIMER_CALL.test(withoutComments("// no setInterval here\nconst a = 1;")),
+    ).toBe(false);
+  });
+
+  it("self-check: item 8 catches motion outside the media blocks", () => {
+    expect(motionPlacementBreaks("a { animation: x 1s; }")).toHaveLength(1);
+    expect(motionPlacementBreaks("a { transition: opacity 1s; }")).toHaveLength(
+      1,
+    );
+    expect(
+      motionPlacementBreaks(
+        "@media (min-width: 64rem) { a { animation-name: x; } }",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("self-check: item 8 accepts the two motion blocks", () => {
+    expect(
+      motionPlacementBreaks(
+        "@media (prefers-reduced-motion: no-preference) { a { animation: x 1s; } }\n" +
+          "@media (prefers-reduced-motion: reduce) { a { transition: none; } }\n" +
+          "a { color: red; }",
+      ),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 9 catches filters and blend modes", () => {
+    expect(filterBreaks("a { filter: blur(2px); }")).toHaveLength(1);
+    expect(filterBreaks("a { backdrop-filter: blur(2px); }")).toHaveLength(1);
+    expect(filterBreaks("a { mix-blend-mode: multiply; }")).toHaveLength(1);
+    expect(filterBreaks("a { filter: none; mix-blend-mode: none; }")).toEqual(
+      [],
+    );
+  });
+});
+
+// Scenic imports and network (Requirements 22.10, 25.2 to 25.4, 25.8).
+const SCENIC_FORBIDDEN_IMPORT =
+  /\b(?:from|import)\s*\(?\s*["'][^"']*(?:\bassets|\bsimple)\/[^"']*["']/;
+const SIMPLE_FORBIDDEN_IMPORT =
+  /\b(?:from|import)\s*\(?\s*["'][^"']*\bscenic\/[^"']*["']/;
+const FETCH_CALL = /\bfetch\s*\(/;
+
+describe("scenic imports and network (Requirements 22.10, 25.2 to 25.4)", () => {
+  const simpleFiles = viewFiles.filter((f) =>
+    f.path.startsWith("src/view/simple/"),
+  );
+
+  it("no scenic file imports view/assets or view/simple", () => {
+    expect(offenders(scenicTsFiles, SCENIC_FORBIDDEN_IMPORT)).toEqual([]);
+  });
+
+  it("no simple file imports view/scenic", () => {
+    expect(simpleFiles.length).toBeGreaterThan(0);
+    expect(offenders(simpleFiles, SIMPLE_FORBIDDEN_IMPORT)).toEqual([]);
+  });
+
+  it("no scenic file calls fetch", () => {
+    expect(
+      scenicTsFiles
+        .filter((f) => FETCH_CALL.test(withoutComments(f.text)))
+        .map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("self-check: the import rules catch the forbidden paths", () => {
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import { a } from "../assets/resolve.js";'),
+    ).toBe(true);
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import { a } from "../simple/dom.js";'),
+    ).toBe(true);
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import("../../view/assets/x.js")'),
+    ).toBe(true);
+    expect(SCENIC_FORBIDDEN_IMPORT.test('import { a } from "./dom.js";')).toBe(
+      false,
+    );
+    expect(
+      SCENIC_FORBIDDEN_IMPORT.test('import { a } from "../shared/focus.js";'),
+    ).toBe(false);
+    expect(
+      SIMPLE_FORBIDDEN_IMPORT.test('import { a } from "../scenic/hud.js";'),
+    ).toBe(true);
+    expect(
+      SIMPLE_FORBIDDEN_IMPORT.test('import { a } from "../shared/focus.js";'),
+    ).toBe(false);
+  });
+
+  it("self-check: the fetch rule catches a call", () => {
+    expect(FETCH_CALL.test('const r = await fetch("/a");')).toBe(true);
+    expect(FETCH_CALL.test("window.fetch (url)")).toBe(true);
+    expect(FETCH_CALL.test("const prefetched = 1;")).toBe(false);
+  });
+});
+
+describe("gallery page (Requirement 25.8)", () => {
+  it("follows the presentation rules when it exists", () => {
+    expect(offenders(galleryFiles, STORAGE)).toEqual([]);
+    expect(offenders(galleryFiles, RAW_HTML)).toEqual([]);
+    expect(offenders(galleryFiles, POWER_WORD)).toEqual([]);
+    expect(offenders(galleryFiles, INLINE_STYLE)).toEqual([]);
+    expect(galleryFiles.filter((f) => hasExternalAddress(f.text))).toEqual([]);
+  });
+
+  it("is part of the presentation files only when it exists", () => {
+    const listed = presentationFiles.some((f) => f.path === "gallery.html");
+    expect(listed).toBe(galleryFiles.length > 0);
+  });
+});
+
+// Scenic fonts and breakpoint (Requirements 21.1 to 21.3, 19.1).
+const FONT_LOGO = "var(--font-logo)";
+const FONT_TITLE = "var(--font-title)";
+
+interface FontRule {
+  selectors: string[];
+  family: string;
+}
+
+/** Every rule that sets font-family, with its selector list split. */
+function fontRules(css: string): FontRule[] {
+  const rules: FontRule[] = [];
+  walkCss(parseCss(css), (node) => {
+    const family = node.decls.find((d) => d.property === "font-family");
+    if (family && !node.prelude.startsWith("@")) {
+      rules.push({
+        selectors: node.prelude.split(",").map((s) => s.trim()),
+        family: family.value,
+      });
+    }
+  });
+  return rules;
+}
+
+const LOGO_SELECTOR = /(?:^|\s)\.(?:hud-logo|hud-tagline)(?:$|[\s:.[])/;
+const HEADING_SELECTOR = /(?:^|\s)h[123]$/;
+const BANNER_LINE_SELECTOR = /\.finale-banner\s+\.line-1$/;
+
+/** Item 12: where Creepster and IM Fell English may be used. */
+function fontRoleBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  for (const { selectors, family } of fontRules(css)) {
+    for (const selector of selectors) {
+      if (family.includes(FONT_LOGO) && !LOGO_SELECTOR.test(selector)) {
+        breaks.push(`${selector} uses the logo font`);
+      }
+      const isTitle =
+        HEADING_SELECTOR.test(selector) || BANNER_LINE_SELECTOR.test(selector);
+      const isLogo = LOGO_SELECTOR.test(selector);
+      if (isTitle && !isLogo && family !== FONT_TITLE) {
+        breaks.push(`${selector} does not use the title font`);
+      }
+    }
+  }
+  return breaks;
+}
+
+/** The text of every @media query with a width in a CSS text. */
+function widthQueries(css: string): string[] {
+  const queries: string[] = [];
+  walkCss(parseCss(css), (node) => {
+    if (/^@media\b/i.test(node.prelude) && /-width/.test(node.prelude)) {
+      queries.push(
+        node.prelude.replace(/^@media\s*/i, "").replace(/\s+/g, " "),
+      );
+    }
+  });
+  return queries;
+}
+
+describe("scenic fonts and breakpoint (Requirements 21.1 to 21.3, 19.1)", () => {
+  const scenicStyles = [...scenicCssFiles];
+
+  it("the logo font is used only for the logo and the tagline", () => {
+    expect(
+      scenicStyles
+        .map((f) => ({ path: f.path, breaks: fontRoleBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("h1, h2 and h3 use the title font", () => {
+    const rules = scenicStyles.flatMap((f) => fontRules(f.text));
+    const headings = rules.filter((r) =>
+      r.selectors.some((s) => HEADING_SELECTOR.test(s)),
+    );
+    expect(headings.length).toBeGreaterThan(0);
+    expect(headings.every((r) => r.family === FONT_TITLE)).toBe(true);
+    const logo = rules.filter((r) => r.family.includes(FONT_LOGO));
+    expect(logo.length).toBeGreaterThan(0);
+  });
+
+  it("every width media query equals WIDE_QUERY", () => {
+    const queries = scenicStyles.flatMap((f) => widthQueries(f.text));
+    expect(queries.length).toBeGreaterThan(0);
+    expect(queries.filter((q) => q !== WIDE_QUERY)).toEqual([]);
+  });
+
+  it("self-check: item 12 catches a misused font", () => {
+    expect(
+      fontRoleBreaks(".scenic p { font-family: var(--font-logo); }"),
+    ).toHaveLength(1);
+    expect(
+      fontRoleBreaks(".scenic h2 { font-family: var(--font-body); }"),
+    ).toHaveLength(1);
+    expect(
+      fontRoleBreaks(
+        ".finale-banner .line-1 { font-family: var(--font-body); }",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("self-check: item 12 accepts the intended uses", () => {
+    expect(
+      fontRoleBreaks(
+        ".scenic h1, .scenic h2 { font-family: var(--font-title); }\n" +
+          ".scenic .hud-logo, .scenic .hud-tagline { font-family: var(--font-logo); }\n" +
+          ".finale-banner .line-1 { font-family: var(--font-title); }\n" +
+          ".scenic { font-family: var(--font-body); }",
+      ),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 18 sees a different width query", () => {
+    expect(widthQueries("@media (min-width: 48rem) { a { top: 0; } }")).toEqual(
+      ["(min-width: 48rem)"],
+    );
+    expect(
+      widthQueries("@media (prefers-reduced-motion: reduce) { a { top: 0; } }"),
+    ).toEqual([]);
+    expect(WIDE_QUERY).toBe("(min-width: 64rem)");
+  });
+});
+
+// Bundled display fonts (Requirement 21.4): only these two files are imported.
+const FONTSOURCE_SPECIFIER = /["'`](@fontsource\/[^"'`]*)["'`]/g;
+const ALLOWED_FONT_FILES = [
+  "@fontsource/creepster/files/creepster-latin-400-normal.woff2?url",
+  "@fontsource/im-fell-english/files/im-fell-english-latin-400-normal.woff2?url",
+];
+
+function fontsourceSpecifiers(text: string): string[] {
+  return [...text.matchAll(FONTSOURCE_SPECIFIER)].map((m) => m[1] ?? "");
+}
+
+describe("display font files (Requirement 21.4)", () => {
+  it("every @fontsource specifier in src is one of the two woff2 paths", () => {
+    const found = srcFiles.flatMap((f) => fontsourceSpecifiers(f.text));
+    expect(found.sort()).toEqual([...ALLOWED_FONT_FILES].sort());
+  });
+
+  it("self-check: the rule sees other specifiers", () => {
+    expect(fontsourceSpecifiers('import "@fontsource/creepster";')).toEqual([
+      "@fontsource/creepster",
+    ]);
+    expect(
+      fontsourceSpecifiers(
+        'import u from "@fontsource/creepster/files/creepster-latin-400-normal.woff?url";',
+      ).filter((s) => !ALLOWED_FONT_FILES.includes(s)),
+    ).toHaveLength(1);
+    expect(fontsourceSpecifiers('import "./fonts.js";')).toEqual([]);
   });
 });
