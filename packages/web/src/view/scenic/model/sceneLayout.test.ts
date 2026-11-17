@@ -475,3 +475,44 @@ describe("Property 6", () => {
     expect(hidden).toBeGreaterThan(0);
   });
 });
+
+describe("Property 7", () => {
+  // Feature: scenic-web, Property 7: Navigation controls follow Available_Actions
+  // **Validates: Requirements 3.6, 8.2, 8.7, 8.13, 14.3**
+  it("navigation controls follow Available_Actions", () => {
+    const busyRuns = new Set<boolean>();
+    fc.assert(
+      fc.property(
+        viewModelArbWith().filter((model) => model.scene.kind !== "ghost"),
+        (model) => {
+          busyRuns.add(model.live.busy);
+          const layout = sceneLayout(model);
+          const expected = (model.house?.floors ?? [])
+            .filter((view) =>
+              model.available.some(
+                (a) => a.type === "go-to-floor" && a.floor === view.floor,
+              ),
+            )
+            .map((view) => ({
+              floor: view.floor,
+              label: view.title,
+              accessibleName: `${view.title}. ${TEXTS.actionLabels["go-to-floor"]}`,
+            }));
+          expect(layout.floorButtons).toEqual(expected);
+          expect(layout.backButton).toBe(
+            model.available.some((a) => a.type === "go-to-house"),
+          );
+          if (model.scene.kind === "floor") {
+            const focus = model.scene.floor;
+            expect(layout.floorButtons.some((b) => b.floor === focus)).toBe(
+              false,
+            );
+            expect(layout.dimmedFloors).toHaveLength(2);
+          }
+        },
+      ),
+      { numRuns: 200 },
+    );
+    expect(busyRuns).toEqual(new Set([true, false]));
+  });
+});

@@ -374,7 +374,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 13.1, 13.2, 13.6, 23.7_
     - _Design: "Correctness Properties", Property 6_
 
-  - [ ] 3.11 Property test for navigation controls
+  - [x] 3.11 Property test for navigation controls
     - **Property 7: Navigation controls follow Available_Actions**
     - **Validates: Requirements 3.6, 8.2, 8.7, 8.13, 14.3**
     - Generator: `viewModelArb` restricted to House and Floor Scenes, `live.busy` true and false, at least 100 runs.
