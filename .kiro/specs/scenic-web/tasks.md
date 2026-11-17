@@ -117,7 +117,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.7, 2.8, 11.1_
     - _Design: "Correctness Properties", Property 13_
 
-  - [ ] 1.7 Add the HUD view
+  - [x] 1.7 Add the HUD view
     - Create `packages/web/src/view/scenic/model/renderMemory.ts` with only `MeterView` and `meterScale(share)` (share clamped to 0..1, 4 decimals). Task 14.3 adds the rest of the module.
     - Create `packages/web/src/view/scenic/model/hudView.ts`: `HudView` without the Lightning_Toggle fields (task 15.5 adds them) and `hudView(model)`, which takes the meter from `house.progress` with `from` always `null`. Task 14.6 changes it to `hudView(model, effects)`.
     - Create `packages/web/src/view/scenic/model/hudView.test.ts` with examples: logo `TEXTS.pageTitle` and the tagline (4.2); licence (4.11); meter line and `meterScale` within 0.01 of `share` for the sample (4.3); no meter and no icons when `house` or `house.progress` is `null` (4.17); `total` icons with `total - haunted` exorcised icons first (4.4); `plaque.visible` follows `live.formVisible` (4.5, 4.6).
