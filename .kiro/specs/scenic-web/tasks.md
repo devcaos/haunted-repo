@@ -271,7 +271,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 3. PR 1c — Scene_Layout and Camera with properties
+- [x] 3. PR 1c — Scene_Layout and Camera with properties
   - Branch: `feat/scenic-web-1c`. Stacks on: `feat/scenic-web-1b`.
   - Estimate: ~860 changed lines. Model: Auto.
   - _Design: "PR Split" row 1c_
@@ -413,12 +413,12 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 4. PR 1d — Art system and the house
+- [x] 4. PR 1d — Art system and the house
   - Branch: `feat/scenic-web-1d`. Stacks on: `feat/scenic-web-1c`.
   - Estimate: ~900 changed lines. Model: Opus.
   - _Design: "PR Split" row 1d_
 
-  - [ ] 4.1 Add Shape_Data and its rules test
+  - [x] 4.1 Add Shape_Data and its rules test
     - Create `packages/web/src/view/scenic/art/shapes.ts`: `SVG_NS`, `ShapeKind`, `Keyword`, `ShapeNode` (as in "Data Models") and the builders `g`, `path`, `rect`, `circle`, `ellipse`, `poly`.
     - Create `packages/web/src/view/scenic/art/art.test.ts` with a tree walker that checks the Shape_Data rules: allowed kinds; class names and path data match the design regexes; `fill` and `stroke` only the four keywords; ids unique per tree; every `paint` and `clip` points to an id in the same tree. Example trees from the builders pass; a bad class and a bad path fail.
     - Verify: `npm run check` exits `0`.
@@ -426,7 +426,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.1, 17.1_
     - _Design: "Shape_Data (ShapeNode)", "Art modules (scenic/art/)"_
 
-  - [ ] 4.2 Mount Shape_Data as SVG
+  - [x] 4.2 Mount Shape_Data as SVG
     - Create `packages/web/src/view/scenic/svg.ts`: `createSvgRoot(viewBox, className)` (the only place that creates an `svg`; sets `aria-hidden="true"`, `focusable="false"`, `viewBox`, `class`) and `mountShape(node, idPrefix)` (`document.createElementNS(SVG_NS, kind)` for every node; ids and `url(#...)` references prefixed; `part` written as `data-part`; no markup parsing).
     - No test file (DOM): covered by the build and the Source_Scan.
     - Verify: `npm run check` exits `0`.
@@ -434,7 +434,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 17.2, 22.2, 22.3_
     - _Design: "svg.ts (DOM)", "Accessibility Design" (Structure)_
 
-  - [ ] 4.3 Draw the sky, weather and foreground
+  - [x] 4.3 Draw the sky, weather and foreground
     - Create `packages/web/src/view/scenic/art/sky.ts`: `skyLayers()` (L0 sky gradient, moon and halo, cloud bands in `clouds-left` and `clouds-right` groups, far and near hills), `weatherLayer()` (`rain-wrap` > `rain`, two fog bands) and `foregroundLayer()` (fence and 3 gravestones on the left, dead tree on the right, rim paths), following "Depth layers" and "World geometry".
     - Extend `art.test.ts`: the three trees pass the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
@@ -442,7 +442,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.3, 22.1_
     - _Design: "Depth layers (back to front)", "World geometry"_
 
-  - [ ] 4.4 Draw the house shell
+  - [x] 4.4 Draw the house shell
     - Create `packages/web/src/view/scenic/art/house.ts` with `houseLayer()`: walls, roof with the off-centre ridge, chimney, crooked tower, attic oculus, cut ground line, rim paths, with one group per floor whose rectangle matches the Scene_Layout floor rectangles.
     - Extend `art.test.ts`: the tree passes the rules; the house layers are not a mirror image about the vertical centre line (3.4); each floor group's rectangle equals the Scene_Layout floor rectangle.
     - Verify: `npm run check` exits `0`.
@@ -450,7 +450,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 3.4, 22.1_
     - _Design: "House composition", "World geometry"_
 
-  - [ ] 4.5 Draw the rooms
+  - [x] 4.5 Draw the rooms
     - In `house.ts` add the room contents: attic (rafters, cobwebs, trunk), Entrance_Hall (front door, transom window, telephone table), Parlour (fireplace, shelves, portrait), basement (stone walls, boiler, pipes, chains).
     - Extend `art.test.ts`: the tree still passes the rules; the Entrance_Hall is left of the Parlour (3.2).
     - Verify: `npm run check` exits `0`.
@@ -458,7 +458,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 3.2, 22.1_
     - _Design: "House composition"_
 
-  - [ ] 4.6 Checkpoint and PR 1d
+  - [x] 4.6 Checkpoint and PR 1d
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 1e, task 5.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1d`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1c -- . ':(exclude)package-lock.json'`.
