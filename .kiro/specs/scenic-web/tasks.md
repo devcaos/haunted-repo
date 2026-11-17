@@ -245,7 +245,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.18, 17.12, 17.13, 21.1, 21.2, 21.3, 19.1_
     - _Design: "Props and panels" (HUD panels, Haunt_Meter, Live_Plaque), "Source_Scan additions" items 12 and 18_
 
-  - [ ] 2.8 Bundle the display fonts
+  - [x] 2.8 Bundle the display fonts
     - Check the current Fontsource docs. Add `@fontsource/creepster` 5.3.0 and `@fontsource/im-fell-english` 5.3.0 to `packages/web/package.json` with exact versions; commit `package-lock.json` in the same commit.
     - Create `packages/web/src/view/scenic/fonts.ts`: `loadScenicFonts()` imports only `files/creepster-latin-400-normal.woff2?url` and `files/im-fell-english-latin-400-normal.woff2?url`, creates each `FontFace` with weight 400, style normal and `display: "swap"`, adds it to `document.fonts` and ignores load errors. `entry.ts` calls it.
     - Source_Scan item 13: every `@fontsource/` specifier in `src/` is one of those two paths.

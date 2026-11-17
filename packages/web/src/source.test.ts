@@ -958,3 +958,33 @@ describe("scenic fonts and breakpoint (Requirements 21.1 to 21.3, 19.1)", () => 
     expect(WIDE_QUERY).toBe("(min-width: 64rem)");
   });
 });
+
+// Bundled display fonts (Requirement 21.4): only these two files are imported.
+const FONTSOURCE_SPECIFIER = /["'`](@fontsource\/[^"'`]*)["'`]/g;
+const ALLOWED_FONT_FILES = [
+  "@fontsource/creepster/files/creepster-latin-400-normal.woff2?url",
+  "@fontsource/im-fell-english/files/im-fell-english-latin-400-normal.woff2?url",
+];
+
+function fontsourceSpecifiers(text: string): string[] {
+  return [...text.matchAll(FONTSOURCE_SPECIFIER)].map((m) => m[1] ?? "");
+}
+
+describe("display font files (Requirement 21.4)", () => {
+  it("every @fontsource specifier in src is one of the two woff2 paths", () => {
+    const found = srcFiles.flatMap((f) => fontsourceSpecifiers(f.text));
+    expect(found.sort()).toEqual([...ALLOWED_FONT_FILES].sort());
+  });
+
+  it("self-check: the rule sees other specifiers", () => {
+    expect(fontsourceSpecifiers('import "@fontsource/creepster";')).toEqual([
+      "@fontsource/creepster",
+    ]);
+    expect(
+      fontsourceSpecifiers(
+        'import u from "@fontsource/creepster/files/creepster-latin-400-normal.woff?url";',
+      ).filter((s) => !ALLOWED_FONT_FILES.includes(s)),
+    ).toHaveLength(1);
+    expect(fontsourceSpecifiers('import "./fonts.js";')).toEqual([]);
+  });
+});
