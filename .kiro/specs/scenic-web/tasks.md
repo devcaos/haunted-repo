@@ -605,7 +605,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.1, 24.2, 24.3, 24.7, 24.11_
     - _Design: "Shots_Script (npm run shots)", D12, decision Q27_
 
-  - [ ] 7.7 Run the servers and fake GitHub in the Shots_Script
+  - [x] 7.7 Run the servers and fake GitHub in the Shots_Script
     - In `shots.ts`: start `preview()` on port 4179 and `createServer()` plus `listen()` on port 5179 in the script's own process; a `try/finally` and a `SIGINT` handler close the browser, the dev server and the preview `httpServer`; `step(name, fn)` prints `Shots failed at step "<name>": <message>`, cleans up and exits `1`; `page.setDefaultTimeout(10_000)`; a missing Chromium prints the install command.
     - `context.route` for every non-local request: `https://api.github.com/...` `OPTIONS` gets 204 with the CORS headers of the design; other GitHub requests go to Core's strict `createFakeGitHub` with the committed `files.json`, adding `User-Agent: playwright-shots` only when missing, plus the CORS and expose headers; anything else is aborted; a hold hook for the busy shot.
     - Verify: `npm run check` exits `0` (type check through `tsc -p scripts`).
