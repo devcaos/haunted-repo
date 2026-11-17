@@ -1,7 +1,17 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import type { AvailableAction, UserAction } from "../../../logic/actions.js";
+import {
+  isAvailable,
+  type AvailableAction,
+  type UserAction,
+} from "../../../logic/actions.js";
 import type { ViewModel } from "../../../logic/viewModel.js";
 import { createActionGuard } from "./actionGuard.js";
+import {
+  actionArb,
+  fromAvailable,
+  viewModelArb,
+} from "./viewModelArb.testutil.js";
 
 function modelWith(available: AvailableAction[]): ViewModel {
   return {
@@ -65,5 +75,56 @@ describe("createActionGuard", () => {
     expect(guard.send({ type: "show-sample" })).toBe(false);
     expect(guard.send({ type: "go-to-house" })).toBe(true);
     expect(sent).toEqual([{ type: "go-to-house" }]);
+  });
+});
+
+type Step =
+  | { kind: "set"; model: ViewModel }
+  | { kind: "send"; action: UserAction }
+  | { kind: "send-listed"; pick: number };
+
+// "send-listed" picks an entry of the newest model, so available actions are
+// hit often and not only by luck.
+const stepArb: fc.Arbitrary<Step> = fc.oneof(
+  viewModelArb.map((model): Step => ({ kind: "set", model })),
+  actionArb.map((action): Step => ({ kind: "send", action })),
+  fc.nat().map((pick): Step => ({ kind: "send-listed", pick })),
+);
+
+describe("createActionGuard properties", () => {
+  // Feature: scenic-web, Property 13: The renderer sends only available actions
+  // **Validates: Requirements 2.7, 2.8, 11.1**
+  it("Property 13: the renderer sends only available actions", () => {
+    fc.assert(
+      fc.property(fc.array(stepArb, { maxLength: 20 }), (steps) => {
+        const { sent, guard } = guardWithSink();
+        let last: ViewModel | null = null;
+        let expectedCount = 0;
+        for (const step of steps) {
+          if (step.kind === "set") {
+            last = step.model;
+            guard.setModel(step.model);
+            continue;
+          }
+          const action =
+            step.kind === "send"
+              ? step.action
+              : last !== null && last.available.length > 0
+                ? fromAvailable(
+                    last.available[step.pick % last.available.length]!,
+                  )
+                : null;
+          if (action === null) continue;
+          const expected = last !== null && isAvailable(last, action);
+          const before = sent.length;
+          expect(guard.send(action)).toBe(expected);
+          if (expected) expectedCount += 1;
+          expect(sent.length - before).toBe(expected ? 1 : 0);
+          if (last === null) expect(sent).toHaveLength(0);
+        }
+        expect(sent).toHaveLength(expectedCount);
+      }),
+      { numRuns: 100 },
+    );
   });
 });

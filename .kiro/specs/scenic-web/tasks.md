@@ -106,7 +106,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.7, 2.8_
     - _Design: "scenic/model/actionGuard.ts", "Generators"_
 
-  - [ ] 1.6 Property test for the action guard
+  - [x] 1.6 Property test for the action guard
     - **Property 13: The renderer sends only available actions**
     - **Validates: Requirements 2.7, 2.8, 11.1**
     - Generator: sequences of `setModel` calls (from `viewModelArb`, minimal until task 3.1) and `send(action)` calls (from `actionArb`), at least 100 runs. Checks: an action is forwarded exactly when a model was set and `isAvailable(lastModel, action)` is true; nothing is forwarded before the first model.
