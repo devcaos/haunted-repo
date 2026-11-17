@@ -245,7 +245,8 @@ The work is split into five pull requests of under about 900 lines each (lockfil
 
 ### Final: manual check in Kiro (planned for 17 Nov 2026)
 
-- [ ] 11. Manual end-to-end check in Kiro IDE (done by the director with Kiro; not automatable)
+- [x] 11. Manual end-to-end check in Kiro IDE (done by the director with Kiro; not automatable)
+  - Accepted without a live test of `warning`, `house-clean` and `replace: true` (see `docs/spike-power-e2e.md`).
   - [x] 11.1 Install from GitHub `main` and run the whole check
     - Install from `https://github.com/devcaos/haunted-repo/tree/main/packages/power` (done together with 11.2, after the merge).
     - Run `find_ghosts` on `https://github.com/lukeed/sirv`, exorcise one ghost, answer "I don't know" once, and see at least one Verdict_Retry (the check may force one by asking the Tutor to end a judgement with a full stop).
