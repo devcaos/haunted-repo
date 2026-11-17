@@ -95,7 +95,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 4.2, 1.11, 3.6, 17.3_
     - _Design: "New texts"_
 
-  - [ ] 1.5 Add the action guard and the first generators
+  - [x] 1.5 Add the action guard and the first generators
     - Create `packages/web/src/view/scenic/model/actionGuard.ts`: `ActionGuard` and `createActionGuard(onAction)` with `setModel`, `current` and `send` (forwards only when a model exists and `isAvailable(model, action)` is true; returns whether it sent).
     - Create `packages/web/src/view/scenic/model/viewModelArb.testutil.ts` with:
       - `actionArb`, complete as in the design "Generators" (13 `UserAction` types, model paths and free strings, the 3 floors, ratings, self-check answers, free URLs).
