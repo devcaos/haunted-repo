@@ -199,7 +199,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.6, 2.9, 22.3, 22.8, 22.9, 22.11, 25.9_
     - _Design: "Source_Scan additions" items 1 to 3_
 
-  - [ ] 2.3 Source_Scan items 4 and 5
+  - [x] 2.3 Source_Scan items 4 and 5
     - Item 4: the Simple_Renderer CSS rules (no literal colour, no literal size, no `font-family` without `var(`, same exemptions) run on every CSS file under `src/view/scenic/` except `styles/scenic-tokens.css`; the test names each failing file; it checks that the tokens file exists, is skipped, and would break the colour rule if scanned.
     - Item 5: no non-test scenic TypeScript string literal holds a hex colour or a colour function, or is exactly a CSS named colour; `transparent`, `currentColor`, `none`, `inherit` and names like `"ghost--red-eyes"` pass. Self-checks for a hex value, a colour function and a named colour.
     - Verify: `npm run check` exits `0`.

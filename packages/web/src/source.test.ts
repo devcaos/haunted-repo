@@ -431,3 +431,101 @@ describe("scenic files (Requirements 2.6, 2.9, 22.3, 22.8, 22.11)", () => {
     expect(SCANNED.test(`${SCENIC_DIR}art/house.svg`)).toBe(true);
   });
 });
+
+// Scenic CSS (Requirements 22.5 to 22.7, 22.9): the Simple_Renderer rules run
+// on every scenic CSS file except its tokens file.
+const SCENIC_TOKENS_CSS = `${SCENIC_DIR}styles/scenic-tokens.css`;
+const scenicCssFiles = viewFiles.filter(
+  (f) =>
+    f.path.startsWith(SCENIC_DIR) &&
+    f.path.endsWith(".css") &&
+    f.path !== SCENIC_TOKENS_CSS,
+);
+const scenicTsFiles = viewFiles.filter(
+  (f) => f.path.startsWith(SCENIC_DIR) && f.path.endsWith(".ts"),
+);
+const SOURCE_TOKEN =
+  /\/\*[\s\S]*?\*\/|\/\/[^\n]*|"(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*'|`(?:[^`\\]|\\.)*`/g;
+const NAMED_COLOUR_EXACT = new RegExp(
+  `^(?:${CSS_NAMED_COLOURS.join("|")})$`,
+  "i",
+);
+
+/** The string literals of a TypeScript text, without their quotes. */
+function stringLiterals(ts: string): string[] {
+  return [...ts.matchAll(SOURCE_TOKEN)]
+    .map((m) => m[0])
+    .filter((token) => !token.startsWith("/"))
+    .map((token) => token.slice(1, -1));
+}
+
+/** The string literals that hold a colour value. */
+function colourStrings(ts: string): string[] {
+  return stringLiterals(ts).filter(
+    (s) =>
+      HEX_COLOUR.test(s) ||
+      COLOUR_FUNCTION.test(s) ||
+      NAMED_COLOUR_EXACT.test(s.trim()),
+  );
+}
+
+describe("scenic CSS (Requirements 22.5, 22.9)", () => {
+  it("scans every scenic CSS file except scenic-tokens.css", () => {
+    const paths = scenicCssFiles.map((f) => f.path);
+    expect(paths).not.toContain(SCENIC_TOKENS_CSS);
+    expect(paths).not.toContain(TOKENS_CSS);
+  });
+
+  it("no literal colour, size or font outside scenic-tokens.css", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: cssBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("self-check: scenic-tokens.css exists and would break the colour rule", () => {
+    const tokens = viewFiles.filter((f) => f.path === SCENIC_TOKENS_CSS);
+    expect(tokens).toHaveLength(1);
+    expect(cssBreaks(tokens[0]?.text ?? "")).toContain("colour");
+  });
+});
+
+describe("scenic strings (Requirements 22.6, 22.7)", () => {
+  it("scans scenic TypeScript", () => {
+    expect(scenicTsFiles.length).toBeGreaterThan(0);
+  });
+
+  it("no string literal holds a colour", () => {
+    expect(
+      scenicTsFiles
+        .map((f) => ({ path: f.path, found: colourStrings(f.text) }))
+        .filter((r) => r.found.length > 0),
+    ).toEqual([]);
+  });
+
+  it("self-check: the rule catches a hex value, a function and a name", () => {
+    expect(colourStrings('const a = "#ff7a1a";')).toEqual(["#ff7a1a"]);
+    expect(colourStrings("const a = '#fff';")).toEqual(["#fff"]);
+    expect(colourStrings('node.style = "rgb(0 0 0)";')).toEqual(["rgb(0 0 0)"]);
+    expect(colourStrings("const a = `hsl(0 0% 0%)`;")).toEqual([
+      "hsl(0 0% 0%)",
+    ]);
+    expect(colourStrings('const fill = "Red";')).toEqual(["Red"]);
+  });
+
+  it("self-check: allowed strings and comments pass", () => {
+    for (const ts of [
+      'const a = "transparent";',
+      'const a = "currentColor";',
+      'const a = "none";',
+      'const a = "inherit";',
+      'const a = "ghost--red-eyes";',
+      'const a = "var(--sc-night)";',
+      "// the colour is #fff or red\nconst a = 1;",
+      '/* "red" */ const a = 1;',
+    ]) {
+      expect(colourStrings(ts)).toEqual([]);
+    }
+  });
+});
