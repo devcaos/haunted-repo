@@ -1,0 +1,211 @@
+/*
+ * Stage and house styles of the Scenic_Renderer. Tokens only.
+ * The stage is outside the Camera; `.world` inside it is the Camera. Stroke
+ * widths are plain numbers in viewBox units.
+ */
+
+/* Narrow screens: a square stage, full width (design "Camera frames"). */
+.scenic .stage {
+  position: relative;
+  width: var(--sc-full);
+  aspect-ratio: 1;
+  overflow: hidden;
+  background-color: var(--sc-backing);
+}
+
+/* Wide screens: 16:10 like the viewBox, as big as fits; 1440 x 900 fills it. */
+@media (min-width: 64rem) {
+  .scenic .stage {
+    width: var(--sc-stage-wide);
+    aspect-ratio: 16 / 10;
+    justify-self: center;
+    align-self: center;
+  }
+}
+
+/* The world box keeps the 16:10 ratio of the viewBox; the Camera moves it from its top left corner. */
+.scenic .world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--sc-full);
+  aspect-ratio: 16 / 10;
+  transform-origin: 0 0;
+}
+
+.scenic .world > .house {
+  display: block;
+  width: var(--sc-full);
+  height: var(--sc-full);
+}
+
+/* Same box as the SVG; holds HTML pinned to the art (the phone widget). */
+.scenic .world-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Scene_Heading on a solid Night backing, outside the Camera. */
+.scenic .scene-bar {
+  position: absolute;
+  z-index: 1;
+  top: var(--sc-space-2);
+  left: var(--sc-space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--sc-space-2);
+  padding: var(--sc-space-1) var(--sc-space-3);
+  background-color: var(--sc-backing);
+  border: var(--sc-line) solid var(--sc-border);
+}
+
+@media (min-width: 64rem) {
+  .scenic .scene-bar {
+    top: var(--sc-space-3);
+    right: var(--sc-space-3);
+    left: auto;
+  }
+}
+
+.scenic .scene-heading {
+  font-size: var(--sc-text-h2);
+}
+
+/* Flat tones of the art: the palette, one class per colour. */
+.house .tone-night {
+  fill: var(--sc-night);
+}
+
+.house .tone-slate {
+  fill: var(--sc-slate);
+}
+
+.house .tone-mist {
+  fill: var(--sc-mist);
+}
+
+.house .tone-bone {
+  fill: var(--sc-bone);
+}
+
+.house .tone-candle {
+  fill: var(--sc-candle);
+}
+
+.house .tone-brass {
+  fill: var(--sc-brass);
+}
+
+.house .tone-rust {
+  fill: var(--sc-rust);
+}
+
+/* L0 sky: Night at the top to Slate at the horizon. */
+.house .stop-night {
+  stop-color: var(--sc-night);
+}
+
+.house .stop-slate {
+  stop-color: var(--sc-slate);
+}
+
+/* L1 moon halo, clouds; L2 far hills: paler and bluer with distance. */
+.house .stop-halo-0 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: var(--sc-depth-cloud);
+}
+
+.house .stop-halo-1 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0;
+}
+
+.house .moon-shade {
+  opacity: var(--sc-depth-cloud);
+}
+
+.house .cloud {
+  opacity: var(--sc-depth-cloud);
+}
+
+.house .hill-far {
+  opacity: var(--sc-depth-hill-far);
+}
+
+.house .hill-near {
+  opacity: var(--sc-depth-hill-near);
+}
+
+/* L4 house: lines drawn by stroke only. */
+.house .beams,
+.house .stone-joints,
+.house .gauge-needle {
+  stroke: var(--sc-night);
+  stroke-width: 4;
+}
+
+.house .stone-joints {
+  stroke-width: 2;
+}
+
+.house .cobweb {
+  stroke: var(--sc-bone);
+  stroke-width: 1;
+  opacity: 0.4;
+}
+
+.house .oculus-bars {
+  stroke: var(--sc-mist);
+  stroke-width: 3;
+}
+
+.house .chain-link {
+  stroke: var(--sc-mist);
+  stroke-width: 2;
+}
+
+.house .table-leg {
+  fill: var(--sc-slate);
+}
+
+/* Rim light: only the moon-facing edges, no filter (Requirement 20.2). */
+.house .rim {
+  stroke: var(--sc-rim);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: var(--sc-rim-opacity);
+}
+
+/* Weather: thin rain and two fog bands. */
+.house .rain-streaks {
+  stroke: var(--sc-spectral);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.house .rain {
+  opacity: var(--sc-rain);
+}
+
+.house .fog {
+  fill: var(--sc-mist);
+  opacity: var(--sc-fog);
+}
+
+/* L5 foreground: Night silhouettes with a fainter, thinner rim. */
+.house .rim-fg .rim {
+  stroke-width: 1.5;
+  opacity: var(--sc-fg-rim-opacity);
+}
+
+/* A Night overlay over each floor; shown on the two other floors of a Floor_Scene (D3). */
+.house .dim {
+  fill: var(--sc-night);
+  opacity: 0;
+}
+
+.house .dim.is-dimmed {
+  opacity: var(--sc-dim);
+}

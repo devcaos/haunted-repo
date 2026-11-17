@@ -76,6 +76,7 @@
   --sc-line: 1px;
   --sc-line-heavy: 2px;
   --sc-hud-width: 22rem;
+  --sc-stage-wide: min(100vw, 160dvh);
   --sc-viewport-height: 100vh;
   --sc-icon-size: 1.25rem;
   --sc-meter-height: 0.75rem;

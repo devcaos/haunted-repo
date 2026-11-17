@@ -502,7 +502,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.1, 3.5, 3.9, 8.9, 17.2_
     - _Design: "Art System", "stage.ts" row of "DOM modules", "Camera frames"_
 
-  - [ ] 5.5 Style the stage
+  - [x] 5.5 Style the stage
     - Create `packages/web/src/view/scenic/styles/stage.css` (tokens only): wide stage `width: min(100vw, 160dvh)` at 16:10, narrow square stage, `.world` with `transform-origin: 0 0`, `.world-overlay`, layer classes (sky, moon, clouds, hills, walls, rooms, rim with its opacity token, foreground), dims with `--sc-dim`, `.scene-bar` heading.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): style the scenic stage and house`
