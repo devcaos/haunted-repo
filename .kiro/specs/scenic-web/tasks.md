@@ -276,7 +276,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~860 changed lines. Model: Auto.
   - _Design: "PR Split" row 1c_
 
-  - [ ] 3.1 Complete the generators
+  - [x] 3.1 Complete the generators
     - In `packages/web/src/view/scenic/model/viewModelArb.testutil.ts` replace the minimal `viewModelArb` of task 1.5 with the full one of the design (same export name): report from `reportArb` or `uniquePathReportArb` with option `maxPerFloor`; `house` from `buildLiveHouse(report)` or `buildSampleHouse(report, { progress, step, scripted, startAllowed })` with `progressArb(report.ghosts)`, `fc.subarray` of the paths, `fc.constantFrom` of the 8 steps and `fc.boolean()`; `house: null` in about 1 run in 20; `scene` from house, floor and ghost; `available` built with the rules of `page.ts` (and `ghostActions` for the ghost scene); `status.kind` from the 5 kinds; an option that biases about a third of the sample houses to have every Card Locked or Exorcised (for P6).
     - Add `pageRunArb`: runs the real `createPage` with the committed `report.json`, `files.json` and either the committed `demo-script.json` or `fullScriptFor(report)`, a recording renderer, and a `detect` that returns a live report from `uniquePathReportArb`, an error or a throw; each number from `choicesArb` picks one action of `model.available` (a fixed URL for `submit-live`); it yields the list of consecutive models.
     - Create `packages/web/src/view/scenic/model/viewModelArb.test.ts`: one test with `fc.statistics` that logs the share of each `house.source`, Scene kind and GhostState, and asserts that each value appears.
