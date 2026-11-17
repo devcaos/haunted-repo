@@ -438,3 +438,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** Una entrada anterior (la de "2 buenas de 3") tiene un salto de página y un retorno de carro sueltos donde iban `` `f `` y `` `r `` (escapes de PowerShell). La edición borró una línea de otra entrada.
 - **Cómo lo rodeé:** Restauré el archivo desde git y añadí las entradas al final con Node. Los caracteres de control siguen ahí.
 - **Estado:** abierto (arreglar esa entrada a mano en una limpieza de docs)
+
+## 18 nov 2026: El test de propiedad del Power vuelve a pasar de 5 s (repetido)
+- **Qué intentaba:** Pasar `npm run check` después de la tarea 7.8 de `scenic-web` (capturas de la PR 1f).
+- **Qué pasó:** `packages/power/src/dataFile.roundtrip.property.test.ts` (Property 3, 100 guardados en una carpeta real) superó los 5000 ms en tres ejecuciones completas seguidas. Solo, el mismo test pasa en unos 700 ms. El cambio no toca el Power; lo único nuevo desde la última vez que pasó es la instalación de Chromium para Playwright.
+- **Cómo lo rodeé:** No lo rodeé. Paré y pregunté a Luis Miguel, como pide la regla de "si falla dos veces, para".
+- **Estado:** abierto (propuesta: subir el tiempo límite de ese test a 20 s, como ya decía la entrada del 17 nov)
