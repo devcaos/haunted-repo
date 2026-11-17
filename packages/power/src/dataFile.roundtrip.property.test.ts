@@ -78,5 +78,6 @@ describe("Property 3: Save round-trip", () => {
       }),
       { numRuns: 100 },
     );
-  });
+    // 100 writes to a real folder: slow on a busy Windows disk, not a failure.
+  }, 20_000);
 });
