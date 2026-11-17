@@ -341,7 +341,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.10, 6.6, 8.4, 8.5, 23.4_
     - _Design: "Correctness Properties", Property 3_
 
-  - [ ] 3.8 Property test for Variants
+  - [x] 3.8 Property test for Variants
     - **Property 4: The Variant depends only on the floor position**
     - **Validates: Requirements 5.8, 5.10, 5.11, 23.5**
     - Generator: `viewModelArb` with `maxPerFloor: 5`, and a mapper that rewrites the Cards' `path`, `score`, `reason`, `state` and `canStart` while keeping floors and order, at least 100 runs.

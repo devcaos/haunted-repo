@@ -19,6 +19,8 @@ import {
 import type { Rect } from "./sceneLayout.js";
 import { viewModelArbWith } from "./viewModelArb.testutil.js";
 
+const FLOORS_IN_ORDER: readonly Floor[] = ["attic", "middle floor", "basement"];
+
 function ghost(path: string, floor: Floor): Ghost {
   return {
     path,
@@ -353,6 +355,60 @@ describe("Property 3", () => {
           cards.filter((card) => card.canStart).map((card) => card.path),
         );
       }),
+      { numRuns: 200 },
+    );
+  });
+});
+
+describe("Property 4", () => {
+  const states = ["haunted", "exorcised", "locked"] as const;
+  /** Same floors and order; every other field of every Card is rewritten. */
+  function rewritten(model: ViewModel, seed: number): ViewModel {
+    if (model.house === null) return model;
+    const floors = model.house.floors.map((view, f) => ({
+      ...view,
+      ghosts: view.ghosts.map((card, i) => ({
+        ...card,
+        path: `other-${seed}-${f}-${i}.ts`,
+        score: (seed + i) % 101,
+        reason: `reason ${seed}`,
+        state: states[(seed + i + f) % 3] ?? "haunted",
+        canStart: (seed + i) % 2 === 0,
+      })),
+    }));
+    return {
+      ...model,
+      house: {
+        ...model.house,
+        floors: floors as unknown as typeof model.house.floors,
+      },
+    };
+  }
+
+  // Feature: scenic-web, Property 4: The Variant depends only on the floor position
+  // **Validates: Requirements 5.8, 5.10, 5.11, 23.5**
+  it("the Variant depends only on the floor position", () => {
+    fc.assert(
+      fc.property(
+        viewModelArbWith({ maxPerFloor: 5 }),
+        fc.nat(),
+        (model, seed) => {
+          const before = sceneLayout(model).slots;
+          const after = sceneLayout(rewritten(model, seed)).slots;
+          expect(after.map((s) => [s.key, s.variant])).toEqual(
+            before.map((s) => [s.key, s.variant]),
+          );
+          for (const slot of before) {
+            expect(slot.variant).toBe(slot.index % 5);
+          }
+          for (const floor of FLOORS_IN_ORDER) {
+            const variants = before
+              .filter((s) => s.floor === floor)
+              .map((s) => s.variant);
+            expect(new Set(variants).size).toBe(variants.length);
+          }
+        },
+      ),
       { numRuns: 200 },
     );
   });
