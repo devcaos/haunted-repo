@@ -396,7 +396,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.4, 6.5, 6.9, 8.3, 8.6, 17.3_
     - _Design: "Correctness Properties", Property 8_
 
-  - [ ] 3.13 Add the Camera
+  - [x] 3.13 Add the Camera
     - In `packages/web/src/view/scenic/model/camera.ts` add `CameraTransform`, `frameRect`, `sceneArea`, `cameraFor` and `cssTransform` with the formulas and the "Camera frames" table of the design.
     - Create `packages/web/src/view/scenic/model/camera.test.ts`: every frame of the table, for both viewport classes, maps its floor (or the whole house) inside the scene area; the wide house frame is the identity; the scales match the design within 0.01; the camera duration token in `scenic-tokens.css` is 700 ms.
     - Verify: `npm run check` exits `0`.
