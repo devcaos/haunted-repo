@@ -529,3 +529,228 @@ describe("scenic strings (Requirements 22.6, 22.7)", () => {
     }
   });
 });
+
+// Scenic motion rules (Requirements 18.4, 20.1 to 20.3). A small block parser
+// gives each declaration its @-rule ancestors.
+interface CssNode {
+  prelude: string;
+  decls: Declaration[];
+  children: CssNode[];
+}
+
+function parseCss(css: string): CssNode {
+  const clean = css
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\burl\([^)]*\)/gi, "url()");
+  const root: CssNode = { prelude: "", decls: [], children: [] };
+  const stack = [root];
+  let buf = "";
+  const flush = (): void => {
+    const at = buf.indexOf(":");
+    if (at > 0) {
+      stack[stack.length - 1]?.decls.push({
+        property: buf.slice(0, at).trim().toLowerCase(),
+        value: buf.slice(at + 1).trim(),
+      });
+    }
+    buf = "";
+  };
+  for (const ch of clean) {
+    if (ch === "{") {
+      const node: CssNode = { prelude: buf.trim(), decls: [], children: [] };
+      stack[stack.length - 1]?.children.push(node);
+      stack.push(node);
+      buf = "";
+    } else if (ch === ";") {
+      flush();
+    } else if (ch === "}") {
+      flush();
+      if (stack.length > 1) stack.pop();
+    } else {
+      buf += ch;
+    }
+  }
+  return root;
+}
+
+/** Every node with its chain of ancestors (outermost first). */
+function walkCss(
+  node: CssNode,
+  visit: (node: CssNode, ancestors: CssNode[]) => void,
+  ancestors: CssNode[] = [],
+): void {
+  for (const child of node.children) {
+    visit(child, ancestors);
+    walkCss(child, visit, [...ancestors, child]);
+  }
+}
+
+const ANIMATED_PROPERTY = /^(?:transform|opacity)$/;
+const REDUCED_MOTION_MEDIA =
+  /^@media[^{]*\(\s*prefers-reduced-motion\s*:\s*(?:no-preference|reduce)\s*\)/i;
+const MOTION_PROPERTY = /^(?:animation|transition)(?:-[\w-]+)?$/;
+const FILTER_PROPERTY = /^(?:-webkit-)?(?:filter|backdrop-filter)$/;
+
+/** Item 6: keyframes and transitions may only touch transform and opacity. */
+function animatedPropertyBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node, ancestors) => {
+    const inKeyframes =
+      /^@(?:-webkit-)?keyframes\b/i.test(node.prelude) ||
+      ancestors.some((a) => /^@(?:-webkit-)?keyframes\b/i.test(a.prelude));
+    for (const { property, value } of node.decls) {
+      if (inKeyframes && !ANIMATED_PROPERTY.test(property)) {
+        breaks.push(`keyframes sets ${property}`);
+      }
+      if (property === "transition" || property === "transition-property") {
+        for (const part of value.split(/,(?![^(]*\))/)) {
+          const name = part.trim().split(/\s+/)[0] ?? "";
+          if (name !== "none" && !ANIMATED_PROPERTY.test(name)) {
+            breaks.push(`${property} names ${name || "nothing"}`);
+          }
+        }
+      }
+    }
+  });
+  return breaks;
+}
+
+/** Item 8 (placement): animation and transition only in a motion @media. */
+function motionPlacementBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node, ancestors) => {
+    const inMotionMedia = [node, ...ancestors].some((n) =>
+      REDUCED_MOTION_MEDIA.test(n.prelude),
+    );
+    for (const { property } of node.decls) {
+      if (MOTION_PROPERTY.test(property) && !inMotionMedia) {
+        breaks.push(`${property} outside a prefers-reduced-motion block`);
+      }
+    }
+  });
+  return breaks;
+}
+
+/** Item 9: no filter, backdrop-filter or mix-blend-mode except none. */
+function filterBreaks(css: string): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node) => {
+    for (const { property, value } of node.decls) {
+      const isBlend = property === "mix-blend-mode";
+      if ((FILTER_PROPERTY.test(property) || isBlend) && value !== "none") {
+        breaks.push(`${property}: ${value}`);
+      }
+    }
+  });
+  return breaks;
+}
+
+const TIMER_CALL = /\b(?:requestAnimationFrame|setInterval)\b/;
+
+/** A TypeScript text with its comments removed. */
+function withoutComments(ts: string): string {
+  return ts.replace(SOURCE_TOKEN, (token) =>
+    token.startsWith("/") ? "" : token,
+  );
+}
+
+describe("scenic motion rules (Requirements 18.4, 20.1 to 20.3)", () => {
+  it("keyframes and transitions touch only transform and opacity", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: animatedPropertyBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("animation and transition sit only in a reduced-motion block", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: motionPlacementBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("no filter, backdrop-filter or mix-blend-mode", () => {
+    expect(
+      scenicCssFiles
+        .map((f) => ({ path: f.path, breaks: filterBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("no requestAnimationFrame and no setInterval", () => {
+    expect(
+      scenicTsFiles
+        .filter((f) => TIMER_CALL.test(withoutComments(f.text)))
+        .map((f) => f.path),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 6 catches other properties and all", () => {
+    expect(
+      animatedPropertyBreaks(
+        "@keyframes a { from { left: 0; } to { opacity: 1; } }",
+      ),
+    ).toEqual(["keyframes sets left"]);
+    expect(animatedPropertyBreaks("a { transition: all 80ms; }")).toEqual([
+      "transition names all",
+    ]);
+    expect(
+      animatedPropertyBreaks("a { transition: transform 80ms, color 1s; }"),
+    ).toEqual(["transition names color"]);
+    expect(animatedPropertyBreaks("a { transition-property: width; }")).toEqual(
+      ["transition-property names width"],
+    );
+  });
+
+  it("self-check: item 6 accepts transform and opacity", () => {
+    expect(
+      animatedPropertyBreaks(
+        "@keyframes a { 0% { transform: none; } 100% { opacity: 1; } }\n" +
+          "a { transition: transform 80ms ease-out, opacity var(--d); }\n" +
+          "a { transition-property: opacity; }",
+      ),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 7 catches both calls", () => {
+    expect(TIMER_CALL.test("requestAnimationFrame(tick);")).toBe(true);
+    expect(TIMER_CALL.test("window.setInterval(f, 10);")).toBe(true);
+    expect(TIMER_CALL.test("window.setTimeout(f, 10);")).toBe(false);
+    expect(
+      TIMER_CALL.test(withoutComments("// no setInterval here\nconst a = 1;")),
+    ).toBe(false);
+  });
+
+  it("self-check: item 8 catches motion outside the media blocks", () => {
+    expect(motionPlacementBreaks("a { animation: x 1s; }")).toHaveLength(1);
+    expect(motionPlacementBreaks("a { transition: opacity 1s; }")).toHaveLength(
+      1,
+    );
+    expect(
+      motionPlacementBreaks(
+        "@media (min-width: 64rem) { a { animation-name: x; } }",
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("self-check: item 8 accepts the two motion blocks", () => {
+    expect(
+      motionPlacementBreaks(
+        "@media (prefers-reduced-motion: no-preference) { a { animation: x 1s; } }\n" +
+          "@media (prefers-reduced-motion: reduce) { a { transition: none; } }\n" +
+          "a { color: red; }",
+      ),
+    ).toEqual([]);
+  });
+
+  it("self-check: item 9 catches filters and blend modes", () => {
+    expect(filterBreaks("a { filter: blur(2px); }")).toHaveLength(1);
+    expect(filterBreaks("a { backdrop-filter: blur(2px); }")).toHaveLength(1);
+    expect(filterBreaks("a { mix-blend-mode: multiply; }")).toHaveLength(1);
+    expect(filterBreaks("a { filter: none; mix-blend-mode: none; }")).toEqual(
+      [],
+    );
+  });
+});

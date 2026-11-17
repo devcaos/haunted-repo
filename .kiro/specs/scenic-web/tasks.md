@@ -207,7 +207,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 22.5, 22.6, 22.7, 22.9_
     - _Design: "Source_Scan additions" items 4 and 5_
 
-  - [ ] 2.4 Source_Scan items 6, 7, 8 (placement) and 9
+  - [x] 2.4 Source_Scan items 6, 7, 8 (placement) and 9
     - Item 6: every `@keyframes` block in scenic CSS sets only `transform` and `opacity`; every `transition` and `transition-property` names only `transform` or `opacity`, never `all`.
     - Item 7: no `requestAnimationFrame` and no `setInterval` in non-test scenic TypeScript.
     - Item 8, placement part: `animation` and `transition` declarations appear only inside `@media (prefers-reduced-motion: no-preference)` or `@media (prefers-reduced-motion: reduce)` blocks. The rule on the content of `reduce` blocks comes in task 16.4.
