@@ -685,13 +685,13 @@ Resulting scales: wide attic 1.94, middle floor 1.76, basement 1.88; narrow hous
 
 | | Wisp (attic) | Lantern_Wraith (middle floor) | Chained_Brute (basement) |
 | --- | --- | --- | --- |
-| Box W × H (units) | 60 × 64 | 72 × 96 | 96 × 88 |
-| Width : height | 0.94 | 0.75 | 1.09 |
-| Eye height / body height | 11 / 64 = 17 % | 7 / 96 = 7.3 % | 6 / 88 = 6.8 % |
-| Outline parts | round dome, straight sides, hem of 5 small scallops; no tail, no horns | pointed hood leaning forward, body narrowing into a spiral tail that curls left (1.25 turns) | broad hunched body, 2 horns curving up and out, lower edge with 4 hanging drips |
-| Part only this type has | `hem-round` (round body, no tail) | `hood`, `tail-spiral` | `horns` |
-| Other parts | 2 eyes, small "o" mouth, `cobweb` on the top-left of the head (3 radial and 2 arc threads plus 1 hanging thread) | 2 slit eyes in a Night face opening, `lantern` (18 × 24, Brass frame, Candle glass) held at the front right at 60 % height, Candle light gradient on the lower face | heavy brow, 2 Pumpkin eyes with a warm glow, `chain` of 7 links across the body to a shackle on one wrist |
-| Idle animation | `wisp-bob`, 2.4 s | `wraith-sway`, 4.2 s | `brute-heave`, 3.2 s |
+| Box W × H (units) | 56 × 88 | 72 × 96 | 96 × 88 |
+| Width : height | 0.64 | 0.75 | 1.09 |
+| Eye height / body height | 4 / 88 = 4.5 % | 7 / 96 = 7.3 % | 6 / 88 = 6.8 % |
+| Outline parts | tall gothic spectre: narrow head, sleeves sweeping out, ragged tail of 4 Bezier tatters; no hood, no horns | pointed hood leaning forward, body narrowing into a spiral tail that curls left (1.25 turns) | broad hunched body, 2 horns curving up and out, lower edge with 4 hanging drips |
+| Part only this type has | `tail-ragged` (ragged tail, no hood) | `hood`, `tail-spiral` | `horns` |
+| Other parts | 2 small slanted Night eye sockets with glowing cold-white cores, no mouth, `cobweb` on the left sleeve (3 threads and 1 arc), 2 cloth folds | 2 slit eyes in a Night face opening, `lantern` (18 × 24, Brass frame, Candle glass) held at the front right at 60 % height, Candle light gradient on the lower face | heavy brow, 2 Pumpkin eyes with a warm glow, `chain` of 7 links across the body to a shackle on one wrist |
+| Idle animation | `wisp-float`, 5.6 s | `wraith-sway`, 4.2 s | `brute-heave`, 3.2 s |
 
 At every Variant number the three types use the same scale (table below), so the order of sizes (Wisp smallest, Chained_Brute widest) holds for every Variant (Requirement 5.6).
 
@@ -787,17 +787,17 @@ The rim light is drawn on the edge facing the moon (upper right), on the roof, t
 
 ### The Wisp, Variant 0 (the vertical-slice ghost)
 
-Local coordinates, box 60 × 64, origin top left:
+Local coordinates, box 56 × 88, origin top left. Redrawn on 18 Nov after the art review of the Vertical Slice Gate (director's decision, `docs/decisiones.md`): a tall gothic spectre, not cute.
 
-- Outline: `M30 0 C47 0 60 13 60 31 L60 54 Q55 64 50 56 Q45 64 40 56 Q35 64 30 56 Q25 64 20 56 Q15 64 10 56 Q5 64 0 54 L0 31 C0 13 13 0 30 0 Z`, class `ghost-body` (Spectral), part `outline` and `hem-round`.
-- Inner shade: lower-left crescent `M4 34 C6 48 14 54 24 55 Q14 58 8 54 Q2 48 2 36 Z`, Mist at 0.3.
-- Eyes: ellipses at (21, 27) and (39, 27), rx 5, ry 5.5 (height 11), Night; glints r 1.6 at (+1.8, −2.2), Bone.
-- Mouth: ellipse (30, 40), rx 3, ry 2.5, Night at 0.8.
-- Cobweb: centre (6, 4); threads to (0, 18), (14, 0), (16, 12); arcs at radius 6 and 11; one thread hanging to (−4, 26); Bone 0.8 wide at 0.6 opacity; part `cobweb`.
-- Rim: `M34 1 C49 3 59 15 59.5 31 L59.5 38`, Bone, width 2, opacity 0.6.
-- Glow: circle centre (30, 34), r 52, radial cold blue 0.55 to 0; part `glow`.
-- Floor shadow: ellipse (30, 72), rx 20, ry 4, Night at 0.5.
-- Idle `wisp-bob`: translateY 0 → −6 → 0 with rotate −3° → 3° → −3°, 2.4 s, ease-in-out, infinite. Playful by intent.
+- Outline: narrow head, sleeves that sweep out to (0, 40) and (56, 42), and a ragged tail of 4 quadratic Bezier tatters down to (34, 88); class `ghost-body`, part `outline` and `tail-ragged`. The exact path data is in `art/ghosts.ts`.
+- Body paint: a vertical linear gradient, cold white (`--sc-cold-white`) at 0.95, Spectral at 0.7 halfway, cold blue at 0 at the tail.
+- Folds: 2 Mist strokes down the body, width 1.2, opacity 0.35.
+- Eyes: Night ellipses rx 3.6, ry 2 (height 4) at (22, 19) and (34, 19), tilted 14° and −14°, each with a cold-white core r 0.8 and a cold-blue radial glow r 5. No mouth.
+- Cobweb: on the left sleeve, 3 threads from (9, 30) and 1 arc; Bone 0.6 wide at 0.45 opacity; part `cobweb`.
+- Rim: along the right side of the head and sleeve, Bone, width 2, opacity 0.6.
+- Glow: ellipse centre (28, 40), rx 46, ry 58, radial cold blue 0.55 to 0; part `glow`.
+- Floor shadow: ellipse (28, 96), rx 16, ry 3, Night at 0.5; the Wisp floats 8 units above it.
+- Idle `wisp-float`: translateY 0 → −8 → 0 with rotate −1.5° → 1.5° → −1.5°, 5.6 s, ease-in-out, infinite. Each slot gets `ghost-phase-<index mod 4>`, which starts the loop 1.4 s later per phase (negative delay), so neighbours never float in step.
 
 The Lantern_Wraith and the Chained_Brute follow the table in "Data Models" with the same layering (body, shade, eyes, parts, rim, glow, shadow). Their idle animations: `wraith-sway` rotates −4° ↔ 4° about the hood tip with translateX ±4, 4.2 s ease-in-out infinite alternate; `brute-heave` scales (1, 1) → (1.03, 0.97) → (1, 1) with translateY 2, 3.2 s ease-in-out infinite.
 
@@ -863,7 +863,7 @@ Every animation animates only `transform` and `opacity` (Requirement 20.1). Ever
 | `fog-drift` | `g.fog` (both bands) | transform: translateX ±60 | 24 s | ease-in-out | infinite alternate | none; still at 0.35 |
 | `bats-fly` | `g.bats` | transform: translate across the sky | 22 s (8 s off screen) | linear | infinite | none; bats hidden |
 | `window-flicker` | `.oculus-light` | opacity 0.5 ↔ 0.9 | 3.2 s | steps(4) | infinite | none; still at 0.8 |
-| `wisp-bob` | `.ghost--wisp .ghost-idle` | transform | 2.4 s | ease-in-out | infinite | none |
+| `wisp-float` | `.ghost--wisp .ghost-idle` | transform | 5.6 s | ease-in-out | infinite | none |
 | `wraith-sway` | `.ghost--lantern-wraith .ghost-idle` | transform | 4.2 s | ease-in-out | infinite alternate | none |
 | `brute-heave` | `.ghost--chained-brute .ghost-idle` | transform | 3.2 s | ease-in-out | infinite | none |
 | `flame-flicker` | `.flame` (Exorcised slot, lit Question_Candle) | transform: scaleY 1 ↔ 1.08 | 1.6 s | ease-in-out | infinite alternate | none |
@@ -1234,7 +1234,7 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 8. `animation` and `transition` declarations appear only inside `@media (prefers-reduced-motion: no-preference)` or `@media (prefers-reduced-motion: reduce)` blocks; inside `reduce` blocks they use only keyframes that animate `opacity`, a duration token whose value is 200 ms or less, and no `infinite` (18.4, 18.6).
 9. No `filter`, `backdrop-filter` or `mix-blend-mode` declaration other than `none` in scenic CSS (design choice that keeps 20.2 trivially true).
 10. `scenic/model/**` and `scenic/art/**` use no DOM name and import no CSS or `?url` asset (23.1).
-11. The three idle `@keyframes` (`wisp-bob`, `wraith-sway`, `brute-heave`) exist and their bodies differ (5.7).
+11. The three idle `@keyframes` (`wisp-float`, `wraith-sway`, `brute-heave`) exist and their bodies differ (5.7).
 12. `font-family` with `var(--font-logo)` appears only in rules for `.hud-logo` and `.hud-tagline` (21.1, 21.3); `h1, h2, h3` and `.finale-banner .line-1` use `var(--font-title)` (21.2).
 13. Every `@fontsource/` specifier in `src/` is one of the two `files/<name>-latin-400-normal.woff2?url` paths (21.4).
 14. The Answer_Box rules: no `.value` read and no `input` or `change` listener in `grimoire.ts`; no scenic file reads `answerBox.value` or listens to it (10.11, 25.1).
@@ -1319,7 +1319,7 @@ Every PR body carries the size warning and the line count measured with `git dif
 Stage 1 must end (PR 1f) with:
 
 - the House_Scene complete at the final quality of this style guide: sky, moon, clouds, hills, house with every room and its contents, cut ground line, foreground, rain and fog, rim light, palette, typography, HUD shell;
-- **one finished Wisp** (Variant 0, Haunted look, cold glow, rim light, cobweb, `wisp-bob` idle) drawn in the attic slots;
+- **one finished Wisp** (Variant 0, Haunted look, cold glow, rim light, cobweb, `wisp-float` idle) drawn in the attic slots;
 - the screenshots of `npm run shots` for that stage: `01-house` and `16-reduced-house` at 1440 × 900 and 390 × 844, and the Gallery with the Wisp.
 
 Luis Miguel reviews those screenshots before stage 2 starts. Changes to the look are cheapest at that point, because every later ghost, prop and Scene reuses the same tokens, layering and rim-light rules. Until stage 2a, every attic Card draws Variant 0 and the middle-floor and basement slots show only their window; this temporary state exists only behind `?view=scenic` (decision Q15).

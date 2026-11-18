@@ -74,26 +74,52 @@ describe("cameraFor", () => {
     }
   });
 
-  it("makes the wide house frame the identity", () => {
-    const t = cameraFor({ kind: "house" }, "wide");
-    expect(t).toEqual({
-      scale: 1,
-      txPercent: 0,
-      tyPercent: 0,
-      counterScale: 1,
-    });
-    expect(cssTransform(t)).toBe("translate(0%, 0%) scale(1)");
+  it("frames the House from the porch (x 280) to the tower (x 1253), for both viewport classes", () => {
+    for (const viewport of VIEWPORTS) {
+      const f = frameRect({ kind: "house" }, viewport);
+      expect(f.x, viewport).toBeLessThanOrEqual(280);
+      expect(f.x + f.w, viewport).toBeGreaterThanOrEqual(1253);
+      // From the spire tip (y 56) to the cellar floor (y 913).
+      expect(f.y, viewport).toBeLessThanOrEqual(56);
+      expect(f.y + f.h, viewport).toBeGreaterThanOrEqual(913);
+    }
+  });
+
+  it("shows the porch and the tower right of the sidebar and centres the house there (wide)", () => {
+    // The sidebar covers about x 0 to 400 of the stage at 1440 x 900.
+    const house: Frame = { kind: "house" };
+    const t = cameraFor(house, "wide");
+    const toStage = (x: number) => t.txPercent * 16 + t.scale * x;
+    const [porch, tower] = [toStage(280), toStage(1253)];
+    expect(porch).toBeGreaterThanOrEqual(400);
+    expect(tower).toBeLessThanOrEqual(1600);
+    // Equal space on both sides of the house, within 5 % of the visible width.
+    expect(Math.abs(porch - 400 - (1600 - tower))).toBeLessThan(60);
+    // The spire tip (1178, 56) stays below the scene heading bar (about y 60).
+    const spire = t.tyPercent * 10 + t.scale * 56;
+    expect(spire).toBeGreaterThan(60);
+    // The world still covers the stage top, so no bare strip shows above it.
+    expect(t.tyPercent * 10).toBeLessThanOrEqual(12);
+  });
+
+  it("keeps the porch and the tower inside the narrow stage", () => {
+    const t = cameraFor({ kind: "house" }, "narrow");
+    const toStage = (x: number) => t.txPercent * 16 + t.scale * x;
+    expect(toStage(280)).toBeGreaterThanOrEqual(40); // not cut at the left edge
+    expect(toStage(1253)).toBeLessThanOrEqual(1560);
   });
 
   it("gives the scales of the design within 0.01", () => {
     const expected: [string, ViewportClass, number][] = [
-      ["attic", "wide", 1.94],
-      ["middle floor", "wide", 1.76],
-      ["basement", "wide", 1.88],
-      ["house", "narrow", 1.7],
-      ["attic", "narrow", 2.45],
-      ["middle floor", "narrow", 2.24],
-      ["basement", "narrow", 2.38],
+      // The frames of the scene illustration (director's decision, 18 Nov).
+      ["attic", "wide", 1.77],
+      ["middle floor", "wide", 1.68],
+      ["basement", "wide", 1.68],
+      ["house", "wide", 1.06],
+      ["house", "narrow", 1.52],
+      ["attic", "narrow", 2.25],
+      ["middle floor", "narrow", 2.13],
+      ["basement", "narrow", 2.13],
     ];
     for (const [name, viewport, scale] of expected) {
       const frame = FRAMES.find((f) => f.name === name)!.frame;

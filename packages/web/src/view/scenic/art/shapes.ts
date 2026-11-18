@@ -4,14 +4,27 @@ export const SVG_NS = "http://www.w3.org/2000/svg";
 // prettier-ignore
 export type ShapeKind = "g" | "path" | "rect" | "circle" | "ellipse" | "polygon"
   | "polyline" | "line" | "defs" | "linearGradient" | "radialGradient" | "stop"
-  | "clipPath";
+  | "clipPath" | "image";
+
+/**
+ * A same-site path such as "/haunted-repo/assets/house-scene-abc.svg": it
+ * starts with one "/", has no scheme, no "//", no "..", no query and no quote.
+ * The only address Shape_Data may hold, and only on an `image`.
+ */
+const SAME_SITE_HREF =
+  /^\/(?!\/)(?:[\w-]+(?:\.[\w-]+)*\/)*[\w-]+(?:\.[\w-]+)+$/;
+
+export function isSameSiteHref(href: string): boolean {
+  return SAME_SITE_HREF.test(href);
+}
 
 /** The only paint values Shape_Data may hold; real colours come from CSS classes. */
 export type Keyword = "transparent" | "currentColor" | "none" | "inherit";
 
 /**
- * One SVG element as plain data (Shape_Data). No field can hold a colour, an
- * address, text or an event handler.
+ * One SVG element as plain data (Shape_Data). No field can hold a colour,
+ * text or an event handler. The only address is `href` on an `image`, and it
+ * must pass `isSameSiteHref` (the built URL of a local asset).
  */
 // prettier-ignore
 export interface ShapeNode {
@@ -28,6 +41,7 @@ export interface ShapeNode {
   units?: "userSpaceOnUse" | "objectBoundingBox"; // gradients
   paint?: string; // id of a gradient in the same tree, written as fill="url(#...)"
   clip?: string; // id of a clipPath in the same tree
+  href?: string; // image only: a same-site path (isSameSiteHref)
   fill?: Keyword;
   stroke?: Keyword;
   children?: readonly ShapeNode[];
@@ -113,6 +127,30 @@ export function gradient(
   return { kind, id, children, ...extra };
 }
 
+/** A picture file shown in the box; `href` is a same-site path. */
+export function image(
+  cls: string,
+  href: string,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): ShapeNode {
+  return { kind: "image", cls, href, x, y, width, height };
+}
+
 export function defs(children: readonly ShapeNode[]): ShapeNode {
   return { kind: "defs", children };
+}
+
+/** A pointed (gothic) arch from its foot line, centre, half width and height. */
+export function arch(
+  cx: number,
+  foot: number,
+  half: number,
+  h: number,
+): string {
+  const spring = foot - h + half * 1.6;
+  const top = foot - h;
+  return `M${cx - half} ${foot} V${spring} Q${cx - half} ${top + half * 0.6} ${cx} ${top} Q${cx + half} ${top + half * 0.6} ${cx + half} ${spring} V${foot} Z`;
 }

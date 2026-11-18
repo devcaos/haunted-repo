@@ -1,4 +1,4 @@
-import { GHOST_BOX } from "../model/sceneLayout.js";
+import { GHOST_BOX, type GhostType } from "../model/sceneLayout.js";
 import {
   circle,
   defs,
@@ -10,82 +10,281 @@ import {
   type ShapeNode,
 } from "./shapes.js";
 
+// The three Ghost_Types after `ghost-reference.svg` (drafted with Claude and
+// declared, director's decision of 18 Nov): one tall hooded wraith with a
+// pointed hood, a dark oval face with two small pale eyes, no mouth, one long
+// reaching arm and a robe that ends in long asymmetric points. The path data
+// is ported from that file; colours come only from scenic tokens (CSS
+// classes), and the glow is a radial-gradient ellipse, never a filter.
+
 /** What every drawing of one Ghost_Type shares. */
 export interface GhostTypeSpec {
   /** Natural size at Variant 0, in viewBox units (the Scene_Layout box). */
   box: { w: number; h: number };
-  /** Height of one eye, for the eye share of Requirement 5.6. */
+  /** Height of one eye, for the eye share (small eyes, Requirement 5.1). */
   eyeHeight: number;
   /** Name of the idle `@keyframes` in motion.css. */
   idle: string;
 }
 
 /**
- * The Ghost_Types drawn so far. Only the Wisp exists until task 9.1 adds the
- * Lantern_Wraith and the Chained_Brute.
+ * The reference silhouette, in the units of `ghost-reference.svg`: x -54 to
+ * 70, y -10 to 262. Every command is absolute and every number pair is x, y.
  */
-export const GHOST_TYPES: Readonly<Record<"wisp", GhostTypeSpec>> = {
-  wisp: { box: GHOST_BOX.wisp, eyeHeight: 11, idle: "wisp-bob" },
+const REF_ORIGIN = [54, 10] as const;
+const REF_BODY =
+  "M5 -10 C-2 2 -19 14 -22 38 C-24 55 -30 66 -34 80 C-41 104 -39 134 -31 160 " +
+  "C-25 182 -36 204 -54 226 C-30 214 -21 202 -14 190 C-12 210 -8 232 -4 262 " +
+  "C2 236 6 210 10 192 C15 202 20 210 24 220 C24 196 22 176 26 156 " +
+  "C32 130 34 104 30 80 C26 64 22 54 20 40 C18 18 12 0 5 -10 Z";
+/** The long reaching arm (right) and the short one (left), with clawed tips. */
+const REF_ARMS =
+  "M28 78 C40 88 52 100 60 116 L70 124 L61 122 L66 132 L58 125 L57 135 L52 122 " +
+  "C46 110 36 100 24 94 Z M-31 82 C-38 100 -42 124 -44 146 L-48 158 L-43 153 " +
+  "L-43 164 L-39 153 L-35 160 L-37 146 C-34 124 -30 104 -25 90 Z";
+const REF_FOLDS =
+  "M-14 70 C-18 110 -16 150 -12 186 M8 66 C10 110 8 150 10 190 M-2 60 C-4 120 -2 170 1 230";
+const REF_FACE =
+  "M-13 32 C-12 18 -4 12 1 12 C8 13 13 22 12 34 C11 47 6 54 0 54 C-7 54 -14 45 -13 32 Z";
+/** [cx, cy, tilt] of each eye. */
+const REF_EYES = [
+  [-5, 33, 16],
+  [5, 32, -12],
+] as const;
+/**
+ * The eyes are drawn twice the reference size: the ghosts are about a quarter
+ * of the reference size on the stage, and the eyes must still read.
+ */
+const EYE_BOOST = 2;
+const REF_EYE = { rx: 1.9, ry: 1, glow: 2.8 } as const;
+/** The cold lantern of the Lantern_Wraith, hanging from the reaching claw. */
+const REF_LANTERN_HANGER = "M64 128 L64 144";
+const REF_LANTERN =
+  "M57 144 L71 144 L69 148 L69 164 L72 167 L56 167 L59 164 L59 148 Z";
+/** The dark iron shackles of the Chained_Brute, on both wrists. */
+const REF_SHACKLES =
+  "M58 124 L72 124 L72 130 L58 130 Z M-50 152 L-38 152 L-38 158 L-50 158 Z";
+/** [cx, cy, rx] of each chain link; every link is 3.6 tall. */
+// prettier-ignore
+const REF_CHAIN_LINKS = [
+  [65, 134, 1.4], [65.8, 140, 2.4], [66.4, 146, 1.4], [66.5, 152, 2.4],
+  [66, 158, 1.4], [65.2, 164, 2.4], [64.3, 170, 1.4], [63.7, 176, 2.4],
+  [63.5, 182, 1.4], [63.8, 188, 2.4], [64.6, 194, 1.4], [65.5, 200, 2.4],
+  [-44, 162, 1.4], [-43.2, 168, 2.4], [-42.6, 174, 1.4], [-42.5, 180, 2.4],
+  [-43, 186, 1.4], [-43.8, 192, 2.4], [-44.7, 198, 1.4], [-45.3, 204, 2.4],
+  [-45.5, 210, 1.4],
+] as const;
+/** The glow behind the body, from the reference: centre and radii. */
+const REF_GLOW = { cx: 0, cy: 80, rx: 90, ry: 130 } as const;
+
+/**
+ * Scale of each type from reference units to local units. The Wisp is the
+ * plain shape and the smallest; the Chained_Brute is stretched wider, as in
+ * the reference (1.8 : 1.4).
+ */
+const SCALE: Readonly<Record<GhostType, readonly [number, number]>> = {
+  wisp: [0.3125, 0.3125],
+  "lantern-wraith": [0.5, 0.5],
+  "chained-brute": [0.625, 0.5],
 };
 
-// The Wisp, Variant 0, in local units: box 60 x 64, origin top left (design
-// "The Wisp, Variant 0"). A round dome, straight sides and a hem of five small
-// scallops: no tail and no horns.
-const WISP_OUTLINE =
-  "M30 0 C47 0 60 13 60 31 L60 54 Q55 64 50 56 Q45 64 40 56 Q35 64 30 56 Q25 64 20 56 Q15 64 10 56 Q5 64 0 54 L0 31 C0 13 13 0 30 0 Z";
-const WISP_SHADE = "M4 34 C6 48 14 54 24 55 Q14 58 8 54 Q2 48 2 36 Z";
-const WISP_RIM = "M34 1 C49 3 59 15 59.5 31 L59.5 38";
-/**
- * Cobweb on the top left of the head, centred on (6, 4): three radial threads,
- * two arcs at radius 6 and 11 across them, and one thread hanging down.
- */
-const WISP_COBWEB =
-  "M6 4 L0 18 M6 4 L16 12 M6 4 L14 0 " +
-  "M3.6 9.5 A6 6 0 0 0 10.7 7.8 A6 6 0 0 0 11.4 1.3 " +
-  "M1.7 14.1 A11 11 0 0 0 14.6 10.9 A11 11 0 0 0 15.8 -0.9 " +
-  "M0 18 L-4 26";
-const WISP_EYES: readonly (readonly [number, number])[] = [
-  [21, 27],
-  [39, 27],
-];
+const round2 = (v: number): number => Math.round(v * 100) / 100;
+
+/** Reference point to local point: shifted so the silhouette starts at 0, 0. */
+function at(type: GhostType, x: number, y: number): [number, number] {
+  const [sx, sy] = SCALE[type];
+  return [round2((x + REF_ORIGIN[0]) * sx), round2((y + REF_ORIGIN[1]) * sy)];
+}
+
+/** Absolute reference path data (only x, y pairs) in local units. */
+function fit(type: GhostType, d: string): string {
+  const tokens = d.match(/[A-Za-z]|-?\d+(?:\.\d+)?/g) ?? [];
+  const out: string[] = [];
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i] ?? "";
+    if (/^[A-Za-z]$/.test(token)) {
+      out.push(token);
+      continue;
+    }
+    const [x, y] = at(type, Number(token), Number(tokens[i + 1] ?? 0));
+    out.push(`${x} ${y}`);
+    i += 1;
+  }
+  return out.join(" ").replace(/([A-Za-z]) /g, "$1");
+}
+
+export const GHOST_TYPES: Readonly<Record<GhostType, GhostTypeSpec>> = {
+  wisp: spec("wisp", "wisp-float"),
+  "lantern-wraith": spec("lantern-wraith", "wraith-sway"),
+  "chained-brute": spec("chained-brute", "brute-heave"),
+};
+
+function spec(type: GhostType, idle: string): GhostTypeSpec {
+  const box = GHOST_BOX[type];
+  return {
+    box,
+    eyeHeight: 2 * round2(REF_EYE.ry * EYE_BOOST * SCALE[type][1]),
+    idle,
+  };
+}
+
+/** The cold lantern: hanger, pale light, dark frame and a cold flame. */
+function lantern(id: (name: string) => string): ShapeNode {
+  const t: GhostType = "lantern-wraith";
+  const [cx, cy] = at(t, 64, 158);
+  const [fx, fy] = at(t, 64, 157);
+  const [sx, sy] = SCALE[t];
+  return g(
+    "ghost-lantern",
+    [
+      strokePath("lantern-hanger", fit(t, REF_LANTERN_HANGER)),
+      circle("lantern-light", cx, cy, round2(26 * sx), {
+        paint: id("lantern"),
+      }),
+      path("lantern-frame", fit(t, REF_LANTERN), { part: "lantern-frame" }),
+      ellipse("lantern-halo", cx, cy, round2(7 * sx), round2(10 * sy), {
+        paint: id("lantern"),
+      }),
+      ellipse("lantern-flame", fx, fy, round2(3.5 * sx), round2(6 * sy)),
+    ],
+    { part: "lantern" },
+  );
+}
+
+/** Dark iron shackles on both wrists and two hanging chains. */
+function shackles(): ShapeNode[] {
+  const t: GhostType = "chained-brute";
+  const [sx, sy] = SCALE[t];
+  return [
+    path("ghost-shackle", fit(t, REF_SHACKLES), { part: "shackles" }),
+    g(
+      "ghost-chain",
+      REF_CHAIN_LINKS.map(([x, y, rx]) => {
+        const [cx, cy] = at(t, x, y);
+        return ellipse(
+          "chain-link",
+          cx,
+          cy,
+          round2(rx * sx),
+          round2(3.6 * sy),
+          {
+            fill: "none",
+          },
+        );
+      }),
+      { part: "chain" },
+    ),
+  ];
+}
 
 /**
- * The drawing of one ghost. Until task 9.1 only the Wisp, Variant 0, in the
- * Haunted look exists, so the types accept only those values.
+ * The drawing of one ghost. Until group 9 only Variant 0 in the Haunted look
+ * exists (the other Variants and the Cloche come with task 9), so the types
+ * accept only those values.
  *
- * Structure (design "Art System"): `g.ghost` > static glow and floor shadow,
- * then `g.ghost-idle`, the only part the idle animation moves.
+ * Structure (design "Art System"): `g.ghost` > the static glow, then
+ * `g.ghost-idle`, the only part the idle animation moves. A ghost floats, so
+ * it casts no shadow (director's decision, 18 Nov).
  */
-export function ghostArt(type: "wisp", variant: 0, look: "haunted"): ShapeNode {
-  const glowId = `${type}-${variant}-glow`;
-  const eyes = WISP_EYES.flatMap(([cx, cy]) => [
-    ellipse("ghost-eye", cx, cy, 5, 5.5, { part: "eye" }),
-    circle("ghost-glint", cx + 1.8, cy - 2.2, 1.6),
-  ]);
+export function ghostArt(
+  type: GhostType,
+  variant: 0,
+  look: "haunted",
+): ShapeNode {
+  const id = (name: string): string => `${type}-${variant}-${name}`;
+  const [sx, sy] = SCALE[type];
+
+  const [gx, gy] = at(type, REF_GLOW.cx, REF_GLOW.cy);
+  const eyes = REF_EYES.flatMap(([x, y, tilt]) => {
+    const [cx, cy] = at(type, x, y);
+    return [
+      circle("ghost-eye-glow", cx, cy, round2(REF_EYE.glow * EYE_BOOST * sx), {
+        paint: id("eye"),
+      }),
+      ellipse(
+        "ghost-eye",
+        0,
+        0,
+        round2(REF_EYE.rx * EYE_BOOST * sx),
+        round2(REF_EYE.ry * EYE_BOOST * sy),
+        { part: "eye", transform: { translate: [cx, cy], rotate: tilt } },
+      ),
+    ];
+  });
+  const extra =
+    type === "lantern-wraith"
+      ? [lantern(id)]
+      : type === "chained-brute"
+        ? shackles()
+        : [];
+  const lanternGlow =
+    type === "lantern-wraith"
+      ? [
+          gradient("radialGradient", id("lantern"), [
+            ["stop-lantern-0", 0],
+            ["stop-lantern-1", 1],
+          ]),
+        ]
+      : [];
   return g(`ghost ghost--${type} look-${look}`, [
     defs([
-      gradient("radialGradient", glowId, [
+      gradient("radialGradient", id("glow"), [
         ["stop-cold-0", 0],
         ["stop-cold-1", 1],
       ]),
+      gradient("radialGradient", id("eye"), [
+        ["stop-eye-0", 0],
+        ["stop-eye-1", 1],
+      ]),
+      // Pale blue-white at the hood, fading to nothing at the robe points.
+      gradient(
+        "linearGradient",
+        id("body"),
+        [
+          ["stop-spectre-0", 0],
+          ["stop-spectre-1", 0.3],
+          ["stop-spectre-2", 0.75],
+          ["stop-spectre-3", 1],
+        ],
+        { x1: 0, y1: 0, x2: 0, y2: 1 },
+      ),
+      ...lanternGlow,
     ]),
-    g("ghost-glow", [circle("glow", 30, 34, 52, { paint: glowId })], {
-      part: "glow",
-    }),
-    ellipse("ghost-shadow", 30, 72, 20, 4),
+    g(
+      "ghost-glow",
+      [
+        ellipse(
+          "glow",
+          gx,
+          gy,
+          round2(REF_GLOW.rx * sx),
+          round2(REF_GLOW.ry * sy),
+          {
+            paint: id("glow"),
+          },
+        ),
+      ],
+      { part: "glow" },
+    ),
     g("ghost-idle", [
       g(
         "ghost-outline",
-        [path("ghost-body", WISP_OUTLINE, { part: "hem-round" })],
-        {
-          part: "outline",
-        },
+        [
+          path("ghost-body", fit(type, REF_BODY), {
+            part: "hooded-robe",
+            paint: id("body"),
+          }),
+          path("ghost-arm", fit(type, REF_ARMS), {
+            part: "arm",
+            paint: id("body"),
+          }),
+        ],
+        { part: "outline" },
       ),
-      path("ghost-shade", WISP_SHADE),
+      strokePath("ghost-fold", fit(type, REF_FOLDS)),
+      path("ghost-face", fit(type, REF_FACE), { part: "face" }),
       ...eyes,
-      ellipse("ghost-mouth", 30, 40, 3, 2.5),
-      strokePath("ghost-cobweb", WISP_COBWEB, { part: "cobweb" }),
-      strokePath("ghost-rim", WISP_RIM),
+      ...extra,
     ]),
   ]);
 }

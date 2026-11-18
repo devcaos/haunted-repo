@@ -26,25 +26,35 @@ export const GHOST_TYPE_OF: Readonly<Record<Floor, GhostType>> = {
 };
 
 /** The floor rectangles of the house ("World geometry"). */
+// The floors of the scene illustration (asset units x 10/9). The attic
+// rectangle is the box around its triangle (art/house.ts ATTIC_TRIANGLE).
 export const FLOOR_RECT: Readonly<Record<Floor, Rect>> = {
-  attic: { x: 590, y: 330, w: 560, h: 170 },
-  "middle floor": { x: 560, y: 500, w: 620, h: 260 },
-  basement: { x: 580, y: 760, w: 580, h: 180 },
+  attic: { x: 437, y: 173, w: 637, h: 300 },
+  "middle floor": { x: 418, y: 496, w: 675, h: 200 },
+  basement: { x: 418, y: 718, w: 675, h: 195 },
 };
 
-/** The band of each floor where Ghost_Slots sit; always inside its floor rectangle. */
+/**
+ * The band of each floor where Ghost_Slots sit; always inside its floor
+ * rectangle. The attic band stays under the roof slopes, the middle-floor
+ * band starts right of the telephone, the basement band lies between the
+ * boiler and the stairs.
+ */
 export const SLOT_BAND: Readonly<Record<Floor, Rect>> = {
-  attic: { x: 630, y: 395, w: 480, h: 97 },
-  "middle floor": { x: 770, y: 545, w: 400, h: 207 },
-  basement: { x: 600, y: 790, w: 540, h: 142 },
+  attic: { x: 570, y: 370, w: 370, h: 100 },
+  "middle floor": { x: 640, y: 515, w: 430, h: 170 },
+  basement: { x: 555, y: 740, w: 315, h: 160 },
 };
 
 /** Natural size (Variant 0) of each ghost box, in viewBox units. */
+// The hooded wraith of the reference art is 124 x 272 reference units (126
+// wide with the lantern or a shackle); each type scales it (art/ghosts.ts).
+// The Wisp is the smallest, the Chained_Brute the widest (Requirement 5.6).
 export const GHOST_BOX: Readonly<Record<GhostType, { w: number; h: number }>> =
   {
-    wisp: { w: 60, h: 64 },
-    "lantern-wraith": { w: 72, h: 96 },
-    "chained-brute": { w: 96, h: 88 },
+    wisp: { w: 38.75, h: 85 },
+    "lantern-wraith": { w: 63, h: 136 },
+    "chained-brute": { w: 78.75, h: 136 },
   };
 
 /** Space between two neighbouring slots. */

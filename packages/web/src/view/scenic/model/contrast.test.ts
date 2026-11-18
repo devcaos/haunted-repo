@@ -76,6 +76,8 @@ const TEXT_PAIRS: [string, string, number][] = [
   ["--sc-night", "--sc-bone", 12.3],
   ["--sc-brass", "--sc-night", 5.63],
   ["--sc-mist", "--sc-night", 4.62],
+  // Links and the licence line: stone grey, well above the old Mist (4.62).
+  ["--sc-stone", "--sc-night", 8.36],
 ];
 
 const UI_PAIRS: [string, string, number][] = [
@@ -106,6 +108,8 @@ describe("Scenic_Tokens palette", () => {
       "--sc-text-heading",
       "--sc-text-muted",
       "--sc-text-link",
+      "--sc-text-link-hover",
+      "--sc-text-licence",
       "--sc-backing",
       "--sc-backing-raised",
       "--sc-border",
@@ -148,6 +152,41 @@ describe("contrast (WCAG 2.1)", () => {
 
   it("self-check: Mist on Slate fails the text rule", () => {
     expect(ratio(hexOf("--sc-mist"), hexOf("--sc-slate"))).toBeLessThan(4.5);
+  });
+});
+
+describe("link colours (art review 3, item 13)", () => {
+  const styles = (name: string): string =>
+    readFileSync(
+      fileURLToPath(new URL(`../styles/${name}`, import.meta.url)),
+      "utf8",
+    ).replace(/\s+/g, " ");
+
+  it("links use stone grey, visited links too, and turn Pumpkin on hover", () => {
+    expect(tokens.get("--sc-text-link")).toBe("var(--sc-stone)");
+    expect(tokens.get("--sc-text-link-hover")).toBe("var(--sc-pumpkin)");
+    const base = styles("base.css");
+    expect(base).toContain(
+      ".scenic a, .scenic a:visited { color: var(--sc-text-link); }",
+    );
+    expect(base).toContain(
+      ".scenic a:hover { color: var(--sc-text-link-hover); }",
+    );
+    const hud = styles("hud.css");
+    expect(hud).toContain(
+      ".scenic .hud-foot .licence a, .scenic .hud-foot .licence a:visited { color: var(--sc-text-link); }",
+    );
+    expect(hud).toContain(".scenic .view-link { color: var(--sc-text-link); }");
+  });
+
+  it("no scenic link rule falls back to a blue token", () => {
+    for (const name of ["base.css", "hud.css"]) {
+      for (const m of styles(name).matchAll(
+        /([^{}]*\ba\b[^{}]*)\{([^}]*)\}/g,
+      )) {
+        expect(m[2], `${name}: ${m[1]}`).not.toMatch(/spectral|cold-blue/);
+      }
+    }
   });
 });
 

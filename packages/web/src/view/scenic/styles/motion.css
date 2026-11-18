@@ -2,93 +2,112 @@
  * Motion of the Scenic_Renderer. Animations and transitions live only inside
  * the two prefers-reduced-motion blocks, so nothing moves by accident.
  * Keyframes touch only transform and opacity (Requirement 20.1).
+ * The scene illustration is a still picture: only the page's own overlay
+ * (rain, fog) and the ghosts move.
  */
-
 /* Rain falls by exactly one step of its pattern, so the loop never jumps. */
 @keyframes rain-fall {
   from {
     transform: translate(0, 0);
   }
-
   to {
     transform: translate(var(--sc-rain-step-x), var(--sc-rain-step-y));
   }
 }
-
 @keyframes fog-drift {
   from {
     transform: translateX(calc(-1 * var(--sc-fog-shift)));
   }
-
   to {
     transform: translateX(var(--sc-fog-shift));
   }
 }
-
-@keyframes window-flicker {
+/* A slow levitation with a slight sway: eerie, not playful. */
+@keyframes wisp-float {
   0%,
   100% {
-    opacity: 0.5;
+    transform: translateY(0) rotate(-1.5deg);
   }
-
   50% {
-    opacity: 0.9;
+    transform: translateY(var(--sc-float-rise)) rotate(1.5deg);
   }
 }
-
-/* Playful by intent: a small rise with a rock from side to side. */
-@keyframes wisp-bob {
+/* The Lantern_Wraith sways from its hood tip, as if the lantern swings it. */
+@keyframes wraith-sway {
+  from {
+    transform: translateX(calc(-1 * var(--sc-sway-shift))) rotate(-4deg);
+  }
+  to {
+    transform: translateX(var(--sc-sway-shift)) rotate(4deg);
+  }
+}
+/* The Chained_Brute heaves: a slow, heavy breath that strains the chains. */
+@keyframes brute-heave {
   0%,
   100% {
-    transform: translateY(0) rotate(-3deg);
+    transform: scale(1, 1);
   }
-
   50% {
-    transform: translateY(var(--sc-bob-rise)) rotate(3deg);
+    transform: scale(1.03, 0.97);
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
   /* press: a small, quick push on every button (Game-feel rule 1). */
   .scenic button {
     transition: transform var(--sc-dur-press) var(--sc-ease-out);
   }
-
   .scenic button:active {
     transform: translateY(var(--sc-line)) scale(0.98);
   }
-
   .house .rain {
     animation: rain-fall var(--sc-dur-rain-fall) var(--sc-ease-linear) infinite;
   }
-
+  .house .rain-far {
+    animation-duration: var(--sc-dur-rain-far);
+  }
   .house .fog {
     animation: fog-drift var(--sc-dur-fog-drift) var(--sc-ease-in-out) infinite
       alternate;
   }
-
-  .house .oculus-light {
-    animation: window-flicker var(--sc-dur-window-flicker) steps(4) infinite;
-  }
-
   .ghost--wisp .ghost-idle {
     transform-box: fill-box;
     transform-origin: center;
-    animation: wisp-bob var(--sc-dur-wisp-bob) var(--sc-ease-in-out) infinite;
+    animation: wisp-float var(--sc-dur-wisp-float) var(--sc-ease-in-out)
+      infinite;
+  }
+  .ghost--lantern-wraith .ghost-idle {
+    transform-box: fill-box;
+    transform-origin: top;
+    animation: wraith-sway var(--sc-dur-wraith-sway) var(--sc-ease-in-out)
+      infinite alternate;
+  }
+  .ghost--chained-brute .ghost-idle {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: brute-heave var(--sc-dur-brute-heave) var(--sc-ease-in-out)
+      infinite;
+  }
+  /* Negative delays start neighbouring ghosts at other points of the loop. */
+  .ghost-phase-1 .ghost-idle {
+    animation-delay: calc(-1 * var(--sc-delay-phase-1));
+  }
+  .ghost-phase-2 .ghost-idle {
+    animation-delay: calc(-2 * var(--sc-delay-phase-1));
+  }
+  .ghost-phase-3 .ghost-idle {
+    animation-delay: calc(-3 * var(--sc-delay-phase-1));
+  }
+  /* The dev-only gallery draws every ghost in its resting pose. */
+  [data-motion="still"] .ghost-idle {
+    animation: none;
   }
 }
-
-/* Reduced_Motion: rain, fog and the oculus are drawn still (D9). */
+/* Reduced_Motion: rain and fog are drawn still (D9). */
 @media (prefers-reduced-motion: reduce) {
   .scenic .house .rain {
     opacity: var(--sc-rain-still);
   }
-
   .scenic .house .fog {
     opacity: var(--sc-fog-still);
-  }
-
-  .scenic .house .oculus-light {
-    opacity: 0.8;
   }
 }

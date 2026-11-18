@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Stage and house styles of the Scenic_Renderer. Tokens only.
  * The stage is outside the Camera; `.world` inside it is the Camera. Stroke
  * widths are plain numbers in viewBox units.
@@ -72,122 +72,21 @@
   font-size: var(--sc-text-h2);
 }
 
-/* Flat tones of the art: the palette, one class per colour. */
-.house .tone-night {
+/*
+ * The scene illustration (a still picture) and its fallback. The picture
+ * keeps its own colours; the page adds only tokens on top of it.
+ */
+.house .scene-fallback {
   fill: var(--sc-night);
 }
-
-.house .tone-slate {
-  fill: var(--sc-slate);
-}
-
-.house .tone-mist {
-  fill: var(--sc-mist);
-}
-
-.house .tone-bone {
-  fill: var(--sc-bone);
-}
-
-.house .tone-candle {
-  fill: var(--sc-candle);
-}
-
-.house .tone-brass {
-  fill: var(--sc-brass);
-}
-
-.house .tone-rust {
-  fill: var(--sc-rust);
-}
-
-/* L0 sky: Night at the top to Slate at the horizon. */
-.house .stop-night {
-  stop-color: var(--sc-night);
-}
-
-.house .stop-slate {
-  stop-color: var(--sc-slate);
-}
-
-/* L1 moon halo, clouds; L2 far hills: paler and bluer with distance. */
-.house .stop-halo-0 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: var(--sc-depth-cloud);
-}
-
-.house .stop-halo-1 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: 0;
-}
-
-.house .moon-shade {
-  opacity: var(--sc-depth-cloud);
-}
-
-.house .cloud {
-  opacity: var(--sc-depth-cloud);
-}
-
-.house .hill-far {
-  opacity: var(--sc-depth-hill-far);
-}
-
-.house .hill-near {
-  opacity: var(--sc-depth-hill-near);
-}
-
-/* L4 house: lines drawn by stroke only. */
-.house .beams,
-.house .stone-joints,
-.house .gauge-needle {
-  stroke: var(--sc-night);
-  stroke-width: 4;
-}
-
-.house .stone-joints {
-  stroke-width: 2;
-}
-
-.house .cobweb {
-  stroke: var(--sc-bone);
-  stroke-width: 1;
-  opacity: 0.4;
-}
-
-.house .oculus-bars {
-  stroke: var(--sc-mist);
-  stroke-width: 3;
-}
-
-/* The oculus glows faintly cold; motion.css makes it flicker. */
-.house .oculus-light {
-  fill: var(--sc-cold-blue);
-  opacity: 0.8;
-}
-
-.house .chain-link {
-  stroke: var(--sc-mist);
-  stroke-width: 2;
-}
-
-.house .table-leg {
-  fill: var(--sc-slate);
-}
-
-/* Rim light: only the moon-facing edges, no filter (Requirement 20.2). */
-.house .rim {
-  stroke: var(--sc-rim);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: var(--sc-rim-opacity);
-}
-
-/* Weather: thin rain and two fog bands. */
+/*
+ * Weather overlay above the picture: rain and soft fog, no filter. The drops
+ * are about 1 unit wide and faint, so they match the rain painted in the
+ * illustration; the clip keeps them off the house, the tower and the ground.
+ */
 .house .rain-streaks {
   stroke: var(--sc-spectral);
-  stroke-width: 1.5;
+  stroke-width: 1;
   stroke-linecap: round;
 }
 
@@ -195,15 +94,28 @@
   opacity: var(--sc-rain);
 }
 
+/* The far rain is thinner and fainter, so the two layers read as depth. */
+.house .rain-far {
+  opacity: var(--sc-rain-far);
+}
+
+.house .rain-far .rain-streaks {
+  stroke-width: 0.75;
+}
+
+/* Soft fog: each puff fades from Mist at its centre to nothing at its edge. */
 .house .fog {
-  fill: var(--sc-mist);
   opacity: var(--sc-fog);
 }
 
-/* L5 foreground: Night silhouettes with a fainter, thinner rim. */
-.house .rim-fg .rim {
-  stroke-width: 1.5;
-  opacity: var(--sc-fg-rim-opacity);
+.house .stop-fog-0 {
+  stop-color: var(--sc-mist);
+  stop-opacity: 0.55;
+}
+
+.house .stop-fog-1 {
+  stop-color: var(--sc-mist);
+  stop-opacity: 0;
 }
 
 /* A Night overlay over each floor; shown on the two other floors of a Floor_Scene (D3). */

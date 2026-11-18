@@ -6,6 +6,10 @@
 :root {
   /* Palette: the nine colours of the house */
   --sc-night: #0b111b;
+  /* Darker than Night: the ground and the foreground silhouettes */
+  --sc-abyss: #05080d;
+  /* Stone grey for quiet links and the licence line */
+  --sc-stone: #a7adb4;
   --sc-slate: #202d3b;
   --sc-mist: #6f7f92;
   --sc-bone: #d5d0c5;
@@ -14,15 +18,30 @@
   --sc-pumpkin: #ff7a1a;
   --sc-brass: #c47b3d;
   --sc-rust: #6e2a1e;
+  /* Dark iron and dark wood, matched to the scene illustration */
+  --sc-iron: #2a303c;
+  --sc-iron-dark: #1a202c;
+  --sc-door-wood: #3a1d15;
+  /* The hooded wraiths, after the ghost reference art */
+  --sc-ghost-0: #eef4ff;
+  --sc-ghost-1: #c9d8f2;
+  --sc-ghost-2: #9fb4da;
+  --sc-ghost-shade: #5d7090;
+  --sc-ghost-eye: #d9f3ff;
+  --sc-lantern-light: #cfefff;
+  --sc-lantern-flame: #e6f6ff;
   /* Named lights */
   --sc-cold-blue: #6e9bd8;
   --sc-warm-orange: #f59a45;
+  --sc-cold-white: #e8f0fb;
   --sc-dawn: #e9894a;
   /* Roles */
   --sc-text: var(--sc-bone);
   --sc-text-heading: var(--sc-candle);
   --sc-text-muted: var(--sc-mist);
-  --sc-text-link: var(--sc-spectral);
+  --sc-text-link: var(--sc-stone);
+  --sc-text-link-hover: var(--sc-pumpkin);
+  --sc-text-licence: var(--sc-stone);
   --sc-backing: var(--sc-night);
   --sc-backing-raised: var(--sc-slate);
   --sc-border: var(--sc-brass);
@@ -38,7 +57,8 @@
   --sc-rim-opacity: 0.6;
   --sc-fg-rim-opacity: 0.35;
   --sc-dim: 0.65;
-  --sc-rain: 0.35;
+  --sc-rain: 0.3;
+  --sc-rain-far: 0.16;
   --sc-rain-still: 0.25;
   --sc-fog: 0.4;
   --sc-fog-still: 0.35;
@@ -112,23 +132,30 @@
   --sc-dur-smoke-question: 700ms;
   --sc-dur-exorcise-spiral: 600ms;
   --sc-dur-exorcise-sparks: 400ms;
-  --sc-dur-rain-fall: 800ms;
+  --sc-dur-rain-fall: 600ms;
+  --sc-dur-rain-far: 1600ms;
   --sc-dur-fog-drift: 24s;
   --sc-dur-bats-fly: 22s;
   --sc-dur-window-flicker: 3.2s;
-  --sc-dur-wisp-bob: 2.4s;
+  --sc-dur-wisp-float: 5.6s;
+  --sc-dur-motes: 9s;
   --sc-dur-wraith-sway: 4.2s;
   --sc-dur-brute-heave: 3.2s;
   --sc-dur-flame-flicker: 1.6s;
+  --sc-dur-flame-core: 1.1s;
   --sc-dur-ring: 2s;
   --sc-dur-beam-sweep: 2.5s;
   /* Distances of the looping motions, in viewBox units */
-  --sc-rain-step-x: -40px;
+  --sc-rain-step-x: -80px;
   --sc-rain-step-y: 200px;
   --sc-fog-shift: 60px;
-  --sc-bob-rise: -6px;
+  --sc-float-rise: -8px;
+  --sc-sway-shift: 4px;
+  --sc-mote-drift-x: -6px;
+  --sc-mote-drift-y: 10px;
   /* Delays of the Animation Catalogue */
   --sc-delay-spiral: 400ms;
+  --sc-delay-phase-1: 1.4s;
   --sc-delay-sparks: 1000ms;
   --sc-delay-finale: 800ms;
   /* Reduced_Motion fades, never longer than 200 ms */

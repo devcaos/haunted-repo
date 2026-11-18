@@ -9,6 +9,12 @@ import { sceneLayout } from "./model/sceneLayout.js";
 import { watchMedia } from "./motion.js";
 import { createStage, type StageView } from "./stage.js";
 
+/** What the entry outside `view/scenic/` hands in. */
+export interface ScenicOptions {
+  /** Built URL of the scene illustration, or null to draw the token-colour fallback. */
+  sceneHref: string | null;
+}
+
 /**
  * Builds the Scenic shell once inside `root`, in document order: header, aside,
  * announcer, `main.stage` and the footer last (the Licence_Notice link is the
@@ -18,6 +24,7 @@ import { createStage, type StageView } from "./stage.js";
 export function createScenicRenderer(
   root: HTMLElement,
   onAction: ActionSink,
+  options: ScenicOptions = { sceneHref: null },
 ): Renderer {
   const guard = createActionGuard(onAction);
   const hud = createHud({
@@ -28,7 +35,7 @@ export function createScenicRenderer(
       guard.send({ type: "show-sample" });
     },
   });
-  const stage = createStage();
+  const stage = createStage(options.sceneHref);
   // The Scene_Heading is a focus target, never a Tab stop.
   const heading = el("h2", { class: "scene-heading", tabindex: "-1" });
   stage.sceneBar.append(heading);

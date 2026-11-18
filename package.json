@@ -16,7 +16,9 @@
     "test": "vitest run",
     "test:live": "vitest run --config vitest.live.config.ts",
     "sample:make": "npm run build -w @haunted-repo/core && node packages/web/scripts/make-sample.ts",
-    "check": "npm run lint && npm run format:check && npm run build && npm test"
+    "size": "node packages/web/scripts/size.ts",
+    "shots": "npm run build -w @haunted-repo/core && npm run build -w @haunted-repo/web && node packages/web/scripts/shots.ts",
+    "check": "npm run lint && npm run format:check && npm run build && npm run size && npm test"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -24,6 +26,7 @@
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "fast-check": "4.10.2",
+    "playwright": "1.65.1",
     "prettier": "3.9.10",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.2",

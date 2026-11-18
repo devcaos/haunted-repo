@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { hasExternalAddress } from "./tooling/distRules.js";
 import { WIDE_QUERY } from "./view/scenic/model/camera.js";
 
 // Scans the source text of the Web_Package. Scanned: every non-test `.ts`,
@@ -77,23 +78,6 @@ const ANSWER_BOX_READ =
   /\banswerBox\s*\??\.\s*(?:value|addEventListener|oninput|onchange)\b/;
 
 // External addresses (Requirement 11.5), in index.html and src/view/.
-const SVG_NAMESPACES = [
-  "http://www.w3.org/2000/svg",
-  "http://www.w3.org/1999/xlink",
-];
-const FULL_ADDRESS = /https?:\/\//i;
-const PROTOCOL_RELATIVE = [
-  /\burl\(\s*["']?\s*\/\//i,
-  /@import\s+(?:url\(\s*)?["']?\s*\/\//i,
-  /\b(?:src|href)\s*[=:]\s*["'`]?\s*\/\//i,
-  /["'](?:src|href)["']\s*,\s*["'`]\s*\/\//i,
-];
-
-/** True when the text loads or links anything outside the site. */
-function hasExternalAddress(text: string): boolean {
-  const rest = SVG_NAMESPACES.reduce((t, ns) => t.replaceAll(ns, ""), text);
-  return FULL_ADDRESS.test(rest) || PROTOCOL_RELATIVE.some((p) => p.test(rest));
-}
 
 // Simple_Renderer CSS (Requirements 11.2, 11.3): only tokens.css has literal
 // colours, sizes and fonts. Only declaration values are checked; comments,
@@ -865,6 +849,9 @@ describe("scenic model and art stay pure (Requirement 23.1)", () => {
 });
 
 describe("gallery page (Requirement 25.8)", () => {
+  it("exists (item 17)", () => {
+    expect(galleryFiles.map((f) => f.path)).toEqual(["gallery.html"]);
+  });
   it("follows the presentation rules when it exists", () => {
     expect(offenders(galleryFiles, STORAGE)).toEqual([]);
     expect(offenders(galleryFiles, RAW_HTML)).toEqual([]);

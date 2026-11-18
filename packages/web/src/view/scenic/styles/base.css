@@ -83,8 +83,14 @@ body {
   overflow-wrap: anywhere;
 }
 
-.scenic a {
+/* Visited links keep the theme colour too, never the browser's blue or purple. */
+.scenic a,
+.scenic a:visited {
   color: var(--sc-text-link);
+}
+
+.scenic a:hover {
+  color: var(--sc-text-link-hover);
 }
 
 .scenic p {

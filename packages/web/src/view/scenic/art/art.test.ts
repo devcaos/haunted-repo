@@ -1,3 +1,5 @@
+﻿/// <reference types="node" />
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   circle,
@@ -5,6 +7,8 @@ import {
   ellipse,
   g,
   gradient,
+  image,
+  isSameSiteHref,
   path,
   poly,
   rect,
@@ -20,19 +24,31 @@ import {
   SLOT_BAND,
   floorGhostScale,
   slotRects,
+  type Rect,
   type SlotPlacement,
   type VariantNumber,
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
-import { FLOOR_CLASS, houseLayer } from "./house.js";
-import { chainedDoorArt, slotArt } from "./props.js";
-import { foregroundLayer, rainPath, skyLayers, weatherLayer } from "./sky.js";
-
+import {
+  ATTIC_BACK,
+  ATTIC_CLIP,
+  ATTIC_TRIANGLE,
+  GROUND_Y,
+  HOUSE_OUTLINE,
+  HOUSE_POLYGON,
+  ILLUSTRATION_PROPS,
+  TOWER_POLYGON,
+  TELEPHONE_ANCHOR,
+  atticClip,
+  sceneBackdrop,
+} from "./house.js";
+import { FLOOR_LINE, chainedDoorArt, slotArt } from "./props.js";
+import { RAIN_BOTTOM, RAIN_STEP, rainPath, weatherLayer } from "./weather.js";
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
 const KINDS = new Set<string>([
   "g", "path", "rect", "circle", "ellipse", "polygon", "polyline", "line",
-  "defs", "linearGradient", "radialGradient", "stop", "clipPath",
+  "defs", "linearGradient", "radialGradient", "stop", "clipPath", "image",
 ]);
 // prettier-ignore
 const ID_KINDS = new Set<string>(["linearGradient", "radialGradient", "clipPath"]);
@@ -49,7 +65,7 @@ const NUMBER_KEYS = [
 const KNOWN_KEYS = new Set<string>([
   ...NUMBER_KEYS,
   ...["kind", "cls", "id", "part", "d", "points", "transform", "units"],
-  ...["paint", "clip", "fill", "stroke", "children"],
+  ...["paint", "clip", "fill", "stroke", "children", "href"],
 ]);
 
 /** Every Shape_Data rule the tree breaks, as short readable lines. */
@@ -92,6 +108,14 @@ function shapeProblems(tree: ShapeNode): string[] {
     }
     if (node.paint !== undefined) refs.push(node.paint);
     if (node.clip !== undefined) refs.push(node.clip);
+    // The only address: a same-site path, on an image only.
+    if (node.href !== undefined) {
+      if (node.kind !== "image") problems.push(`href on ${node.kind}`);
+      if (!isSameSiteHref(node.href)) problems.push(`href "${node.href}"`);
+    }
+    if (node.kind === "image" && node.children !== undefined) {
+      problems.push("children on image");
+    }
     node.children?.forEach(walk);
   };
   walk(tree);
@@ -144,6 +168,45 @@ describe("Shape_Data rules", () => {
     expect(shapeProblems(path("p", "url(x)"))).toHaveLength(1);
   });
 
+  it("accepts an image with a same-site path and catches any other address", () => {
+    const art = "/haunted-repo/assets/house-scene-B1x_9.svg";
+    expect(shapeProblems(image("scene-art", art, 0, 0, 1600, 1000))).toEqual(
+      [],
+    );
+    expect(
+      shapeProblems(
+        image(
+          "a",
+          "/haunted-repo/src/view/assets/files/house-scene.svg",
+          0,
+          0,
+          1,
+          1,
+        ),
+      ),
+    ).toEqual([]);
+    for (const bad of [
+      "https://cdn.example/a.svg",
+      "http://example.com/a.svg",
+      "//cdn.example/a.svg",
+      "data:image/svg+xml,<svg/>",
+      "javascript:alert(1)",
+      "assets/a.svg",
+      "/a/../b.svg",
+      "/a.svg?x=1",
+      '/a.svg" onload="x',
+      "/folder/",
+    ]) {
+      expect(isSameSiteHref(bad), bad).toBe(false);
+      expect(shapeProblems(image("a", bad, 0, 0, 1, 1))).toEqual([
+        `href "${bad}"`,
+      ]);
+    }
+    expect(shapeProblems({ ...rect("a", 0, 0, 1, 1), href: art })).toEqual([
+      "href on rect",
+    ]);
+  });
+
   it("catches colours, unknown fields, ids and broken references", () => {
     const red = {
       ...rect("a", 0, 0, 1, 1),
@@ -166,49 +229,164 @@ describe("Shape_Data rules", () => {
   });
 });
 
-describe("sky, weather and foreground (Requirement 3.3)", () => {
-  it("every tree passes the Shape_Data rules", () => {
-    for (const tree of [skyLayers(), weatherLayer(), foregroundLayer()]) {
-      expect(shapeProblems(tree)).toEqual([]);
+describe("rain loop (Requirement 3.3)", () => {
+  it("one step of rain-fall lands every streak on another, so the loop never jumps", () => {
+    const [sx, sy] = RAIN_STEP;
+    for (const layer of ["far", "near"] as const) {
+      const d = rainPath(layer);
+      const starts = [...d.matchAll(/M(-?[\d.]+) (-?[\d.]+)/g)].map(
+        (m) => [Number(m[1]), Number(m[2])] as const,
+      );
+      const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
+      for (const [x, y] of starts) {
+        // Moved by one step: either another streak or below the drawn rain.
+        if (y + sy < RAIN_BOTTOM)
+          expect(seen.has(`${x + sx},${y + sy}`)).toBe(true);
+        // Every visible streak was filled in from one step before.
+        if (y >= 0) expect(seen.has(`${x - sx},${y - sy}`)).toBe(true);
+      }
+      // Columns start right of the scene, so the leftward drift leaves no gap.
+      expect(Math.max(...starts.map(([x]) => x))).toBeGreaterThan(
+        1600 - 6 * sx - 100,
+      );
+      // Every streak falls along the step, so the rain is diagonal and steady.
+      for (const m of d.matchAll(/l(-?\d+) (\d+)/g)) {
+        expect(Number(m[1]) / Number(m[2])).toBeCloseTo(sx / sy, 1);
+      }
     }
-  });
-
-  it("draws the depth layers back to front and the groups motion needs", () => {
-    const layers = skyLayers()
-      .children?.filter((n) => n.kind === "g")
-      .map((n) => n.cls);
-    expect(layers).toEqual(["sky", "moon-clouds", "hills-far", "hills-near"]);
-    expect(classesOf(skyLayers())).toEqual(
-      expect.arrayContaining(["moon", "clouds-left", "clouds-right"]),
-    );
-    const wrap = weatherLayer().children?.find((n) => n.cls === "rain-wrap");
-    expect(wrap?.children?.map((n) => n.cls)).toEqual(["rain"]);
-    expect(classesOf(weatherLayer()).filter((c) => c === "fog")).toHaveLength(
-      2,
-    );
-    expect(classesOf(foregroundLayer())).toEqual(
-      expect.arrayContaining(["fence", "dead-tree", "rim-fg"]),
-    );
-    expect(
-      classesOf(foregroundLayer()).filter((c) => c === "grave"),
-    ).toHaveLength(3);
   });
 });
 
-describe("rain loop (Requirement 3.3)", () => {
-  it("one step of rain-fall lands every streak on another, so the loop never jumps", () => {
-    const starts = [...rainPath().matchAll(/M(-?[\d.]+) (-?[\d.]+)/g)].map(
-      (m) => [Number(m[1]), Number(m[2])] as const,
-    );
-    const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
-    for (const [x, y] of starts) {
-      // Moved by one step (-40, 200): either another streak or below the scene.
-      if (y + 200 < 1000) expect(seen.has(`${x - 40},${y + 200}`)).toBe(true);
-      // Every visible streak was filled in from one step before.
-      if (y >= 0) expect(seen.has(`${x + 40},${y - 200}`)).toBe(true);
+/** Winding number of the closed subpaths of absolute path data around a point. */
+function winding(d: string, [px, py]: [number, number]): number {
+  let total = 0;
+  for (const sub of d.split("Z").filter((s) => s.trim() !== "")) {
+    const pts = pathPoints(`${sub}Z`);
+    pts.forEach(([x1, y1], i) => {
+      const [x2, y2] = pts[(i + 1) % pts.length] ?? [x1, y1];
+      const cross = (x2 - x1) * (py - y1) - (px - x1) * (y2 - y1);
+      if (y1 <= py && y2 > py && cross > 0) total += 1;
+      if (y1 > py && y2 <= py && cross < 0) total -= 1;
+    });
+  }
+  return total;
+}
+
+describe("weather overlay (Requirement 3.3)", () => {
+  const weather = weatherLayer();
+  const wrap = nodesOf(weather).find((n) => n.cls === "rain-wrap");
+  const clip = nodesOf(weather).find((n) => n.id === wrap?.clip);
+  const d = clip?.children?.[0]?.d ?? "";
+
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(weather)).toEqual([]);
+  });
+
+  it("the still wrapper holds the clip; only the two layers inside it move", () => {
+    expect(wrap?.clip).toBe("rain-sky");
+    expect(wrap?.children?.map((n) => n.cls)).toEqual([
+      "rain rain-far",
+      "rain rain-near",
+    ]);
+  });
+
+  /** Point in polygon by ray casting, independent of the clip's winding rule. */
+  const inside = (
+    poly: readonly number[],
+    [px, py]: [number, number],
+  ): boolean => {
+    let hit = false;
+    for (let i = 0, j = poly.length - 2; i < poly.length; j = i, i += 2) {
+      const [xi = 0, yi = 0, xj = 0, yj = 0] = [
+        poly[i],
+        poly[i + 1],
+        poly[j],
+        poly[j + 1],
+      ];
+      if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi)
+        hit = !hit;
     }
-    // Columns start right of the scene, so the leftward drift leaves no gap.
-    expect(Math.max(...starts.map(([x]) => x))).toBeGreaterThan(1600 + 200);
+    return hit;
+  };
+
+  it("lets rain fall only on the sky: never on the house, the tower or below the ground line", () => {
+    // Spot checks by name.
+    const sky: [number, number][] = [
+      [200, 300],
+      [1400, 500],
+      [756, 100],
+      [1060, 300], // right of the roof, left of the tower
+      [1300, 650],
+    ];
+    const solid: [number, number][] = [
+      [756, 300], // attic
+      [700, 600], // middle floor
+      [1178, 200], // tower spire
+      [1178, 600], // tower shaft
+      [1120, 650], // house and tower overlap
+      [700, 800], // basement, under the ground
+      [100, GROUND_Y + 5],
+    ];
+    for (const p of sky) expect(winding(d, p), `${p}`).not.toBe(0);
+    for (const p of solid) expect(winding(d, p), `${p}`).toBe(0);
+    // Every point of a grid over the viewBox: blocked exactly when it is in
+    // the house polygon, in the tower polygon or below the ground line.
+    for (let x = 3; x < 1600; x += 11) {
+      for (let y = 3; y < 1000; y += 11) {
+        const blocked =
+          inside(HOUSE_POLYGON, [x, y]) ||
+          inside(TOWER_POLYGON, [x, y]) ||
+          y > GROUND_Y;
+        expect(winding(d, [x, y]) === 0, `${x},${y}`).toBe(blocked);
+      }
+    }
+    // The outline stands on the ground line.
+    const ys = HOUSE_OUTLINE.filter((_, i) => i % 2 === 1);
+    expect(Math.max(...ys)).toBe(GROUND_Y);
+  });
+
+  it("uses the house and tower polygons of the illustration", () => {
+    expect(HOUSE_POLYGON).toEqual([
+      362, 511, 756, 127, 1149, 511, 1144, 711, 367, 711,
+    ]);
+    expect(TOWER_POLYGON).toEqual([
+      1102, 711, 1102, 284, 1178, 56, 1253, 284, 1253, 711,
+    ]);
+  });
+
+  it("draws thin, faint drops: about 1 unit wide and at most 0.3 opacity", () => {
+    const css = readFileSync(
+      new URL("../styles/stage.css", import.meta.url),
+      "utf8",
+    );
+    const tokens = readFileSync(
+      new URL("../styles/scenic-tokens.css", import.meta.url),
+      "utf8",
+    );
+    const width =
+      /\.house \.rain-streaks\s*{[^}]*stroke-width:\s*([\d.]+)/.exec(css);
+    expect(Number(width?.[1])).toBeLessThanOrEqual(1);
+    const far =
+      /\.house \.rain-far \.rain-streaks\s*{[^}]*stroke-width:\s*([\d.]+)/.exec(
+        css,
+      );
+    expect(Number(far?.[1])).toBeLessThanOrEqual(1);
+    const opacity = /--sc-rain:\s*([\d.]+)/.exec(tokens);
+    expect(Number(opacity?.[1])).toBeGreaterThan(0.2);
+    expect(Number(opacity?.[1])).toBeLessThanOrEqual(0.3);
+    expect(Number(/--sc-rain-far:\s*([\d.]+)/.exec(tokens)?.[1])).toBeLessThan(
+      Number(opacity?.[1]),
+    );
+  });
+
+  it("draws the fog as soft gradient puffs in two drifting groups", () => {
+    const all = nodesOf(weather);
+    const fogs = all.filter((n) => n.cls?.startsWith("fog "));
+    expect(fogs.map((n) => n.cls)).toEqual(["fog fog-back", "fog fog-front"]);
+    for (const puff of fogs.flatMap((n) => n.children ?? [])) {
+      expect(puff.kind).toBe("ellipse");
+      expect(all.find((n) => n.id === puff.paint)?.kind).toBe("radialGradient");
+    }
   });
 });
 
@@ -237,78 +415,226 @@ function pointsOf(tree: ShapeNode): [number, number][] {
   });
 }
 
-describe("house (Requirements 3.1, 3.4)", () => {
-  it("passes the Shape_Data rules", () => {
-    expect(shapeProblems(houseLayer())).toEqual([]);
+describe("scene backdrop (director's decision, 18 Nov)", () => {
+  const href = "/haunted-repo/assets/house-scene-B1x_9.svg";
+
+  it("is one image over the whole viewBox, with nothing parsed from it", () => {
+    const art = sceneBackdrop(href);
+    expect(art).toEqual({
+      kind: "image",
+      cls: "scene-art",
+      href,
+      x: 0,
+      y: 0,
+      width: 1600,
+      height: 1000,
+    });
+    expect(shapeProblems(art)).toEqual([]);
   });
 
-  it("each floor group's room back is the Scene_Layout floor rectangle", () => {
-    for (const floor of ["attic", "middle floor", "basement"] as const) {
-      const group = nodesOf(houseLayer()).find(
-        (n) => n.part === FLOOR_CLASS[floor],
+  it("falls back to a plain token-colour rectangle without the file", () => {
+    const art = sceneBackdrop(null);
+    expect(art).toEqual(rect("scene-fallback", 0, 0, 1600, 1000));
+    expect(art.href).toBeUndefined();
+    expect(shapeProblems(art)).toEqual([]);
+  });
+
+  it("keeps the attic dim clip a valid Shape_Data tree", () => {
+    const tree = g("dims", [
+      defs([atticClip()]),
+      rect("dim", ATTIC_BACK.x, ATTIC_BACK.y, ATTIC_BACK.w, ATTIC_BACK.h, {
+        clip: ATTIC_CLIP,
+      }),
+    ]);
+    expect(shapeProblems(tree)).toEqual([]);
+  });
+});
+
+describe("the three Ghost_Types, Variant 0 (Requirements 5.4, 5.6, 6.1; director's decision, 18 Nov)", () => {
+  const TYPES = ["wisp", "lantern-wraith", "chained-brute"] as const;
+  const art = (type: (typeof TYPES)[number]) => ghostArt(type, 0, "haunted");
+  const partsOf = (tree: ShapeNode): string[] =>
+    nodesOf(tree).flatMap((n) => (n.part === undefined ? [] : [n.part]));
+  const boxOfAll = (nodes: ShapeNode[]): Box => {
+    const pts = nodes.flatMap((n) => pointsOf(n));
+    const xs = pts.map(([x]) => x);
+    const ys = pts.map(([, y]) => y);
+    return {
+      x1: Math.min(...xs),
+      y1: Math.min(...ys),
+      x2: Math.max(...xs),
+      y2: Math.max(...ys),
+    };
+  };
+
+  it("every type passes the Shape_Data rules", () => {
+    for (const type of TYPES) expect(shapeProblems(art(type))).toEqual([]);
+  });
+
+  it("is a hooded wraith with a pointed hood, a dark face, a reaching arm and a glow, and no mouth", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      expect(partsOf(tree)).toEqual(
+        expect.arrayContaining([
+          "outline",
+          "hooded-robe",
+          "arm",
+          "face",
+          "glow",
+        ]),
       );
-      const back = group?.children?.find((n) => n.part === "room-back");
-      const { x, y, w, h } = FLOOR_RECT[floor];
-      expect(back).toMatchObject({ kind: "rect", x, y, width: w, height: h });
+      expect(classesOf(tree)).not.toContain("ghost-mouth");
+      // The hood ends in one point: the path starts at its single topmost point.
+      const robe = nodesOf(tree).find((n) => n.part === "hooded-robe");
+      const pts = pathPoints(robe?.d ?? "");
+      const top = Math.min(...pts.map(([, y]) => y));
+      expect(pts[0]?.[1]).toBe(top);
+      expect(pts.filter(([, y]) => y === top)).toHaveLength(2); // start and close
+      // The face sits under the hood point, in the upper third.
+      const face = boxOf(nodesOf(tree).find((n) => n.part === "face")!);
+      expect(face?.y1 ?? 0).toBeGreaterThan(top);
+      expect(face?.y2 ?? 0).toBeLessThan(GHOST_BOX[type].h / 3);
+      const idle = nodesOf(tree).find((n) => n.cls === "ghost-idle");
+      expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
     }
   });
 
-  it("is not a mirror image about the vertical centre line", () => {
-    const scene = [skyLayers(), houseLayer(), foregroundLayer()];
-    const points = scene.flatMap(pointsOf);
-    const seen = new Set(points.map(([x, y]) => `${x},${y}`));
-    const twins = points.filter(([x, y]) => seen.has(`${1600 - x},${y}`));
-    expect(twins.length).toBeLessThan(points.length / 2);
-    const roof = nodesOf(houseLayer()).find((n) => n.part === "roof");
-    const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
-    expect(roof?.points?.[2]).toBeLessThan(800); // the ridge is left of centre
-    expect(tower?.transform?.translate?.[0]).toBeGreaterThan(800);
-  });
-});
-
-describe("the Wisp, Variant 0 (Requirements 5.1, 5.4, 6.1)", () => {
-  const wisp = ghostArt("wisp", 0, "haunted");
-  const parts = nodesOf(wisp).flatMap((n) =>
-    n.part === undefined ? [] : [n.part],
-  );
-
-  it("passes the Shape_Data rules", () => {
-    expect(shapeProblems(wisp)).toEqual([]);
-  });
-
-  it("has a round hem, a cobweb and a glow, and no tail, hood or horns", () => {
-    expect(parts).toEqual(
-      expect.arrayContaining(["outline", "hem-round", "cobweb", "glow"]),
+  it("ends the robe in long asymmetric points", () => {
+    const robe = nodesOf(art("wisp")).find((n) => n.part === "hooded-robe");
+    const pts = pathPoints(robe?.d ?? "");
+    const h = GHOST_BOX.wisp.h;
+    // Tips: points in the lowest third that are lower than both neighbours.
+    const tips = pts.filter(
+      ([, y], i) =>
+        y > (2 * h) / 3 &&
+        y > (pts[i - 1]?.[1] ?? Infinity) &&
+        y > (pts[i + 1]?.[1] ?? Infinity),
     );
-    for (const other of ["tail-spiral", "hood", "horns"]) {
-      expect(parts).not.toContain(other);
-    }
-    const idle = nodesOf(wisp).find((n) => n.cls === "ghost-idle");
-    expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
+    expect(tips.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(tips.map(([, y]) => y)).size).toBe(tips.length);
   });
 
-  it("eye height over body height is 11/64", () => {
-    const eyes = nodesOf(wisp).filter((n) => n.part === "eye");
-    expect(eyes).toHaveLength(2);
-    for (const eye of eyes) {
-      expect((2 * (eye.ry ?? 0)) / GHOST_BOX.wisp.h).toBe(11 / 64);
+  it("paints the body with a vertical gradient that fades out at the bottom", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      const body = nodesOf(tree).find((n) => n.cls === "ghost-body");
+      const fill = nodesOf(tree).find((n) => n.id === body?.paint);
+      expect(fill).toMatchObject({
+        kind: "linearGradient",
+        x1: 0,
+        x2: 0,
+        y1: 0,
+        y2: 1,
+      });
+      expect(fill?.children?.at(-1)).toMatchObject({
+        cls: "stop-spectre-3",
+        offset: 1,
+      });
     }
-    expect(GHOST_TYPES.wisp.eyeHeight / GHOST_TYPES.wisp.box.h).toBe(11 / 64);
   });
 
-  it("its outline box equals the Wisp box of the Scene_Layout", () => {
-    const outline = nodesOf(wisp).find((n) => n.part === "outline");
-    const points = outline === undefined ? [] : pointsOf(outline);
-    const xs = points.map(([x]) => x);
-    const ys = points.map(([, y]) => y);
-    expect(Math.min(...xs)).toBe(0);
-    expect(Math.min(...ys)).toBe(0);
-    expect({ w: Math.max(...xs), h: Math.max(...ys) }).toEqual(GHOST_BOX.wisp);
-    expect(GHOST_TYPES.wisp.box).toEqual(GHOST_BOX.wisp);
+  it("floats: it casts no shadow, and its only ellipse behind the body is the glow", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      expect(classesOf(tree).filter((c) => /shadow/.test(c))).toEqual([]);
+      const idleAt = (tree.children ?? []).findIndex(
+        (n) => n.cls === "ghost-idle",
+      );
+      const before = (tree.children ?? []).slice(0, idleAt);
+      expect(before.map((n) => n.part ?? n.kind)).toEqual(["defs", "glow"]);
+    }
+  });
+
+  it("makes its glow a radial-gradient ellipse behind the body", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      const kids = tree.children ?? [];
+      const glowAt = kids.findIndex((n) => n.part === "glow");
+      const idleAt = kids.findIndex((n) => n.cls === "ghost-idle");
+      expect(glowAt).toBeGreaterThanOrEqual(0);
+      expect(glowAt).toBeLessThan(idleAt);
+      const glow = kids[glowAt]?.children?.[0];
+      expect(glow?.kind).toBe("ellipse");
+      const fill = nodesOf(tree).find((n) => n.id === glow?.paint);
+      expect(fill?.kind).toBe("radialGradient");
+      expect(fill?.children?.map((s) => s.cls)).toEqual([
+        "stop-cold-0",
+        "stop-cold-1",
+      ]);
+    }
+  });
+
+  it("has two small slanted pale eyes", () => {
+    for (const type of TYPES) {
+      const eyes = nodesOf(art(type)).filter((n) => n.part === "eye");
+      expect(eyes).toHaveLength(2);
+      const { box, eyeHeight } = GHOST_TYPES[type];
+      for (const eye of eyes) {
+        expect(2 * (eye.ry ?? 0)).toBeCloseTo(eyeHeight, 2);
+        expect(eye.transform?.rotate).not.toBe(0);
+      }
+      expect(eyeHeight / box.h).toBeLessThan(0.05);
+    }
+  });
+
+  it("gives each type its own part: the Wisp is plain, the Lantern_Wraith holds a lantern, the Chained_Brute wears shackles and chains", () => {
+    const parts = Object.fromEntries(
+      TYPES.map((type) => [type, partsOf(art(type))]),
+    );
+    const own = ["lantern", "shackles", "chain"];
+    expect(parts.wisp?.filter((p) => own.includes(p))).toEqual([]);
+    expect(parts["lantern-wraith"]).toContain("lantern");
+    expect(parts["lantern-wraith"]).not.toContain("shackles");
+    expect(parts["chained-brute"]).toEqual(
+      expect.arrayContaining(["shackles", "chain"]),
+    );
+    expect(parts["chained-brute"]).not.toContain("lantern");
+    // The lantern light is cold: its stops are the lantern tokens, never warm.
+    const lantern = nodesOf(art("lantern-wraith"));
+    const light = lantern.find((n) => n.cls === "lantern-light");
+    expect(
+      lantern.find((n) => n.id === light?.paint)?.children?.map((s) => s.cls),
+    ).toEqual(["stop-lantern-0", "stop-lantern-1"]);
+    expect(classesOf(art("lantern-wraith")).join(" ")).not.toMatch(
+      /warm|candle|pumpkin/,
+    );
+    // Dark iron with no light outline.
+    expect(classesOf(art("chained-brute"))).not.toContain("ghost-rim");
+  });
+
+  it("the Wisp outline box equals its box; every type fits its box; the Wisp is the smallest and the Chained_Brute the widest", () => {
+    const wispOutline = nodesOf(art("wisp")).find((n) => n.part === "outline");
+    expect(boxOfAll(wispOutline === undefined ? [] : [wispOutline])).toEqual({
+      x1: 0,
+      y1: 0,
+      x2: GHOST_BOX.wisp.w,
+      y2: GHOST_BOX.wisp.h,
+    });
+    for (const type of TYPES) {
+      const nodes = nodesOf(art(type)).filter((n) =>
+        ["outline", "lantern-frame", "shackles", "chain"].includes(
+          n.part ?? "",
+        ),
+      );
+      const box = boxOfAll(nodes);
+      expect(box.x1).toBeGreaterThanOrEqual(0);
+      expect(box.y1).toBeGreaterThanOrEqual(0);
+      expect(box.x2).toBeLessThanOrEqual(GHOST_BOX[type].w);
+      expect(box.y2).toBeLessThanOrEqual(GHOST_BOX[type].h);
+      expect(GHOST_TYPES[type].box).toEqual(GHOST_BOX[type]);
+    }
+    const {
+      wisp,
+      "lantern-wraith": wraith,
+      "chained-brute": brute,
+    } = GHOST_BOX;
+    expect(wisp.w).toBeLessThan(wraith.w);
+    expect(wraith.w).toBeLessThan(brute.w);
+    expect(wisp.h).toBeLessThan(wraith.h);
   });
 });
 
-describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
+describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
   const FLOORS = ["attic", "middle floor", "basement"] as const;
   const STATES = ["haunted", "locked", "exorcised"] as const;
   /** Slot `index` of `count` on a floor, as the Scene_Layout would place it. */
@@ -348,35 +674,56 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
     }
   });
 
-  it("the pane is lit exactly for Exorcised slots", () => {
-    for (const slot of allSlots) {
-      const classes = classesOf(slotArt(slot));
-      expect(classes).toContain("pane");
-      expect(classes.includes("pane-lit")).toBe(slot.state === "exorcised");
-      expect(classes.includes("pane-unlit")).toBe(slot.state !== "exorcised");
-    }
-  });
-
-  it("the pane is centred on its slot with its top 4 units below the slot top", () => {
-    for (const slot of allSlots) {
-      const frame = nodesOf(slotArt(slot)).find((n) => n.cls === "pane-frame");
-      const { x = 0, y = 0, width = 0 } = frame ?? {};
-      expect(x + width / 2).toBeCloseTo(slot.rect.x + slot.rect.w / 2, 1);
-      expect(y).toBe(slot.rect.y + 4);
-    }
-  });
-
-  it("a Haunted attic slot draws the Wisp with its glow; other slots draw no ghost yet", () => {
+  it("draws no window in any slot: Locked and Exorcised slots are empty until the ghost's own looks come (director's decision, 18 Nov)", () => {
     for (const slot of allSlots) {
       const tree = slotArt(slot);
-      const ghost = slot.floor === "attic" && slot.state === "haunted";
+      const names = nodesOf(tree).flatMap((n) => [
+        ...(n.cls?.split(" ") ?? []),
+        n.part ?? "",
+      ]);
+      expect(names.filter((name) => /pane|window|sill/.test(name))).toEqual([]);
+      if (slot.state !== "haunted") expect(tree.children).toEqual([]);
+    }
+  });
+
+  it("a Haunted slot draws its floor's ghost with its glow; Locked and Exorcised slots draw no ghost yet", () => {
+    for (const slot of allSlots) {
+      const tree = slotArt(slot);
+      const ghost = slot.state === "haunted";
       const parts = nodesOf(tree).map((n) => n.part);
       expect(parts.includes("glow")).toBe(ghost);
-      expect(classesOf(tree).includes("ghost--wisp")).toBe(ghost);
+      for (const type of ["wisp", "lantern-wraith", "chained-brute"]) {
+        expect(classesOf(tree).includes(`ghost--${type}`)).toBe(
+          ghost && type === GHOST_TYPE_OF[slot.floor],
+        );
+      }
       if (ghost) {
-        const holder = nodesOf(tree).find((n) => n.cls === "slot-ghost");
+        const holder = nodesOf(tree).find((n) =>
+          n.cls?.startsWith("slot-ghost "),
+        );
+        expect(holder?.cls).toContain(`ghost-phase-${slot.index % 4}`);
         expect(holder?.transform?.scale).toBeCloseTo(slot.ghostScale, 2);
       }
+    }
+  });
+
+  it("every ghost box lies inside its slot, so no ghost pokes through a roof or floor line", () => {
+    for (const slot of allSlots.filter((s) => s.state === "haunted")) {
+      const holder = nodesOf(slotArt(slot)).find((n) =>
+        n.cls?.startsWith("slot-ghost "),
+      );
+      const [x = 0, y = 0] = holder?.transform?.translate ?? [];
+      const k = holder?.transform?.scale ?? 1;
+      const { box } = GHOST_TYPES[slot.ghostType];
+      const label = `${slot.key} of ${slot.rect.w}`;
+      expect(x, label).toBeGreaterThanOrEqual(slot.rect.x - 0.01);
+      expect(x + box.w * k, label).toBeLessThanOrEqual(
+        slot.rect.x + slot.rect.w + 0.01,
+      );
+      expect(y, label).toBeGreaterThanOrEqual(slot.rect.y);
+      expect(y + box.h * k, label).toBeLessThanOrEqual(
+        slot.rect.y + slot.rect.h,
+      );
     }
   });
 
@@ -393,50 +740,244 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
       );
       const panel = nodesOf(door).find((n) => n.cls === "door-panel");
       const band = SLOT_BAND[floor];
-      expect(panel).toMatchObject({ width: 70, height: band.h - 10 });
-      expect((panel?.x ?? 0) + 35).toBeCloseTo(band.x + band.w / 2, 1);
+      const room = FLOOR_RECT[floor];
+      const { x1 = 0, y1 = 0, x2 = 0, y2 = 0 } = (panel && boxOf(panel)) ?? {};
+      expect(x1).toBeGreaterThanOrEqual(band.x);
+      expect(x2).toBeLessThanOrEqual(band.x + band.w);
+      expect(y1).toBeGreaterThanOrEqual(room.y);
+      expect(y2).toBeLessThanOrEqual(room.y + room.h);
+      // Dark iron with no light outline: no rim stroke on the door.
+      expect(classesOf(door)).not.toContain("rim");
     }
   });
 });
 
-describe("rooms (Requirements 3.1, 3.2)", () => {
-  const part = (name: string): ShapeNode | undefined =>
-    nodesOf(houseLayer()).find((n) => n.part === name);
-  // Left and right edges of the rects, circles and ellipses of a part. Paths
-  // are skipped: the books (relative path data) sit inside their bookcase rect.
-  const xs = (name: string): number[] =>
-    nodesOf(part(name) ?? g("none", [])).flatMap((n) => {
-      if (n.kind === "rect") return [n.x ?? 0, (n.x ?? 0) + (n.width ?? 0)];
-      const r = n.rx ?? n.r ?? 0;
-      return n.cx === undefined ? [] : [n.cx - r, n.cx + r];
-    });
+interface Box {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
 
-  it("the Entrance_Hall, with the front door and the table, is left of the Parlour", () => {
-    expect(Math.max(...xs("entrance-hall"))).toBeLessThanOrEqual(760);
-    expect(Math.min(...xs("parlour"))).toBeGreaterThanOrEqual(760);
-    const hall = part("entrance-hall");
-    expect(hall === undefined ? [] : classesOf(hall)).toEqual(
-      expect.arrayContaining(["door", "telephone-table"]),
-    );
+/** The points of absolute path data (M L H V C S Q T Z), with H and V read right. */
+function pathPoints(d: string): [number, number][] {
+  const pts: [number, number][] = [];
+  let [x, y] = [0, 0];
+  for (const [, cmd = "", args = ""] of d.matchAll(/([A-Za-z])([^A-Za-z]*)/g)) {
+    const n = (args.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+    if (cmd === "H") n.forEach((v) => pts.push([(x = v), y]));
+    else if (cmd === "V") n.forEach((v) => pts.push([x, (y = v)]));
+    else if (/[MLCSQT]/.test(cmd)) {
+      for (let i = 0; i + 1 < n.length; i += 2) {
+        [x, y] = [n[i] ?? 0, n[i + 1] ?? 0];
+        pts.push([x, y]);
+      }
+    } else if (cmd !== "Z") throw new Error(`relative path data: ${cmd}`);
+  }
+  return pts;
+}
+
+/** The box around a leaf's points (stroke paths included, so beams count). */
+function boxOf(node: ShapeNode): Box | null {
+  const pts =
+    node.d === undefined
+      ? pointsOf({ ...node, children: [] })
+      : pathPoints(node.d);
+  if (node.kind === "circle" || node.kind === "ellipse") {
+    const [cx = 0, cy = 0] = pts[0] ?? [];
+    const rx = node.rx ?? node.r ?? 0;
+    const ry = node.ry ?? node.r ?? 0;
+    return { x1: cx - rx, y1: cy - ry, x2: cx + rx, y2: cy + ry };
+  }
+  if (pts.length === 0) return null;
+  const xs = pts.map(([x]) => x);
+  const ys = pts.map(([, y]) => y);
+  return {
+    x1: Math.min(...xs),
+    y1: Math.min(...ys),
+    x2: Math.max(...xs),
+    y2: Math.max(...ys),
+  };
+}
+
+describe("slots on the scene illustration (director's decision, 18 Nov)", () => {
+  const FLOORS = ["attic", "middle floor", "basement"] as const;
+  const apart = (a: Rect, b: Rect): boolean =>
+    a.x + a.w <= b.x ||
+    b.x + b.w <= a.x ||
+    a.y + a.h <= b.y ||
+    b.y + b.h <= a.y;
+  const triangle = (() => {
+    const [ax, ay, bx, by, cx, cy] = ATTIC_TRIANGLE;
+    return `M${ax} ${ay} L${bx} ${by} L${cx} ${cy} Z`;
+  })();
+
+  it("the attic dim box is the floor rectangle around the attic triangle", () => {
+    const xs = ATTIC_TRIANGLE.filter((_, i) => i % 2 === 0);
+    const ys = ATTIC_TRIANGLE.filter((_, i) => i % 2 === 1);
+    const box = {
+      x: Math.min(...xs),
+      y: Math.min(...ys),
+      w: Math.max(...xs) - Math.min(...xs),
+      h: Math.max(...ys) - Math.min(...ys),
+    };
+    expect(box).toEqual({ ...ATTIC_BACK });
+    expect(FLOOR_RECT.attic).toEqual(box);
+    expect(atticClip().children?.[0]?.points).toEqual(ATTIC_TRIANGLE);
   });
 
-  it("each floor holds its furniture", () => {
-    const furniture = {
-      attic: ["beams", "cobweb", "trunk"],
-      "middle floor": [
-        "door",
-        "telephone-table",
-        "fireplace",
-        "shelves",
-        "portrait-frame",
-      ],
-      basement: ["stone-joints", "boiler", "pipe", "chain"],
-    } as const;
-    for (const [floor, names] of Object.entries(furniture)) {
-      const group = part(FLOOR_CLASS[floor as keyof typeof furniture]);
-      expect(group === undefined ? [] : classesOf(group)).toEqual(
-        expect.arrayContaining([...names]),
-      );
+  it("no slot covers the telephone, the boiler or the stairs, with 1 to 5 Cards", () => {
+    for (const floor of FLOORS) {
+      for (let count = 1; count <= 5; count += 1) {
+        for (const slot of slotRects(floor, count)) {
+          for (const [name, prop] of Object.entries(ILLUSTRATION_PROPS)) {
+            expect(apart(slot, prop), `${floor} ${count}: ${name}`).toBe(true);
+          }
+        }
+      }
+    }
+  });
+
+  it("no attic slot pokes through the roof, and every slot stands above its floor line", () => {
+    for (let count = 1; count <= 5; count += 1) {
+      for (const slot of slotRects("attic", count)) {
+        for (const corner of [
+          [slot.x, slot.y],
+          [slot.x + slot.w, slot.y],
+        ] as [number, number][]) {
+          expect(winding(triangle, corner), `${count}: ${corner}`).not.toBe(0);
+        }
+      }
+    }
+    for (const floor of FLOORS) {
+      const band = SLOT_BAND[floor];
+      const room = FLOOR_RECT[floor];
+      expect(band.y + band.h).toBeLessThanOrEqual(room.y + room.h);
+      expect(band.y).toBeGreaterThanOrEqual(room.y);
+    }
+  });
+
+  it("anchors the telephone on its table in the hall, left of every middle-floor slot", () => {
+    const phone = ILLUSTRATION_PROPS.telephone;
+    expect(TELEPHONE_ANCHOR.x).toBeGreaterThan(phone.x);
+    expect(TELEPHONE_ANCHOR.x).toBeLessThan(phone.x + phone.w);
+    expect(TELEPHONE_ANCHOR.y).toBeGreaterThan(phone.y);
+    expect(TELEPHONE_ANCHOR.y).toBeLessThan(phone.y + phone.h);
+    expect(TELEPHONE_ANCHOR.x).toBeLessThan(SLOT_BAND["middle floor"].x);
+  });
+});
+
+describe("chained doors stand on their floor", () => {
+  const FLOORS = ["attic", "middle floor", "basement"] as const;
+  const panelBox = (floor: Floor): Box => {
+    const panel = nodesOf(chainedDoorArt(floor)).find(
+      (n) => n.cls === "door-panel",
+    );
+    const box = panel === undefined ? null : boxOf(panel);
+    if (box === null) throw new Error(`no door panel on ${floor}`);
+    return box;
+  };
+
+  it("every chained door is arched, stands on its floor inside a surround, over a threshold", () => {
+    for (const floor of FLOORS) {
+      const door = nodesOf(chainedDoorArt(floor));
+      const panel = door.find((n) => n.cls === "door-panel");
+      const sill = door.find((n) => n.cls === "door-threshold");
+      expect(panelBox(floor).y2).toBe(FLOOR_LINE[floor]);
+      expect((sill?.y ?? 0) + (sill?.height ?? 0)).toBe(FLOOR_LINE[floor]);
+      expect(panel?.d).toContain("Q"); // rounded shoulders: an arched top
+      const frame = door.find((n) => n.cls === "door-frame");
+      const outer = frame === undefined ? null : boxOf(frame);
+      expect(outer?.x1 ?? 0).toBeLessThan(panelBox(floor).x1);
+      expect(outer?.x2 ?? 0).toBeGreaterThan(panelBox(floor).x2);
+      expect(outer?.y1 ?? 0).toBeLessThan(panelBox(floor).y1);
+    }
+  });
+
+  it("the basement door has the size and place of the painted cellar door, so it shows no painted door around it", () => {
+    // The painted door spans x 693 to 773, from the arch top at y 739 to its foot at y 849.
+    const box = panelBox("basement");
+    expect(box.x1).toBeLessThanOrEqual(693);
+    expect(box.x1).toBeGreaterThanOrEqual(690);
+    expect(box.x2).toBeGreaterThanOrEqual(773);
+    expect(box.x2).toBeLessThanOrEqual(776);
+    expect(box.y1).toBe(737);
+    expect(box.y2).toBeGreaterThanOrEqual(849);
+    expect(box.y2).toBeLessThanOrEqual(852);
+    // Same centre as the painted door (x 733).
+    expect((box.x1 + box.x2) / 2).toBe(733);
+    // The painted padlock (near 733, 795) is under the door.
+    const panel = nodesOf(chainedDoorArt("basement")).find(
+      (n) => n.cls === "door-panel",
+    );
+    expect(winding(panel?.d ?? "", [733, 795])).not.toBe(0);
+  });
+
+  it("the basement surround covers the chain ends the painted door sticks out at both sides", () => {
+    const frame = nodesOf(chainedDoorArt("basement")).find(
+      (n) => n.cls === "door-frame",
+    );
+    // Tips of the painted chains, measured on the illustration.
+    const tips: [number, number][] = [
+      [681, 757],
+      [686, 765],
+      [785, 759],
+      [780, 766],
+      [682, 832],
+      [688, 835],
+      [786, 833],
+      [781, 836],
+    ];
+    for (const tip of tips) {
+      expect(winding(frame?.d ?? "", tip), `${tip}`).not.toBe(0);
+    }
+  });
+
+  it("draws no chain piece outside its door, and every link is dark iron with a faint inner glint", () => {
+    for (const floor of FLOORS) {
+      const door = nodesOf(chainedDoorArt(floor));
+      const box = panelBox(floor);
+      const links = door.filter((n) => n.cls === "door-chain-link");
+      const glints = door.filter((n) => n.cls === "door-chain-glint");
+      expect(links.length).toBeGreaterThan(0);
+      // No link at the crossing of the two chains (the centre of the door).
+      const mid = (box.x1 + box.x2) / 2;
+      for (const link of links) {
+        expect(
+          Math.abs((link.transform?.translate?.[0] ?? 0) - mid),
+        ).toBeGreaterThan(2);
+      }
+      expect(glints).toHaveLength(links.length);
+      for (const link of links) {
+        const [x = 0, y = 0] = link.transform?.translate ?? [];
+        // A link lies on a diagonal; its longest reach is its half length.
+        expect(x - (link.rx ?? 0), `${floor}`).toBeGreaterThanOrEqual(box.x1);
+        expect(x + (link.rx ?? 0), `${floor}`).toBeLessThanOrEqual(box.x2);
+        expect(y - (link.rx ?? 0), `${floor}`).toBeGreaterThanOrEqual(box.y1);
+        expect(y + (link.rx ?? 0), `${floor}`).toBeLessThanOrEqual(box.y2);
+      }
+      for (const glint of glints) {
+        const link = links[glints.indexOf(glint)];
+        expect(glint.rx ?? 0).toBeLessThan(link?.rx ?? 0);
+        expect(glint.ry ?? 0).toBeLessThan(link?.ry ?? 0);
+        expect(glint.transform).toEqual(link?.transform);
+      }
+      expect(door.flatMap((n) => n.cls?.split(" ") ?? [])).not.toContain("rim");
+    }
+    const css = readFileSync(
+      new URL("../styles/ghosts.css", import.meta.url),
+      "utf8",
+    );
+    const rule = (name: string): string =>
+      new RegExp(`\\.chained-door \\.${name}\\s*{([^}]*)}`).exec(css)?.[1] ??
+      "";
+    expect(rule("door-chain-link")).toMatch(/stroke:\s*var\(--sc-iron\)/);
+    expect(rule("door-chain-glint")).toMatch(/stroke:\s*var\(--sc-mist\)/);
+    expect(
+      Number(/opacity:\s*([\d.]+)/.exec(rule("door-chain-glint"))?.[1]),
+    ).toBeLessThanOrEqual(0.25);
+    for (const name of ["door-frame", "door-threshold", "door-hook"]) {
+      expect(rule(name)).toMatch(/var\(--sc-iron-dark\)/);
     }
   });
 });

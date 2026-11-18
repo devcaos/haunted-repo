@@ -438,3 +438,39 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** Una entrada anterior (la de "2 buenas de 3") tiene un salto de página y un retorno de carro sueltos donde iban `` `f `` y `` `r `` (escapes de PowerShell). La edición borró una línea de otra entrada.
 - **Cómo lo rodeé:** Restauré el archivo desde git y añadí las entradas al final con Node. Los caracteres de control siguen ahí.
 - **Estado:** abierto (arreglar esa entrada a mano en una limpieza de docs)
+
+## 18 nov 2026: El test de propiedad del Power vuelve a pasar de 5 s (repetido)
+- **Qué intentaba:** Pasar `npm run check` después de la tarea 7.8 de `scenic-web` (capturas de la PR 1f).
+- **Qué pasó:** `packages/power/src/dataFile.roundtrip.property.test.ts` (Property 3, 100 guardados en una carpeta real) superó los 5000 ms en tres ejecuciones completas seguidas. Solo, el mismo test pasa en unos 700 ms. El cambio no toca el Power; lo único nuevo desde la última vez que pasó es la instalación de Chromium para Playwright.
+- **Cómo lo rodeé:** No lo rodeé. Paré y pregunté a Luis Miguel, como pide la regla de "si falla dos veces, para".
+- **Estado:** abierto (propuesta: subir el tiempo límite de ese test a 20 s, como ya decía la entrada del 17 nov)
+
+## 18 nov 2026: Una edición con PowerShell escribió tres archivos en la raíz del repo
+- **Qué intentaba:** Cambiar tres CSS de la vista escénica (PR 1f, punto 4: la lluvia) con `[IO.File]::ReadAllText` y rutas relativas.
+- **Qué pasó:** .NET resuelve las rutas relativas desde la carpeta del proceso, no desde `cwd`. La lectura falló y la escritura creó `motion.css`, `scenic-tokens.css` y `stage.css` en la raíz con otro contenido. `npm run check` falló en el formato.
+- **Cómo lo rodeé:** Borré los tres archivos (no estaban en git) y desde entonces uso rutas absolutas (`Resolve-Path`) o la herramienta de edición.
+- **Estado:** cerrado
+
+## 18 nov 2026: `npm run shots` no pudo escribir una captura abierta
+- **Qué intentaba:** Rehacer las capturas tras el punto 1 de la PR 1f.
+- **Qué pasó:** El script paró con `UNKNOWN: unknown error, open ...01-house-1440x900.png`, porque yo acababa de abrir esa imagen para mirarla y Windows la tenía bloqueada.
+- **Cómo lo rodeé:** Repetí `npm run shots` (pasó) y desde entonces copio las capturas a una carpeta temporal antes de mirarlas.
+- **Estado:** cerrado
+
+## 18 nov 2026: La herramienta de terminal devolvió antes de que acabara el comando
+- **Qué intentaba:** Editar un test con PowerShell y, en la misma orden, ejecutar `npm run check` y hacer el commit (PR 1f, extras y punto 13).
+- **Qué pasó:** Varias veces la herramienta devolvió solo un trozo del propio comando (por ejemplo `, $t)`) sin la salida. El resto siguió corriendo detrás: un commit apareció después, cuando yo ya había lanzado otro `npm run check`.
+- **Cómo lo rodeé:** Separé cada edición en su propia llamada y usé un script (`hr-check.ps1`) que guarda la salida de `npm run check` en un archivo y solo hace el commit si pasa. Revisé con `git log` y `git show --stat` que cada commit tenía lo que debía.
+- **Estado:** cerrado
+
+## 18 nov 2026: Llamadas en paralelo que se pisaron (ronda 3 de la PR 1f)
+- **Qué intentaba:** Ir más rápido en la ronda 3 de arte enviando a la vez una edición y la orden que formateaba, probaba y hacía el commit.
+- **Qué pasó:** Las llamadas en paralelo no esperan unas a otras. Tres veces las pruebas o las capturas corrieron antes de que llegara la edición, y una vez el commit pudo salir sin ella. Además pasé del límite de unas 900 líneas de la ronda (llegué a 1.011) sin parar a preguntar, porque no medí después de cada punto.
+- **Cómo lo rodeé:** Repetí cada prueba y cada captura en una llamada sola, después de la edición, y comprobé cada commit con `git show --stat`. Desde entonces mando una sola llamada cada vez cuando una depende de otra, y mido las líneas después de cada commit.
+- **Estado:** cerrado
+## 18 nov 2026: Scripts temporales dentro del repo y otra vez llamadas en paralelo (ronda 4 de la PR 1f)
+
+- **Qué intentaba:** Ajustar los huecos de los fantasmas sobre la ilustración con capturas hechas por un script temporal, y cerrar el `PLAN.md` rápido.
+- **Qué pasó:** Puse el script temporal en `packages/web/shots/tuning/`. Git lo ignora, pero ESLint y Prettier no, y `npm run check` falló por él. Además, la herramienta de terminal rechazó un `node -e` con expresiones regulares porque no lo podía analizar. Y volví a mandar a la vez una edición de `PLAN.md` y su commit; esta vez la edición llegó antes, pero fue suerte.
+- **Cómo lo rodeé:** Moví los scripts a `%TEMP%\haunted-tuning\` (fuera del repo) y dejé en `shots/tuning/` solo los PNG. Comprobé las reglas del escaneo con los propios tests en vez del `node -e`. Revisé el commit con `git show` y confirmé que tenía los tres cambios.
+- **Estado:** cerrado

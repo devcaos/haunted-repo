@@ -539,20 +539,20 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 6. Director setup before PR 1f (by hand, once)
-  - [ ] 6.1 Install Chromium for Playwright
-    - **For the director (Luis Miguel), done by hand, not by Kiro, before the screenshot tasks of PR 1f (7.7, 7.8).** Run once in PowerShell from the repository root: `npx playwright install chromium`. It downloads about 150 MB, once per machine. If it is run before task 7.6 adds the pinned `playwright` package, use `npx playwright@1.65.1 install chromium` so the browser matches the pinned version.
+- [x] 6. Setup before PR 1f (Kiro, once, with the director's permission)
+  - [x] 6.1 Install Chromium for Playwright
+    - **Kiro runs this itself, and asks the director's permission once, before the screenshot tasks of PR 1f (7.7, 7.8).** Command, from the repository root: `npx playwright@1.65.1 install chromium`. It downloads about 150 MB, once per machine. The version is pinned so the browser matches the `playwright` package that task 7.6 adds.
     - `npm ci` never downloads a browser, neither in CI nor in the deploy job nor on this machine (decision Q27). Without this step, `npm run shots` stops with `Chromium for Playwright is not installed. Run: npx playwright install chromium`.
-    - No commit of its own; Kiro marks it `[x]` in the next commit after the director confirms.
+    - No commit of its own; Kiro marks it `[x]` in the next commit after the install succeeds.
     - _Requirements: 24.2, 24.3_
     - _Design: "Shots_Script (npm run shots)", decision Q27_
 
-- [ ] 7. PR 1f — Size_Check, Shots_Script, Gallery
+- [x] 7. PR 1f — Size_Check, Shots_Script, Gallery
   - Branch: `feat/scenic-web-1f`. Stacks on: `feat/scenic-web-1e`.
   - Estimate: ~800 changed lines. Model: Auto.
   - _Design: "PR Split" row 1f, "Tooling"_
 
-  - [ ] 7.1 Add the pure Size_Check rules
+  - [x] 7.1 Add the pure Size_Check rules
     - Create `packages/web/src/tooling/distRules.ts` (no relative import, no Node import): move `hasExternalAddress` and `SVG_NAMESPACES` here from `source.test.ts`, which now imports them with its self-check cases unchanged; add `checkDist(files)` returning `{ total, limit: 307200, counted, problems }` and the report and missing-dist messages, by the rules of the design "Size_Check".
     - Create `packages/web/src/tooling/distRules.test.ts` with examples: the missing-dist message names `npm run build` (20.6); the report line prints the total and the 307,200-byte limit (20.8); exactly 307,200 bytes fails; a `gallery` file name or the `data-scenic-gallery` marker is a problem (24.9); `index.html` with `rel="stylesheet"` is a problem (1.9).
     - Verify: `npm run check` exits `0`.
@@ -560,7 +560,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.9, 1.10, 20.6, 20.7, 20.8, 20.9, 24.9_
     - _Design: "Size_Check (npm run size)"_
 
-  - [ ] 7.2 Property test for the Size_Check
+  - [x] 7.2 Property test for the Size_Check
     - **Property 18: The Size_Check fails exactly on budget or address problems**
     - **Validates: Requirements 20.7, 20.9**
     - Generator: lists of generated dist files (random names with extensions from the counted list, `.html`, `.txt` and `.map`; random gzipped sizes; texts that may contain `https://`, a protocol-relative `//` in `url(...)`, or the SVG namespace), at least 100 runs.
@@ -571,7 +571,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.7, 20.9_
     - _Design: "Correctness Properties", Property 18_
 
-  - [ ] 7.3 Add the `npm run size` script
+  - [x] 7.3 Add the `npm run size` script
     - Create `packages/web/scripts/size.ts` (I/O only, Node built-ins `node:fs`, `node:path`, `node:url`, `node:zlib`): resolves `packages/web/dist` from its own URL, walks it, gzips each counted file at the default level, reads HTML, CSS and SVG as text, calls `checkDist`, prints the report and exits `0` or `1`. It imports `../src/tooling/distRules.ts`.
     - Root `package.json`: add `"size": "node packages/web/scripts/size.ts"`; `check` becomes `npm run lint && npm run format:check && npm run build && npm run size && npm test`.
     - Verify: `npm run check` exits `0` and prints the measured total.
@@ -579,7 +579,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 20.5, 20.6, 20.7, 20.8, 20.9, 20.10, 25.10_
     - _Design: "Size_Check (npm run size)"_
 
-  - [ ] 7.4 Add the shot list
+  - [x] 7.4 Add the shot list
     - Create `packages/web/src/tooling/shotList.ts` (pure): state ids, the two sizes `1440x900` and `390x844`, and `<state>-<width>x<height>.png` file names. In this PR it lists only the stage-1 states `01-house`, `16-reduced-house` and `19-gallery` (decision Q2).
     - Create `packages/web/src/tooling/shotList.test.ts`: the names are unique and each contains its state id and its size; the current list has 3 states × 2 sizes. Task 16.7 changes the expectation to 19 × 2 = 38.
     - Verify: `npm run check` exits `0`.
@@ -587,7 +587,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5, 24.10_
     - _Design: "Shots (Requirement 24.4, 24.5, 24.10)"_
 
-  - [ ] 7.5 Add the dev-only Gallery
+  - [x] 7.5 Add the dev-only Gallery
     - Create `packages/web/gallery.html` (head, `<div id="gallery" data-scenic-gallery></div>`, module script `/src/view/scenic/gallery/gallery.ts`) and `packages/web/src/view/scenic/gallery/gallery.ts`: imports the scenic CSS and fonts, sets `data-motion="still"`, and draws the art that exists now (the Wisp, Variant 0, Haunted) with HTML labels as plain strings. Task 9.8 fills the full grid.
     - In `source.test.ts` make the existence of `gallery.html` an assertion of item 17.
     - Verify: `npm run check` exits `0`; `npm run size` reports no Gallery problem (the build input stays `index.html`).
@@ -595,7 +595,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.8, 24.9, 25.2, 25.3, 25.4_
     - _Design: "Gallery (dev only)"_
 
-  - [ ] 7.6 Add Playwright and the `shots` script entry
+  - [x] 7.6 Add Playwright and the `shots` script entry
     - Check the current Playwright docs. Add `playwright` 1.65.1 (exact) to the root `devDependencies`; commit `package-lock.json` in the same commit. No `@playwright/browser-chromium`.
     - Root `package.json`: `"shots": "npm run build -w @haunted-repo/core && npm run build -w @haunted-repo/web && node packages/web/scripts/shots.ts"` (D12). `check`, `test` and `.github/workflows/*` do not run it.
     - Add `packages/web/shots/` to `.gitignore` and `.prettierignore`.
@@ -605,7 +605,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.1, 24.2, 24.3, 24.7, 24.11_
     - _Design: "Shots_Script (npm run shots)", D12, decision Q27_
 
-  - [ ] 7.7 Run the servers and fake GitHub in the Shots_Script
+  - [x] 7.7 Run the servers and fake GitHub in the Shots_Script
     - In `shots.ts`: start `preview()` on port 4179 and `createServer()` plus `listen()` on port 5179 in the script's own process; a `try/finally` and a `SIGINT` handler close the browser, the dev server and the preview `httpServer`; `step(name, fn)` prints `Shots failed at step "<name>": <message>`, cleans up and exits `1`; `page.setDefaultTimeout(10_000)`; a missing Chromium prints the install command.
     - `context.route` for every non-local request: `https://api.github.com/...` `OPTIONS` gets 204 with the CORS headers of the design; other GitHub requests go to Core's strict `createFakeGitHub` with the committed `files.json`, adding `User-Agent: playwright-shots` only when missing, plus the CORS and expose headers; anything else is aborted; a hold hook for the busy shot.
     - Verify: `npm run check` exits `0` (type check through `tsc -p scripts`).
@@ -613,14 +613,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.11, 24.13, 24.14, 24.15_
     - _Design: "Shots_Script (npm run shots)" (Servers, No real GitHub, Timeouts and errors)_
 
-  - [ ] 7.8 Take the stage-1 screenshots
+  - [x] 7.8 Take the stage-1 screenshots
     - In `shots.ts`: for each size, open `/haunted-repo/?view=scenic` (dark launch) and take `01-house`; a second context with `reducedMotion: "reduce"` takes `16-reduced-house`; the Gallery page on the dev server takes `19-gallery`. Before each shot wait until no finite animation or transition runs, run the required checks (at most 15 running animations; no filtered element with animations in its subtree) and the warnings (svg without `aria-hidden`, focusable element in an svg, small targets, horizontal scroll at 390 px), then `page.screenshot({ path, animations: "disabled" })` into `packages/web/shots/`. At the end print the number of PNG files written; exit `1` after writing every file if a required check failed.
     - Verify: `npm run check` exits `0`; `npm run shots` (needs task 6.1) writes 6 PNG files and exits `0`.
     - Commit message: `feat(web): take the first scenic screenshots`
     - _Requirements: 20.2, 20.4, 24.4, 24.5, 24.6, 24.10, 24.12_
     - _Design: "Shots_Script (npm run shots)" (Flow per viewport, Stable frames, Checks, End)_
 
-  - [ ] 7.9 Checkpoint and PR 1f
+  - [x] 7.9 Checkpoint and PR 1f
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is the Vertical Slice Gate, task 8.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 1f`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-1e -- . ':(exclude)package-lock.json'`.
@@ -646,7 +646,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [ ] 9.1 Draw the Lantern_Wraith and the Chained_Brute, Variant 0
     - In `art/ghosts.ts` add both types to `GHOST_TYPES` and `ghostArt` for Variant 0, following the "Ghost types" table: Lantern_Wraith with `hood`, `tail-spiral` and `lantern`; Chained_Brute with `horns`, drips, `chain` and Pumpkin eye classes.
-    - Extend `art.test.ts`: each type has a part the other two lack (Wisp `hem-round`, Lantern_Wraith `hood` and `tail-spiral`, Chained_Brute `horns`); at Variant 0 the Wisp has the smallest box and the Chained_Brute the widest; the Wisp's eye share is the largest; boxes equal the Scene_Layout boxes.
+    - Extend `art.test.ts`: each type has a part the other two lack (Wisp `tail-ragged`, Lantern_Wraith `hood` and `tail-spiral`, Chained_Brute `horns`); at Variant 0 the Wisp has the smallest box and the Chained_Brute the widest; boxes equal the Scene_Layout boxes.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the lantern wraith and the chained brute`
     - _Requirements: 5.2, 5.3, 5.4, 5.6, 22.1_
@@ -676,7 +676,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Palette", "Ghost states"_
 
   - [ ] 9.5 Animate the idle loops
-    - Source_Scan item 11 first: the `@keyframes` `wisp-bob`, `wraith-sway` and `brute-heave` exist and their bodies differ.
+    - Source_Scan item 11 first: the `@keyframes` `wisp-float`, `wraith-sway` and `brute-heave` exist and their bodies differ.
     - In `motion.css` (no-preference block): `wraith-sway`, `brute-heave` and `flame-flicker`, with the catalogue durations; Locked ghosts have no idle animation.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): give each ghost type its own idle motion`
