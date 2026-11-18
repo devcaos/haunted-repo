@@ -137,15 +137,6 @@ function tower(): ShapeNode {
   );
 }
 
-/** The jagged soil edge where the ground is cut open over the basement. */
-function groundCut(): string {
-  let d = "M380 754 H1330";
-  for (let x = 1330, i = 0; x > 380; x -= 38, i += 1) {
-    d += ` L${x - 19} ${i % 2 === 0 ? 772 : 764}`;
-  }
-  return `${d} L380 766 Z`;
-}
-
 /** Attic: three beams, cobwebs in both upper corners, an old trunk on the right. */
 function attic(): ShapeNode[] {
   return [
@@ -226,19 +217,11 @@ function middleFloor(): ShapeNode[] {
   return [hall, rect("partition tone-night", 756, 500, 8, 260), parlour];
 }
 
-/** Stone joints of the basement wall: rows of 30 units, each row shifted by half a block. */
-function stoneJoints(): string {
-  let d = "";
-  for (let row = 0; row < 6; row += 1) {
-    const y = 760 + row * 30;
-    d += `M580 ${y} H1160 `;
-    for (let x = 600 + (row % 2) * 30; x < 1160; x += 60)
-      d += `M${x} ${y} v30 `;
-  }
-  return d.trim();
-}
+/** Five bricks that suggest the wall, in two corners away from the slot panes. */
+// prettier-ignore
+const BRICKS = [[594, 776, 30, 12], [606, 790, 24, 12], [1104, 912, 30, 12], [1120, 898, 26, 12], [1084, 926, 22, 10]] as const;
 
-/** Basement: stone walls, the boiler on the left, two pipes, two chains on the right. */
+/** Basement: a few bricks, the boiler with its glowing dial on the left, two chains on the right. */
 function basement(): ShapeNode[] {
   // Each chain hangs from a ring bolt under the ceiling joist.
   const chain = (x: number): ShapeNode =>
@@ -249,22 +232,23 @@ function basement(): ShapeNode[] {
       ),
     ]);
   return [
-    strokePath("stone-joints", stoneJoints()),
+    ...BRICKS.map(([x, y, w, h]) => rect("brick", x, y, w, h)),
+    rect("pipe tone-mist", 610, 765, 10, 90),
     g("boiler", [
-      rect("tone-rust", 600, 800, 80, 130, { rx: 12 }),
-      circle("tone-brass", 640, 836, 12),
-      strokePath("gauge-needle", "M640 836 L647 829"),
+      rect("tone-rust", 598, 852, 76, 88, { rx: 10 }),
+      circle("dial-light", 636, 882, 30, { paint: "dial-glow" }),
+      circle("tone-brass", 636, 882, 13),
+      circle("dial-face tone-candle", 636, 882, 10),
+      strokePath("gauge-needle", "M636 882 L642 875"),
+      rect("grate tone-pumpkin", 614, 914, 44, 10),
     ]),
-    rect("pipe tone-mist", 650, 778, 500, 8),
-    rect("pipe tone-mist", 680, 792, 470, 6),
-    rect("pipe tone-mist", 650, 778, 10, 22),
     rect("joist tone-night", 1096, 765, 64, 8, { part: "joist" }),
     chain(1112),
     chain(1138),
   ];
 }
 
-/** Walls, roof, chimney, tower, oculus, the three floors and the cut ground line. */
+/** Ground, tower, chimney, walls, oculus, the three floors, roof, slabs and rim light. */
 export function houseLayer(): ShapeNode {
   const { left, right } = BODY;
   return g("house", [
@@ -276,8 +260,12 @@ export function houseLayer(): ShapeNode {
           poly("clip-shape", [...ROOF_INNER, INNER_R, 510, INNER_L, 510]),
         ],
       },
+      gradient("radialGradient", "dial-glow", [
+        ["stop-lamp-0", 0],
+        ["stop-lamp-1", 1],
+      ]),
     ]),
-    rect("ground tone-night", 0, 760, 1600, 240),
+    rect("ground tone-abyss", 0, 760, 1600, 240, { part: "ground" }),
     tower(),
     rect("chimney tone-night", 1010, 220, 36, 70),
     rect("chimney-cap tone-night", 1004, 212, 48, 10),
@@ -304,7 +292,7 @@ export function houseLayer(): ShapeNode {
     floorGroup("basement", basement()),
     path("roof tone-night", ROOF_BAND, { part: "roof" }),
     rect("floor-slab tone-night", left, 496, right - left, 8),
-    path("ground-cut tone-night", groundCut()),
+    rect("ground-slab tone-night", left, 755, right - left, 10),
     g("rims", [
       strokePath("rim", ROOF_RIM, { part: "roof-rim" }),
       strokePath("rim", `M${right} ${EAVE_Y} V760`),

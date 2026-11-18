@@ -77,6 +77,14 @@
   fill: var(--sc-night);
 }
 
+.house .tone-abyss {
+  fill: var(--sc-abyss);
+}
+
+.house .tone-pumpkin {
+  fill: var(--sc-pumpkin);
+}
+
 .house .tone-slate {
   fill: var(--sc-slate);
 }
@@ -139,14 +147,19 @@
 
 /* L4 house: lines drawn by stroke only. */
 .house .beams,
-.house .stone-joints,
 .house .gauge-needle {
   stroke: var(--sc-night);
   stroke-width: 4;
 }
 
-.house .stone-joints {
+.house .gauge-needle {
   stroke-width: 2;
+}
+
+/* A few bricks only suggest the basement wall. */
+.house .brick {
+  fill: var(--sc-mist);
+  opacity: 0.18;
 }
 
 .house .cobweb {

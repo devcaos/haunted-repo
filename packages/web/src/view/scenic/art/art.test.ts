@@ -591,13 +591,34 @@ describe("furniture and slot panes (Requirement 12.5)", () => {
     );
 
   it("no pane covers furniture, whatever the number of Cards", () => {
-    for (const floor of ["attic", "middle floor"] as const) {
+    for (const floor of ["attic", "middle floor", "basement"] as const) {
       const hits = furnitureOf(floor).filter((n) => {
         const box = boxOf(n);
         return box !== null && panes(floor).some((p) => overlaps(p, box));
       });
       expect(hits.map((n) => `${floor}: ${n.cls ?? n.kind}`)).toEqual([]);
     }
+  });
+});
+
+describe("basement in the ground (Requirement 3.1)", () => {
+  it("sits in one dark ground block across the whole width, with at most 5 bricks", () => {
+    const ground = nodesOf(houseLayer()).find((n) => n.part === "ground");
+    expect(ground).toMatchObject({ x: 0, y: 760, width: 1600, height: 240 });
+    expect(ground?.cls).toContain("tone-abyss");
+    const bricks = furnitureOf("basement").filter((n) => n.cls === "brick");
+    expect(bricks.length).toBeGreaterThanOrEqual(4);
+    expect(bricks.length).toBeLessThanOrEqual(5);
+  });
+
+  it("keeps the boiler well apart from the chained door", () => {
+    const boiler = nodesOf(houseLayer()).find((n) => n.cls === "boiler");
+    const boxes = (boiler?.children ?? []).flatMap((n) => boxOf(n) ?? []);
+    const door = nodesOf(chainedDoorArt("basement")).find(
+      (n) => n.cls === "door-panel",
+    );
+    const right = Math.max(...boxes.map((b) => b.x2));
+    expect((door?.x ?? 0) - right).toBeGreaterThan(100);
   });
 });
 
@@ -676,7 +697,7 @@ describe("rooms (Requirements 3.1, 3.2)", () => {
         "shelves",
         "portrait-frame",
       ],
-      basement: ["stone-joints", "boiler", "pipe", "chain"],
+      basement: ["brick", "boiler", "pipe", "chain"],
     } as const;
     for (const [floor, names] of Object.entries(furniture)) {
       const group = part(FLOOR_CLASS[floor as keyof typeof furniture]);

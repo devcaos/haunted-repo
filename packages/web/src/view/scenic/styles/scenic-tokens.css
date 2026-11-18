@@ -6,6 +6,8 @@
 :root {
   /* Palette: the nine colours of the house */
   --sc-night: #0b111b;
+  /* Darker than Night: the ground and the foreground silhouettes */
+  --sc-abyss: #05080d;
   --sc-slate: #202d3b;
   --sc-mist: #6f7f92;
   --sc-bone: #d5d0c5;
