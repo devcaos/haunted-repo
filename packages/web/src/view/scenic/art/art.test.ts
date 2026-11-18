@@ -31,6 +31,7 @@ import {
   ROOF_INNER,
   ROOF_RIM,
   TOWER,
+  WALL,
   houseLayer,
 } from "./house.js";
 import { chainedDoorArt, slotArt } from "./props.js";
@@ -683,6 +684,28 @@ describe("furniture and slot panes (Requirement 12.5)", () => {
         return box !== null && panes(floor).some((p) => overlaps(p, box));
       });
       expect(hits.map((n) => `${floor}: ${n.cls ?? n.kind}`)).toEqual([]);
+    }
+  });
+});
+
+describe("walls with weight (Requirement 3.1)", () => {
+  it("gives floors, foundation, partition and outer walls 8 to 12 units", () => {
+    const parts = nodesOf(houseLayer()).find((n) => n.part === "structure");
+    for (const n of parts?.children ?? []) {
+      expect(Math.min(n.width ?? 0, n.height ?? 0)).toBe(WALL);
+    }
+    const partition = nodesOf(houseLayer()).find((n) =>
+      n.cls?.startsWith("partition"),
+    );
+    const sides = [
+      FLOOR_RECT["middle floor"].x - BODY.left,
+      BODY.right -
+        (FLOOR_RECT["middle floor"].x + FLOOR_RECT["middle floor"].w),
+      partition?.width ?? 0,
+    ];
+    for (const t of sides) {
+      expect(t).toBeGreaterThanOrEqual(8);
+      expect(t).toBeLessThanOrEqual(12);
     }
   });
 });

@@ -338,6 +338,9 @@ function basement(): ShapeNode[] {
   ];
 }
 
+/** Thickness of the floors, the cellar foundation and (at least) the outer walls. */
+export const WALL = 10;
+
 /** Ground, tower, chimney, walls, oculus, the three floors, roof, slabs and rim light. */
 export function houseLayer(): ShapeNode {
   const { left, right } = BODY;
@@ -398,8 +401,18 @@ export function houseLayer(): ShapeNode {
     floorGroup("basement", basement()),
     path("roof tone-night", ROOF_BAND, { part: "roof" }),
     lightCones(),
-    rect("floor-slab tone-night", left, 496, right - left, 8),
-    rect("ground-slab tone-night", left, 755, right - left, 10),
+    // Walls with weight: 10-unit floors and a 10-unit foundation round the cellar.
+    g(
+      "structure tone-night",
+      [
+        rect("floor-slab", left, 495, right - left, WALL),
+        rect("floor-slab", left, 755, right - left, WALL),
+        rect("foundation", 570, 760, WALL, 190),
+        rect("foundation", 1160, 760, WALL, 190),
+        rect("foundation", 570, 940, 600, WALL),
+      ],
+      { part: "structure" },
+    ),
     g("rims", [
       strokePath("rim", ROOF_RIM, { part: "roof-rim" }),
       strokePath("rim", `M${right} ${EAVE_Y} V760`),
