@@ -345,15 +345,18 @@ function attic(): ShapeNode[] {
 /** [x, top, width, tone] of each book; a book stands on the shelf (680) or the case floor (752). */
 const BOOKS: readonly (readonly [number, number, number, string])[] = [
   [786, 642, 10, "mist"],
-  [797, 636, 8, "rust"],
-  [806, 646, 12, "slate"],
-  [820, 640, 9, "mist"],
-  [831, 650, 10, "rust"],
-  [788, 712, 8, "rust"],
-  [798, 706, 12, "slate"],
-  [812, 716, 9, "mist"],
-  [834, 708, 10, "rust"],
+  [797, 630, 8, "rust"],
+  [806, 652, 12, "slate"],
+  [820, 638, 9, "mist"],
+  [831, 656, 10, "rust"],
+  [788, 716, 8, "rust"],
+  [798, 702, 12, "slate"],
+  [812, 724, 9, "mist"],
+  [834, 710, 10, "rust"],
 ];
+/** [x, shelf y, height, tilt, tone] of the books that lean on their neighbours. */
+// prettier-ignore
+const LEANING_BOOKS = [[846, 680, 38, -14, "slate"], [846, 752, 32, -10, "mist"]] as const;
 
 /** The fire: an outer flame with three tongues and a brighter inner one, both standing on the logs. */
 const FLAME_OUTER =
@@ -402,9 +405,16 @@ function middleFloor(): ShapeNode[] {
       rect("door tone-rust", 579, 628, 72, 127, { part: "front-door" }),
       circle("door-knob tone-brass", 640, 696, 4),
       rect("lintel tone-brass", 563, 594, 104, 10, { part: "lintel" }),
-      rect("portrait-frame tone-brass", 680, 566, 56, 70),
-      rect("portrait tone-slate", 685, 571, 46, 60),
-      ellipse("portrait-face tone-mist", 708, 596, 10, 14),
+      // The portrait hangs a little crooked.
+      g(
+        "portrait-group",
+        [
+          rect("portrait-frame tone-brass", -28, -35, 56, 70),
+          rect("portrait tone-slate", -23, -30, 46, 60),
+          ellipse("portrait-face tone-mist", 0, -5, 10, 14),
+        ],
+        { part: "portrait", transform: { translate: [708, 601], rotate: -4 } },
+      ),
       // The legs stand on the floor (755), so the top never floats.
       g("telephone-table tone-rust", [
         rect("table-top", 668, 694, 80, 8),
@@ -423,12 +433,29 @@ function middleFloor(): ShapeNode[] {
         ...BOOKS.map(([x, y, w, tone]) =>
           rect(`books tone-${tone}`, x, y, w, (y < 680 ? 680 : 752) - y),
         ),
+        ...LEANING_BOOKS.map(([x, y, h, tilt, tone]) =>
+          rect(`books tone-${tone}`, 0, -h, 8, h, {
+            part: "leaning-book",
+            transform: { translate: [x, y], rotate: tilt },
+          }),
+        ),
       ]),
       // The visual anchor of the floor: a warm light over the parlour, then the fire.
       rect("fire-light", 764, 505, 416, 250, { paint: "fire-warmth" }),
       g("fireplace", [
         rect("tone-slate", 985, 646, 130, 109),
         rect("tone-night", 975, 636, 150, 10),
+        // An unlit Brass candlestick on the mantel: base, stem, cup and a Bone candle.
+        g(
+          "candlestick tone-brass",
+          [
+            rect("candle-base", 983, 632, 14, 4),
+            rect("candle-stem", 988, 624, 4, 8),
+            rect("candle-cup", 985, 622, 10, 2),
+            rect("candle tone-bone", 987, 612, 6, 10),
+          ],
+          { part: "candlestick" },
+        ),
         rect("tone-abyss", 1012, 680, 76, 75),
         circle("fire-glow", 1050, 728, 56, { paint: "fire-glow" }),
         // Two overlapping Bezier flames; each group sways on its own rhythm.

@@ -832,6 +832,31 @@ describe("attic volume (art review 3, item 10)", () => {
   });
 });
 
+describe("small interior story (art review 3, item 9)", () => {
+  const all = nodesOf(houseLayer());
+
+  it("tilts the portrait and some books, and puts an unlit candlestick on the mantel", () => {
+    expect(all.find((n) => n.part === "portrait")?.transform?.rotate).not.toBe(
+      0,
+    );
+    const leaning = all.filter((n) => n.part === "leaning-book");
+    expect(leaning.length).toBeGreaterThan(0);
+    for (const book of leaning) expect(book.transform?.rotate).not.toBe(0);
+    const heights = new Set(
+      all.filter((n) => n.cls?.startsWith("books")).map((n) => n.height),
+    );
+    expect(heights.size).toBeGreaterThan(5);
+    const stick = all.find((n) => n.part === "candlestick");
+    const base = stick?.children?.find((n) => n.cls === "candle-base");
+    expect((base?.y ?? 0) + (base?.height ?? 0)).toBe(636); // stands on the mantel
+    expect(
+      classesOf(stick ?? g("none", [])).some((c) =>
+        /flame|pumpkin|candle-light/.test(c),
+      ),
+    ).toBe(false);
+  });
+});
+
 describe("walls with weight (Requirement 3.1)", () => {
   it("gives floors, foundation, partition and outer walls 8 to 12 units", () => {
     const parts = nodesOf(houseLayer()).find((n) => n.part === "structure");
@@ -1026,7 +1051,9 @@ describe("rooms (Requirements 3.1, 3.2)", () => {
   const xs = (name: string): number[] =>
     nodesOf(part(name) ?? g("none", [])).flatMap((n) => {
       if (n.kind.endsWith("Gradient")) return []; // paint, not a shape
-      if (n.kind === "rect") return [n.x ?? 0, (n.x ?? 0) + (n.width ?? 0)];
+      const tx = n.transform?.translate?.[0] ?? 0; // leaning books are placed by translate
+      if (n.kind === "rect")
+        return [tx + (n.x ?? 0), tx + (n.x ?? 0) + (n.width ?? 0)];
       const r = n.rx ?? n.r ?? 0;
       return n.cx === undefined ? [] : [n.cx - r, n.cx + r];
     });
