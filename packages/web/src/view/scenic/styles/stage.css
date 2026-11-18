@@ -225,8 +225,9 @@
   stop-opacity: 0.38;
 }
 
+/* Three nested beam layers at 0.08 each give about 0.22 on the axis and soft sides. */
 .house .stop-cone-0 {
-  stop-opacity: 0.22;
+  stop-opacity: 0.08;
 }
 
 .house .stop-warmth-1,

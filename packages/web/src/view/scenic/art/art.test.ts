@@ -34,6 +34,7 @@ import {
   ROOF_RIM,
   TOWER,
   WALL,
+  beamPolygon,
   houseLayer,
 } from "./house.js";
 import { FLOOR_LINE, chainedDoorArt, slotArt } from "./props.js";
@@ -430,8 +431,35 @@ describe("house (Requirements 3.1, 3.4)", () => {
     expect(TOWER.x).toBeGreaterThan(ROOF[4]); // clear of the right eave
     const parts = inTower.map((n) => n.part);
     expect(parts).toEqual(
-      expect.arrayContaining(["weathervane", "tower-arch"]),
+      expect.arrayContaining([
+        "weathervane",
+        "tower-arch",
+        "plinth",
+        "tower-door",
+      ]),
     );
+    const plinth = inTower.find((n) => n.part === "plinth");
+    expect((plinth?.y ?? 0) + (plinth?.height ?? 0)).toBe(TOWER.foot);
+    expect(plinth?.width ?? 0).toBeGreaterThan(TOWER.w);
+    const door = inTower.find((n) => n.part === "tower-door");
+    expect(pathPoints(door?.d ?? "").at(-1)?.[1]).toBe(TOWER.foot);
+  });
+
+  it("softens the tower beam: nested layers that fade out before the ground", () => {
+    const layers = nodesOf(houseLayer()).filter((n) =>
+      n.cls?.startsWith("light-cone "),
+    );
+    expect(layers).toHaveLength(3);
+    const widths = layers.map(
+      (n) => (n.points?.[4] ?? 0) - (n.points?.[6] ?? 0),
+    );
+    expect(widths[0]).toBeGreaterThan(widths[1] ?? 0);
+    expect(widths[1]).toBeGreaterThan(widths[2] ?? 0);
+    const fade = nodesOf(houseLayer()).find((n) => n.id === layers[0]?.paint);
+    expect(fade?.y2).toBeLessThan(TOWER.foot);
+    expect(
+      Math.max(...beamPolygon().filter((_, i) => i % 2 === 1)),
+    ).toBeLessThan(TOWER.foot);
   });
 });
 

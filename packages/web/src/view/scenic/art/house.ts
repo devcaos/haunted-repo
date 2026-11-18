@@ -60,7 +60,26 @@ export function houseOutline(): number[][] {
     [BODY.right, 760, BODY.left, 760, BODY.left, EAVE_Y],
   ].flat();
   const tower = [x - 12, top - 8, x + w / 2, apex, x + w + 12, top - 8];
-  return [body, [...tower, x + w, top, x + w, foot, x, foot, x, top]];
+  const [l, r] = [x - PLINTH - 2, x + w + PLINTH + 2];
+  const shaft = [
+    x + w,
+    top,
+    x + w,
+    710,
+    r,
+    710,
+    r,
+    foot,
+    l,
+    foot,
+    l,
+    710,
+    x,
+    710,
+    x,
+    top,
+  ];
+  return [body, [...tower, ...shaft]];
 }
 
 /** Id of the clip that keeps the attic under the inner roof line (stage.ts clips its dim with it too). */
@@ -127,38 +146,59 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
   );
 }
 
-/** [polygon, gradient start, gradient end] of each light cone: the tower arch. */
-// prettier-ignore
-const CONES: readonly (readonly [number[], number[]])[] = [
-  [[1264, 474, 1288, 474, 1368, 760, 1240, 760], [1276, 474, 1304, 760]],
-];
+/**
+ * The warm beam from the tower arch: its axis from the arch foot down to where
+ * it has faded out, and its half width at both ends.
+ */
+export const BEAM = {
+  top: [1276, 474],
+  end: [1304, 720],
+  half: [12, 60],
+} as const;
+/** Width scale of the three nested layers; together they give the beam soft side edges. */
+const BEAM_LAYERS = [1, 0.66, 0.33] as const;
 
-/** The warm cone that leaves the tower arch. */
+/** One layer of the beam, scaled across its axis by `k`. */
+export function beamPolygon(k = 1): number[] {
+  const [[ax, ay], [bx, by], [ht, hb]] = [BEAM.top, BEAM.end, BEAM.half];
+  const r = (v: number): number => Math.round(v * 10) / 10;
+  return [
+    r(ax - ht * k),
+    ay,
+    r(ax + ht * k),
+    ay,
+    r(bx + hb * k),
+    by,
+    r(bx - hb * k),
+    by,
+  ];
+}
+
+/** The tower beam: three nested layers fading along the axis, so no edge is hard. */
 function lightCones(): ShapeNode {
+  const [[x1, y1], [x2, y2]] = [BEAM.top, BEAM.end];
   return g(
     "light-cones",
     [
-      ...CONES.map(([, [x1, y1, x2, y2]], i) =>
-        defs([
-          gradient(
-            "linearGradient",
-            `cone-${i}`,
-            [
-              ["stop-cone-0", 0],
-              ["stop-cone-1", 1],
-            ],
-            {
-              units: "userSpaceOnUse",
-              x1,
-              y1,
-              x2,
-              y2,
-            },
-          ),
-        ]),
-      ),
-      ...CONES.map(([points], i) =>
-        poly("light-cone", points, { paint: `cone-${i}` }),
+      defs([
+        gradient(
+          "linearGradient",
+          "beam-fade",
+          [
+            ["stop-cone-0", 0],
+            ["stop-cone-1", 1],
+          ],
+          {
+            units: "userSpaceOnUse",
+            x1,
+            y1,
+            x2,
+            y2,
+          },
+        ),
+      ]),
+      ...BEAM_LAYERS.map((k, i) =>
+        poly(`light-cone beam-${i}`, beamPolygon(k), { paint: "beam-fade" }),
       ),
     ],
     { part: "light-cones" },
@@ -173,6 +213,9 @@ export const TOWER = {
   foot: 760,
   apex: 118,
 } as const;
+
+/** How far the plinth sticks out on each side of the tower shaft. */
+const PLINTH = 10;
 
 /** The upright tower: shaft, spire, weathervane and one lit pointed-arch opening. */
 function tower(): ShapeNode {
@@ -201,6 +244,21 @@ function tower(): ShapeNode {
         { part: "weathervane" },
       ),
       circle("tone-night", cx, apex - 8, 3),
+      // A stone plinth and a small door anchor the tower to the ground.
+      rect(
+        "tower-plinth tone-slate",
+        x - PLINTH,
+        716,
+        w + 2 * PLINTH,
+        foot - 716,
+        { part: "plinth" },
+      ),
+      rect("tone-night", x - PLINTH - 2, 710, w + 2 * PLINTH + 4, 6),
+      path("tone-night", arch(cx, foot, 17, 54)),
+      path("tower-door tone-rust", arch(cx, foot, 13, 48), {
+        part: "tower-door",
+      }),
+      circle("tone-brass", cx + 7, foot - 20, 2),
       circle("tower-glow", cx, 432, 70, { paint: "tower-glow" }),
       path("tower-arch-frame tone-slate", arch(cx, 476, 18, 92)),
       path("tower-arch-glass", arch(cx, 472, 14, 84), { part: "tower-arch" }),
@@ -211,7 +269,7 @@ function tower(): ShapeNode {
       path("tower-slit tone-slate", arch(cx, 640, 7, 44)),
       strokePath(
         "rim",
-        `M${cx} ${apex} L${right + 12} ${top - 8} M${right} ${top} V${foot}`,
+        `M${cx} ${apex} L${right + 12} ${top - 8} M${right} ${top} V710 M${right + PLINTH} 716 V${foot}`,
       ),
       strokePath("rim vane-rim", `M${cx + 2} ${apex} V${apex - 32}`),
     ],
