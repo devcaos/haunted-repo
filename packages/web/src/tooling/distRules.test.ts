@@ -69,6 +69,26 @@ describe("checkDist (Requirements 1.9, 20.6 to 20.9, 24.9)", () => {
     ).toHaveLength(1);
   });
 
+  it("allows the C2PA namespace but still catches a real load", () => {
+    const c2pa =
+      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAA</c2pa:manifest></metadata></svg>';
+    expect(hasExternalAddress(c2pa)).toBe(false);
+    expect(checkDist([file("assets/house.svg", 1, c2pa)]).problems).toEqual([]);
+    // The namespace text is removed, nothing else: a load in the same file is caught.
+    const withLoad = c2pa.replace(
+      "</svg>",
+      '<image href="https://c2pa.org/manifest/a.png"/></svg>',
+    );
+    expect(hasExternalAddress(withLoad)).toBe(true);
+    expect(
+      hasExternalAddress('<image href="http://c2pa.org/manifest/a.png"/>'),
+    ).toBe(true);
+    expect(
+      hasExternalAddress('<image href="https://cdn.example/a.svg"/>'),
+    ).toBe(true);
+    expect(hasExternalAddress("url(https://c2pa.org/x.png)")).toBe(true);
+  });
+
   it("does not scan JavaScript for addresses", () => {
     const js = 'fetch("https://api.github.com/x")';
     expect(checkDist([file("assets/a.js", 1, js)]).problems).toEqual([]);

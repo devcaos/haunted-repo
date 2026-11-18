@@ -2,9 +2,12 @@
 // address scan. No relative import and no Node import: `scripts/size.ts`
 // imports this file under Node's type stripping, and `source.test.ts` too.
 
+// Namespace names, not loads. The C2PA one is declared by the provenance
+// block of the scene illustration (house-scene.svg), which is kept as it is.
 export const SVG_NAMESPACES = [
   "http://www.w3.org/2000/svg",
   "http://www.w3.org/1999/xlink",
+  "http://c2pa.org/manifest",
 ];
 const FULL_ADDRESS = /https?:\/\//i;
 const PROTOCOL_RELATIVE = [
@@ -16,7 +19,11 @@ const PROTOCOL_RELATIVE = [
 
 /** True when the text loads or links anything outside the site. */
 export function hasExternalAddress(text: string): boolean {
-  const rest = SVG_NAMESPACES.reduce((t, ns) => t.replaceAll(ns, ""), text);
+  // Only a whole quoted namespace is removed, so "<ns>/a.png" is still caught.
+  const rest = SVG_NAMESPACES.reduce(
+    (t, ns) => t.replaceAll(`"${ns}"`, '""').replaceAll(`'${ns}'`, "''"),
+    text,
+  );
   return FULL_ADDRESS.test(rest) || PROTOCOL_RELATIVE.some((p) => p.test(rest));
 }
 
