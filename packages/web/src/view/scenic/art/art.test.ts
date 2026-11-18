@@ -25,6 +25,7 @@ import {
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import {
+  ATTIC_CLIP,
   BODY,
   FLOOR_CLASS,
   ROOF,
@@ -648,7 +649,7 @@ function furnitureOf(floor: Floor): ShapeNode[] {
   return nodesOf(group ?? g("none", [])).filter(
     (n) =>
       n.children === undefined &&
-      n.part !== "room-back" &&
+      !(n.cls ?? "").startsWith("room-back") &&
       !(n.cls ?? "").includes("light"),
   );
 }
@@ -729,6 +730,44 @@ describe("simple, iconic silhouettes (art review, item 13)", () => {
       for (const piece of pieces) {
         const leaves = nodesOf(piece).filter((n) => n.children === undefined);
         expect(leaves.length, `${floor}: ${piece.cls}`).toBeLessThanOrEqual(14);
+      }
+    }
+  });
+});
+
+describe("attic volume (art review 3, item 10)", () => {
+  const all = nodesOf(houseLayer());
+  const clip = all.find((n) => n.id === ATTIC_CLIP)?.children?.[0];
+  const pts = clip?.points ?? [];
+  const pairs = pts.flatMap((v, i) =>
+    i % 2 === 0 ? [`${v} ${pts[i + 1]}`] : [],
+  );
+  const inside = `M${pairs.join(" L")} Z`;
+
+  it("rises to the ridge with no flat ceiling, and holds the round window", () => {
+    const attic = all.find((n) => n.part === FLOOR_CLASS.attic);
+    const backs = (attic?.children ?? []).filter((n) =>
+      n.cls?.startsWith("room-back"),
+    );
+    expect(Math.min(...backs.map((n) => n.y ?? 0))).toBe(ROOF_INNER[3]);
+    const oculus = nodesOf(attic ?? g("none", [])).find(
+      (n) => n.part === "oculus",
+    );
+    const frame = oculus?.children?.[0];
+    expect(
+      winding(inside, [frame?.cx ?? 0, (frame?.cy ?? 0) - (frame?.r ?? 0)]),
+    ).not.toBe(0);
+  });
+
+  it("keeps every piece of attic furniture inside the attic shape", () => {
+    for (const n of furnitureOf("attic")) {
+      const box = boxOf(n);
+      if (box === null) continue;
+      for (const corner of [
+        [box.x1, box.y1],
+        [box.x2, box.y1],
+      ] as [number, number][]) {
+        expect(winding(inside, corner), `${n.cls}`).not.toBe(0);
       }
     }
   });

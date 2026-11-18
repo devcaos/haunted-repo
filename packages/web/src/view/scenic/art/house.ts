@@ -65,9 +65,17 @@ export function houseOutline(): number[][] {
 /** Id of the clip that keeps the attic under the inner roof line (stage.ts clips its dim with it too). */
 export const ATTIC_CLIP = "attic-inside";
 
-/** Centre and radius of each room's light: the ghosts, the fire, the boiler dial. */
+/** The whole attic volume, from the inner ridge down to the attic floor (the roof clip cuts its top corners). */
+export const ATTIC_BACK = {
+  x: 590,
+  y: INNER_Y,
+  w: 560,
+  h: 500 - INNER_Y,
+} as const;
+
+/** Centre and radius of each room's light: the ghosts and the moonlit oculus, the fire, the boiler dial. */
 const ROOM_LIGHT: Readonly<Record<Floor, readonly [number, number, number]>> = {
-  attic: [870, 450, 340],
+  attic: [870, 380, 360],
   "middle floor": [1050, 700, 470],
   basement: [636, 880, 440],
 };
@@ -80,6 +88,20 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
     part: "room-back",
     paint: id,
   });
+  // The attic has no flat ceiling: its back rises to the ridge, cut by the roof clip.
+  const upper =
+    floor === "attic"
+      ? [
+          rect(
+            "room-back-upper",
+            ATTIC_BACK.x,
+            ATTIC_BACK.y,
+            ATTIC_BACK.w,
+            r.y - ATTIC_BACK.y + 1,
+            { paint: id },
+          ),
+        ]
+      : [];
   const fill = gradient(
     "radialGradient",
     id,
@@ -94,10 +116,14 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
       r: radius,
     },
   );
-  return g(`floor ${FLOOR_CLASS[floor]}`, [defs([fill]), back, ...contents], {
-    part: FLOOR_CLASS[floor],
-    ...(floor === "attic" ? { clip: ATTIC_CLIP } : {}),
-  });
+  return g(
+    `floor ${FLOOR_CLASS[floor]}`,
+    [defs([fill]), ...upper, back, ...contents],
+    {
+      part: FLOOR_CLASS[floor],
+      ...(floor === "attic" ? { clip: ATTIC_CLIP } : {}),
+    },
+  );
 }
 
 /** [polygon, gradient start, gradient end] of each light cone: two roof gaps, then the tower arch. */
@@ -206,12 +232,21 @@ function tower(): ShapeNode {
   );
 }
 
-/** Attic: three beams, cobwebs in both upper corners, an old trunk on the right. */
+/** Attic: the round window in the gable, a collar beam, cobwebs in both corners, an old trunk. */
 function attic(): ShapeNode[] {
   return [
-    strokePath("beams", "M620 350 H1120 M800 330 V350 M940 330 V350", {
-      part: "rafters",
-    }),
+    g(
+      "oculus",
+      [
+        circle("oculus-frame tone-mist", RIDGE_X, 262, 24),
+        circle("oculus-glass tone-slate", RIDGE_X, 262, 19),
+        circle("oculus-light", RIDGE_X, 262, 19),
+        strokePath("oculus-bars", "M851 262 H889 M870 243 V281"),
+      ],
+      { part: "oculus" },
+    ),
+    // A collar beam ties the two slopes; it is not a ceiling.
+    strokePath("beams", "M676 312 H1064", { part: "rafters" }),
     strokePath(
       "cobweb",
       "M592 380 H640 M592 380 V424 M592 380 L628 412 M608 380 Q606 394 592 396 M626 380 Q622 410 592 414",
@@ -389,12 +424,6 @@ export function houseLayer(): ShapeNode {
       EAVE_Y,
       right,
       760,
-    ]),
-    g("oculus", [
-      circle("oculus-frame tone-mist", RIDGE_X, 262, 24),
-      circle("oculus-glass tone-slate", RIDGE_X, 262, 19),
-      circle("oculus-light", RIDGE_X, 262, 19),
-      strokePath("oculus-bars", "M851 262 H889 M870 243 V281"),
     ]),
     floorGroup("attic", attic()),
     floorGroup("middle floor", middleFloor()),
