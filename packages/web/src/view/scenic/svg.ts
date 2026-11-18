@@ -1,4 +1,4 @@
-import { SVG_NS, type ShapeNode } from "./art/shapes.js";
+import { SVG_NS, isSameSiteHref, type ShapeNode } from "./art/shapes.js";
 import type { Rect } from "./model/sceneLayout.js";
 
 // prettier-ignore
@@ -36,7 +36,9 @@ function transformText(t: NonNullable<ShapeNode["transform"]>): string {
 /**
  * Builds the DOM of a Shape_Data tree with `createElementNS`, one element per
  * node. Attributes come only from numbers, keywords and class names; no markup
- * is ever parsed (Requirements 22.2, 22.3). Ids and the `url(#...)` references
+ * is ever parsed (Requirements 22.2, 22.3). The one address, `href` of an
+ * `image`, is set only when it is a same-site path; the browser loads that
+ * file as a picture, so its markup never reaches the DOM. Ids and the `url(#...)` references
  * to them get `idPrefix`, so several SVGs on one page never share an id.
  */
 export function mountShape(node: ShapeNode, idPrefix: string): SVGElement {
@@ -57,6 +59,13 @@ export function mountShape(node: ShapeNode, idPrefix: string): SVGElement {
   set("fill", ref(node.paint) ?? node.fill);
   set("clip-path", ref(node.clip));
   set("stroke", node.stroke);
+  if (
+    node.kind === "image" &&
+    node.href !== undefined &&
+    isSameSiteHref(node.href)
+  ) {
+    set("href", node.href);
+  }
   for (const child of node.children ?? []) {
     element.append(mountShape(child, idPrefix));
   }

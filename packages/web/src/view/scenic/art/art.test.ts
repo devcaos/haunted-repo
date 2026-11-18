@@ -5,6 +5,8 @@ import {
   ellipse,
   g,
   gradient,
+  image,
+  isSameSiteHref,
   path,
   poly,
   rect,
@@ -53,7 +55,7 @@ import {
 // prettier-ignore
 const KINDS = new Set<string>([
   "g", "path", "rect", "circle", "ellipse", "polygon", "polyline", "line",
-  "defs", "linearGradient", "radialGradient", "stop", "clipPath",
+  "defs", "linearGradient", "radialGradient", "stop", "clipPath", "image",
 ]);
 // prettier-ignore
 const ID_KINDS = new Set<string>(["linearGradient", "radialGradient", "clipPath"]);
@@ -70,7 +72,7 @@ const NUMBER_KEYS = [
 const KNOWN_KEYS = new Set<string>([
   ...NUMBER_KEYS,
   ...["kind", "cls", "id", "part", "d", "points", "transform", "units"],
-  ...["paint", "clip", "fill", "stroke", "children"],
+  ...["paint", "clip", "fill", "stroke", "children", "href"],
 ]);
 
 /** Every Shape_Data rule the tree breaks, as short readable lines. */
@@ -113,6 +115,14 @@ function shapeProblems(tree: ShapeNode): string[] {
     }
     if (node.paint !== undefined) refs.push(node.paint);
     if (node.clip !== undefined) refs.push(node.clip);
+    // The only address: a same-site path, on an image only.
+    if (node.href !== undefined) {
+      if (node.kind !== "image") problems.push(`href on ${node.kind}`);
+      if (!isSameSiteHref(node.href)) problems.push(`href "${node.href}"`);
+    }
+    if (node.kind === "image" && node.children !== undefined) {
+      problems.push("children on image");
+    }
     node.children?.forEach(walk);
   };
   walk(tree);
@@ -163,6 +173,45 @@ describe("Shape_Data rules", () => {
       'path "M0 0 L#fff 1"',
     ]);
     expect(shapeProblems(path("p", "url(x)"))).toHaveLength(1);
+  });
+
+  it("accepts an image with a same-site path and catches any other address", () => {
+    const art = "/haunted-repo/assets/house-scene-B1x_9.svg";
+    expect(shapeProblems(image("scene-art", art, 0, 0, 1600, 1000))).toEqual(
+      [],
+    );
+    expect(
+      shapeProblems(
+        image(
+          "a",
+          "/haunted-repo/src/view/assets/files/house-scene.svg",
+          0,
+          0,
+          1,
+          1,
+        ),
+      ),
+    ).toEqual([]);
+    for (const bad of [
+      "https://cdn.example/a.svg",
+      "http://example.com/a.svg",
+      "//cdn.example/a.svg",
+      "data:image/svg+xml,<svg/>",
+      "javascript:alert(1)",
+      "assets/a.svg",
+      "/a/../b.svg",
+      "/a.svg?x=1",
+      '/a.svg" onload="x',
+      "/folder/",
+    ]) {
+      expect(isSameSiteHref(bad), bad).toBe(false);
+      expect(shapeProblems(image("a", bad, 0, 0, 1, 1))).toEqual([
+        `href "${bad}"`,
+      ]);
+    }
+    expect(shapeProblems({ ...rect("a", 0, 0, 1, 1), href: art })).toEqual([
+      "href on rect",
+    ]);
   });
 
   it("catches colours, unknown fields, ids and broken references", () => {
