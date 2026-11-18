@@ -48,10 +48,6 @@
   stop-color: var(--sc-ghost-eye);
   stop-opacity: 0;
 }
-.ghost .ghost-shadow {
-  fill: var(--sc-night);
-  opacity: 0.5;
-}
 /* Haunted glow: the named cold blue, fading out to the edge (Requirement 6.1). */
 .ghost .stop-cold-0 {
   stop-color: var(--sc-cold-blue);

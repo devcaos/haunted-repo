@@ -533,6 +533,18 @@ describe("the three Ghost_Types, Variant 0 (Requirements 5.4, 5.6, 6.1; director
     }
   });
 
+  it("floats: it casts no shadow, and its only ellipse behind the body is the glow", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      expect(classesOf(tree).filter((c) => /shadow/.test(c))).toEqual([]);
+      const idleAt = (tree.children ?? []).findIndex(
+        (n) => n.cls === "ghost-idle",
+      );
+      const before = (tree.children ?? []).slice(0, idleAt);
+      expect(before.map((n) => n.part ?? n.kind)).toEqual(["defs", "glow"]);
+    }
+  });
+
   it("makes its glow a radial-gradient ellipse behind the body", () => {
     for (const type of TYPES) {
       const tree = art(type);
@@ -702,14 +714,14 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
       );
       const [x = 0, y = 0] = holder?.transform?.translate ?? [];
       const k = holder?.transform?.scale ?? 1;
-      const { box, shadowY } = GHOST_TYPES[slot.ghostType];
+      const { box } = GHOST_TYPES[slot.ghostType];
       const label = `${slot.key} of ${slot.rect.w}`;
       expect(x, label).toBeGreaterThanOrEqual(slot.rect.x - 0.01);
       expect(x + box.w * k, label).toBeLessThanOrEqual(
         slot.rect.x + slot.rect.w + 0.01,
       );
       expect(y, label).toBeGreaterThanOrEqual(slot.rect.y);
-      expect(y + shadowY * k, label).toBeLessThanOrEqual(
+      expect(y + box.h * k, label).toBeLessThanOrEqual(
         slot.rect.y + slot.rect.h,
       );
     }

@@ -23,8 +23,6 @@ export interface GhostTypeSpec {
   box: { w: number; h: number };
   /** Height of one eye, for the eye share (small eyes, Requirement 5.1). */
   eyeHeight: number;
-  /** Local y of the floor shadow: the ghost floats a little above it. */
-  shadowY: number;
   /** Name of the idle `@keyframes` in motion.css. */
   idle: string;
 }
@@ -126,7 +124,6 @@ function spec(type: GhostType, idle: string): GhostTypeSpec {
   return {
     box,
     eyeHeight: 2 * round2(REF_EYE.ry * EYE_BOOST * SCALE[type][1]),
-    shadowY: box.h + 6,
     idle,
   };
 }
@@ -185,8 +182,9 @@ function shackles(): ShapeNode[] {
  * exists (the other Variants and the Cloche come with task 9), so the types
  * accept only those values.
  *
- * Structure (design "Art System"): `g.ghost` > static glow and floor shadow,
- * then `g.ghost-idle`, the only part the idle animation moves.
+ * Structure (design "Art System"): `g.ghost` > the static glow, then
+ * `g.ghost-idle`, the only part the idle animation moves. A ghost floats, so
+ * it casts no shadow (director's decision, 18 Nov).
  */
 export function ghostArt(
   type: GhostType,
@@ -195,7 +193,7 @@ export function ghostArt(
 ): ShapeNode {
   const id = (name: string): string => `${type}-${variant}-${name}`;
   const [sx, sy] = SCALE[type];
-  const { box, shadowY } = GHOST_TYPES[type];
+
   const [gx, gy] = at(type, REF_GLOW.cx, REF_GLOW.cy);
   const eyes = REF_EYES.flatMap(([x, y, tilt]) => {
     const [cx, cy] = at(type, x, y);
@@ -268,7 +266,6 @@ export function ghostArt(
       ],
       { part: "glow" },
     ),
-    ellipse("ghost-shadow", round2(box.w / 2), shadowY, round2(box.w * 0.3), 3),
     g("ghost-idle", [
       g(
         "ghost-outline",

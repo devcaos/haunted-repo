@@ -3,8 +3,8 @@ import type { SlotPlacement } from "../model/sceneLayout.js";
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import { ellipse, g, rect, strokePath, type ShapeNode } from "./shapes.js";
 
-/** A ghost's floor shadow sits this far above the slot bottom. */
-const SHADOW_LIFT = 4;
+/** A ghost floats: its box ends this many units above the slot bottom (at floor scale 1). */
+const GHOST_LIFT = 10;
 
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
@@ -17,9 +17,9 @@ function round2(value: number): number {
  */
 function slotGhost(slot: SlotPlacement): ShapeNode {
   const k = slot.ghostScale;
-  const { box, shadowY } = GHOST_TYPES[slot.ghostType];
+  const { box } = GHOST_TYPES[slot.ghostType];
   const x = round2(slot.rect.x + (slot.rect.w - box.w * k) / 2);
-  const y = round2(slot.rect.y + slot.rect.h - SHADOW_LIFT - shadowY * k);
+  const y = round2(slot.rect.y + slot.rect.h - GHOST_LIFT * k - box.h * k);
   // The phase class starts each idle loop at another point, so neighbours never float in step.
   return g(
     `slot-ghost ghost-phase-${slot.index % 4}`,
