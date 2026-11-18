@@ -116,3 +116,15 @@ export function gradient(
 export function defs(children: readonly ShapeNode[]): ShapeNode {
   return { kind: "defs", children };
 }
+
+/** A pointed (gothic) arch from its foot line, centre, half width and height. */
+export function arch(
+  cx: number,
+  foot: number,
+  half: number,
+  h: number,
+): string {
+  const spring = foot - h + half * 1.6;
+  const top = foot - h;
+  return `M${cx - half} ${foot} V${spring} Q${cx - half} ${top + half * 0.6} ${cx} ${top} Q${cx + half} ${top + half * 0.6} ${cx + half} ${spring} V${foot} Z`;
+}

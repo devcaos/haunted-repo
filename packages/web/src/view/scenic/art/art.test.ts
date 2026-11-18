@@ -545,12 +545,20 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
     }
   });
 
-  it("the pane is centred on its slot with its top 4 units below the slot top", () => {
+  it("the pane is a centred gothic arch about 1:2, 4 units below the slot top, on a wider sill", () => {
     for (const slot of allSlots) {
-      const frame = nodesOf(slotArt(slot)).find((n) => n.cls === "pane-frame");
-      const { x = 0, y = 0, width = 0 } = frame ?? {};
-      expect(x + width / 2).toBeCloseTo(slot.rect.x + slot.rect.w / 2, 1);
-      expect(y).toBe(slot.rect.y + 4);
+      const nodes = nodesOf(slotArt(slot));
+      const frame = nodes.find((n) => n.cls === "pane-frame");
+      const box = frame === undefined ? null : boxOf(frame);
+      const { x1 = 0, y1 = 0, x2 = 0, y2 = 0 } = box ?? {};
+      expect((x1 + x2) / 2).toBeCloseTo(slot.rect.x + slot.rect.w / 2, 1);
+      expect(y1).toBe(slot.rect.y + 4);
+      expect((y2 - y1) / (x2 - x1)).toBeCloseTo(2, 0);
+      expect(frame?.d).toContain("Q"); // pointed top
+      const sill = nodes.find((n) => n.cls === "pane-sill");
+      expect(sill?.width ?? 0).toBeGreaterThan(x2 - x1);
+      expect(sill?.y).toBe(y2);
+      expect(nodes.some((n) => n.cls === "pane-glint")).toBe(true);
     }
   });
 
@@ -671,11 +679,10 @@ describe("furniture and slot panes (Requirement 12.5)", () => {
           rect,
           ghostScale: 1,
         };
-        const frame = nodesOf(slotArt(slot)).find(
-          (n) => n.cls === "pane-frame",
-        );
-        const box = frame === undefined ? null : boxOf(frame);
-        return box === null ? [] : [box];
+        // The frame and the wider sill both count.
+        return nodesOf(slotArt(slot))
+          .filter((n) => n.cls === "pane-frame" || n.cls === "pane-sill")
+          .flatMap((n) => boxOf(n) ?? []);
       }),
     );
 

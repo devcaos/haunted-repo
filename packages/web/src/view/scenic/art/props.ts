@@ -6,22 +6,26 @@ import {
 } from "../model/sceneLayout.js";
 import { WISP_SHADOW_Y, ghostArt } from "./ghosts.js";
 import {
+  arch,
   circle,
   defs,
   ellipse,
   g,
   gradient,
+  path,
   rect,
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
 
-/** Size of the back-wall window ("pane") of a slot on each floor ("Slot layout rule"). */
+/** Size of the back-wall window ("pane") of a slot on each floor: gothic, about 1:2. */
 const PANE_SIZE: Readonly<Record<Floor, { w: number; h: number }>> = {
-  attic: { w: 30, h: 40 },
-  "middle floor": { w: 34, h: 48 },
-  basement: { w: 32, h: 36 },
+  attic: { w: 24, h: 48 },
+  "middle floor": { w: 28, h: 56 },
+  basement: { w: 22, h: 44 },
 };
+/** The sill sticks out this far on each side of the pane. */
+const SILL_OVERHANG = 4;
 /** Gap between the slot top and the pane top. */
 const PANE_TOP = 4;
 /** Width of the pane frame around the glass. */
@@ -44,21 +48,33 @@ function pane(slot: SlotPlacement): ShapeNode {
   const x = round2(slot.rect.x + (slot.rect.w - w) / 2);
   const y = slot.rect.y + PANE_TOP;
   const lit = slot.state === "exorcised";
-  const glass = rect(
-    "pane-glass",
-    x + PANE_FRAME,
-    y + PANE_FRAME,
-    w - 2 * PANE_FRAME,
-    h - 2 * PANE_FRAME,
-  );
   const midX = round2(x + w / 2);
-  const midY = round2(y + h / 2);
+  const midY = round2(y + h * 0.55);
+  const foot = y + h;
+  // A pointed arch: frame, glass inside it, a cross of bars, a faint diagonal glint, a wide sill.
+  const frame = path("pane-frame", arch(midX, foot, w / 2, h));
+  const glass = path(
+    "pane-glass",
+    arch(midX, foot - PANE_FRAME, w / 2 - PANE_FRAME, h - 2 * PANE_FRAME),
+  );
+  const inner = round2(x + w - PANE_FRAME);
   const bars = strokePath(
     "pane-bars",
-    `M${midX} ${y + PANE_FRAME} V${y + h - PANE_FRAME} M${x + PANE_FRAME} ${midY} H${round2(x + w - PANE_FRAME)}`,
+    `M${midX} ${y + PANE_FRAME + 4} V${foot - PANE_FRAME} M${x + PANE_FRAME} ${midY} H${inner}`,
   );
-  const frame = rect("pane-frame", x, y, w, h);
-  if (!lit) return g("pane pane-unlit", [frame, glass, bars]);
+  const glint = strokePath(
+    "pane-glint",
+    `M${x + PANE_FRAME + 2} ${round2(y + h * 0.8)} L${round2(inner - 2)} ${round2(y + h * 0.45)}`,
+  );
+  const sill = rect(
+    "pane-sill",
+    round2(x - SILL_OVERHANG),
+    foot,
+    w + 2 * SILL_OVERHANG,
+    4,
+  );
+  const parts = [frame, glass, glint, bars, sill];
+  if (!lit) return g("pane pane-unlit", parts);
   return g(
     "pane pane-lit",
     [
@@ -69,9 +85,7 @@ function pane(slot: SlotPlacement): ShapeNode {
         ]),
       ]),
       circle("pane-halo", midX, midY, h, { paint: "pane-halo" }),
-      frame,
-      glass,
-      bars,
+      ...parts,
     ],
     { part: "pane-lit" },
   );

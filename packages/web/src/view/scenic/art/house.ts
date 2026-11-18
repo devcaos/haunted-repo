@@ -1,6 +1,7 @@
 import type { Floor } from "@haunted-repo/core";
 import { FLOOR_RECT } from "../model/sceneLayout.js";
 import {
+  arch,
   circle,
   defs,
   ellipse,
@@ -172,13 +173,6 @@ export const TOWER = {
   foot: 760,
   apex: 118,
 } as const;
-
-/** A pointed (gothic) arch from its foot line, centre, half width and height. */
-function arch(cx: number, foot: number, half: number, h: number): string {
-  const spring = foot - h + half * 1.6;
-  const top = foot - h;
-  return `M${cx - half} ${foot} V${spring} Q${cx - half} ${top + half * 0.6} ${cx} ${top} Q${cx + half} ${top + half * 0.6} ${cx + half} ${spring} V${foot} Z`;
-}
 
 /** The upright tower: shaft, spire, weathervane and one lit pointed-arch opening. */
 function tower(): ShapeNode {
@@ -418,7 +412,7 @@ function stairX(y: number): number {
 
 /**
  * The cellar stairs: a back and a front stringer and six thick treads. The
- * front stringer is split at y 845 so each half keeps clear of the slot panes.
+ * front stringer is split at y 850 so each half keeps clear of the slot panes.
  */
 function stairs(): ShapeNode {
   const band = (
@@ -450,11 +444,11 @@ function stairs(): ShapeNode {
         [HATCH.x1, 765, HATCH.x2, 765, 1124, 940, 1036, 940],
         { paint: "stair-warmth" },
       ),
-      poly("stringer stringer-back", band(6, 765, 845, 0, -4)),
-      poly("stringer stringer-back", band(6, 845, 940, 0, -4)),
+      poly("stringer stringer-back", band(6, 765, 850, 0, -4)),
+      poly("stringer stringer-back", band(6, 850, 940, 0, -4)),
       ...treads,
-      poly("stringer", band(0, 765, 845, 0, 0)),
-      poly("stringer", band(0, 845, 940, 0, 0)),
+      poly("stringer", band(0, 765, 850, 0, 0)),
+      poly("stringer", band(0, 850, 940, 0, 0)),
     ],
     { part: "stairs" },
   );
