@@ -462,3 +462,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** Varias veces la herramienta devolvió solo un trozo del propio comando (por ejemplo `, $t)`) sin la salida. El resto siguió corriendo detrás: un commit apareció después, cuando yo ya había lanzado otro `npm run check`.
 - **Cómo lo rodeé:** Separé cada edición en su propia llamada y usé un script (`hr-check.ps1`) que guarda la salida de `npm run check` en un archivo y solo hace el commit si pasa. Revisé con `git log` y `git show --stat` que cada commit tenía lo que debía.
 - **Estado:** cerrado
+
+## 18 nov 2026: Llamadas en paralelo que se pisaron (ronda 3 de la PR 1f)
+- **Qué intentaba:** Ir más rápido en la ronda 3 de arte enviando a la vez una edición y la orden que formateaba, probaba y hacía el commit.
+- **Qué pasó:** Las llamadas en paralelo no esperan unas a otras. Tres veces las pruebas o las capturas corrieron antes de que llegara la edición, y una vez el commit pudo salir sin ella. Además pasé del límite de unas 900 líneas de la ronda (llegué a 1.011) sin parar a preguntar, porque no medí después de cada punto.
+- **Cómo lo rodeé:** Repetí cada prueba y cada captura en una llamada sola, después de la edición, y comprobé cada commit con `git show --stat`. Desde entonces mando una sola llamada cada vez cuando una depende de otra, y mido las líneas después de cada commit.
+- **Estado:** cerrado
