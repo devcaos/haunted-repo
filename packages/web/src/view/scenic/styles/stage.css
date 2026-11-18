@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Stage and house styles of the Scenic_Renderer. Tokens only.
  * The stage is outside the Camera; `.world` inside it is the Camera. Stroke
  * widths are plain numbers in viewBox units.
@@ -72,236 +72,14 @@
   font-size: var(--sc-text-h2);
 }
 
-/* Flat tones of the art: the palette, one class per colour. */
-.house .tone-night {
+/*
+ * The scene illustration (a still picture) and its fallback. The picture
+ * keeps its own colours; the page adds only tokens on top of it.
+ */
+.house .scene-fallback {
   fill: var(--sc-night);
 }
-
-.house .tone-abyss {
-  fill: var(--sc-abyss);
-}
-
-.house .tone-pumpkin {
-  fill: var(--sc-pumpkin);
-}
-
-.house .tone-slate {
-  fill: var(--sc-slate);
-}
-
-.house .tone-mist {
-  fill: var(--sc-mist);
-}
-
-.house .tone-bone {
-  fill: var(--sc-bone);
-}
-
-.house .tone-candle {
-  fill: var(--sc-candle);
-}
-
-.house .tone-brass {
-  fill: var(--sc-brass);
-}
-
-.house .tone-rust {
-  fill: var(--sc-rust);
-}
-
-/* L0 sky: Night at the top to Slate at the horizon. */
-.house .stop-night {
-  stop-color: var(--sc-night);
-}
-
-.house .stop-slate {
-  stop-color: var(--sc-slate);
-}
-
-/* L1 moon halo, clouds; L2 far hills: paler and bluer with distance. */
-.house .stop-halo-0 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: var(--sc-depth-cloud);
-}
-
-.house .stop-halo-mid {
-  stop-color: var(--sc-spectral);
-  stop-opacity: 0.12;
-}
-
-/* Hill crests catch less moonlight than the house edges. */
-.house .rim.rim-hill {
-  stroke-width: 1.5;
-  opacity: var(--sc-fg-rim-opacity);
-}
-
-.house .stop-halo-1 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: 0;
-}
-
-.house .stop-crater-0 {
-  stop-color: var(--sc-mist);
-  stop-opacity: 0.22;
-}
-
-.house .stop-crater-1 {
-  stop-color: var(--sc-mist);
-  stop-opacity: 0;
-}
-
-.house .stop-abyss {
-  stop-color: var(--sc-abyss);
-}
-
-.house .hill-far {
-  opacity: var(--sc-depth-hill-far);
-}
-
-.house .hill-near {
-  opacity: var(--sc-depth-hill-near);
-}
-
-/* L4 house: lines drawn by stroke only. */
-.house .gauge-needle {
-  stroke: var(--sc-night);
-  stroke-width: 2;
-}
-
-/* A few bricks only suggest the basement wall. */
-.house .brick {
-  fill: var(--sc-mist);
-  opacity: 0.18;
-}
-
-.house .cobweb {
-  stroke: var(--sc-bone);
-  stroke-width: 1;
-  opacity: 0.4;
-}
-
-.house .oculus-bars {
-  stroke: var(--sc-mist);
-  stroke-width: 3;
-}
-
-/* The oculus glows faintly cold; motion.css makes it flicker. */
-.house .oculus-light {
-  fill: var(--sc-cold-blue);
-  opacity: 0.8;
-}
-
-/* The tower: a Candle pointed arch with a warm glow, and an iron weathervane. */
-.house .tower-arch-glass {
-  fill: var(--sc-candle);
-}
-
-.house .tower-arch-bars,
-.house .vane {
-  stroke: var(--sc-night);
-  stroke-width: 3;
-}
-
-/* Light: rooms brighter near their light and almost black in the corners. */
-.house .stop-room-0 {
-  stop-color: var(--sc-slate);
-}
-
-.house .stop-room-1 {
-  stop-color: var(--sc-abyss);
-}
-
-/* The hall: very dark blue, never black. */
-.house .stop-hall-0 {
-  stop-color: var(--sc-slate);
-}
-
-.house .stop-hall-1 {
-  stop-color: var(--sc-night);
-}
-
-.house .stop-warmth-0,
-.house .stop-cone-0 {
-  stop-color: var(--sc-warm-orange);
-  stop-opacity: 0.38;
-}
-
-/* Three nested beam layers at 0.08 each give about 0.22 on the axis and soft sides. */
-.house .stop-cone-0 {
-  stop-opacity: 0.08;
-}
-
-.house .stop-warmth-1,
-.house .stop-cone-1 {
-  stop-color: var(--sc-warm-orange);
-  stop-opacity: 0;
-}
-
-/* Moonlight through the oculus: pale blue, very faint, normal blending. */
-.house .stop-moonbeam-0 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: 0.12;
-}
-
-.house .stop-moonbeam-1 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: 0;
-}
-
-.house .mote {
-  fill: var(--sc-spectral);
-  opacity: 0.45;
-}
-
-.house .stop-lamp-0 {
-  stop-color: var(--sc-warm-orange);
-  stop-opacity: 0.5;
-}
-
-.house .stop-lamp-1 {
-  stop-color: var(--sc-warm-orange);
-  stop-opacity: 0;
-}
-
-/* Cellar: a bent iron flue with a Brass valve, wooden stairs under the hatch. */
-.house .pipe {
-  stroke: var(--sc-mist);
-  stroke-width: 9;
-}
-
-.house .valve-wheel {
-  stroke: var(--sc-brass);
-  stroke-width: 2;
-}
-
-.house .tread {
-  fill: var(--sc-brass);
-}
-
-.house .stringer {
-  fill: var(--sc-rust);
-}
-
-.house .stringer-back {
-  fill: var(--sc-night);
-}
-
-.house .chain-link,
-.house .chain-ring {
-  stroke: var(--sc-mist);
-  stroke-width: 2;
-}
-
-/* Rim light: only the moon-facing edges, no filter (Requirement 20.2). */
-.house .rim {
-  stroke: var(--sc-rim);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: var(--sc-rim-opacity);
-}
-
-/* Weather: thin rain and two fog bands. */
+/* Weather overlay above the picture: thin rain and soft fog, no filter. */
 .house .rain-streaks {
   stroke: var(--sc-spectral);
   stroke-width: 1.5;
@@ -334,12 +112,6 @@
 .house .stop-fog-1 {
   stop-color: var(--sc-mist);
   stop-opacity: 0;
-}
-
-/* L5 foreground: Night silhouettes with a fainter, thinner rim. */
-.house .rim-fg .rim {
-  stroke-width: 1.5;
-  opacity: var(--sc-fg-rim-opacity);
 }
 
 /* A Night overlay over each floor; shown on the two other floors of a Floor_Scene (D3). */

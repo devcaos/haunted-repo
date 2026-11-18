@@ -2,161 +2,67 @@
  * Motion of the Scenic_Renderer. Animations and transitions live only inside
  * the two prefers-reduced-motion blocks, so nothing moves by accident.
  * Keyframes touch only transform and opacity (Requirement 20.1).
+ * The scene illustration is a still picture: only the page's own overlay
+ * (rain, fog) and the ghosts move.
  */
-
 /* Rain falls by exactly one step of its pattern, so the loop never jumps. */
 @keyframes rain-fall {
   from {
     transform: translate(0, 0);
   }
-
   to {
     transform: translate(var(--sc-rain-step-x), var(--sc-rain-step-y));
   }
 }
-
 @keyframes fog-drift {
   from {
     transform: translateX(calc(-1 * var(--sc-fog-shift)));
   }
-
   to {
     transform: translateX(var(--sc-fog-shift));
   }
 }
-
-/* The flames stretch and lean a little; the room light breathes on the same beat. */
-@keyframes flame-lick {
-  0%,
-  100% {
-    transform: scaleY(1) skewX(0deg);
-  }
-
-  35% {
-    transform: scaleY(1.07) skewX(-3deg);
-  }
-
-  70% {
-    transform: scaleY(0.96) skewX(2deg);
-  }
-}
-
-@keyframes room-breathe {
-  0%,
-  100% {
-    opacity: 0.85;
-  }
-
-  35% {
-    opacity: 1;
-  }
-
-  70% {
-    opacity: 0.78;
-  }
-}
-
-@keyframes mote-drift {
-  from {
-    transform: translate(0, 0);
-  }
-
-  to {
-    transform: translate(var(--sc-mote-drift-x), var(--sc-mote-drift-y));
-  }
-}
-
-@keyframes window-flicker {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-
-  50% {
-    opacity: 0.9;
-  }
-}
-
 /* A slow levitation with a slight sway: eerie, not playful. */
 @keyframes wisp-float {
   0%,
   100% {
     transform: translateY(0) rotate(-1.5deg);
   }
-
   50% {
     transform: translateY(var(--sc-float-rise)) rotate(1.5deg);
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
   /* press: a small, quick push on every button (Game-feel rule 1). */
   .scenic button {
     transition: transform var(--sc-dur-press) var(--sc-ease-out);
   }
-
   .scenic button:active {
     transform: translateY(var(--sc-line)) scale(0.98);
   }
-
   .house .rain {
     animation: rain-fall var(--sc-dur-rain-fall) var(--sc-ease-linear) infinite;
   }
-
   .house .rain-far {
     animation-duration: var(--sc-dur-rain-far);
   }
-
-  /* One animation moves every mote, so the running count stays low. */
-  .house .dust-motes {
-    animation: mote-drift var(--sc-dur-motes) var(--sc-ease-in-out) infinite
-      alternate;
-  }
-
-  .house .flames,
-  .house .flame-core {
-    transform-box: fill-box;
-    transform-origin: bottom;
-    animation: flame-lick var(--sc-dur-flame-flicker) var(--sc-ease-in-out)
-      infinite;
-  }
-
-  /* The inner flame runs faster, so the two never move as one shape. */
-  .house .flame-core {
-    animation-duration: var(--sc-dur-flame-core);
-  }
-
-  .house .fire-light {
-    animation: room-breathe var(--sc-dur-flame-flicker) var(--sc-ease-in-out)
-      infinite;
-  }
-
   .house .fog {
     animation: fog-drift var(--sc-dur-fog-drift) var(--sc-ease-in-out) infinite
       alternate;
   }
-
-  .house .oculus-light,
-  .house .tower-glow {
-    animation: window-flicker var(--sc-dur-window-flicker) steps(4) infinite;
-  }
-
   .ghost--wisp .ghost-idle {
     transform-box: fill-box;
     transform-origin: center;
     animation: wisp-float var(--sc-dur-wisp-float) var(--sc-ease-in-out)
       infinite;
   }
-
   /* Negative delays start neighbouring ghosts at other points of the loop. */
   .ghost-phase-1 .ghost-idle {
     animation-delay: calc(-1 * var(--sc-delay-phase-1));
   }
-
   .ghost-phase-2 .ghost-idle {
     animation-delay: calc(-2 * var(--sc-delay-phase-1));
   }
-
   .ghost-phase-3 .ghost-idle {
     animation-delay: calc(-3 * var(--sc-delay-phase-1));
   }
@@ -165,19 +71,12 @@
     animation: none;
   }
 }
-
-/* Reduced_Motion: rain, fog and the oculus are drawn still (D9). */
+/* Reduced_Motion: rain and fog are drawn still (D9). */
 @media (prefers-reduced-motion: reduce) {
   .scenic .house .rain {
     opacity: var(--sc-rain-still);
   }
-
   .scenic .house .fog {
     opacity: var(--sc-fog-still);
-  }
-
-  .scenic .house .oculus-light,
-  .scenic .house .tower-glow {
-    opacity: 0.8;
   }
 }

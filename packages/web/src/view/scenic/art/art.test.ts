@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 import {
   circle,
   defs,
@@ -16,7 +16,6 @@ import {
 import type { Floor } from "@haunted-repo/core";
 import type { GhostState } from "../../../logic/viewModel.js";
 import {
-  FLOOR_RECT,
   GHOST_BOX,
   GHOST_TYPE_OF,
   SLOT_BAND,
@@ -29,28 +28,13 @@ import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
-  BODY,
-  FLOOR_CLASS,
-  HATCH,
-  ROOF,
-  ROOF_INNER,
-  ROOF_RIM,
-  TOWER,
-  WALL,
-  beamPolygon,
-  houseLayer,
+  GROUND_Y,
+  HOUSE_OUTLINE,
+  atticClip,
+  sceneBackdrop,
 } from "./house.js";
 import { FLOOR_LINE, chainedDoorArt, slotArt } from "./props.js";
-import {
-  MOON,
-  RAIN_BOTTOM,
-  RAIN_STEP,
-  foregroundLayer,
-  rainPath,
-  skyLayers,
-  weatherLayer,
-} from "./sky.js";
-
+import { RAIN_BOTTOM, RAIN_STEP, rainPath, weatherLayer } from "./weather.js";
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
 const KINDS = new Set<string>([
@@ -236,105 +220,6 @@ describe("Shape_Data rules", () => {
   });
 });
 
-describe("sky, weather and foreground (Requirement 3.3)", () => {
-  it("every tree passes the Shape_Data rules", () => {
-    for (const tree of [skyLayers(), weatherLayer(), foregroundLayer()]) {
-      expect(shapeProblems(tree)).toEqual([]);
-    }
-  });
-
-  it("draws the depth layers back to front and the groups motion needs", () => {
-    const layers = skyLayers()
-      .children?.filter((n) => n.kind === "g")
-      .map((n) => n.cls);
-    expect(layers).toEqual(["sky", "moon-sky", "hills-far", "hills-near"]);
-    expect(classesOf(skyLayers())).toContain("moon");
-    expect(classesOf(skyLayers())).not.toContain("cloud");
-    expect(classesOf(foregroundLayer())).toEqual(
-      expect.arrayContaining(["fence", "dead-tree", "rim-fg"]),
-    );
-  });
-
-  it("hides the left edge of the moon behind the spire, inside a wide halo", () => {
-    const spire = nodesOf(houseLayer()).find((n) => n.part === "spire");
-    const pts = spire?.points ?? [];
-    const d = `M${pts.slice(0, 2).join(" ")} L${pts.slice(2, 4).join(" ")} L${pts.slice(4).join(" ")} Z`;
-    expect(winding(d, [MOON.cx - MOON.r + 6, MOON.cy])).not.toBe(0);
-    expect(winding(d, [MOON.cx, MOON.cy])).toBe(0);
-    const halo = nodesOf(skyLayers()).find((n) => n.cls === "moon-halo");
-    expect(halo?.r).toBeGreaterThan(8 * MOON.r);
-    // Craters fade out to their rims instead of ending in a hard edge.
-    const sky = nodesOf(skyLayers());
-    const blotches = sky.filter((n) => n.cls === "moon-shade");
-    expect(blotches.length).toBeGreaterThanOrEqual(3);
-    for (const crater of blotches) {
-      expect(sky.find((n) => n.id === crater.paint)?.kind).toBe(
-        "radialGradient",
-      );
-      // Irregular: tilted and not round.
-      expect(crater.transform?.rotate).not.toBe(0);
-      expect(crater.rx).not.toBe(crater.ry);
-    }
-  });
-
-  it("lights only the hill crests that face the moon, on the hill outline", () => {
-    for (const hill of ["far", "near"]) {
-      const rim = nodesOf(skyLayers()).find((n) => n.part === `rim-${hill}`);
-      const outline = nodesOf(skyLayers()).find(
-        (n) => n.part === `hill-${hill}`,
-      );
-      const [start] = pathPoints(rim?.d ?? "");
-      expect(outline?.d).toContain(
-        (rim?.d ?? "").slice(`M${start?.join(" ")} `.length),
-      );
-      expect(start?.[0]).toBeGreaterThan(900); // the moon is on the right
-    }
-  });
-
-  it("puts the far hill higher than the near one, behind it", () => {
-    const top = (part: string): number =>
-      Math.min(
-        ...pathPoints(
-          nodesOf(skyLayers()).find((n) => n.part === part)?.d ?? "",
-        ).map(([, y]) => y),
-      );
-    expect(top("hill-far")).toBeLessThan(top("hill-near") - 60);
-  });
-
-  it("builds the dead tree from polygons that taper to sharp tips", () => {
-    const tree = nodesOf(foregroundLayer()).find((n) => n.part === "dead-tree");
-    const limbs = tree?.children ?? [];
-    expect(limbs.length).toBeGreaterThanOrEqual(6);
-    for (const limb of limbs) {
-      expect(limb.kind).toBe("polygon");
-      const pts = limb.points ?? [];
-      const half = pts.length / 2;
-      // The tip is where both sides meet: points half-1 and half are the same.
-      expect([pts[half - 2], pts[half - 1]]).toEqual([
-        pts[half],
-        pts[half + 1],
-      ]);
-      // The base is the widest part of the limb.
-      const baseWidth = Math.hypot(
-        (pts[0] ?? 0) - (pts.at(-2) ?? 0),
-        (pts[1] ?? 0) - (pts.at(-1) ?? 0),
-      );
-      expect(baseWidth).toBeGreaterThan(5);
-    }
-  });
-
-  it("draws the fog as soft gradient puffs in two drifting groups", () => {
-    const weather = nodesOf(weatherLayer());
-    const fogs = weather.filter((n) => n.cls?.startsWith("fog "));
-    expect(fogs.map((n) => n.cls)).toEqual(["fog fog-back", "fog fog-front"]);
-    for (const puff of fogs.flatMap((n) => n.children ?? [])) {
-      expect(puff.kind).toBe("ellipse");
-      const fill = weather.find((n) => n.id === puff.paint);
-      expect(fill?.kind).toBe("radialGradient");
-    }
-  });
-});
-
 describe("rain loop (Requirement 3.3)", () => {
   it("one step of rain-fall lands every streak on another, so the loop never jumps", () => {
     const [sx, sy] = RAIN_STEP;
@@ -378,11 +263,15 @@ function winding(d: string, [px, py]: [number, number]): number {
   return total;
 }
 
-describe("rain clip (Requirement 3.3)", () => {
+describe("weather overlay (Requirement 3.3)", () => {
   const weather = weatherLayer();
   const wrap = nodesOf(weather).find((n) => n.cls === "rain-wrap");
   const clip = nodesOf(weather).find((n) => n.id === wrap?.clip);
   const d = clip?.children?.[0]?.d ?? "";
+
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(weather)).toEqual([]);
+  });
 
   it("the still wrapper holds the clip; only the two layers inside it move", () => {
     expect(wrap?.clip).toBe("rain-sky");
@@ -392,28 +281,37 @@ describe("rain clip (Requirement 3.3)", () => {
     ]);
   });
 
-  it("lets rain fall only on the sky outside the house and above the ground", () => {
+  it("lets rain fall only on the sky outside the illustrated house and above the ground", () => {
     const sky: [number, number][] = [
-      [420, 300],
-      [1209, 600],
+      [200, 300],
       [1400, 500],
-      [870, 120],
-      [1000, 205],
+      [756, 100],
+      [1060, 300], // right of the roof, left of the tower
+      [1300, 650],
     ];
     const solid: [number, number][] = [
-      [870, 600],
-      [600, 420],
-      [1028, 240],
-      [1268, 500],
-      [1268, 200],
-      [870, 170],
-      [300, 800],
-      [1268, 900],
-      [1210, 690], // inside the tower beam, between house and tower
-      [1220, 640],
+      [756, 300], // attic
+      [700, 600], // middle floor
+      [1178, 200], // tower spire
+      [1178, 600], // tower shaft
+      [700, 800], // basement, under the ground
+      [100, GROUND_Y + 5],
     ];
     for (const p of sky) expect(winding(d, p), `${p}`).not.toBe(0);
     for (const p of solid) expect(winding(d, p), `${p}`).toBe(0);
+    // The outline stands on the ground line.
+    const ys = HOUSE_OUTLINE.filter((_, i) => i % 2 === 1);
+    expect(Math.max(...ys)).toBe(GROUND_Y);
+  });
+
+  it("draws the fog as soft gradient puffs in two drifting groups", () => {
+    const all = nodesOf(weather);
+    const fogs = all.filter((n) => n.cls?.startsWith("fog "));
+    expect(fogs.map((n) => n.cls)).toEqual(["fog fog-back", "fog fog-front"]);
+    for (const puff of fogs.flatMap((n) => n.children ?? [])) {
+      expect(puff.kind).toBe("ellipse");
+      expect(all.find((n) => n.id === puff.paint)?.kind).toBe("radialGradient");
+    }
   });
 });
 
@@ -442,97 +340,38 @@ function pointsOf(tree: ShapeNode): [number, number][] {
   });
 }
 
-describe("house (Requirements 3.1, 3.4)", () => {
-  it("passes the Shape_Data rules", () => {
-    expect(shapeProblems(houseLayer())).toEqual([]);
+describe("scene backdrop (director's decision, 18 Nov)", () => {
+  const href = "/haunted-repo/assets/house-scene-B1x_9.svg";
+
+  it("is one image over the whole viewBox, with nothing parsed from it", () => {
+    const art = sceneBackdrop(href);
+    expect(art).toEqual({
+      kind: "image",
+      cls: "scene-art",
+      href,
+      x: 0,
+      y: 0,
+      width: 1600,
+      height: 1000,
+    });
+    expect(shapeProblems(art)).toEqual([]);
   });
 
-  it("each floor group's room back is the Scene_Layout floor rectangle", () => {
-    for (const floor of ["attic", "middle floor", "basement"] as const) {
-      const group = nodesOf(houseLayer()).find(
-        (n) => n.part === FLOOR_CLASS[floor],
-      );
-      const back = group?.children?.find((n) => n.part === "room-back");
-      const { x, y, w, h } = FLOOR_RECT[floor];
-      expect(back).toMatchObject({ kind: "rect", x, y, width: w, height: h });
-    }
+  it("falls back to a plain token-colour rectangle without the file", () => {
+    const art = sceneBackdrop(null);
+    expect(art).toEqual(rect("scene-fallback", 0, 0, 1600, 1000));
+    expect(art.href).toBeUndefined();
+    expect(shapeProblems(art)).toEqual([]);
   });
 
-  it("is not a mirror image about the vertical centre line", () => {
-    const scene = [skyLayers(), houseLayer(), foregroundLayer()];
-    const points = scene.flatMap(pointsOf);
-    const seen = new Set(points.map(([x, y]) => `${x},${y}`));
-    const twins = points.filter(([x, y]) => seen.has(`${1600 - x},${y}`));
-    expect(twins.length).toBeLessThan(points.length / 2);
-  });
-
-  it("has a symmetric gable over the body centre, with the rim on its edge", () => {
-    const [l, ly, rx, ry, r, rY] = ROOF;
-    expect(ly).toBe(rY);
-    expect(rx - l).toBe(r - rx);
-    expect(rx).toBe((BODY.left + BODY.right) / 2);
-    const [il, ily, irx, iry, ir, irY] = ROOF_INNER;
-    expect([ily, irY, irx]).toEqual([ly, ly, rx]);
-    expect(irx - il).toBe(ir - irx);
-    expect(iry).toBeGreaterThan(ry);
-    // Both lines have the same slope, so the band keeps one thickness.
-    expect((ly - iry) / (irx - il)).toBeCloseTo((ly - ry) / (rx - l), 2);
-    const roof = nodesOf(houseLayer()).find((n) => n.part === "roof");
-    expect(roof?.d).toContain(`M${l} ${ly} L${rx} ${ry} L${r} ${ly}`);
-    const rim = nodesOf(houseLayer()).find((n) => n.part === "roof-rim");
-    expect(rim?.d).toBe(`M${rx} ${ry} L${r} ${ly}`);
-    expect(ROOF_RIM).toBe(rim?.d);
-  });
-
-  it("has an upright tower apart from the roof, with a centred spire, vane and lit arch", () => {
-    const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
-    const inTower = tower === undefined ? [] : nodesOf(tower);
-    expect(inTower.filter((n) => n.transform !== undefined)).toEqual([]);
-    const spire = inTower.find((n) => n.part === "spire")?.points ?? [];
-    const centre = TOWER.x + TOWER.w / 2;
-    expect([spire[4], spire[5]]).toEqual([centre, TOWER.apex]);
-    expect(centre - (spire[0] ?? 0)).toBe((spire[2] ?? 0) - centre);
-    expect(TOWER.x).toBeGreaterThan(ROOF[4]); // clear of the right eave
-    const parts = inTower.map((n) => n.part);
-    expect(parts).toEqual(
-      expect.arrayContaining([
-        "weathervane",
-        "tower-arch",
-        "plinth",
-        "tower-door",
-      ]),
-    );
-    const plinth = inTower.find((n) => n.part === "plinth");
-    expect((plinth?.y ?? 0) + (plinth?.height ?? 0)).toBe(TOWER.foot);
-    expect(plinth?.width ?? 0).toBeGreaterThan(TOWER.w);
-    const door = inTower.find((n) => n.part === "tower-door");
-    expect(pathPoints(door?.d ?? "").at(-1)?.[1]).toBe(TOWER.foot);
-  });
-
-  it("tilts the tower beam down and to the left, opening as it falls", () => {
-    const [ax, ay, , , bx, by, cx] = beamPolygon();
-    const midTop = (ax ?? 0) + 12;
-    const midEnd = ((bx ?? 0) + (cx ?? 0)) / 2;
-    expect(midEnd).toBeLessThan(midTop - 30);
-    expect(by).toBeGreaterThan(ay ?? 0);
-    expect((bx ?? 0) - (cx ?? 0)).toBeGreaterThan(3 * 24);
-  });
-
-  it("softens the tower beam: nested layers that fade out before the ground", () => {
-    const layers = nodesOf(houseLayer()).filter((n) =>
-      n.cls?.startsWith("light-cone "),
-    );
-    expect(layers).toHaveLength(3);
-    const widths = layers.map(
-      (n) => (n.points?.[4] ?? 0) - (n.points?.[6] ?? 0),
-    );
-    expect(widths[0]).toBeGreaterThan(widths[1] ?? 0);
-    expect(widths[1]).toBeGreaterThan(widths[2] ?? 0);
-    const fade = nodesOf(houseLayer()).find((n) => n.id === layers[0]?.paint);
-    expect(fade?.y2).toBeLessThan(TOWER.foot);
-    expect(
-      Math.max(...beamPolygon().filter((_, i) => i % 2 === 1)),
-    ).toBeLessThan(TOWER.foot);
+  it("keeps the attic dim clip a valid Shape_Data tree", () => {
+    const tree = g("dims", [
+      defs([atticClip()]),
+      rect("dim", ATTIC_BACK.x, ATTIC_BACK.y, ATTIC_BACK.w, ATTIC_BACK.h, {
+        clip: ATTIC_CLIP,
+      }),
+    ]);
+    expect(shapeProblems(tree)).toEqual([]);
   });
 });
 
@@ -747,326 +586,7 @@ function boxOf(node: ShapeNode): Box | null {
   };
 }
 
-function overlaps(a: Box, b: Box): boolean {
-  return a.x1 < b.x2 && b.x1 < a.x2 && a.y1 < b.y2 && b.y1 < a.y2;
-}
-
-/** The furniture of one floor: every leaf of its group except the room back and its lights. */
-function furnitureOf(floor: Floor): ShapeNode[] {
-  const group = nodesOf(houseLayer()).find(
-    (n) => n.part === FLOOR_CLASS[floor],
-  );
-  return nodesOf(group ?? g("none", [])).filter(
-    (n) =>
-      n.children === undefined &&
-      !(n.cls ?? "").startsWith("room-back") &&
-      !/light|mote/.test(n.cls ?? ""),
-  );
-}
-
-describe("furniture and slot panes (Requirement 12.5)", () => {
-  /** Every pane frame of a floor for 1 to 5 Cards. */
-  const panes = (floor: Floor): Box[] =>
-    [1, 2, 3, 4, 5].flatMap((count) =>
-      slotRects(floor, count).flatMap((rect, index) => {
-        const slot: SlotPlacement = {
-          key: `${floor}#${index}`,
-          floor,
-          index,
-          variant: 0,
-          ghostType: GHOST_TYPE_OF[floor],
-          path: "a.ts",
-          state: "locked",
-          rect,
-          ghostScale: 1,
-        };
-        // The frame and the wider sill both count.
-        return nodesOf(slotArt(slot))
-          .filter((n) => n.cls === "pane-frame" || n.cls === "pane-sill")
-          .flatMap((n) => boxOf(n) ?? []);
-      }),
-    );
-
-  it("no pane covers furniture, whatever the number of Cards", () => {
-    for (const floor of ["attic", "middle floor", "basement"] as const) {
-      const hits = furnitureOf(floor).filter((n) => {
-        const box = boxOf(n);
-        return box !== null && panes(floor).some((p) => overlaps(p, box));
-      });
-      expect(hits.map((n) => `${floor}: ${n.cls ?? n.kind}`)).toEqual([]);
-    }
-  });
-});
-
-describe("simple, iconic silhouettes (art review, item 13)", () => {
-  const FORBIDDEN =
-    /brick-wall|stone-joint|grain|wood|lightning|bolt|human|person|figure|ornate|carving|filigree/;
-  const trees = [
-    skyLayers(),
-    houseLayer(),
-    weatherLayer(),
-    foregroundLayer(),
-    ghostArt("wisp", 0, "haunted"),
-    ...["attic", "middle floor", "basement"].map((f) =>
-      chainedDoorArt(f as Floor),
-    ),
-  ];
-
-  it("draws no individual brick wall, wood texture, lightning, people or ornate furniture", () => {
-    const names = trees.flatMap((tree) =>
-      nodesOf(tree).flatMap((n) => [
-        ...(n.cls?.split(" ") ?? []),
-        n.part ?? "",
-      ]),
-    );
-    expect(names.filter((name) => FORBIDDEN.test(name))).toEqual([]);
-    expect(names.filter((name) => name === "brick").length).toBeLessThanOrEqual(
-      5,
-    );
-  });
-
-  it("keeps every piece of furniture to a few shapes", () => {
-    for (const floor of ["attic", "middle floor", "basement"] as const) {
-      const group = nodesOf(houseLayer()).find(
-        (n) => n.part === FLOOR_CLASS[floor],
-      );
-      const PIECES =
-        /^(?:trunk|telephone-table|shelves|fireplace|boiler|chain)\b/;
-      const pieces = nodesOf(group ?? g("none", [])).filter((n) =>
-        PIECES.test(n.cls ?? ""),
-      );
-      expect(pieces.length).toBeGreaterThan(0);
-      for (const piece of pieces) {
-        const leaves = nodesOf(piece).filter((n) => n.children === undefined);
-        expect(leaves.length, `${floor}: ${piece.cls}`).toBeLessThanOrEqual(14);
-      }
-    }
-  });
-});
-
-describe("attic volume (art review 3, item 10)", () => {
-  const all = nodesOf(houseLayer());
-  const clip = all.find((n) => n.id === ATTIC_CLIP)?.children?.[0];
-  const pts = clip?.points ?? [];
-  const pairs = pts.flatMap((v, i) =>
-    i % 2 === 0 ? [`${v} ${pts[i + 1]}`] : [],
-  );
-  const inside = `M${pairs.join(" L")} Z`;
-
-  it("rises to the ridge with no flat ceiling, and holds the round window", () => {
-    const attic = all.find((n) => n.part === FLOOR_CLASS.attic);
-    const backs = (attic?.children ?? []).filter((n) =>
-      n.cls?.startsWith("room-back"),
-    );
-    expect(Math.min(...backs.map((n) => n.y ?? 0))).toBe(ROOF_INNER[3]);
-    const oculus = nodesOf(attic ?? g("none", [])).find(
-      (n) => n.part === "oculus",
-    );
-    const frame = oculus?.children?.[0];
-    expect(
-      winding(inside, [frame?.cx ?? 0, (frame?.cy ?? 0) - (frame?.r ?? 0)]),
-    ).not.toBe(0);
-  });
-
-  it("is a clean triangle: no beam or line spans the attic", () => {
-    const attic = all.find((n) => n.part === FLOOR_CLASS.attic);
-    const names = classesOf(attic ?? g("none", []));
-    expect(names).not.toContain("beams");
-    // No furniture wider than half the attic (a tie beam or a ceiling line would be).
-    for (const n of furnitureOf("attic")) {
-      const box = boxOf(n);
-      if (box !== null)
-        expect(box.x2 - box.x1, `${n.cls}`).toBeLessThan(ATTIC_BACK.w / 2);
-    }
-  });
-
-  it("keeps every piece of attic furniture inside the attic shape", () => {
-    for (const n of furnitureOf("attic")) {
-      const box = boxOf(n);
-      if (box === null) continue;
-      for (const corner of [
-        [box.x1, box.y1],
-        [box.x2, box.y1],
-      ] as [number, number][]) {
-        expect(winding(inside, corner), `${n.cls}`).not.toBe(0);
-      }
-    }
-  });
-});
-
-describe("small interior story (art review 3, item 9)", () => {
-  const all = nodesOf(houseLayer());
-
-  it("tilts the portrait and some books, and puts an unlit candlestick on the mantel", () => {
-    expect(all.find((n) => n.part === "portrait")?.transform?.rotate).not.toBe(
-      0,
-    );
-    const leaning = all.filter((n) => n.part === "leaning-book");
-    expect(leaning.length).toBeGreaterThan(0);
-    for (const book of leaning) expect(book.transform?.rotate).not.toBe(0);
-    const heights = new Set(
-      all.filter((n) => n.cls?.startsWith("books")).map((n) => n.height),
-    );
-    expect(heights.size).toBeGreaterThan(5);
-    const stick = all.find((n) => n.part === "candlestick");
-    const base = stick?.children?.find((n) => n.cls === "candle-base");
-    expect((base?.y ?? 0) + (base?.height ?? 0)).toBe(636); // stands on the mantel
-    expect(
-      classesOf(stick ?? g("none", [])).some((c) =>
-        /flame|pumpkin|candle-light/.test(c),
-      ),
-    ).toBe(false);
-  });
-});
-
-describe("walls with weight (Requirement 3.1)", () => {
-  it("gives floors, foundation, partition and outer walls 8 to 12 units", () => {
-    const parts = nodesOf(houseLayer()).find((n) => n.part === "structure");
-    for (const n of parts?.children ?? []) {
-      expect(Math.min(n.width ?? 0, n.height ?? 0)).toBe(WALL);
-    }
-    const partition = nodesOf(houseLayer()).find((n) =>
-      n.cls?.startsWith("partition"),
-    );
-    const sides = [
-      FLOOR_RECT["middle floor"].x - BODY.left,
-      BODY.right -
-        (FLOOR_RECT["middle floor"].x + FLOOR_RECT["middle floor"].w),
-      partition?.width ?? 0,
-    ];
-    for (const t of sides) {
-      expect(t).toBeGreaterThanOrEqual(8);
-      expect(t).toBeLessThanOrEqual(12);
-    }
-  });
-});
-
-describe("light (Requirement 3.1)", () => {
-  const all = nodesOf(houseLayer());
-
-  it("the fire is two Bezier flames, the inner one inside the outer, in two moving groups", () => {
-    const group = all.find((n) => n.part === "flames");
-    const flames = nodesOf(group ?? g("none", [])).filter((n) =>
-      n.cls?.startsWith("flame "),
-    );
-    expect(flames).toHaveLength(2);
-    for (const flame of flames) expect(flame.d).toMatch(/C/);
-    const [outer, inner] = flames.map((n) => boxOf(n));
-    expect(inner?.x1 ?? 0).toBeGreaterThan(outer?.x1 ?? 0);
-    expect(inner?.x2 ?? 0).toBeLessThan(outer?.x2 ?? 0);
-    expect(inner?.y1 ?? 0).toBeGreaterThan(outer?.y1 ?? 0);
-    expect(classesOf(group ?? g("none", []))).toContain("flame-core");
-  });
-
-  it("every room back is a radial gradient", () => {
-    for (const back of all.filter((n) => n.part === "room-back")) {
-      expect(all.find((n) => n.id === back.paint)?.kind).toBe("radialGradient");
-    }
-  });
-
-  it("has no warm light leaving the roof; cold moonlight and dust enter the attic", () => {
-    expect(all.filter((n) => n.cls?.includes("roof-gap"))).toEqual([]);
-    const attic = nodesOf(
-      all.find((n) => n.part === FLOOR_CLASS.attic) ?? g("none", []),
-    );
-    const shafts = attic.filter((n) => n.cls === "moonlight");
-    expect(shafts).toHaveLength(2);
-    for (const shaft of shafts) {
-      const fill = attic.find((n) => n.id === shaft.paint);
-      expect(fill?.children?.map((s) => s.cls)).toEqual([
-        "stop-moonbeam-0",
-        "stop-moonbeam-1",
-      ]);
-    }
-    const motes = attic.find((n) => n.part === "dust-motes")?.children ?? [];
-    expect(motes.length).toBeGreaterThanOrEqual(6);
-    expect(motes.length).toBeLessThanOrEqual(8);
-  });
-});
-
-describe("basement in the ground (Requirement 3.1)", () => {
-  it("sits in one dark ground block across the whole width, with at most 5 bricks", () => {
-    const ground = nodesOf(houseLayer()).find((n) => n.part === "ground");
-    expect(ground).toMatchObject({ x: 0, y: 760, width: 1600, height: 240 });
-    expect(ground?.cls).toContain("tone-abyss");
-    const bricks = furnitureOf("basement").filter((n) => n.cls === "brick");
-    expect(bricks.length).toBeGreaterThanOrEqual(4);
-    expect(bricks.length).toBeLessThanOrEqual(5);
-  });
-
-  it("keeps the boiler well apart from the chained door", () => {
-    const boiler = nodesOf(houseLayer()).find((n) => n.cls === "boiler");
-    const boxes = (boiler?.children ?? []).flatMap((n) => boxOf(n) ?? []);
-    const door = nodesOf(chainedDoorArt("basement")).find(
-      (n) => n.cls === "door-panel",
-    );
-    const right = Math.max(...boxes.map((b) => b.x2));
-    expect((door?.x ?? 0) - right).toBeGreaterThan(100);
-  });
-});
-
-describe("nothing floats (Requirement 3.1)", () => {
-  const all = nodesOf(houseLayer());
-  const one = (cls: string): ShapeNode | undefined =>
-    all.find((n) => n.cls?.split(" ").includes(cls));
-
-  it("the lintel rests on a Brass door frame, and the door sits inside it", () => {
-    const [lintel, frame, door] = ["lintel", "door-frame", "door"].map(one);
-    expect((lintel?.y ?? 0) + (lintel?.height ?? 0)).toBe(frame?.y);
-    expect(lintel?.x).toBeLessThan(frame?.x ?? 0);
-    expect(door?.x).toBeGreaterThan(frame?.x ?? 0);
-    // Same tone, so the lintel and the jambs read as one surround.
-    expect(frame?.cls).toContain("tone-brass");
-    expect(lintel?.cls).toContain("tone-brass");
-  });
-
-  it("the hall is dark blue, not black, with warm light through the doorway", () => {
-    const hall = nodesOf(
-      all.find((n) => n.part === "entrance-hall") ?? g("none", []),
-    );
-    const back = hall.find((n) => n.cls === "hall-back");
-    const fill = hall.find((n) => n.id === back?.paint);
-    expect(fill?.children?.map((s) => s.cls)).toEqual([
-      "stop-hall-0",
-      "stop-hall-1",
-    ]);
-    expect(hall.some((n) => n.cls === "spill-light")).toBe(true);
-    const wall = all.find((n) => n.cls?.startsWith("partition"));
-    expect((wall?.y ?? 0) + (wall?.height ?? 0)).toBeLessThan(755);
-  });
-
-  it("the table legs stand on the middle floor and touch the top", () => {
-    const top = one("table-top");
-    const legs = all.filter((n) => n.cls === "table-leg");
-    expect(legs).toHaveLength(2);
-    for (const leg of legs) {
-      expect(leg.y).toBe((top?.y ?? 0) + (top?.height ?? 0));
-      expect((leg.y ?? 0) + (leg.height ?? 0)).toBe(755);
-    }
-  });
-
-  it("the cellar stairs start under an open hatch and reach the cellar floor", () => {
-    const slabs = all.filter((n) => n.cls === "floor-slab" && n.y === 755);
-    expect(slabs).toHaveLength(2);
-    const gapStart = Math.min(...slabs.map((n) => (n.x ?? 0) + (n.width ?? 0)));
-    const gapEnd = Math.max(...slabs.map((n) => n.x ?? 0));
-    expect([gapStart, gapEnd]).toEqual([HATCH.x1, HATCH.x2]);
-    const treads = all.filter((n) => n.cls === "tread");
-    const top = treads[0];
-    expect(top?.x ?? 0).toBeGreaterThanOrEqual(HATCH.x1);
-    expect(treads.at(-1)?.y).toBeGreaterThan(900);
-    expect(all.find((n) => n.part === "hatch-lid")).toBeDefined();
-  });
-
-  it("the flue bends twice, ends at a fitting and has a valve", () => {
-    const pipe = all.find((n) => n.cls === "pipe");
-    expect(pipe?.d?.match(/Q/g)).toHaveLength(2);
-    const end = pathPoints(pipe?.d ?? "").at(-1);
-    const fitting = one("pipe-fitting");
-    expect(end?.[1]).toBe((fitting?.y ?? 0) + (fitting?.height ?? 0));
-    expect(all.some((n) => n.cls === "valve")).toBe(true);
-  });
-
+describe("chained doors stand on their floor", () => {
   it("every chained door stands on its floor inside a frame, over a threshold", () => {
     for (const floor of ["attic", "middle floor", "basement"] as const) {
       const door = nodesOf(chainedDoorArt(floor));
@@ -1075,77 +595,6 @@ describe("nothing floats (Requirement 3.1)", () => {
       expect((panel?.y ?? 0) + (panel?.height ?? 0)).toBe(FLOOR_LINE[floor]);
       expect((sill?.y ?? 0) + (sill?.height ?? 0)).toBe(FLOOR_LINE[floor]);
       expect(door.some((n) => n.cls === "door-frame")).toBe(true);
-    }
-  });
-
-  it("each basement chain hangs from a ring under the iron wall bar, and ends above the floor", () => {
-    const joist = all.find((n) => n.part === "chain-bar");
-    for (const chain of all.filter((n) => n.cls === "chain")) {
-      const last = chain.children?.at(-1);
-      expect((last?.cy ?? 0) + (last?.ry ?? 0)).toBeLessThan(940);
-    }
-    const rings = all.filter((n) => n.cls === "chain-ring");
-    expect(rings).toHaveLength(2);
-    for (const ring of rings) {
-      const x = ring.cx ?? 0;
-      expect(x).toBeGreaterThan(joist?.x ?? 0);
-      expect(x).toBeLessThan((joist?.x ?? 0) + (joist?.width ?? 0));
-      expect((ring.cy ?? 0) - (ring.r ?? 0)).toBe(
-        (joist?.y ?? 0) + (joist?.height ?? 0),
-      );
-    }
-  });
-
-  it("the foreground has no lantern post and the weather no fog bands", () => {
-    expect(nodesOf(foregroundLayer()).map((n) => n.part)).not.toContain(
-      "lantern",
-    );
-    const fog = nodesOf(weatherLayer()).filter((n) => n.cls?.includes("fog"));
-    expect(fog.filter((n) => n.kind === "path")).toEqual([]);
-  });
-});
-
-describe("rooms (Requirements 3.1, 3.2)", () => {
-  const part = (name: string): ShapeNode | undefined =>
-    nodesOf(houseLayer()).find((n) => n.part === name);
-  // Left and right edges of the rects, circles and ellipses of a part. Paths
-  // are skipped: the books (relative path data) sit inside their bookcase rect.
-  const xs = (name: string): number[] =>
-    nodesOf(part(name) ?? g("none", [])).flatMap((n) => {
-      if (n.kind.endsWith("Gradient")) return []; // paint, not a shape
-      const tx = n.transform?.translate?.[0] ?? 0; // leaning books are placed by translate
-      if (n.kind === "rect")
-        return [tx + (n.x ?? 0), tx + (n.x ?? 0) + (n.width ?? 0)];
-      const r = n.rx ?? n.r ?? 0;
-      return n.cx === undefined ? [] : [n.cx - r, n.cx + r];
-    });
-
-  it("the Entrance_Hall, with the front door and the table, is left of the Parlour", () => {
-    expect(Math.max(...xs("entrance-hall"))).toBeLessThanOrEqual(760);
-    expect(Math.min(...xs("parlour"))).toBeGreaterThanOrEqual(760);
-    const hall = part("entrance-hall");
-    expect(hall === undefined ? [] : classesOf(hall)).toEqual(
-      expect.arrayContaining(["door", "telephone-table"]),
-    );
-  });
-
-  it("each floor holds its furniture", () => {
-    const furniture = {
-      attic: ["oculus", "cobweb", "trunk"],
-      "middle floor": [
-        "door",
-        "telephone-table",
-        "fireplace",
-        "shelves",
-        "portrait-frame",
-      ],
-      basement: ["brick", "boiler", "pipe", "chain"],
-    } as const;
-    for (const [floor, names] of Object.entries(furniture)) {
-      const group = part(FLOOR_CLASS[floor as keyof typeof furniture]);
-      expect(group === undefined ? [] : classesOf(group)).toEqual(
-        expect.arrayContaining([...names]),
-      );
     }
   });
 });

@@ -1,9 +1,14 @@
 import type { Floor } from "@haunted-repo/core";
 import type { Scene } from "../../logic/viewModel.js";
+import {
+  ATTIC_BACK,
+  ATTIC_CLIP,
+  atticClip,
+  sceneBackdrop,
+} from "./art/house.js";
 import { chainedDoorArt, slotArt } from "./art/props.js";
-import { ATTIC_BACK, ATTIC_CLIP, houseLayer } from "./art/house.js";
-import { g, rect } from "./art/shapes.js";
-import { foregroundLayer, skyLayers, weatherLayer } from "./art/sky.js";
+import { defs, g, rect } from "./art/shapes.js";
+import { weatherLayer } from "./art/weather.js";
 import { el } from "./dom.js";
 import { cameraFor, cssTransform, type ViewportClass } from "./model/camera.js";
 import { FLOOR_RECT, type SceneLayout } from "./model/sceneLayout.js";
@@ -42,12 +47,13 @@ function slotSignature(layout: SceneLayout): string {
 
 /**
  * Builds the stage once: `main.stage` > `div.scene-bar` and `div.world` (the
- * Camera) > one `svg.house` with its layers back to front (design "Art
- * System") and `div.world-overlay`. Each render changes only attributes,
- * classes and the Camera transform; the slot layer is rebuilt only when the
- * slot signature changes, so idle animations do not restart.
+ * Camera) > one `svg.house` with its layers back to front (the illustration,
+ * slots, dims, telephone, weather, effects) and `div.world-overlay`. Each
+ * render changes only attributes, classes and the Camera transform; the slot
+ * layer is rebuilt only when the slot signature changes, so idle animations
+ * do not restart.
  */
-export function createStage(): Stage {
+export function createStage(sceneHref: string | null): Stage {
   const svg = createSvgRoot({ x: 0, y: 0, w: 1600, h: 1000 }, "house");
   const slots = mountShape(g("slots", []), "house-");
   // One Night overlay per floor rectangle, shown on the dimmed floors.
@@ -61,17 +67,15 @@ export function createStage(): Stage {
     );
     return { floor, node };
   });
-  const dims = mountShape(g("dims", []), "house-");
+  const dims = mountShape(g("dims", [defs([atticClip()])]), "house-");
   dims.append(...dimRects.map((d) => d.node));
   svg.append(
-    mountShape(skyLayers(), "house-"),
-    mountShape(houseLayer(), "house-"),
+    mountShape(sceneBackdrop(sceneHref), "house-"),
     slots,
     dims,
     // Filled by the Telephone in task 11.1 and the effects in task 15.4.
     mountShape(g("telephone", []), "house-"),
     mountShape(weatherLayer(), "house-"),
-    mountShape(foregroundLayer(), "house-"),
     mountShape(g("effects", []), "house-"),
   );
 

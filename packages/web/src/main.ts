@@ -23,7 +23,7 @@ const script = parsedScript.ok ? parsedScript.value : null;
 // own, so the other renderer never receives it (Requirements 1.9, 1.10).
 const entry =
   chooseView(window.location.search) === "scenic"
-    ? import("./view/scenic/entry.js")
+    ? import("./view/scenicEntry.js")
     : import("./view/simpleEntry.js");
 
 entry.then(
