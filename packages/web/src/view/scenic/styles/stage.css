@@ -226,6 +226,10 @@
   stop-opacity: 0;
 }
 
+.house .light-cone-gap {
+  opacity: 0.5;
+}
+
 .house .stop-lamp-0 {
   stop-color: var(--sc-warm-orange);
   stop-opacity: 0.5;

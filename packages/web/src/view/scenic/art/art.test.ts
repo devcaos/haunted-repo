@@ -705,7 +705,9 @@ describe("light (Requirement 3.1)", () => {
     for (const back of all.filter((n) => n.part === "room-back")) {
       expect(all.find((n) => n.id === back.paint)?.kind).toBe("radialGradient");
     }
-    const cones = all.filter((n) => n.cls === "light-cone");
+    const cones = all.filter(
+      (n) => n.kind === "polygon" && n.cls?.startsWith("light-cone"),
+    );
     expect(cones).toHaveLength(3);
     for (const cone of cones) {
       const fill = all.find((n) => n.id === cone.paint);

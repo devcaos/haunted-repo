@@ -133,7 +133,10 @@ function lightCones(): ShapeNode {
         ]),
       ),
       ...CONES.map(([points], i) =>
-        poly("light-cone", points, { paint: `cone-${i}` }),
+        // The two roof-gap cones (0 and 1) are fainter than the tower's.
+        poly(i < 2 ? "light-cone light-cone-gap" : "light-cone", points, {
+          paint: `cone-${i}`,
+        }),
       ),
       poly("roof-gap tone-candle", [632, 328, 652, 314, 652, 323, 632, 337]),
       poly("roof-gap tone-candle", [700, 281, 716, 270, 716, 279, 700, 290]),
