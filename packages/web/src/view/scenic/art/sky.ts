@@ -73,7 +73,7 @@ export const RAIN_BOTTOM = 780;
 /** Columns start this far right of the scene, so the leftward drift never leaves a gap. */
 const RAIN_SPAN = 1600 + 6 * -RAIN_STEP[0];
 /** Columns and streak length of the far (thin, slow) and near (long, fast) rain. */
-const RAIN_LAYERS = { far: [64, 12], near: [28, 26] } as const;
+const RAIN_LAYERS = { far: [120, 12], near: [52, 26] } as const;
 
 /** Slanted streaks along the fall direction, one path for a whole layer. */
 export function rainPath(layer: keyof typeof RAIN_LAYERS): string {
