@@ -444,3 +444,15 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** `packages/power/src/dataFile.roundtrip.property.test.ts` (Property 3, 100 guardados en una carpeta real) superó los 5000 ms en tres ejecuciones completas seguidas. Solo, el mismo test pasa en unos 700 ms. El cambio no toca el Power; lo único nuevo desde la última vez que pasó es la instalación de Chromium para Playwright.
 - **Cómo lo rodeé:** No lo rodeé. Paré y pregunté a Luis Miguel, como pide la regla de "si falla dos veces, para".
 - **Estado:** abierto (propuesta: subir el tiempo límite de ese test a 20 s, como ya decía la entrada del 17 nov)
+
+## 18 nov 2026: Una edición con PowerShell escribió tres archivos en la raíz del repo
+- **Qué intentaba:** Cambiar tres CSS de la vista escénica (PR 1f, punto 4: la lluvia) con `[IO.File]::ReadAllText` y rutas relativas.
+- **Qué pasó:** .NET resuelve las rutas relativas desde la carpeta del proceso, no desde `cwd`. La lectura falló y la escritura creó `motion.css`, `scenic-tokens.css` y `stage.css` en la raíz con otro contenido. `npm run check` falló en el formato.
+- **Cómo lo rodeé:** Borré los tres archivos (no estaban en git) y desde entonces uso rutas absolutas (`Resolve-Path`) o la herramienta de edición.
+- **Estado:** cerrado
+
+## 18 nov 2026: `npm run shots` no pudo escribir una captura abierta
+- **Qué intentaba:** Rehacer las capturas tras el punto 1 de la PR 1f.
+- **Qué pasó:** El script paró con `UNKNOWN: unknown error, open ...01-house-1440x900.png`, porque yo acababa de abrir esa imagen para mirarla y Windows la tenía bloqueada.
+- **Cómo lo rodeé:** Repetí `npm run shots` (pasó) y desde entonces copio las capturas a una carpeta temporal antes de mirarlas.
+- **Estado:** cerrado
