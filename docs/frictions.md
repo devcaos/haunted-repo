@@ -456,3 +456,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** El script paró con `UNKNOWN: unknown error, open ...01-house-1440x900.png`, porque yo acababa de abrir esa imagen para mirarla y Windows la tenía bloqueada.
 - **Cómo lo rodeé:** Repetí `npm run shots` (pasó) y desde entonces copio las capturas a una carpeta temporal antes de mirarlas.
 - **Estado:** cerrado
+
+## 18 nov 2026: La herramienta de terminal devolvió antes de que acabara el comando
+- **Qué intentaba:** Editar un test con PowerShell y, en la misma orden, ejecutar `npm run check` y hacer el commit (PR 1f, extras y punto 13).
+- **Qué pasó:** Varias veces la herramienta devolvió solo un trozo del propio comando (por ejemplo `, $t)`) sin la salida. El resto siguió corriendo detrás: un commit apareció después, cuando yo ya había lanzado otro `npm run check`.
+- **Cómo lo rodeé:** Separé cada edición en su propia llamada y usé un script (`hr-check.ps1`) que guarda la salida de `npm run check` en un archivo y solo hace el commit si pasa. Revisé con `git log` y `git show --stat` que cada commit tenía lo que debía.
+- **Estado:** cerrado
