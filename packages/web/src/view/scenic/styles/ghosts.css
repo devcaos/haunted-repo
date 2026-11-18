@@ -119,31 +119,30 @@
   stop-opacity: 0;
 }
 
-/* Chained door of an empty floor: Rust door, Mist chains, Night hook, no padlock. */
+/*
+ * Chained door of an empty floor, matched to the illustration: dark wood,
+ * dark iron chains and hook, no light outline and no padlock.
+ */
 .chained-door .door-panel {
-  fill: var(--sc-rust);
+  fill: var(--sc-door-wood);
 }
-
 .chained-door .door-frame {
-  fill: var(--sc-night);
+  fill: var(--sc-iron-dark);
 }
-
 .chained-door .door-threshold {
-  fill: var(--sc-mist);
+  fill: var(--sc-iron-dark);
 }
-
 .chained-door .door-planks {
-  stroke: var(--sc-night);
+  stroke: var(--sc-abyss);
   stroke-width: 2;
+  opacity: 0.6;
 }
-
 .chained-door .door-chain-link {
-  stroke: var(--sc-mist);
-  stroke-width: 2;
+  stroke: var(--sc-iron);
+  stroke-width: 2.5;
 }
-
 .chained-door .door-hook {
-  stroke: var(--sc-night);
+  stroke: var(--sc-iron-dark);
   stroke-width: 3;
   stroke-linecap: round;
 }

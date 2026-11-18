@@ -537,8 +537,15 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
       );
       const panel = nodesOf(door).find((n) => n.cls === "door-panel");
       const band = SLOT_BAND[floor];
-      expect(panel).toMatchObject({ width: 70, height: band.h - 10 });
-      expect((panel?.x ?? 0) + 35).toBeCloseTo(band.x + band.w / 2, 1);
+      const room = FLOOR_RECT[floor];
+      expect(panel?.width).toBe(70);
+      const { x = 0, y = 0, height = 0 } = panel ?? {};
+      expect(x).toBeGreaterThanOrEqual(band.x);
+      expect(x + 70).toBeLessThanOrEqual(band.x + band.w);
+      expect(y).toBeGreaterThanOrEqual(room.y);
+      expect(y + height).toBeLessThanOrEqual(room.y + room.h);
+      // Dark iron with no light outline: no rim stroke on the door.
+      expect(classesOf(door)).not.toContain("rim");
     }
   });
 });
@@ -668,5 +675,14 @@ describe("chained doors stand on their floor", () => {
       expect((sill?.y ?? 0) + (sill?.height ?? 0)).toBe(FLOOR_LINE[floor]);
       expect(door.some((n) => n.cls === "door-frame")).toBe(true);
     }
+  });
+
+  it("the basement door covers the painted cellar door and its padlock", () => {
+    const panel = nodesOf(chainedDoorArt("basement")).find(
+      (n) => n.cls === "door-panel",
+    );
+    // The painted door spans about x 692 to 773 and y 738 to 850; its padlock is near (733, 795).
+    expect((panel?.x ?? 0) + 35).toBe(733);
+    expect(panel?.y ?? 0).toBeLessThan(795 - 20);
   });
 });

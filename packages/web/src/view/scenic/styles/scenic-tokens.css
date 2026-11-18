@@ -18,6 +18,10 @@
   --sc-pumpkin: #ff7a1a;
   --sc-brass: #c47b3d;
   --sc-rust: #6e2a1e;
+  /* Dark iron and dark wood, matched to the scene illustration */
+  --sc-iron: #2a303c;
+  --sc-iron-dark: #1a202c;
+  --sc-door-wood: #3a1d15;
   /* Named lights */
   --sc-cold-blue: #6e9bd8;
   --sc-warm-orange: #f59a45;

@@ -1,9 +1,5 @@
 import type { Floor } from "@haunted-repo/core";
-import {
-  GHOST_BOX,
-  SLOT_BAND,
-  type SlotPlacement,
-} from "../model/sceneLayout.js";
+import { GHOST_BOX, type SlotPlacement } from "../model/sceneLayout.js";
 import { WISP_SHADOW_Y, ghostArt } from "./ghosts.js";
 import {
   arch,
@@ -125,11 +121,22 @@ export function slotArt(slot: SlotPlacement): ShapeNode {
 }
 
 const DOOR_WIDTH = 70;
-/** Top of each floor's floor (where a door stands): the slab tops and the cellar floor. */
+/** Where a door stands on each floor of the scene illustration. */
 export const FLOOR_LINE: Readonly<Record<Floor, number>> = {
-  attic: 495,
-  "middle floor": 755,
-  basement: 940,
+  attic: 473,
+  "middle floor": 696,
+  // The cellar door of the illustration stands on this line, in front of the room's back.
+  basement: 852,
+};
+/**
+ * Centre and height of the chained door of an empty floor: under the attic
+ * ridge, between the parlour window and the armchair, and in the basement
+ * exactly over the painted cellar door (whose padlock it covers, Requirement 8.6).
+ */
+const DOOR_AT: Readonly<Record<Floor, { cx: number; h: number }>> = {
+  attic: { cx: 755, h: 90 },
+  "middle floor": { cx: 740, h: 110 },
+  basement: { cx: 733, h: 112 },
 };
 const LINKS_PER_CHAIN = 7;
 
@@ -153,15 +160,14 @@ function chainLinks(x1: number, y1: number, x2: number, y2: number): ShapeNode {
 }
 
 /**
- * The chained door of a floor with no Card, centred in its slot band: 70 wide,
- * the band height minus 10. A Rust door, two Mist chains crossing in an X and
- * an iron hook. It has no padlock, so it never looks like a Locked ghost
- * (Requirement 8.6).
+ * The chained door of a floor with no Card, 70 wide, inside its slot band,
+ * in the style of the illustration: a dark wooden door, two dark iron chains
+ * crossing in an X and an iron hook, with no light outline. It has no
+ * padlock, so it never looks like a Locked ghost (Requirement 8.6).
  */
 export function chainedDoorArt(floor: Floor): ShapeNode {
-  const band = SLOT_BAND[floor];
-  const x = round2(band.x + (band.w - DOOR_WIDTH) / 2);
-  const h = band.h - 10;
+  const { cx, h } = DOOR_AT[floor];
+  const x = round2(cx - DOOR_WIDTH / 2);
   // The door stands on its floor, inside a frame, over a stone threshold.
   const y = FLOOR_LINE[floor] - h;
   const right = x + DOOR_WIDTH;
