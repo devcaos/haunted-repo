@@ -25,6 +25,7 @@ import {
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import {
+  ATTIC_BACK,
   ATTIC_CLIP,
   BODY,
   FLOOR_CLASS,
@@ -818,6 +819,18 @@ describe("attic volume (art review 3, item 10)", () => {
     ).not.toBe(0);
   });
 
+  it("is a clean triangle: no beam or line spans the attic", () => {
+    const attic = all.find((n) => n.part === FLOOR_CLASS.attic);
+    const names = classesOf(attic ?? g("none", []));
+    expect(names).not.toContain("beams");
+    // No furniture wider than half the attic (a tie beam or a ceiling line would be).
+    for (const n of furnitureOf("attic")) {
+      const box = boxOf(n);
+      if (box !== null)
+        expect(box.x2 - box.x1, `${n.cls}`).toBeLessThan(ATTIC_BACK.w / 2);
+    }
+  });
+
   it("keeps every piece of attic furniture inside the attic shape", () => {
     for (const n of furnitureOf("attic")) {
       const box = boxOf(n);
@@ -1069,7 +1082,7 @@ describe("rooms (Requirements 3.1, 3.2)", () => {
 
   it("each floor holds its furniture", () => {
     const furniture = {
-      attic: ["beams", "cobweb", "trunk"],
+      attic: ["oculus", "cobweb", "trunk"],
       "middle floor": [
         "door",
         "telephone-table",

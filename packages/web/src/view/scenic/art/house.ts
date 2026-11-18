@@ -282,7 +282,7 @@ function tower(): ShapeNode {
 // prettier-ignore
 const MOTES = [[846, 300], [828, 338], [840, 362], [812, 392], [824, 420], [796, 446], [778, 472]] as const;
 
-/** Attic: the round window in the gable, a collar beam, cobwebs in both corners, an old trunk. */
+/** Attic: a clean triangle with the round window in the gable, cobwebs in both corners, an old trunk. */
 function attic(): ShapeNode[] {
   return [
     g(
@@ -324,8 +324,6 @@ function attic(): ShapeNode[] {
       MOTES.map(([x, y]) => circle("mote", x, y, 1.4)),
       { part: "dust-motes" },
     ),
-    // A collar beam ties the two slopes; it is not a ceiling.
-    strokePath("beams", "M676 312 H1064", { part: "rafters" }),
     strokePath(
       "cobweb",
       "M592 380 H640 M592 380 V424 M592 380 L628 412 M608 380 Q606 394 592 396 M626 380 Q622 410 592 414",

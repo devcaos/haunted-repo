@@ -163,13 +163,8 @@
 }
 
 /* L4 house: lines drawn by stroke only. */
-.house .beams,
 .house .gauge-needle {
   stroke: var(--sc-night);
-  stroke-width: 4;
-}
-
-.house .gauge-needle {
   stroke-width: 2;
 }
 
