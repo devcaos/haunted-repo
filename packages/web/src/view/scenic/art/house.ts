@@ -105,7 +105,7 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
 const CONES: readonly (readonly [number[], number[]])[] = [
   [[632, 328, 652, 314, 610, 209, 549, 251], [642, 321, 580, 230]],
   [[700, 281, 716, 270, 670, 168, 622, 201], [708, 276, 646, 184]],
-  [[1256, 474, 1280, 474, 1360, 760, 1232, 760], [1268, 474, 1296, 760]],
+  [[1264, 474, 1288, 474, 1368, 760, 1240, 760], [1276, 474, 1304, 760]],
 ];
 
 /** Gaps in the left roof slope and the warm cones that leave them and the tower arch. */
@@ -145,7 +145,7 @@ function lightCones(): ShapeNode {
 /** The tower shaft: upright, apart from the right eave. */
 export const TOWER = {
   x: 1226,
-  w: 84,
+  w: 100,
   top: 312,
   foot: 760,
   apex: 118,
