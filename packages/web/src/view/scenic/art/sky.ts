@@ -102,7 +102,7 @@ function rainClip(): string {
   return `M0 0 H1600 V760 H0 Z ${houseOutline().map(hole).join(" ")}`;
 }
 
-/** Rain (`rain-wrap` holds the clip and stays still, each `rain` layer moves) and two fog bands. */
+/** Rain: `rain-wrap` holds the clip and stays still, each `rain` layer moves. */
 export function weatherLayer(): ShapeNode {
   const layer = (name: keyof typeof RAIN_LAYERS): ShapeNode =>
     g(`rain rain-${name}`, [strokePath("rain-streaks", rainPath(name))]);
@@ -115,14 +115,6 @@ export function weatherLayer(): ShapeNode {
       },
     ]),
     g("rain-wrap", [layer("far"), layer("near")], { clip: "rain-sky" }),
-    path(
-      "fog fog-back",
-      "M380 748 C560 728 800 732 1000 742 C1160 730 1300 736 1420 752 C1200 770 620 772 380 748 Z",
-    ),
-    path(
-      "fog fog-front",
-      "M0 900 C240 874 520 880 760 892 C1000 878 1300 884 1600 902 C1300 930 300 932 0 900 Z",
-    ),
   ]);
 }
 
@@ -147,8 +139,6 @@ export function foregroundLayer(): ShapeNode {
       path("pickets", PICKETS),
       rect("rail", 250, 770, 196, 6),
       rect("rail", 250, 860, 196, 6),
-      rect("post", 434, 868, 14, 132),
-      rect("lantern tone-brass", 431, 846, 20, 22, { part: "lantern" }),
     ]),
     path("dead-tree tone-night", DEAD_TREE, { part: "dead-tree" }),
     g("rim-fg", [

@@ -186,16 +186,20 @@ function middleFloor(): ShapeNode[] {
   const hall = g(
     "entrance-hall",
     [
-      rect("door tone-rust", 575, 610, 80, 150, { part: "front-door" }),
-      circle("door-knob tone-brass", 643, 690, 4),
-      rect("transom tone-candle", 583, 590, 64, 14),
+      // One door unit: frame, lit transom and door inside it, lintel resting on the frame.
+      rect("door-frame tone-night", 571, 604, 88, 151),
+      rect("transom tone-candle", 579, 612, 72, 12),
+      rect("door tone-rust", 579, 628, 72, 127, { part: "front-door" }),
+      circle("door-knob tone-brass", 640, 696, 4),
+      rect("lintel tone-brass", 563, 594, 104, 10, { part: "lintel" }),
       rect("portrait-frame tone-brass", 680, 566, 56, 70),
       rect("portrait tone-slate", 685, 571, 46, 60),
       ellipse("portrait-face tone-mist", 708, 596, 10, 14),
-      g("telephone-table tone-night", [
-        rect("table-top", 664, 700, 88, 8),
-        rect("table-leg", 672, 708, 6, 52),
-        rect("table-leg", 734, 708, 6, 52),
+      // The legs stand on the floor (755), so the top never floats.
+      g("telephone-table tone-rust", [
+        rect("table-top", 668, 694, 80, 8),
+        rect("table-leg", 674, 702, 6, 53),
+        rect("table-leg", 736, 702, 6, 53),
       ]),
     ],
     { part: "entrance-hall" },
@@ -236,13 +240,14 @@ function stoneJoints(): string {
 
 /** Basement: stone walls, the boiler on the left, two pipes, two chains on the right. */
 function basement(): ShapeNode[] {
+  // Each chain hangs from a ring bolt under the ceiling joist.
   const chain = (x: number): ShapeNode =>
-    g(
-      "chain",
-      [0, 1, 2, 3, 4, 5].map((i) =>
-        ellipse("chain-link", x, 786 + i * 12, 4, 7, { fill: "none" }),
+    g("chain", [
+      circle("chain-ring", x, 777, 4, { fill: "none" }),
+      ...[0, 1, 2, 3, 4, 5].map((i) =>
+        ellipse("chain-link", x, 787 + i * 12, 4, 7, { fill: "none" }),
       ),
-    );
+    ]);
   return [
     strokePath("stone-joints", stoneJoints()),
     g("boiler", [
@@ -253,8 +258,9 @@ function basement(): ShapeNode[] {
     rect("pipe tone-mist", 650, 778, 500, 8),
     rect("pipe tone-mist", 680, 792, 470, 6),
     rect("pipe tone-mist", 650, 778, 10, 22),
-    chain(1110),
-    chain(1136),
+    rect("joist tone-night", 1096, 765, 64, 8, { part: "joist" }),
+    chain(1112),
+    chain(1138),
   ];
 }
 

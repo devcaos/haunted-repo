@@ -187,13 +187,10 @@
   stop-opacity: 0;
 }
 
-.house .chain-link {
+.house .chain-link,
+.house .chain-ring {
   stroke: var(--sc-mist);
   stroke-width: 2;
-}
-
-.house .table-leg {
-  fill: var(--sc-slate);
 }
 
 /* Rim light: only the moon-facing edges, no filter (Requirement 20.2). */

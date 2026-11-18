@@ -196,9 +196,6 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(classesOf(skyLayers())).toEqual(
       expect.arrayContaining(["moon", "clouds-left", "clouds-right"]),
     );
-    expect(classesOf(weatherLayer()).filter((c) => c === "fog")).toHaveLength(
-      2,
-    );
     expect(classesOf(foregroundLayer())).toEqual(
       expect.arrayContaining(["fence", "dead-tree", "rim-fg"]),
     );
@@ -601,6 +598,50 @@ describe("furniture and slot panes (Requirement 12.5)", () => {
       });
       expect(hits.map((n) => `${floor}: ${n.cls ?? n.kind}`)).toEqual([]);
     }
+  });
+});
+
+describe("nothing floats (Requirement 3.1)", () => {
+  const all = nodesOf(houseLayer());
+  const one = (cls: string): ShapeNode | undefined =>
+    all.find((n) => n.cls?.split(" ").includes(cls));
+
+  it("the lintel rests on the door frame, and the door sits inside it", () => {
+    const [lintel, frame, door] = ["lintel", "door-frame", "door"].map(one);
+    expect((lintel?.y ?? 0) + (lintel?.height ?? 0)).toBe(frame?.y);
+    expect(lintel?.x).toBeLessThan(frame?.x ?? 0);
+    expect(door?.x).toBeGreaterThan(frame?.x ?? 0);
+  });
+
+  it("the table legs stand on the middle floor and touch the top", () => {
+    const top = one("table-top");
+    const legs = all.filter((n) => n.cls === "table-leg");
+    expect(legs).toHaveLength(2);
+    for (const leg of legs) {
+      expect(leg.y).toBe((top?.y ?? 0) + (top?.height ?? 0));
+      expect((leg.y ?? 0) + (leg.height ?? 0)).toBe(755);
+    }
+  });
+
+  it("each basement chain hangs from a ring under the joist", () => {
+    const joist = one("joist");
+    const rings = all.filter((n) => n.cls === "chain-ring");
+    expect(rings).toHaveLength(2);
+    for (const ring of rings) {
+      const x = ring.cx ?? 0;
+      expect(x).toBeGreaterThan(joist?.x ?? 0);
+      expect(x).toBeLessThan((joist?.x ?? 0) + (joist?.width ?? 0));
+      expect((ring.cy ?? 0) - (ring.r ?? 0)).toBe(
+        (joist?.y ?? 0) + (joist?.height ?? 0),
+      );
+    }
+  });
+
+  it("the foreground has no lantern post and the weather no fog bands", () => {
+    expect(nodesOf(foregroundLayer()).map((n) => n.part)).not.toContain(
+      "lantern",
+    );
+    expect(classesOf(weatherLayer())).not.toContain("fog-front");
   });
 });
 
