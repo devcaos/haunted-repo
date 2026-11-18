@@ -845,15 +845,18 @@ describe("walls with weight (Requirement 3.1)", () => {
 describe("light (Requirement 3.1)", () => {
   const all = nodesOf(houseLayer());
 
-  it("the fire has three stacked flames, each one narrower and shorter", () => {
-    const flames = all.find((n) => n.part === "flames")?.children ?? [];
-    const boxes = flames.flatMap((n) => boxOf(n) ?? []);
-    expect(boxes).toHaveLength(3);
-    for (let i = 1; i < 3; i += 1) {
-      const [outer, inner] = [boxes[i - 1], boxes[i]];
-      expect(inner?.x2 ?? 0).toBeLessThan(outer?.x2 ?? 0);
-      expect(inner?.y1 ?? 0).toBeGreaterThan(outer?.y1 ?? 0);
-    }
+  it("the fire is two Bezier flames, the inner one inside the outer, in two moving groups", () => {
+    const group = all.find((n) => n.part === "flames");
+    const flames = nodesOf(group ?? g("none", [])).filter((n) =>
+      n.cls?.startsWith("flame "),
+    );
+    expect(flames).toHaveLength(2);
+    for (const flame of flames) expect(flame.d).toMatch(/C/);
+    const [outer, inner] = flames.map((n) => boxOf(n));
+    expect(inner?.x1 ?? 0).toBeGreaterThan(outer?.x1 ?? 0);
+    expect(inner?.x2 ?? 0).toBeLessThan(outer?.x2 ?? 0);
+    expect(inner?.y1 ?? 0).toBeGreaterThan(outer?.y1 ?? 0);
+    expect(classesOf(group ?? g("none", []))).toContain("flame-core");
   });
 
   it("every room back is a radial gradient", () => {

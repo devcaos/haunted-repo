@@ -130,6 +130,7 @@
   --sc-dur-wraith-sway: 4.2s;
   --sc-dur-brute-heave: 3.2s;
   --sc-dur-flame-flicker: 1.6s;
+  --sc-dur-flame-core: 1.1s;
   --sc-dur-ring: 2s;
   --sc-dur-beam-sweep: 2.5s;
   /* Distances of the looping motions, in viewBox units */

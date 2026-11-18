@@ -355,6 +355,13 @@ const BOOKS: readonly (readonly [number, number, number, string])[] = [
   [834, 708, 10, "rust"],
 ];
 
+/** The fire: an outer flame with three tongues and a brighter inner one, both standing on the logs. */
+const FLAME_OUTER =
+  "M1020 750 C1012 730 1026 718 1030 700 C1036 712 1040 704 1042 690 C1050 702 1052 680 1050 670 " +
+  "C1064 686 1066 700 1062 712 C1070 708 1074 700 1074 692 C1088 712 1088 736 1080 750 Z";
+const FLAME_INNER =
+  "M1032 750 C1026 736 1038 726 1042 712 C1048 722 1052 716 1052 704 C1062 718 1068 734 1064 750 Z";
+
 /** Middle floor: the Entrance_Hall on the left, a wall at x 760, the Parlour on the right. */
 function middleFloor(): ShapeNode[] {
   const hall = g(
@@ -424,21 +431,12 @@ function middleFloor(): ShapeNode[] {
         rect("tone-night", 975, 636, 150, 10),
         rect("tone-abyss", 1012, 680, 76, 75),
         circle("fire-glow", 1050, 728, 56, { paint: "fire-glow" }),
+        // Two overlapping Bezier flames; each group sways on its own rhythm.
         g(
           "flames",
           [
-            poly(
-              "tone-pumpkin",
-              [
-                1018, 748, 1030, 712, 1040, 722, 1050, 684, 1060, 718, 1070,
-                706, 1082, 748,
-              ],
-            ),
-            poly(
-              "tone-candle",
-              [1028, 748, 1040, 724, 1050, 700, 1060, 726, 1072, 748],
-            ),
-            poly("tone-bone", [1040, 748, 1050, 720, 1060, 748]),
+            path("flame tone-pumpkin", FLAME_OUTER),
+            g("flame-core", [path("flame tone-candle", FLAME_INNER)]),
           ],
           { part: "flames" },
         ),
