@@ -190,6 +190,31 @@
   stroke-width: 3;
 }
 
+/* Light: rooms brighter near their light and almost black in the corners. */
+.house .stop-room-0 {
+  stop-color: var(--sc-slate);
+}
+
+.house .stop-room-1 {
+  stop-color: var(--sc-abyss);
+}
+
+.house .stop-warmth-0,
+.house .stop-cone-0 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0.38;
+}
+
+.house .stop-cone-0 {
+  stop-opacity: 0.22;
+}
+
+.house .stop-warmth-1,
+.house .stop-cone-1 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0;
+}
+
 .house .stop-lamp-0 {
   stop-color: var(--sc-warm-orange);
   stop-opacity: 0.5;

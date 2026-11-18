@@ -25,6 +25,16 @@
   }
 }
 
+@keyframes flame-flicker {
+  from {
+    transform: scale(1, 1);
+  }
+
+  to {
+    transform: scale(0.95, 1.08);
+  }
+}
+
 @keyframes window-flicker {
   0%,
   100% {
@@ -64,6 +74,13 @@
 
   .house .rain-far {
     animation-duration: var(--sc-dur-rain-far);
+  }
+
+  .house .flames {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: flame-flicker var(--sc-dur-flame-flicker) var(--sc-ease-in-out)
+      infinite alternate;
   }
 
   .house .fog {

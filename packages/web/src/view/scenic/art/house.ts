@@ -65,15 +65,81 @@ export function houseOutline(): number[][] {
 /** Id of the clip that keeps the attic under the inner roof line (stage.ts clips its dim with it too). */
 export const ATTIC_CLIP = "attic-inside";
 
+/** Centre and radius of each room's light: the ghosts, the fire, the boiler dial. */
+const ROOM_LIGHT: Readonly<Record<Floor, readonly [number, number, number]>> = {
+  attic: [870, 450, 340],
+  "middle floor": [1050, 700, 470],
+  basement: [636, 880, 440],
+};
+
 function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
   const r = FLOOR_RECT[floor];
-  const back = rect("room-back tone-slate", r.x, r.y, r.w, r.h, {
+  const [cx, cy, radius] = ROOM_LIGHT[floor];
+  const id = `room-${FLOOR_CLASS[floor]}`;
+  const back = rect("room-back", r.x, r.y, r.w, r.h, {
     part: "room-back",
+    paint: id,
   });
-  return g(`floor ${FLOOR_CLASS[floor]}`, [back, ...contents], {
+  const fill = gradient(
+    "radialGradient",
+    id,
+    [
+      ["stop-room-0", 0],
+      ["stop-room-1", 1],
+    ],
+    {
+      units: "userSpaceOnUse",
+      cx,
+      cy,
+      r: radius,
+    },
+  );
+  return g(`floor ${FLOOR_CLASS[floor]}`, [defs([fill]), back, ...contents], {
     part: FLOOR_CLASS[floor],
     ...(floor === "attic" ? { clip: ATTIC_CLIP } : {}),
   });
+}
+
+/** [polygon, gradient start, gradient end] of each light cone: two roof gaps, then the tower arch. */
+// prettier-ignore
+const CONES: readonly (readonly [number[], number[]])[] = [
+  [[632, 328, 652, 314, 610, 209, 549, 251], [642, 321, 580, 230]],
+  [[700, 281, 716, 270, 670, 168, 622, 201], [708, 276, 646, 184]],
+  [[1256, 474, 1280, 474, 1360, 760, 1232, 760], [1268, 474, 1296, 760]],
+];
+
+/** Gaps in the left roof slope and the warm cones that leave them and the tower arch. */
+function lightCones(): ShapeNode {
+  return g(
+    "light-cones",
+    [
+      ...CONES.map(([, [x1, y1, x2, y2]], i) =>
+        defs([
+          gradient(
+            "linearGradient",
+            `cone-${i}`,
+            [
+              ["stop-cone-0", 0],
+              ["stop-cone-1", 1],
+            ],
+            {
+              units: "userSpaceOnUse",
+              x1,
+              y1,
+              x2,
+              y2,
+            },
+          ),
+        ]),
+      ),
+      ...CONES.map(([points], i) =>
+        poly("light-cone", points, { paint: `cone-${i}` }),
+      ),
+      poly("roof-gap tone-candle", [632, 328, 652, 314, 652, 323, 632, 337]),
+      poly("roof-gap tone-candle", [700, 281, 716, 270, 716, 279, 700, 290]),
+    ],
+    { part: "light-cones" },
+  );
 }
 
 /** The tower shaft: upright, apart from the right eave. */
@@ -205,11 +271,32 @@ function middleFloor(): ShapeNode[] {
           rect(`books tone-${tone}`, x, y, w, (y < 680 ? 680 : 752) - y),
         ),
       ]),
+      // The visual anchor of the floor: a warm light over the parlour, then the fire.
+      rect("fire-light", 764, 505, 416, 250, { paint: "fire-warmth" }),
       g("fireplace", [
-        rect("tone-mist", 1040, 630, 110, 130),
-        rect("tone-night", 1030, 622, 130, 10),
-        rect("tone-night", 1060, 670, 70, 90),
-        ellipse("ember tone-candle", 1095, 752, 22, 5),
+        rect("tone-slate", 985, 646, 130, 109),
+        rect("tone-night", 975, 636, 150, 10),
+        rect("tone-abyss", 1012, 680, 76, 75),
+        circle("fire-glow", 1050, 728, 56, { paint: "fire-glow" }),
+        g(
+          "flames",
+          [
+            poly(
+              "tone-pumpkin",
+              [
+                1018, 748, 1030, 712, 1040, 722, 1050, 684, 1060, 718, 1070,
+                706, 1082, 748,
+              ],
+            ),
+            poly(
+              "tone-candle",
+              [1028, 748, 1040, 724, 1050, 700, 1060, 726, 1072, 748],
+            ),
+            poly("tone-bone", [1040, 748, 1050, 720, 1060, 748]),
+          ],
+          { part: "flames" },
+        ),
+        rect("tone-rust", 1020, 746, 60, 7),
       ]),
     ],
     { part: "parlour" },
@@ -260,10 +347,26 @@ export function houseLayer(): ShapeNode {
           poly("clip-shape", [...ROOF_INNER, INNER_R, 510, INNER_L, 510]),
         ],
       },
-      gradient("radialGradient", "dial-glow", [
-        ["stop-lamp-0", 0],
-        ["stop-lamp-1", 1],
-      ]),
+      ...["dial-glow", "fire-glow"].map((id) =>
+        gradient("radialGradient", id, [
+          ["stop-lamp-0", 0],
+          ["stop-lamp-1", 1],
+        ]),
+      ),
+      gradient(
+        "radialGradient",
+        "fire-warmth",
+        [
+          ["stop-warmth-0", 0],
+          ["stop-warmth-1", 1],
+        ],
+        {
+          units: "userSpaceOnUse",
+          cx: 1050,
+          cy: 720,
+          r: 300,
+        },
+      ),
     ]),
     rect("ground tone-abyss", 0, 760, 1600, 240, { part: "ground" }),
     tower(),
@@ -291,6 +394,7 @@ export function houseLayer(): ShapeNode {
     floorGroup("middle floor", middleFloor()),
     floorGroup("basement", basement()),
     path("roof tone-night", ROOF_BAND, { part: "roof" }),
+    lightCones(),
     rect("floor-slab tone-night", left, 496, right - left, 8),
     rect("ground-slab tone-night", left, 755, right - left, 10),
     g("rims", [

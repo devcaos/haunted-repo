@@ -623,6 +623,36 @@ describe("furniture and slot panes (Requirement 12.5)", () => {
   });
 });
 
+describe("light (Requirement 3.1)", () => {
+  const all = nodesOf(houseLayer());
+
+  it("the fire has three stacked flames, each one narrower and shorter", () => {
+    const flames = all.find((n) => n.part === "flames")?.children ?? [];
+    const boxes = flames.flatMap((n) => boxOf(n) ?? []);
+    expect(boxes).toHaveLength(3);
+    for (let i = 1; i < 3; i += 1) {
+      const [outer, inner] = [boxes[i - 1], boxes[i]];
+      expect(inner?.x2 ?? 0).toBeLessThan(outer?.x2 ?? 0);
+      expect(inner?.y1 ?? 0).toBeGreaterThan(outer?.y1 ?? 0);
+    }
+  });
+
+  it("every room back is a radial gradient, and three warm cones fade out", () => {
+    for (const back of all.filter((n) => n.part === "room-back")) {
+      expect(all.find((n) => n.id === back.paint)?.kind).toBe("radialGradient");
+    }
+    const cones = all.filter((n) => n.cls === "light-cone");
+    expect(cones).toHaveLength(3);
+    for (const cone of cones) {
+      const fill = all.find((n) => n.id === cone.paint);
+      expect(fill?.children?.map((s) => s.cls)).toEqual([
+        "stop-cone-0",
+        "stop-cone-1",
+      ]);
+    }
+  });
+});
+
 describe("basement in the ground (Requirement 3.1)", () => {
   it("sits in one dark ground block across the whole width, with at most 5 bricks", () => {
     const ground = nodesOf(houseLayer()).find((n) => n.part === "ground");
