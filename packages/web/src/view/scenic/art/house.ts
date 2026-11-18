@@ -374,12 +374,12 @@ const BRICKS = [[594, 776, 30, 12], [606, 790, 24, 12], [1104, 912, 30, 12], [11
 
 /** Basement: a few bricks, the boiler with its glowing dial on the left, two chains on the right. */
 function basement(): ShapeNode[] {
-  // Each chain hangs from a ring bolt under the ceiling joist.
+  // Each chain hangs from a ring under an iron bar bolted to the wall.
   const chain = (x: number): ShapeNode =>
     g("chain", [
-      circle("chain-ring", x, 777, 4, { fill: "none" }),
+      circle("chain-ring", x, 856, 4, { fill: "none" }),
       ...[0, 1, 2, 3, 4, 5].map((i) =>
-        ellipse("chain-link", x, 787 + i * 12, 4, 7, { fill: "none" }),
+        ellipse("chain-link", x, 866 + i * 11, 4, 6.5, { fill: "none" }),
       ),
     ]);
   return [
@@ -393,9 +393,13 @@ function basement(): ShapeNode[] {
       strokePath("gauge-needle", "M636 882 L642 875"),
       rect("grate tone-pumpkin", 614, 914, 44, 10),
     ]),
-    rect("joist tone-night", 1096, 765, 64, 8, { part: "joist" }),
-    chain(1112),
-    chain(1138),
+    g("chain-bar", [
+      rect("tone-mist", 734, 846, 54, 6, { part: "chain-bar" }),
+      circle("tone-night", 739, 849, 1.5),
+      circle("tone-night", 783, 849, 1.5),
+    ]),
+    chain(748),
+    chain(774),
   ];
 }
 

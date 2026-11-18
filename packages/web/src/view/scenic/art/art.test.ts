@@ -878,8 +878,12 @@ describe("nothing floats (Requirement 3.1)", () => {
     }
   });
 
-  it("each basement chain hangs from a ring under the joist", () => {
-    const joist = one("joist");
+  it("each basement chain hangs from a ring under the iron wall bar, and ends above the floor", () => {
+    const joist = all.find((n) => n.part === "chain-bar");
+    for (const chain of all.filter((n) => n.cls === "chain")) {
+      const last = chain.children?.at(-1);
+      expect((last?.cy ?? 0) + (last?.ry ?? 0)).toBeLessThan(940);
+    }
     const rings = all.filter((n) => n.cls === "chain-ring");
     expect(rings).toHaveLength(2);
     for (const ring of rings) {
