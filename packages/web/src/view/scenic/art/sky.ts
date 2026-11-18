@@ -10,7 +10,7 @@ import {
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
-import { houseOutline } from "./house.js";
+import { BODY, TOWER, beamPolygon, houseOutline } from "./house.js";
 
 // Everything here is in the house viewBox `0 0 1600 1000` (design "World
 // geometry"). The top band (y < 110) holds only sky and the left column
@@ -73,7 +73,7 @@ export const RAIN_BOTTOM = 780;
 /** Columns start this far right of the scene, so the leftward drift never leaves a gap. */
 const RAIN_SPAN = 1600 + 6 * -RAIN_STEP[0];
 /** Columns and streak length of the far (thin, slow) and near (long, fast) rain. */
-const RAIN_LAYERS = { far: [120, 12], near: [52, 26] } as const;
+const RAIN_LAYERS = { far: [120, 9], near: [52, 36] } as const;
 
 /** Slanted streaks along the fall direction, one path for a whole layer. */
 export function rainPath(layer: keyof typeof RAIN_LAYERS): string {
@@ -99,7 +99,20 @@ function rainClip(): string {
       pairs.push(`${pts[i]} ${pts[i + 1]}`);
     return `M${pairs.join(" L")} Z`;
   };
-  return `M0 0 H1600 V760 H0 Z ${houseOutline().map(hole).join(" ")}`;
+  return `M0 0 H1600 V760 H0 Z ${[...houseOutline(), beamGap()].map(hole).join(" ")}`;
+}
+
+/**
+ * The part of the tower beam that shines on open sky, between the house wall
+ * and the tower, down to the plinth (y 710). Holes must not overlap, or the
+ * nonzero rule lets rain back in, so this is cut to that gap.
+ */
+function beamGap(): number[] {
+  const [x0 = 0, y0 = 0, , , , , x3 = 0, y3 = 0] = beamPolygon();
+  const yAt = (x: number): number =>
+    Math.round(y0 + ((x0 - x) / (x0 - x3)) * (y3 - y0));
+  const [wall, tower] = [BODY.right, TOWER.x];
+  return [tower, yAt(tower), tower, 710, wall, 710, wall, yAt(wall)];
 }
 
 /** Rain: `rain-wrap` holds the clip and stays still, each `rain` layer moves. */

@@ -347,6 +347,8 @@ describe("rain clip (Requirement 3.3)", () => {
       [870, 170],
       [300, 800],
       [1268, 900],
+      [1210, 690], // inside the tower beam, between house and tower
+      [1220, 640],
     ];
     for (const p of sky) expect(winding(d, p), `${p}`).not.toBe(0);
     for (const p of solid) expect(winding(d, p), `${p}`).toBe(0);
