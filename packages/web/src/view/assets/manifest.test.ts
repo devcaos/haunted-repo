@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { ASSET_SLOTS } from "./manifest.js";
 import type { AssetSlotId } from "./manifest.js";
@@ -65,9 +65,23 @@ describe("asset manifest", () => {
     }
   });
 
-  it("leaves every layers list empty in this spec", () => {
+  it("fills only scene.house, with the declared illustration", () => {
     for (const slot of ASSET_SLOTS) {
+      if (slot.id === "scene.house") continue;
       expect(slot.layers).toEqual([]);
     }
+    const house = ASSET_SLOTS.find((slot) => slot.id === "scene.house");
+    expect(house?.layers.map((layer) => layer.file)).toEqual([
+      "house-scene.svg",
+    ]);
+    // Where the art came from is never hidden (director's decision, 18 Nov).
+    expect(house?.layers[0]?.source).toMatch(/Claude \(Anthropic AI\)/);
+    expect(house?.layers[0]?.source).toMatch(/Kiro/);
+  });
+
+  it("keeps the C2PA provenance block inside the scene illustration", () => {
+    const svg = readFileSync(new URL("house-scene.svg", FILES_DIR), "utf8");
+    expect(svg).toContain('xmlns:c2pa="http://c2pa.org/manifest"');
+    expect(svg).toMatch(/<metadata><c2pa:manifest>[^<]+<\/c2pa:manifest>/);
   });
 });

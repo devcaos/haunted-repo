@@ -1,5 +1,6 @@
 // The single inventory of graphics of the web demo. Plain data only.
-// Every slot is empty in this spec, so every renderer uses the fallback.
+// Only `scene.house` has a file (director's decision, 18 Nov): the declared
+// scene illustration. Every other slot is empty and uses its fallback.
 
 export type AssetSlotId =
   | "scene.house"
@@ -38,7 +39,14 @@ export const ASSET_SLOTS: readonly AssetSlot[] = [
   {
     id: "scene.house",
     purpose: "Background of the whole haunted house.",
-    layers: [],
+    layers: [
+      {
+        file: "house-scene.svg",
+        alt: "",
+        source:
+          "Illustration drafted with Claude (Anthropic AI), declared in the Devpost submission; integrated and animated with Kiro. MIT licence, like the repo.",
+      },
+    ],
     fallback: "token-colour",
   },
   {
