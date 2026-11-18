@@ -741,12 +741,11 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
       const panel = nodesOf(door).find((n) => n.cls === "door-panel");
       const band = SLOT_BAND[floor];
       const room = FLOOR_RECT[floor];
-      expect(panel?.width).toBe(70);
-      const { x = 0, y = 0, height = 0 } = panel ?? {};
-      expect(x).toBeGreaterThanOrEqual(band.x);
-      expect(x + 70).toBeLessThanOrEqual(band.x + band.w);
-      expect(y).toBeGreaterThanOrEqual(room.y);
-      expect(y + height).toBeLessThanOrEqual(room.y + room.h);
+      const { x1 = 0, y1 = 0, x2 = 0, y2 = 0 } = (panel && boxOf(panel)) ?? {};
+      expect(x1).toBeGreaterThanOrEqual(band.x);
+      expect(x2).toBeLessThanOrEqual(band.x + band.w);
+      expect(y1).toBeGreaterThanOrEqual(room.y);
+      expect(y2).toBeLessThanOrEqual(room.y + room.h);
       // Dark iron with no light outline: no rim stroke on the door.
       expect(classesOf(door)).not.toContain("rim");
     }
@@ -869,23 +868,116 @@ describe("slots on the scene illustration (director's decision, 18 Nov)", () => 
 });
 
 describe("chained doors stand on their floor", () => {
-  it("every chained door stands on its floor inside a frame, over a threshold", () => {
-    for (const floor of ["attic", "middle floor", "basement"] as const) {
+  const FLOORS = ["attic", "middle floor", "basement"] as const;
+  const panelBox = (floor: Floor): Box => {
+    const panel = nodesOf(chainedDoorArt(floor)).find(
+      (n) => n.cls === "door-panel",
+    );
+    const box = panel === undefined ? null : boxOf(panel);
+    if (box === null) throw new Error(`no door panel on ${floor}`);
+    return box;
+  };
+
+  it("every chained door is arched, stands on its floor inside a surround, over a threshold", () => {
+    for (const floor of FLOORS) {
       const door = nodesOf(chainedDoorArt(floor));
       const panel = door.find((n) => n.cls === "door-panel");
       const sill = door.find((n) => n.cls === "door-threshold");
-      expect((panel?.y ?? 0) + (panel?.height ?? 0)).toBe(FLOOR_LINE[floor]);
+      expect(panelBox(floor).y2).toBe(FLOOR_LINE[floor]);
       expect((sill?.y ?? 0) + (sill?.height ?? 0)).toBe(FLOOR_LINE[floor]);
-      expect(door.some((n) => n.cls === "door-frame")).toBe(true);
+      expect(panel?.d).toContain("Q"); // rounded shoulders: an arched top
+      const frame = door.find((n) => n.cls === "door-frame");
+      const outer = frame === undefined ? null : boxOf(frame);
+      expect(outer?.x1 ?? 0).toBeLessThan(panelBox(floor).x1);
+      expect(outer?.x2 ?? 0).toBeGreaterThan(panelBox(floor).x2);
+      expect(outer?.y1 ?? 0).toBeLessThan(panelBox(floor).y1);
     }
   });
 
-  it("the basement door covers the painted cellar door and its padlock", () => {
+  it("the basement door has the size and place of the painted cellar door, so it shows no painted door around it", () => {
+    // The painted door spans x 693 to 773, from the arch top at y 739 to its foot at y 849.
+    const box = panelBox("basement");
+    expect(box.x1).toBeLessThanOrEqual(693);
+    expect(box.x1).toBeGreaterThanOrEqual(690);
+    expect(box.x2).toBeGreaterThanOrEqual(773);
+    expect(box.x2).toBeLessThanOrEqual(776);
+    expect(box.y1).toBe(737);
+    expect(box.y2).toBeGreaterThanOrEqual(849);
+    expect(box.y2).toBeLessThanOrEqual(852);
+    // Same centre as the painted door (x 733).
+    expect((box.x1 + box.x2) / 2).toBe(733);
+    // The painted padlock (near 733, 795) is under the door.
     const panel = nodesOf(chainedDoorArt("basement")).find(
       (n) => n.cls === "door-panel",
     );
-    // The painted door spans about x 692 to 773 and y 738 to 850; its padlock is near (733, 795).
-    expect((panel?.x ?? 0) + 35).toBe(733);
-    expect(panel?.y ?? 0).toBeLessThan(795 - 20);
+    expect(winding(panel?.d ?? "", [733, 795])).not.toBe(0);
+  });
+
+  it("the basement surround covers the chain ends the painted door sticks out at both sides", () => {
+    const frame = nodesOf(chainedDoorArt("basement")).find(
+      (n) => n.cls === "door-frame",
+    );
+    // Tips of the painted chains, measured on the illustration.
+    const tips: [number, number][] = [
+      [681, 757],
+      [686, 765],
+      [785, 759],
+      [780, 766],
+      [682, 832],
+      [688, 835],
+      [786, 833],
+      [781, 836],
+    ];
+    for (const tip of tips) {
+      expect(winding(frame?.d ?? "", tip), `${tip}`).not.toBe(0);
+    }
+  });
+
+  it("draws no chain piece outside its door, and every link is dark iron with a faint inner glint", () => {
+    for (const floor of FLOORS) {
+      const door = nodesOf(chainedDoorArt(floor));
+      const box = panelBox(floor);
+      const links = door.filter((n) => n.cls === "door-chain-link");
+      const glints = door.filter((n) => n.cls === "door-chain-glint");
+      expect(links.length).toBeGreaterThan(0);
+      // No link at the crossing of the two chains (the centre of the door).
+      const mid = (box.x1 + box.x2) / 2;
+      for (const link of links) {
+        expect(
+          Math.abs((link.transform?.translate?.[0] ?? 0) - mid),
+        ).toBeGreaterThan(2);
+      }
+      expect(glints).toHaveLength(links.length);
+      for (const link of links) {
+        const [x = 0, y = 0] = link.transform?.translate ?? [];
+        // A link lies on a diagonal; its longest reach is its half length.
+        expect(x - (link.rx ?? 0), `${floor}`).toBeGreaterThanOrEqual(box.x1);
+        expect(x + (link.rx ?? 0), `${floor}`).toBeLessThanOrEqual(box.x2);
+        expect(y - (link.rx ?? 0), `${floor}`).toBeGreaterThanOrEqual(box.y1);
+        expect(y + (link.rx ?? 0), `${floor}`).toBeLessThanOrEqual(box.y2);
+      }
+      for (const glint of glints) {
+        const link = links[glints.indexOf(glint)];
+        expect(glint.rx ?? 0).toBeLessThan(link?.rx ?? 0);
+        expect(glint.ry ?? 0).toBeLessThan(link?.ry ?? 0);
+        expect(glint.transform).toEqual(link?.transform);
+      }
+      expect(door.flatMap((n) => n.cls?.split(" ") ?? [])).not.toContain("rim");
+    }
+    const css = readFileSync(
+      new URL("../styles/ghosts.css", import.meta.url),
+      "utf8",
+    );
+    const rule = (name: string): string =>
+      new RegExp(`\\.chained-door \\.${name}\\s*{([^}]*)}`).exec(css)?.[1] ??
+      "";
+    expect(rule("door-chain-link")).toMatch(/stroke:\s*var\(--sc-iron\)/);
+    expect(rule("door-chain-glint")).toMatch(/stroke:\s*var\(--sc-mist\)/);
+    expect(
+      Number(/opacity:\s*([\d.]+)/.exec(rule("door-chain-glint"))?.[1]),
+    ).toBeLessThanOrEqual(0.25);
+    for (const name of ["door-frame", "door-threshold", "door-hook"]) {
+      expect(rule(name)).toMatch(/var\(--sc-iron-dark\)/);
+    }
   });
 });

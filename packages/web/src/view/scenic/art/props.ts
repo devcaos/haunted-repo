@@ -1,7 +1,14 @@
 import type { Floor } from "@haunted-repo/core";
 import type { SlotPlacement } from "../model/sceneLayout.js";
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
-import { ellipse, g, rect, strokePath, type ShapeNode } from "./shapes.js";
+import {
+  ellipse,
+  g,
+  path,
+  rect,
+  strokePath,
+  type ShapeNode,
+} from "./shapes.js";
 
 /** A ghost floats: its box ends this many units above the slot bottom (at floor scale 1). */
 const GHOST_LIFT = 10;
@@ -45,74 +52,117 @@ export function slotArt(slot: SlotPlacement): ShapeNode {
   return g(`slot slot--${slot.state}`, children);
 }
 
-const DOOR_WIDTH = 70;
 /** Where a door stands on each floor of the scene illustration. */
 export const FLOOR_LINE: Readonly<Record<Floor, number>> = {
   attic: 473,
   "middle floor": 696,
-  // The cellar door of the illustration stands on this line, in front of the room's back.
-  basement: 852,
+  // The painted cellar door ends here (its bottom edge is at y 849).
+  basement: 850,
 };
-/**
- * Centre and height of the chained door of an empty floor: under the attic
- * ridge, between the parlour window and the armchair, and in the basement
- * exactly over the painted cellar door (whose padlock it covers, Requirement 8.6).
- */
-const DOOR_AT: Readonly<Record<Floor, { cx: number; h: number }>> = {
-  attic: { cx: 755, h: 90 },
-  "middle floor": { cx: 740, h: 110 },
-  basement: { cx: 733, h: 112 },
-};
-const LINKS_PER_CHAIN = 7;
 
-/** One chain of oval links from (x1, y1) to (x2, y2), each link turned along the chain. */
+/** One chained door: centre, half width, top of the arch and the extra width of its dark surround. */
+interface DoorSpec {
+  cx: number;
+  half: number;
+  top: number;
+  /** The surround is this much wider than the door on each side. */
+  surround: number;
+}
+
+/**
+ * The chained door of an empty floor. In the basement it matches the door
+ * painted in the illustration exactly (x 692 to 774, arch top at y 737, foot
+ * at y 850, one unit wider than the painted door on each side), so the
+ * painted door does not show around it. Its dark iron surround is wide enough
+ * to cover the chain ends the painted door sticks out at both sides (x 680 to
+ * 787, y 755 to 838). On the other floors it is 70 wide, under the attic
+ * ridge and between the parlour window and the armchair.
+ */
+const DOORS: Readonly<Record<Floor, DoorSpec>> = {
+  attic: { cx: 755, half: 35, top: 383, surround: 6 },
+  "middle floor": { cx: 740, half: 35, top: 586, surround: 6 },
+  basement: { cx: 733, half: 41, top: 737, surround: 16 },
+};
+/** Even, so no link sits where the two chains cross: the hook hangs there, never a padlock-like knot. */
+const LINKS_PER_CHAIN = 8;
+
+/**
+ * The outline of an arched door: straight sides, rounded shoulders and a flat
+ * top between them, standing on `bottom`. Absolute commands only.
+ */
+function archedDoor(
+  cx: number,
+  half: number,
+  top: number,
+  bottom: number,
+  shoulder: number,
+): string {
+  const [l, r] = [round2(cx - half), round2(cx + half)];
+  return (
+    `M${l} ${bottom} V${top + shoulder} Q${l} ${top} ${round2(l + shoulder)} ${top} ` +
+    `H${round2(r - shoulder)} Q${r} ${top} ${r} ${top + shoulder} V${bottom} Z`
+  );
+}
+
+/**
+ * One chain of oval links from (x1, y1) to (x2, y2), each link turned along
+ * the chain. Every link is dark iron; a faint glint sits inside it, and no
+ * link has a light outline.
+ */
 function chainLinks(x1: number, y1: number, x2: number, y2: number): ShapeNode {
   const angle = round2((Math.atan2(y2 - y1, x2 - x1) * 180) / Math.PI);
   const links: ShapeNode[] = [];
   for (let i = 0; i < LINKS_PER_CHAIN; i += 1) {
     const t = (i + 0.5) / LINKS_PER_CHAIN;
+    const transform = {
+      translate: [
+        round2(x1 + (x2 - x1) * t),
+        round2(y1 + (y2 - y1) * t),
+      ] as const,
+      rotate: angle,
+    };
     links.push(
-      ellipse("door-chain-link", 0, 0, 6, 3.5, {
-        fill: "none",
-        transform: {
-          translate: [round2(x1 + (x2 - x1) * t), round2(y1 + (y2 - y1) * t)],
-          rotate: angle,
-        },
-      }),
+      ellipse("door-chain-link", 0, 0, 6, 3.5, { fill: "none", transform }),
+      ellipse("door-chain-glint", 0, 0, 3.2, 1.4, { fill: "none", transform }),
     );
   }
   return g("door-chain", links);
 }
 
 /**
- * The chained door of a floor with no Card, 70 wide, inside its slot band,
- * in the style of the illustration: a dark wooden door, two dark iron chains
+ * The chained door of a floor with no Card, in the style of the illustration:
+ * a dark wooden arched door in a dark iron surround, two dark iron chains
  * crossing in an X and an iron hook, with no light outline. It has no
  * padlock, so it never looks like a Locked ghost (Requirement 8.6).
  */
 export function chainedDoorArt(floor: Floor): ShapeNode {
-  const { cx, h } = DOOR_AT[floor];
-  const x = round2(cx - DOOR_WIDTH / 2);
-  // The door stands on its floor, inside a frame, over a stone threshold.
-  const y = FLOOR_LINE[floor] - h;
-  const right = x + DOOR_WIDTH;
-  const midX = round2(x + DOOR_WIDTH / 2);
-  const midY = round2(y + h / 2);
+  const { cx, half, top, surround } = DOORS[floor];
+  const bottom = FLOOR_LINE[floor];
+  const shoulder = Math.min(12, round2(half / 3));
+  const outer = half + surround;
+  const midY = round2((top + bottom) / 2);
+  const [left, right] = [round2(cx - half + 5), round2(cx + half - 5)];
+  const [chainTop, chainBottom] = [top + shoulder + 8, bottom - 14];
   return g(
     "chained-door",
     [
-      rect("door-frame", x - 6, y - 6, DOOR_WIDTH + 12, h + 6),
-      rect("door-panel", x, y, DOOR_WIDTH, h, { rx: 4 }),
-      rect("door-threshold", x - 10, FLOOR_LINE[floor] - 4, DOOR_WIDTH + 20, 4),
+      path(
+        "door-frame",
+        archedDoor(cx, outer, top - 5, bottom, shoulder + surround),
+      ),
+      path("door-panel", archedDoor(cx, half, top, bottom, shoulder), {
+        part: "door-panel",
+      }),
+      rect("door-threshold", cx - outer - 4, bottom - 4, 2 * (outer + 4), 4),
       strokePath(
         "door-planks",
-        `M${x + 23} ${y + 6} V${y + h - 6} M${x + 47} ${y + 6} V${y + h - 6}`,
+        `M${cx - 12} ${top + 14} V${bottom - 6} M${cx + 12} ${top + 14} V${bottom - 6}`,
       ),
-      chainLinks(x + 4, y + 8, right - 4, y + h - 8),
-      chainLinks(right - 4, y + 8, x + 4, y + h - 8),
+      chainLinks(left, chainTop, right, chainBottom),
+      chainLinks(right, chainTop, left, chainBottom),
       strokePath(
         "door-hook",
-        `M${midX} ${midY - 6} V${midY + 4} C${midX} ${midY + 10} ${midX - 8} ${midY + 10} ${midX - 8} ${midY + 4}`,
+        `M${cx} ${midY - 6} V${midY + 4} C${cx} ${midY + 10} ${cx - 8} ${midY + 10} ${cx - 8} ${midY + 4}`,
       ),
     ],
     { part: "chained-door" },

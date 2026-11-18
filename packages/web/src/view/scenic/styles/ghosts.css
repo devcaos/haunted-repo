@@ -85,8 +85,9 @@
   stroke-width: 1;
 }
 /*
- * Chained door of an empty floor, matched to the illustration: dark wood,
- * dark iron chains and hook, no light outline and no padlock.
+ * Chained door of an empty floor, matched to the illustration: dark wood in a
+ * dark iron surround, dark iron chains with only a faint glint inside each
+ * link, a dark hook. No light outline and no padlock.
  */
 .chained-door .door-panel {
   fill: var(--sc-door-wood);
@@ -104,7 +105,12 @@
 }
 .chained-door .door-chain-link {
   stroke: var(--sc-iron);
-  stroke-width: 2.5;
+  stroke-width: 3;
+}
+.chained-door .door-chain-glint {
+  stroke: var(--sc-mist);
+  stroke-width: 0.8;
+  opacity: 0.2;
 }
 .chained-door .door-hook {
   stroke: var(--sc-iron-dark);
