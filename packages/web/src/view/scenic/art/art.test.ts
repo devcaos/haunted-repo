@@ -34,7 +34,14 @@ import {
   houseLayer,
 } from "./house.js";
 import { chainedDoorArt, slotArt } from "./props.js";
-import { foregroundLayer, rainPath, skyLayers, weatherLayer } from "./sky.js";
+import {
+  RAIN_BOTTOM,
+  RAIN_STEP,
+  foregroundLayer,
+  rainPath,
+  skyLayers,
+  weatherLayer,
+} from "./sky.js";
 
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
@@ -189,8 +196,6 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(classesOf(skyLayers())).toEqual(
       expect.arrayContaining(["moon", "clouds-left", "clouds-right"]),
     );
-    const wrap = weatherLayer().children?.find((n) => n.cls === "rain-wrap");
-    expect(wrap?.children?.map((n) => n.cls)).toEqual(["rain"]);
     expect(classesOf(weatherLayer()).filter((c) => c === "fog")).toHaveLength(
       2,
     );
@@ -205,18 +210,81 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
 
 describe("rain loop (Requirement 3.3)", () => {
   it("one step of rain-fall lands every streak on another, so the loop never jumps", () => {
-    const starts = [...rainPath().matchAll(/M(-?[\d.]+) (-?[\d.]+)/g)].map(
-      (m) => [Number(m[1]), Number(m[2])] as const,
-    );
-    const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
-    for (const [x, y] of starts) {
-      // Moved by one step (-40, 200): either another streak or below the scene.
-      if (y + 200 < 1000) expect(seen.has(`${x - 40},${y + 200}`)).toBe(true);
-      // Every visible streak was filled in from one step before.
-      if (y >= 0) expect(seen.has(`${x + 40},${y - 200}`)).toBe(true);
+    const [sx, sy] = RAIN_STEP;
+    for (const layer of ["far", "near"] as const) {
+      const d = rainPath(layer);
+      const starts = [...d.matchAll(/M(-?[\d.]+) (-?[\d.]+)/g)].map(
+        (m) => [Number(m[1]), Number(m[2])] as const,
+      );
+      const seen = new Set(starts.map(([x, y]) => `${x},${y}`));
+      for (const [x, y] of starts) {
+        // Moved by one step: either another streak or below the drawn rain.
+        if (y + sy < RAIN_BOTTOM)
+          expect(seen.has(`${x + sx},${y + sy}`)).toBe(true);
+        // Every visible streak was filled in from one step before.
+        if (y >= 0) expect(seen.has(`${x - sx},${y - sy}`)).toBe(true);
+      }
+      // Columns start right of the scene, so the leftward drift leaves no gap.
+      expect(Math.max(...starts.map(([x]) => x))).toBeGreaterThan(
+        1600 - 6 * sx - 100,
+      );
+      // Every streak falls along the step, so the rain is diagonal and steady.
+      for (const m of d.matchAll(/l(-?\d+) (\d+)/g)) {
+        expect(Number(m[1]) / Number(m[2])).toBeCloseTo(sx / sy, 1);
+      }
     }
-    // Columns start right of the scene, so the leftward drift leaves no gap.
-    expect(Math.max(...starts.map(([x]) => x))).toBeGreaterThan(1600 + 200);
+  });
+});
+
+/** Winding number of the closed subpaths of absolute path data around a point. */
+function winding(d: string, [px, py]: [number, number]): number {
+  let total = 0;
+  for (const sub of d.split("Z").filter((s) => s.trim() !== "")) {
+    const pts = pathPoints(`${sub}Z`);
+    pts.forEach(([x1, y1], i) => {
+      const [x2, y2] = pts[(i + 1) % pts.length] ?? [x1, y1];
+      const cross = (x2 - x1) * (py - y1) - (px - x1) * (y2 - y1);
+      if (y1 <= py && y2 > py && cross > 0) total += 1;
+      if (y1 > py && y2 <= py && cross < 0) total -= 1;
+    });
+  }
+  return total;
+}
+
+describe("rain clip (Requirement 3.3)", () => {
+  const weather = weatherLayer();
+  const wrap = nodesOf(weather).find((n) => n.cls === "rain-wrap");
+  const clip = nodesOf(weather).find((n) => n.id === wrap?.clip);
+  const d = clip?.children?.[0]?.d ?? "";
+
+  it("the still wrapper holds the clip; only the two layers inside it move", () => {
+    expect(wrap?.clip).toBe("rain-sky");
+    expect(wrap?.children?.map((n) => n.cls)).toEqual([
+      "rain rain-far",
+      "rain rain-near",
+    ]);
+  });
+
+  it("lets rain fall only on the sky outside the house and above the ground", () => {
+    const sky: [number, number][] = [
+      [420, 300],
+      [1209, 600],
+      [1400, 500],
+      [870, 120],
+      [1000, 205],
+    ];
+    const solid: [number, number][] = [
+      [870, 600],
+      [600, 420],
+      [1028, 240],
+      [1268, 500],
+      [1268, 200],
+      [870, 170],
+      [300, 800],
+      [1268, 900],
+    ];
+    for (const p of sky) expect(winding(d, p), `${p}`).not.toBe(0);
+    for (const p of solid) expect(winding(d, p), `${p}`).toBe(0);
   });
 });
 

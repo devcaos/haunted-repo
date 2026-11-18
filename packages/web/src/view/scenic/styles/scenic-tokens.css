@@ -38,7 +38,8 @@
   --sc-rim-opacity: 0.6;
   --sc-fg-rim-opacity: 0.35;
   --sc-dim: 0.65;
-  --sc-rain: 0.35;
+  --sc-rain: 0.45;
+  --sc-rain-far: 0.22;
   --sc-rain-still: 0.25;
   --sc-fog: 0.4;
   --sc-fog-still: 0.35;
@@ -112,7 +113,8 @@
   --sc-dur-smoke-question: 700ms;
   --sc-dur-exorcise-spiral: 600ms;
   --sc-dur-exorcise-sparks: 400ms;
-  --sc-dur-rain-fall: 800ms;
+  --sc-dur-rain-fall: 700ms;
+  --sc-dur-rain-far: 1300ms;
   --sc-dur-fog-drift: 24s;
   --sc-dur-bats-fly: 22s;
   --sc-dur-window-flicker: 3.2s;
@@ -123,7 +125,7 @@
   --sc-dur-ring: 2s;
   --sc-dur-beam-sweep: 2.5s;
   /* Distances of the looping motions, in viewBox units */
-  --sc-rain-step-x: -40px;
+  --sc-rain-step-x: -80px;
   --sc-rain-step-y: 200px;
   --sc-fog-shift: 60px;
   --sc-bob-rise: -6px;

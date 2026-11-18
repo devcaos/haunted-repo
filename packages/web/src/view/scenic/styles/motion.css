@@ -62,6 +62,10 @@
     animation: rain-fall var(--sc-dur-rain-fall) var(--sc-ease-linear) infinite;
   }
 
+  .house .rain-far {
+    animation-duration: var(--sc-dur-rain-far);
+  }
+
   .house .fog {
     animation: fog-drift var(--sc-dur-fog-drift) var(--sc-ease-in-out) infinite
       alternate;

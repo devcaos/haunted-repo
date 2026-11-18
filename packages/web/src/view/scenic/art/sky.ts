@@ -10,6 +10,7 @@ import {
   strokePath,
   type ShapeNode,
 } from "./shapes.js";
+import { houseOutline } from "./house.js";
 
 // Everything here is in the house viewBox `0 0 1600 1000` (design "World
 // geometry"). The top band (y < 110) holds only sky and the left column
@@ -62,34 +63,58 @@ export function skyLayers(): ShapeNode {
 }
 
 /**
- * Each column of streaks repeats every (-40, 200) units, the step of the
+ * Each column of streaks repeats every (-80, 200) units, the step of the
  * `rain-fall` animation (`--sc-rain-step-x`, `--sc-rain-step-y`), so one step
  * lands every streak where another was and the loop never jumps.
  */
-const RAIN_STEP_X = -40;
-const RAIN_STEP_Y = 200;
+export const RAIN_STEP = [-80, 200] as const;
+/** Streaks stop a little below the ground line; the clip hides the rest. */
+export const RAIN_BOTTOM = 780;
 /** Columns start this far right of the scene, so the leftward drift never leaves a gap. */
-const RAIN_SPAN = 1600 + 6 * -RAIN_STEP_X;
+const RAIN_SPAN = 1600 + 6 * -RAIN_STEP[0];
+/** Columns and streak length of the far (thin, slow) and near (long, fast) rain. */
+const RAIN_LAYERS = { far: [64, 12], near: [28, 26] } as const;
 
-/** Short slanted streaks spread over the scene, one path for all of them. */
-export function rainPath(): string {
+/** Slanted streaks along the fall direction, one path for a whole layer. */
+export function rainPath(layer: keyof typeof RAIN_LAYERS): string {
+  const [columns, length] = RAIN_LAYERS[layer];
+  const [sx, sy] = RAIN_STEP;
+  const dx = Math.round((length * sx) / sy);
+  const seed = layer === "far" ? 97 : 61;
   let d = "";
-  const columns = 56;
   for (let i = 0; i < columns; i += 1) {
     // Evenly spread over the span, with a small jitter so they do not line up.
     let x = Math.round((i * RAIN_SPAN) / columns) + ((i * 7) % 13) + 6;
-    let y = ((i * 97) % RAIN_STEP_Y) - RAIN_STEP_Y;
-    for (; y < 1000; x += RAIN_STEP_X, y += RAIN_STEP_Y) {
-      d += `M${x} ${y}l-6 22`;
-    }
+    let y = ((i * seed) % sy) - sy;
+    for (; y < RAIN_BOTTOM; x += sx, y += sy) d += `M${x} ${y}l${dx} ${length}`;
   }
   return d;
 }
 
-/** Rain (`rain-wrap` > `rain`, so a wrapper can hide it while the inner group moves) and two fog bands. */
+/** Sky outside the house and above the ground: the outer box clockwise, each outline counter-clockwise. */
+function rainClip(): string {
+  const hole = (pts: number[]): string => {
+    const pairs: string[] = [];
+    for (let i = pts.length - 2; i >= 0; i -= 2)
+      pairs.push(`${pts[i]} ${pts[i + 1]}`);
+    return `M${pairs.join(" L")} Z`;
+  };
+  return `M0 0 H1600 V760 H0 Z ${houseOutline().map(hole).join(" ")}`;
+}
+
+/** Rain (`rain-wrap` holds the clip and stays still, each `rain` layer moves) and two fog bands. */
 export function weatherLayer(): ShapeNode {
+  const layer = (name: keyof typeof RAIN_LAYERS): ShapeNode =>
+    g(`rain rain-${name}`, [strokePath("rain-streaks", rainPath(name))]);
   return g("weather", [
-    g("rain-wrap", [g("rain", [strokePath("rain-streaks", rainPath())])]),
+    defs([
+      {
+        kind: "clipPath",
+        id: "rain-sky",
+        children: [path("clip-shape", rainClip())],
+      },
+    ]),
+    g("rain-wrap", [layer("far"), layer("near")], { clip: "rain-sky" }),
     path(
       "fog fog-back",
       "M380 748 C560 728 800 732 1000 742 C1160 730 1300 736 1420 752 C1200 770 620 772 380 748 Z",

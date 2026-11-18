@@ -216,6 +216,15 @@
   opacity: var(--sc-rain);
 }
 
+/* The far rain is thinner and fainter, so the two layers read as depth. */
+.house .rain-far {
+  opacity: var(--sc-rain-far);
+}
+
+.house .rain-far .rain-streaks {
+  stroke-width: 1;
+}
+
 .house .fog {
   fill: var(--sc-mist);
   opacity: var(--sc-fog);

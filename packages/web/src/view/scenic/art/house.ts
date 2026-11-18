@@ -37,6 +37,31 @@ export const FLOOR_CLASS: Readonly<Record<Floor, string>> = {
   basement: "floor-basement",
 };
 
+/** Y of the slope at `x` on the right side of the roof. */
+function slopeY(x: number): number {
+  return (
+    Math.round(
+      (RIDGE_Y + ((EAVE_Y - RIDGE_Y) * (x - RIDGE_X)) / (EAVE_R - RIDGE_X)) *
+        10,
+    ) / 10
+  );
+}
+
+/**
+ * The outline of everything solid above the ground, clockwise: body with roof
+ * and chimney, then the tower. The rain is clipped to the sky outside it.
+ */
+export function houseOutline(): number[][] {
+  const { x, w, top, foot, apex } = TOWER;
+  const body = [
+    [EAVE_L, EAVE_Y, RIDGE_X, RIDGE_Y, 1004, slopeY(1004), 1004, 212],
+    [1052, 212, 1052, slopeY(1052), EAVE_R, EAVE_Y, BODY.right, EAVE_Y],
+    [BODY.right, 760, BODY.left, 760, BODY.left, EAVE_Y],
+  ].flat();
+  const tower = [x - 12, top - 8, x + w / 2, apex, x + w + 12, top - 8];
+  return [body, [...tower, x + w, top, x + w, foot, x, foot, x, top]];
+}
+
 /** Id of the clip that keeps the attic under the inner roof line (stage.ts clips its dim with it too). */
 export const ATTIC_CLIP = "attic-inside";
 
