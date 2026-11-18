@@ -22,13 +22,24 @@ export function sceneBackdrop(href: string | null): ShapeNode {
 /** The ground line of the illustration: the rain stops here. */
 export const GROUND_Y = 711;
 
+/** The house of the illustration, clockwise: left foot, ridge, right foot, bottom right, bottom left. */
+// prettier-ignore
+export const HOUSE_POLYGON = [362, 511, 756, 127, 1149, 511, 1144, 711, 367, 711] as const;
+
+/** The tower of the illustration, clockwise: bottom left, top left, spire tip, top right, bottom right. */
+// prettier-ignore
+export const TOWER_POLYGON = [1102, 711, 1102, 284, 1178, 56, 1253, 284, 1253, 711] as const;
+
 /**
- * The house with its tower above the ground, clockwise, after the
- * illustration's own rain mask. The rain overlay is clipped outside it.
+ * The outline of the house and the tower together (their union), clockwise.
+ * The rain clip cuts this one outline out of the sky. The two polygons
+ * overlap, and a clip hole must not overlap another one (the nonzero rule
+ * would let rain back in), so the clip takes the union: the right roof slope
+ * meets the tower's left side at (1102, 465.06).
  */
 // prettier-ignore
 export const HOUSE_OUTLINE = [
-  364, 711, 362, 511, 756, 127, 1102, 465, 1102, 284, 1178, 56, 1253, 284,
+  367, 711, 362, 511, 756, 127, 1102, 465.06, 1102, 284, 1178, 56, 1253, 284,
   1253, 711,
 ] as const;
 

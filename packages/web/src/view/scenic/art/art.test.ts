@@ -1,4 +1,6 @@
-﻿import { describe, expect, it } from "vitest";
+﻿/// <reference types="node" />
+import { readFileSync } from "node:fs";
+import { describe, expect, it } from "vitest";
 import {
   circle,
   defs,
@@ -33,7 +35,9 @@ import {
   ATTIC_TRIANGLE,
   GROUND_Y,
   HOUSE_OUTLINE,
+  HOUSE_POLYGON,
   ILLUSTRATION_PROPS,
+  TOWER_POLYGON,
   TELEPHONE_ANCHOR,
   atticClip,
   sceneBackdrop,
@@ -286,7 +290,27 @@ describe("weather overlay (Requirement 3.3)", () => {
     ]);
   });
 
-  it("lets rain fall only on the sky outside the illustrated house and above the ground", () => {
+  /** Point in polygon by ray casting, independent of the clip's winding rule. */
+  const inside = (
+    poly: readonly number[],
+    [px, py]: [number, number],
+  ): boolean => {
+    let hit = false;
+    for (let i = 0, j = poly.length - 2; i < poly.length; j = i, i += 2) {
+      const [xi = 0, yi = 0, xj = 0, yj = 0] = [
+        poly[i],
+        poly[i + 1],
+        poly[j],
+        poly[j + 1],
+      ];
+      if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi)
+        hit = !hit;
+    }
+    return hit;
+  };
+
+  it("lets rain fall only on the sky: never on the house, the tower or below the ground line", () => {
+    // Spot checks by name.
     const sky: [number, number][] = [
       [200, 300],
       [1400, 500],
@@ -299,14 +323,60 @@ describe("weather overlay (Requirement 3.3)", () => {
       [700, 600], // middle floor
       [1178, 200], // tower spire
       [1178, 600], // tower shaft
+      [1120, 650], // house and tower overlap
       [700, 800], // basement, under the ground
       [100, GROUND_Y + 5],
     ];
     for (const p of sky) expect(winding(d, p), `${p}`).not.toBe(0);
     for (const p of solid) expect(winding(d, p), `${p}`).toBe(0);
+    // Every point of a grid over the viewBox: blocked exactly when it is in
+    // the house polygon, in the tower polygon or below the ground line.
+    for (let x = 3; x < 1600; x += 11) {
+      for (let y = 3; y < 1000; y += 11) {
+        const blocked =
+          inside(HOUSE_POLYGON, [x, y]) ||
+          inside(TOWER_POLYGON, [x, y]) ||
+          y > GROUND_Y;
+        expect(winding(d, [x, y]) === 0, `${x},${y}`).toBe(blocked);
+      }
+    }
     // The outline stands on the ground line.
     const ys = HOUSE_OUTLINE.filter((_, i) => i % 2 === 1);
     expect(Math.max(...ys)).toBe(GROUND_Y);
+  });
+
+  it("uses the house and tower polygons of the illustration", () => {
+    expect(HOUSE_POLYGON).toEqual([
+      362, 511, 756, 127, 1149, 511, 1144, 711, 367, 711,
+    ]);
+    expect(TOWER_POLYGON).toEqual([
+      1102, 711, 1102, 284, 1178, 56, 1253, 284, 1253, 711,
+    ]);
+  });
+
+  it("draws thin, faint drops: about 1 unit wide and at most 0.3 opacity", () => {
+    const css = readFileSync(
+      new URL("../styles/stage.css", import.meta.url),
+      "utf8",
+    );
+    const tokens = readFileSync(
+      new URL("../styles/scenic-tokens.css", import.meta.url),
+      "utf8",
+    );
+    const width =
+      /\.house \.rain-streaks\s*{[^}]*stroke-width:\s*([\d.]+)/.exec(css);
+    expect(Number(width?.[1])).toBeLessThanOrEqual(1);
+    const far =
+      /\.house \.rain-far \.rain-streaks\s*{[^}]*stroke-width:\s*([\d.]+)/.exec(
+        css,
+      );
+    expect(Number(far?.[1])).toBeLessThanOrEqual(1);
+    const opacity = /--sc-rain:\s*([\d.]+)/.exec(tokens);
+    expect(Number(opacity?.[1])).toBeGreaterThan(0.2);
+    expect(Number(opacity?.[1])).toBeLessThanOrEqual(0.3);
+    expect(Number(/--sc-rain-far:\s*([\d.]+)/.exec(tokens)?.[1])).toBeLessThan(
+      Number(opacity?.[1]),
+    );
   });
 
   it("draws the fog as soft gradient puffs in two drifting groups", () => {

@@ -79,10 +79,14 @@
 .house .scene-fallback {
   fill: var(--sc-night);
 }
-/* Weather overlay above the picture: thin rain and soft fog, no filter. */
+/*
+ * Weather overlay above the picture: rain and soft fog, no filter. The drops
+ * are about 1 unit wide and faint, so they match the rain painted in the
+ * illustration; the clip keeps them off the house, the tower and the ground.
+ */
 .house .rain-streaks {
   stroke: var(--sc-spectral);
-  stroke-width: 1.5;
+  stroke-width: 1;
   stroke-linecap: round;
 }
 
@@ -96,7 +100,7 @@
 }
 
 .house .rain-far .rain-streaks {
-  stroke-width: 1;
+  stroke-width: 0.75;
 }
 
 /* Soft fog: each puff fades from Mist at its centre to nothing at its edge. */
