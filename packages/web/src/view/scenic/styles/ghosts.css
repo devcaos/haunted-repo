@@ -88,46 +88,6 @@
   stroke: var(--sc-iron-dark);
   stroke-width: 1;
 }
-/* Slot panes: unlit is Slate glass in a Mist frame; lit is Candle glass with a warm halo (Requirement 12.5). */
-.pane .pane-frame {
-  fill: var(--sc-mist);
-}
-
-.pane .pane-bars {
-  stroke: var(--sc-mist);
-  stroke-width: 2;
-}
-
-.pane .pane-sill {
-  fill: var(--sc-mist);
-}
-
-/* A faint diagonal reflection across the glass. */
-.pane .pane-glint {
-  stroke: var(--sc-spectral);
-  stroke-width: 1.2;
-  stroke-linecap: round;
-  opacity: 0.3;
-}
-
-.pane-unlit .pane-glass {
-  fill: var(--sc-slate);
-}
-
-.pane-lit .pane-glass {
-  fill: var(--sc-candle);
-}
-
-.pane-lit .stop-warm-0 {
-  stop-color: var(--sc-warm-orange);
-  stop-opacity: 0.5;
-}
-
-.pane-lit .stop-warm-1 {
-  stop-color: var(--sc-warm-orange);
-  stop-opacity: 0;
-}
-
 /*
  * Chained door of an empty floor, matched to the illustration: dark wood,
  * dark iron chains and hook, no light outline and no padlock.

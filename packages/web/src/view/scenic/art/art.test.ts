@@ -622,7 +622,7 @@ describe("the three Ghost_Types, Variant 0 (Requirements 5.4, 5.6, 6.1; director
   });
 });
 
-describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
+describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
   const FLOORS = ["attic", "middle floor", "basement"] as const;
   const STATES = ["haunted", "locked", "exorcised"] as const;
   /** Slot `index` of `count` on a floor, as the Scene_Layout would place it. */
@@ -662,29 +662,15 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
     }
   });
 
-  it("the pane is lit exactly for Exorcised slots", () => {
+  it("draws no window in any slot: Locked and Exorcised slots are empty until the ghost's own looks come (director's decision, 18 Nov)", () => {
     for (const slot of allSlots) {
-      const classes = classesOf(slotArt(slot));
-      expect(classes).toContain("pane");
-      expect(classes.includes("pane-lit")).toBe(slot.state === "exorcised");
-      expect(classes.includes("pane-unlit")).toBe(slot.state !== "exorcised");
-    }
-  });
-
-  it("the pane is a centred gothic arch about 1:2, 4 units below the slot top, on a wider sill", () => {
-    for (const slot of allSlots) {
-      const nodes = nodesOf(slotArt(slot));
-      const frame = nodes.find((n) => n.cls === "pane-frame");
-      const box = frame === undefined ? null : boxOf(frame);
-      const { x1 = 0, y1 = 0, x2 = 0, y2 = 0 } = box ?? {};
-      expect((x1 + x2) / 2).toBeCloseTo(slot.rect.x + slot.rect.w / 2, 1);
-      expect(y1).toBe(slot.rect.y + 4);
-      expect((y2 - y1) / (x2 - x1)).toBeCloseTo(2, 0);
-      expect(frame?.d).toContain("Q"); // pointed top
-      const sill = nodes.find((n) => n.cls === "pane-sill");
-      expect(sill?.width ?? 0).toBeGreaterThan(x2 - x1);
-      expect(sill?.y).toBe(y2);
-      expect(nodes.some((n) => n.cls === "pane-glint")).toBe(true);
+      const tree = slotArt(slot);
+      const names = nodesOf(tree).flatMap((n) => [
+        ...(n.cls?.split(" ") ?? []),
+        n.part ?? "",
+      ]);
+      expect(names.filter((name) => /pane|window|sill/.test(name))).toEqual([]);
+      if (slot.state !== "haunted") expect(tree.children).toEqual([]);
     }
   });
 
