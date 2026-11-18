@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design adds the Scenic_Renderer in `packages/web/src/view/scenic/`. It draws the demo as a Halloween video-game scene: a cutaway haunted house in SVG built from plain data (Shape_Data), a game HUD in real HTML, a ringing Telephone, three ghost designs (Wisp, Lantern_Wraith, Chained_Brute) and a close-up exorcism room with a Grimoire panel. Animation is CSS only. The Logic_Layer, the committed data and Core do not change; only new English texts are added to `texts.ts` and `powerTexts.ts`.
+This design adds the Scenic_Renderer in `packages/web/src/view/scenic/`. It draws the demo as a Halloween video-game scene: a cutaway haunted house that is one declared illustration (`house-scene.svg`, drafted with Claude) with the weather, the ghosts and the props drawn over it as plain data (Shape_Data), a game HUD in real HTML, a ringing Telephone, three ghost designs (Wisp, Lantern_Wraith, Chained_Brute) and a close-up exorcism room with a Grimoire panel. Animation is CSS only. The Logic_Layer, the committed data and Core do not change; only new English texts are added to `texts.ts` and `powerTexts.ts`.
 
 Key decisions:
 
@@ -89,7 +89,7 @@ packages/web/
           hudView.ts  grimoireView.ts
           viewModelArb.testutil.ts  *.test.ts  contrast.test.ts
         art/                        Shape_Data (pure data and builders)
-          shapes.ts  sky.ts  house.ts  props.ts  ghosts.ts  room.ts
+          shapes.ts  weather.ts  house.ts  props.ts  ghosts.ts  room.ts
           art.test.ts
         styles/
           scenic-tokens.css  base.css  hud.css  stage.css
@@ -331,7 +331,7 @@ export interface VisualMemory {
 export interface RenderEffects {
   meter: { view: MeterView; from: number | null } | null; // null hides the Haunt_Meter; from !== null animates
   exorcisedMoments: string[];   // start now (12.1)
-  returnGlow: string[];         // windows to light up now (12.6)
+  returnGlow: string[];         // Exorcised slot drawings to fade in now (12.6)
   finale: { shown: boolean; animate: boolean; announce: boolean };
   sceneChanged: boolean;
 }
@@ -491,13 +491,13 @@ export type Keyword = "transparent" | "currentColor" | "none" | "inherit";
 export interface ShapeNode { /* see Data Models */ }
 export function g(cls: string, children: ShapeNode[], extra?: Partial<ShapeNode>): ShapeNode; // and path(), rect(), circle(), ellipse(), poly()
 
-// sky.ts, house.ts, props.ts, ghosts.ts, room.ts: builders that return ShapeNode trees
+// weather.ts, house.ts, props.ts, ghosts.ts, room.ts: builders that return ShapeNode trees
 export function skyLayers(): ShapeNode;        // sky, moon, clouds, far and near hills
 export function houseLayer(): ShapeNode;       // walls, roof, tower, rooms, telephone table, door
 export function foregroundLayer(): ShapeNode;  // fence, gravestones, dead tree
 export function weatherLayer(): ShapeNode;     // rain, fog
 export function effectsLayer(): ShapeNode;     // lightning, search beam, dawn, bats, facade (Intro)
-export function slotArt(slot: SlotPlacement): ShapeNode; // window + ghost | cloche | candle
+export function slotArt(slot: SlotPlacement): ShapeNode; // ghost | cloche | candle (no window)
 export function chainedDoorArt(floor: Floor): ShapeNode;
 export function telephoneArt(): ShapeNode;
 export function ghostArt(type: GhostType, variant: VariantNumber, look: "haunted" | "locked"): ShapeNode;
@@ -630,24 +630,18 @@ The house SVG uses one viewBox for the whole scene. The world box always keeps t
 | HUD quiet band, top (wide) | 0, 0, 1600, 110 | Only sky is drawn here. |
 | HUD quiet column, left (wide) | 0, 110, 400, 890 | Far hills, fence and gravestones only. |
 | Nameplate rail (wide, Floor_Scene) | 400, 720, 1200, 280 | Stage area below the framed floor. |
-| House outline | 540, 125, 790, 835 | Includes tower and basement. |
-| Roof | eaves (560, 380) and (1180, 380), ridge (790, 170) | Ridge left of the house centre (asymmetry). |
-| Chimney | 640, 250, 40, 90 | On the left slope. |
-| Attic oculus (round window) | centre (790, 262), r 24 | Window flicker (cut list). |
-| Tower | 1150, 125, 150, 635, rotated 3° clockwise about (1225, 760) | Spire tip at about (1240, 125). |
-| **Attic floor** | 590, 330, 560, 170 | Rafters, trunk, cobwebs. |
-| Attic slot band | 630, 395, 480, 97 | Under both roof slopes. |
-| **Middle floor** | 560, 500, 620, 260 | |
-| Entrance_Hall | 560, 500, 200, 260 | Left part. |
-| Front door | 575, 610, 80, 150 | |
-| Telephone table | 668, 700, 80, 60 | Table top at y 700. |
-| Telephone | centre (708, 676), 70 × 50 | |
-| Answer_Button anchor | (708, 620) | Bottom centre of the pinned phone widget. |
-| Parlour | 760, 500, 420, 260 | Fireplace 1040, 630, 110, 130; shelves 790, 540, 90, 160. |
-| Middle slot band | 770, 545, 400, 207 | Keeps the telephone corner free. |
-| **Basement** | 580, 760, 580, 180 | Stone walls, boiler, pipes, chains. |
-| Basement slot band | 600, 790, 540, 142 | |
-| Cut ground line | y 760, from x 380 to x 1330, jagged | Ground surface elsewhere. |
+| Ground line of the illustration | y 711 | The rain stops here (`GROUND_Y`). |
+| House outline | polygon (362, 511), (756, 127), (1149, 511), (1144, 711), (367, 711) | `HOUSE_POLYGON` in `art/house.ts`; the symmetric gable and the porch lantern at x 280 are in the picture. |
+| Tower | polygon (1102, 711), (1102, 284), (1178, 56), (1253, 284), (1253, 711) | `TOWER_POLYGON`; a straight tower with a spire. |
+| Rain clip | the union of the two outlines above, cut out of the sky down to y 711 | `HOUSE_OUTLINE`, so the page rain never falls on the house. |
+| **Attic floor** | 437, 173, 637, 300 | A triangle under the roof (437, 473), (756, 173), (1074, 473); its floor line is y 473. |
+| Attic slot band | 570, 370, 370, 100 | Under both roof slopes. |
+| **Middle floor** | 418, 496, 675, 200 | Entrance_Hall on the left, Parlour on the right. |
+| Telephone | anchor (536, 611) | The old telephone on its table in the hall (`TELEPHONE_ANCHOR`). Task 11.1 pins the widget here. |
+| Middle slot band | 640, 515, 430, 170 | Starts right of the telephone. |
+| **Basement** | 418, 718, 675, 195 | Below the ground line. |
+| Basement slot band | 555, 740, 315, 160 | Between the boiler and the cellar stairs. |
+| Pieces no ghost may cover | telephone (505, 605, 62, 85), boiler (466, 748, 82, 112), stairs (878, 718, 189, 195) | `ILLUSTRATION_PROPS`. |
 | Moon | centre (1210, 175), r 64 | The one main light of the house scenes. |
 | Search_Beam origin | (440, 860) | Lantern on the last fence post. |
 | Lightning bolt | inside 420, 110, 110, 310 | Between the HUD column and the house. |
@@ -663,9 +657,9 @@ cell = B.w / n
 slot j = { x: B.x + j * cell + G / 2, y: B.y, w: cell - G, h: B.h }   for j = 0 .. n - 1
 ```
 
-Every slot lies inside `B`, and `B` lies inside its floor rectangle, so every slot is inside its floor. Two slots of one floor share at most an edge of width 0 (they are `G` apart). The ghost on a slot is drawn at its natural size times its Variant scale times one floor factor `k = min(1, (cell - G) / (1.08 * W), B.h / (1.08 * H))`, where `W × H` is the largest box of that floor's Ghost_Type. The same `k` is used for every slot of a floor, so the Variant sizes stay comparable. With `n = 5`: attic slots 88 × 97, middle 72 × 207, basement 100 × 142.
+Every slot lies inside `B`, and `B` lies inside its floor rectangle, so every slot is inside its floor. Two slots of one floor share at most an edge of width 0 (they are `G` apart). The ghost on a slot is drawn at its natural size times its Variant scale times one floor factor `k = min(1, (cell - G) / (1.08 * W), B.h / (1.08 * H))`, where `W × H` is the largest box of that floor's Ghost_Type. The same `k` is used for every slot of a floor, so the Variant sizes stay comparable. With `n = 5`: attic slots 66 × 100, middle floor 78 × 170, basement 55 × 160.
 
-Each slot also has a window in the back wall: a rectangle 30 × 40 (attic), 34 × 48 (middle floor) or 32 × 36 (basement) centred on the slot, top at `slot.y + 4`. The window is unlit (Slate glass, Mist frame) for Haunted and Locked Cards and lit (Candle glass plus a warm-orange halo) for Exorcised Cards (Requirement 12.5).
+The Ghost_Slots have no window and no shadow: windows drawn over the walls of the illustration clashed with it, and a ghost floats, so it casts no shadow (director's decision, 18 Nov).
 
 A floor with no Card draws a chained door centred in its slot band: 70 wide, band height minus 10 (Requirement 8.6).
 
@@ -673,24 +667,24 @@ A floor with no Card draws a chained door centred in its slot band: 70 wide, ban
 
 | Frame | Frame rectangle (margin included) | Scene area, wide stage (1600 × 1000) | Scene area, narrow stage (1600 × 1600) |
 | --- | --- | --- | --- |
-| House | wide: 0, 0, 1600, 1000 (identity, scale 1); narrow: 510, 95, 850, 895 | 0, 0, 1600, 1000 | 40, 40, 1520, 1520 |
-| Attic | 560, 300, 620, 230 | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
-| Middle floor | 530, 470, 680, 320 | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
-| Basement | 550, 730, 640, 240 | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
+| House | wide: 280, 56, 973, 880 (from the porch lantern to the tower, spire tip to cellar floor); narrow: 270, 40, 1000, 900 | 400, 66, 1200, 934 | 40, 40, 1520, 1520 |
+| Attic | 417, 153, 677, 340 | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
+| Middle floor | 398, 476, 715, 240 | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
+| Basement | 398, 698, 715, 235 | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
 | Slot (Ghost_Scene) | slot rectangle plus 20 on each side | 400, 110, 1200, 610 | 40, 40, 1520, 1520 |
 
-Resulting scales: wide attic 1.94, middle floor 1.76, basement 1.88; narrow house 1.70, attic 2.45, middle floor 2.24, basement 2.38. The wide stage has the viewBox ratio (16:10) and is sized `width: min(100vw, 160dvh)`; at 1440 × 900 it fills the viewport exactly. The narrow stage is square (`aspect-ratio: 1`), full width.
+Resulting scales (rounded): wide house 1.06, attic 1.77, middle floor 1.68, basement 1.68; narrow house 1.52, attic 2.25, middle floor 2.13, basement 2.13. The wide stage has the viewBox ratio (16:10) and is sized `width: min(100vw, 160dvh)`; at 1440 × 900 it fills the viewport exactly. The narrow stage is square (`aspect-ratio: 1`), full width.
 
 ### Ghost types (natural size, Variant 0)
 
 | | Wisp (attic) | Lantern_Wraith (middle floor) | Chained_Brute (basement) |
 | --- | --- | --- | --- |
-| Box W × H (units) | 56 × 88 | 72 × 96 | 96 × 88 |
-| Width : height | 0.64 | 0.75 | 1.09 |
-| Eye height / body height | 4 / 88 = 4.5 % | 7 / 96 = 7.3 % | 6 / 88 = 6.8 % |
-| Outline parts | tall gothic spectre: narrow head, sleeves sweeping out, ragged tail of 4 Bezier tatters; no hood, no horns | pointed hood leaning forward, body narrowing into a spiral tail that curls left (1.25 turns) | broad hunched body, 2 horns curving up and out, lower edge with 4 hanging drips |
-| Part only this type has | `tail-ragged` (ragged tail, no hood) | `hood`, `tail-spiral` | `horns` |
-| Other parts | 2 small slanted Night eye sockets with glowing cold-white cores, no mouth, `cobweb` on the left sleeve (3 threads and 1 arc), 2 cloth folds | 2 slit eyes in a Night face opening, `lantern` (18 × 24, Brass frame, Candle glass) held at the front right at 60 % height, Candle light gradient on the lower face | heavy brow, 2 Pumpkin eyes with a warm glow, `chain` of 7 links across the body to a shackle on one wrist |
+| Box W × H (units) | 38.75 × 85 | 63 × 136 | 78.75 × 136 |
+| Width : height | 0.46 | 0.46 | 0.58 |
+| Eye height / body height | 1.3 / 85 = 1.5 % | 2 / 136 = 1.5 % | 2 / 136 = 1.5 % |
+| Outline parts | one tall hooded wraith (`hooded-robe`, two arms with clawed tips) at scale 0.3125 | the same shape at scale 0.5 | the same shape stretched wider (scale 0.625 × 0.5) |
+| Part only this type has | none (the plain shape) | `lantern`: hanger, pale light, dark frame and a cold flame, hanging from the reaching claw | `shackles` on both wrists and `chain`: 21 links in two hanging chains |
+| Other parts | `glow` (radial-gradient ellipse), 2 cloth folds, dark oval `face` with 2 small pale eyes (drawn twice the reference size so they read), no mouth | same | same; no rim light |
 | Idle animation | `wisp-float`, 5.6 s | `wraith-sway`, 4.2 s | `brute-heave`, 3.2 s |
 
 At every Variant number the three types use the same scale (table below), so the order of sizes (Wisp smallest, Chained_Brute widest) holds for every Variant (Requirement 5.6).
@@ -699,7 +693,7 @@ At every Variant number the three types use the same scale (table below), so the
 
 | # | Scale | Tilt | Wisp eyes / accessory | Lantern_Wraith eyes / accessory | Chained_Brute eyes / accessory |
 | --- | --- | --- | --- | --- | --- |
-| 0 | 1.00 | 0° | round / none | slits / none | narrow / none |
+| 0 | 1.00 | 0° | small tilted ovals / none | slits / none | narrow / none |
 | 1 | 0.90 | −6° | wide / spider on the cobweb | round / scarf | angry / iron ball on the chain |
 | 2 | 1.08 | 5° | sleepy / dust puff | half-lidded / key ring | three eyes / broken shackle |
 | 3 | 0.95 | 9° | wink / moth | one glint / book | squint / rusty nail in the shoulder |
@@ -749,63 +743,59 @@ That is 19 states × 2 sizes = 38 PNG files.
 | `--sc-mist` | `#6F7F92` | Clouds, far hills, frames, muted text (only on Night) |
 | `--sc-bone` | `#D5D0C5` | Body text, moon, rim on ghosts, candle wax |
 | `--sc-spectral` | `#B9CCE6` | Ghost bodies, rim light on the house, links |
-| `--sc-candle` | `#E6A25C` | Headings, lit windows, candle flames, lantern glass |
+| `--sc-candle` | `#E6A25C` | Headings, candle flames, lantern glass |
 | `--sc-pumpkin` | `#FF7A1A` | Game accent: buttons, focus ring, RING!, Chained_Brute eyes |
 | `--sc-brass` | `#C47B3D` | Plaques, frames, telephone details, padlock |
 | `--sc-rust` | `#6E2A1E` | Doors, chained door, basement boiler, dawn mid band |
 | `--sc-cold-blue` | `#6E9BD8` | Named cold blue: Haunted glow, cold room light, Haunt_Meter fill |
-| `--sc-warm-orange` | `#F59A45` | Named warm orange: Exorcised light, lit window halo, warm room light |
+| `--sc-warm-orange` | `#F59A45` | Named warm orange: Exorcised light, warm room light |
 | `--sc-dawn` | `#E9894A` | Finale horizon |
 
 Role tokens (also in the tokens file, all `var(...)` of the palette): `--sc-text` (Bone), `--sc-text-heading` (Candle), `--sc-text-muted` (Mist, only on Night), `--sc-text-link` (Spectral), `--sc-backing` (Night), `--sc-backing-raised` (Slate), `--sc-border` (Brass), `--sc-accent` (Pumpkin), `--sc-focus-ring` (Pumpkin), `--sc-focus-halo` (Night), `--sc-rim` (Spectral on the house, Bone on ghosts through `--sc-rim-ghost`).
 
 Opacity tokens: `--sc-depth-cloud: 0.35`, `--sc-depth-hill-far: 0.45`, `--sc-depth-hill-near: 1`, `--sc-rim-opacity: 0.6`, `--sc-fg-rim-opacity: 0.35`, `--sc-dim: 0.65`, `--sc-rain: 0.35`, `--sc-rain-still: 0.25`, `--sc-fog: 0.4`, `--sc-fog-still: 0.35`, `--sc-locked: 0.45`.
 
-Colour meaning: cold blue means code you do not understand yet (Haunted glow, unlit windows, Haunt_Meter fill, cold room light). Warm orange means code that is yours (lit windows, Exorcised candle, warm room light, the Ghost_Icon of an Exorcised ghost). The Chained_Brute's Pumpkin eyes are an accent required by Requirement 5.3, not a meaning (decision Q30).
+Colour meaning: cold blue means code you do not understand yet (Haunted glow, Haunt_Meter fill, cold room light). Warm orange means code that is yours (Exorcised candle, warm room light, the Ghost_Icon of an Exorcised ghost).
 
 ### Depth layers (back to front)
 
 | Layer | Content | Fill | Opacity | Lighter and bluer? |
 | --- | --- | --- | --- | --- |
-| L0 Sky | full rect | linear gradient Night (top 0 %) to Slate (horizon 70 %) | 1 | darkest at top |
-| L1 Moon and clouds | moon disc, halo, 3 long cloud bands | moon Bone, halo radial Spectral 0.35 to 0, clouds Mist | clouds 0.35 | farthest, palest and bluest |
-| L2 Far hills | one rolling line, y 640 to 700 | Mist | 0.45 | pale blue-grey |
-| L3 Near hills | rising to the right, y 700 to 760 | Slate | 1 | darker |
-| L4 House | walls Slate, shadow sides and room backs Night, rim Spectral | see house | 1 | mid tones, warm accents |
-| L5 Foreground silhouettes | fence and 3 gravestones left (x 0 to 520), dead tree right (x 1380 to 1600, branches up to y 300) | Night | 1, rim 0.35 | darkest |
+| Illustration (L0 to L5 of the picture) | sky, moon, hills, house, tower and foreground, one `<image>` over the whole viewBox | the picture | 1 | back to front inside the picture |
+| Weather | far and near rain (clipped outside the house), back and front fog | rain Spectral, fog Mist | rain 0.3, fog 0.35 | over the picture |
+| Dim rectangles | the two floors that are not focused, cut to the attic triangle for the attic | Night | see D3 | over the picture |
+| Slots | the ghosts, Cloches and Exorcised drawings | tokens | 1 | over everything above |
 
 The rim light is drawn on the edge facing the moon (upper right), on the roof, the tower, the ghosts and the foreground. The moon is the one main light of the House_Scene and the Floor_Scenes; the Ghost_Scene's main light is the window light of the room (cold, then warm).
 
 ### House composition
 
-- **Proportions.** Above-ground body 620 wide; attic 170 high under a roof 210 high; middle floor 260 high; basement 180 high below the cut ground line. The ridge stands at x 790, left of the body centre (870). The crooked tower on the right is 150 wide and leans 3° outwards.
-- **Attic:** three rafters (Night lines over a Slate slope), the round oculus under the ridge, cobwebs in both upper corners (Bone at 0.4), an old trunk on the floor at the right (Rust with Brass bands).
-- **Middle floor:** the Entrance_Hall on the left with the front door (Rust, Brass knob, a small Candle transom window) and the telephone table (Night top, Slate legs) with the Telephone; the Parlour on the right with a fireplace (Slate stones, Night opening, a faint Candle ember), two shelves of books (Slate spines with Mist and Rust) and a faded portrait frame (Brass).
-- **Basement:** stone walls (Slate blocks with Night joints), an old boiler at the left (Rust body, Brass gauge), two pipes along the ceiling (Mist), two chains hanging at the right (Mist links), the cut ground line drawn as a jagged Night edge.
-- **Asymmetry:** ridge off-centre, tower and dead tree on the right, chimney and fence on the left, moon upper right, hills rising to the right.
-- **Shadow budget:** the sky's top third, the ground band outside the basement, the foreground and the shadow sides of the house are Night; together they cover about half of the House_Scene and at least 40 % of each Floor_Scene. The room of the Ghost_Scene has a Night floor and a vignette and keeps at least 40 % Night.
+The house is the illustration `packages/web/src/view/assets/files/house-scene.svg`, not coded shapes. It was drafted with Claude, is declared in the repository, and keeps its C2PA block (director's decision, 18 Nov; `docs/decisiones.md`). `src/view/scenicEntry.ts` resolves the `scene.house` slot of the asset manifest and passes the built URL to the stage, which shows it as one `<image>` over the viewBox. If the slot falls back, the stage draws a plain token-colour rectangle (`scene-fallback`).
+
+- **What the picture holds:** the cutaway house with a symmetric gable and a straight tower with a spire; the attic as a triangle, the middle floor (Entrance_Hall with the old telephone on its table, Parlour) and the basement under the ground line; the sky, moon, hills and foreground. Its numbers are in "World geometry".
+- **What the page draws over it:** rain (clipped outside the house) and fog, the dim rectangles of the unfocused floors, the ghosts, the Cloches and the Exorcised drawings, the chained door of a floor with no Card, the Telephone effects, and the HTML Nameplates and HUD.
+- **Still pictures:** the fire, the clock pendulum and the lanterns of the picture do not move. Animating them with page layers over the picture is a follow-up (`PLAN.md`).
+- **Shadow budget:** the picture is dark; the Ghost_Scene room has a Night floor and a vignette and keeps at least 40 % Night.
 
 ### The Wisp, Variant 0 (the vertical-slice ghost)
 
-Local coordinates, box 56 × 88, origin top left. Redrawn on 18 Nov after the art review of the Vertical Slice Gate (director's decision, `docs/decisiones.md`): a tall gothic spectre, not cute.
+Redrawn on 18 Nov after the art review (director's decision, `docs/decisiones.md`): the three Ghost_Types are one hooded wraith after `ghost-reference.svg` (drafted with Claude and declared; the reference file is not in the repository). The path data is ported into `art/ghosts.ts`; colours come only from tokens and the glow is a radial-gradient ellipse, never a filter.
 
-- Outline: narrow head, sleeves that sweep out to (0, 40) and (56, 42), and a ragged tail of 4 quadratic Bezier tatters down to (34, 88); class `ghost-body`, part `outline` and `tail-ragged`. The exact path data is in `art/ghosts.ts`.
-- Body paint: a vertical linear gradient, cold white (`--sc-cold-white`) at 0.95, Spectral at 0.7 halfway, cold blue at 0 at the tail.
-- Folds: 2 Mist strokes down the body, width 1.2, opacity 0.35.
-- Eyes: Night ellipses rx 3.6, ry 2 (height 4) at (22, 19) and (34, 19), tilted 14° and −14°, each with a cold-white core r 0.8 and a cold-blue radial glow r 5. No mouth.
-- Cobweb: on the left sleeve, 3 threads from (9, 30) and 1 arc; Bone 0.6 wide at 0.45 opacity; part `cobweb`.
-- Rim: along the right side of the head and sleeve, Bone, width 2, opacity 0.6.
-- Glow: ellipse centre (28, 40), rx 46, ry 58, radial cold blue 0.55 to 0; part `glow`.
-- Floor shadow: ellipse (28, 96), rx 16, ry 3, Night at 0.5; the Wisp floats 8 units above it.
-- Idle `wisp-float`: translateY 0 → −8 → 0 with rotate −1.5° → 1.5° → −1.5°, 5.6 s, ease-in-out, infinite. Each slot gets `ghost-phase-<index mod 4>`, which starts the loop 1.4 s later per phase (negative delay), so neighbours never float in step.
+- Outline: a pointed hood, one long reaching arm (right) and one short arm (left) with clawed tips, and a robe that ends in long asymmetric points. Parts `outline`, `hooded-robe` and `arm`. Local box 38.75 × 85 for the Wisp (reference silhouette × 0.3125).
+- Body paint: a vertical linear gradient from pale blue-white at the hood to transparent at the robe points.
+- Face and eyes: a dark oval face (part `face`) with two small pale eyes (part `eye`, tilted 16° and −12°, each with a soft radial glow). No mouth. The eyes are drawn twice the reference size because the ghosts are about a quarter of it on the stage.
+- Folds: 3 thin strokes down the robe.
+- Glow: an ellipse behind the body, radial cold blue to transparent (part `glow`), outside the idle group so it stays still.
+- No shadow and no rim light: a ghost floats.
+- Idle `wisp-float`: translateY 0 → −8 → 0 with rotate −1.5° → 1.5° → −1.5°, 5.6 s, ease-in-out, infinite, on `g.ghost-idle` only. Each slot gets `ghost-phase-<index mod 4>`, which starts the loop 1.4 s later per phase (negative delay), so neighbours never float in step.
 
-The Lantern_Wraith and the Chained_Brute follow the table in "Data Models" with the same layering (body, shade, eyes, parts, rim, glow, shadow). Their idle animations: `wraith-sway` rotates −4° ↔ 4° about the hood tip with translateX ±4, 4.2 s ease-in-out infinite alternate; `brute-heave` scales (1, 1) → (1.03, 0.97) → (1, 1) with translateY 2, 3.2 s ease-in-out infinite.
+The Lantern_Wraith and the Chained_Brute use the same drawing with the scale and the extra parts of the table in "Data Models". Their idle animations: `wraith-sway` rotates −4° ↔ 4° about the hood tip with translateX ±4, 4.2 s ease-in-out infinite alternate; `brute-heave` scales (1, 1) → (1.03, 0.97) → (1, 1) with translateY 2, 3.2 s ease-in-out infinite.
 
 ### Ghost states
 
 - **Haunted:** body Spectral, cold-blue glow, idle animation (Requirements 6.1, 6.2).
 - **Locked:** same Ghost_Type and Variant with class `look-locked` (body and eyes Mist, whole ghost at `--sc-locked` 0.45, no glow, no idle) inside the Cloche: a bell-jar dome 1.25 × the ghost box wide and 1.3 × high (glass fill Spectral at 0.12, a Bone highlight streak at 0.4 on the upper left, outline Mist), a Brass base plate, and a Brass padlock (body 14 × 12, Bone shackle) centred on the plate. The Cloche is the same for every Locked Card, scaled to the slot (6.3).
-- **Exorcised:** no ghost (6.7). A lit candle (Bone wax 10 × 22, Candle flame teardrop with a Pumpkin core) at the slot bottom, a warm-orange radial light r 40, and the slot window lit (6.8, 12.5).
+- **Exorcised:** no ghost (6.7). A lit candle (Bone wax 10 × 22, Candle flame teardrop with a Pumpkin core) at the slot bottom, a warm-orange radial light r 40. The slot has no window (12.5 withdrawn). Built in task 9.3; until then an Exorcised slot draws nothing.
 
 ### Props and panels
 
@@ -884,7 +874,7 @@ Every animation animates only `transform` and `opacity` (Requirement 20.1). Ever
 | `exorcise-spiral` | `.ghost-vigour` (close-up ghost) | transform: translateY −180, rotate 540°, scale 0.4; opacity 1 → 0 | 600 ms, delay 400 ms | `--sc-ease-in` | one-shot | `ghost-fade-out`: opacity → 0, 200 ms |
 | `exorcise-sparks` | `g.sparks` (12 diamonds) | transform scale 0.2 → 1.4, opacity 1 → 0 | 400 ms, delay 1000 ms | ease-out | one-shot | none; sparks hidden |
 | `room-warm` | `.room-light-warm` (over `.room-light-cold`) | opacity 0 → 1 | 1200 ms from the render | ease-in-out | one-shot | 200 ms fade |
-| `window-light-up` | `.slot.is-returning .window-lit` | opacity 0 → 1 | 800 ms | ease-out | one-shot | 200 ms fade |
+| `slot-return` | `.slot.is-returning .slot-exorcised` | opacity 0 → 1 | 800 ms | ease-out | one-shot | 200 ms fade |
 | meter (transition) | `.meter-fill` | transform scaleX | 800 ms | ease-out | one-shot | none: instant |
 | `beam-sweep` | `g.search-beam` | transform: rotate −18° ↔ 12° about the lantern | 2.5 s per sweep | ease-in-out | infinite alternate | none; fixed at −3° |
 | `lightning-flash` | `g.lightning` | opacity 0, 1, 0.15, 0.8, 0, 0 at 0, 8, 20, 32, 50, 100 % | 600 ms | linear | one-shot per flash | never shown |
@@ -991,7 +981,7 @@ Only the Latin subset at weight 400, normal style, is bundled. Text outside Lati
 | Scene | Steady loops | Extra at worst | Worst total |
 | --- | --- | --- | --- |
 | House or Floor (sample) | rain 1, fog 1, bats 1, oculus flicker 1, slots up to 5 (idle or candle flame) = 9 | Ring 4 (rattle, buzz, glow, bubble), Lightning 1, Camera 1 | 15 |
-| House or Floor during the Finale change | 9 minus rain (stopped) | Finale 4 (rain fade, clouds 2, dawn), Return_Glow 2 (window, meter) | 15 |
+| House or Floor during the Finale change | 9 minus rain (stopped) | Finale 4 (rain fade, clouds 2, dawn), Return_Glow 2 (slot drawing, meter) | 15 |
 | House or Floor, busy | 9 | Search_Beam 1, Camera 1 (no Ring: no Telephone_Target while busy) | 11 |
 | Ghost_Scene | room window rain 1, close-up idle 1, lit Question_Candles up to 3 | Reaction 2 (incl. smoke "?"), Exorcised_Moment 3, vigour 1, room fade 1 | 12 |
 | Any Scene with Reduced_Motion | 0 loops | fades of 200 ms or less | well under 15 |

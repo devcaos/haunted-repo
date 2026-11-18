@@ -26,7 +26,7 @@ The web-demo spec is not edited by this spec. Its rules relate to the Scenic_Ren
 - For the Scenic_Renderer, Requirements 3, 5, 21 and 22 of this spec replace web-demo Requirements 11.1, 11.2, 11.4 and 11.6 and the web-demo Out of Scope line "Any drawing of the house, illustration, painted image, animation or sound" (sound stays out of scope here too). Those web-demo rules keep binding the Simple_Renderer only. The decision is recorded in `docs/decisiones.md` (17 Nov).
 - This spec is the "later spec" named in the web-demo Out of Scope ("The scenic renderer, rooms art, animations and any graphic asset").
 - New texts: this spec is the separate decision about texts that the web-demo design ("How to replace the look") asks for. New texts are additions only; no existing text in `texts.ts` or `powerTexts.ts` changes (Requirement 2.2).
-- Asset manifest: Shape_Data is code, not an asset. The asset manifest of web-demo Requirement 18.5 stays for image files, and the Scenic_Renderer does not use it (Requirement 22.10).
+- Asset manifest: Shape_Data is code, not an asset. The asset manifest of web-demo Requirement 18.5 stays for image files. The Scenic_Renderer shows one image, the scene illustration, which `src/view/scenicEntry.ts` resolves from the manifest and hands in (Requirement 22.10).
 - Every other web-demo requirement that binds any renderer still holds (Requirement 25), including 4.7 (the Power line of a live report), 9 (nothing stored), 10.1 and 10.2 (licence), 12.3 (no horizontal scroll at 360 px) and 17 (warnings).
 
 ### Style guide (short note)
@@ -85,7 +85,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - **Licence_Notice**: the sirv MIT notice: the copyright line plus a link to `sirv-license.txt` (`LicenceView` in `viewModel.ts`).
 - **Ghost_Type**: one of the three ghost designs, one per floor: **Wisp** (attic), **Lantern_Wraith** (middle floor), **Chained_Brute** (basement).
 - **Variant**: one of 5 visual versions (numbers 0 to 4) of a Ghost_Type (size, tilt, eyes, accessory), chosen from the ghost's position among the Cards of its floor.
-- **Ghost_Slot**: the place in the SVG of the Cutaway_House where one ghost is drawn, with its window. Ghost_Slots exist in the House_Scene and the Floor_Scene only.
+- **Ghost_Slot**: the place over the scene illustration where one ghost is drawn (no window of its own). Ghost_Slots exist in the House_Scene and the Floor_Scene only.
 - **Nameplate**: the brass HTML label of one ghost of the focused floor in a Floor_Scene: path, reason, difficulty and state, the locked line when the Card is Locked, and the start control when `canStart` is true. The House_Scene has no Nameplates.
 - **Card**: one `GhostCardView` of the ViewModel (`house.floors[i].ghosts[j]`), with `path`, `floor`, `score`, `reason`, `state`, `canStart` and `lockedLine`.
 - **Haunted / Locked / Exorcised**: the three values of `GhostState` (`"haunted"`, `"locked"`, `"exorcised"`) of a Card.
@@ -106,7 +106,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - **Question_Candles**: three candles in the Ghost_Scene, one per question; each finished question lights one.
 - **Reaction**: a short ghost animation in the Ghost_Scene that follows a UserAction the Scenic_Renderer itself dispatched.
 - **Exorcised_Moment**: the animation in the Ghost_Scene when a Card changes from Haunted to Exorcised between two renders: the ghost spirals up into orange sparks and the room turns from cold to warm.
-- **Return_Glow**: the animation when the judge comes back to the House_Scene or a Floor_Scene after an Exorcised_Moment: the ghost's window lights up and the Haunt_Meter moves.
+- **Return_Glow**: the animation when the judge comes back to the House_Scene or a Floor_Scene after an Exorcised_Moment: the Exorcised drawing of the ghost's slot fades in and the Haunt_Meter moves.
 - **Finale**: the "demo complete" scene change: the rain stops, the clouds part, the horizon turns dawn orange and a banner appears.
 - **Search_Beam**: the visible searching animation shown while a live analysis runs (a lantern beam that sweeps the house).
 - **Lightning**: a short flash that lights the house.
@@ -244,12 +244,12 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 
 #### Acceptance Criteria
 
-1. THE Scenic_Renderer SHALL draw every Card whose `floor` is `"attic"` as the Wisp: a tall gothic spectre with sleeves that sweep out, a ragged tail of Bezier tatters, no mouth, no hood and no horns, two small glowing eyes, a body that fades from cold white to transparent at the tail, and a cobweb piece attached to it.
-2. THE Scenic_Renderer SHALL draw every Card whose `floor` is `"middle floor"` as the Lantern_Wraith: a hood, a spiral tail, and a lantern held in front of the body whose orange light falls on the face.
-3. THE Scenic_Renderer SHALL draw every Card whose `floor` is `"basement"` as the Chained_Brute: horns, drips hanging from the lower edge of the body, chains, and eyes in the orange glow colour.
+1. THE Scenic_Renderer SHALL draw every Card whose `floor` is `"attic"` as the Wisp: a tall hooded wraith with a pointed hood, a dark oval face with two small pale eyes and no mouth, one long reaching arm and one short arm with clawed tips, and a robe that ends in long asymmetric points. Its body fades from pale blue-white at the hood to transparent at the robe points. The Wisp is the plain shape and the smallest of the three.
+2. THE Scenic_Renderer SHALL draw every Card whose `floor` is `"middle floor"` as the Lantern_Wraith: the same hooded shape as the Wisp, larger, with a cold lantern of pale blue light hanging from the reaching claw.
+3. THE Scenic_Renderer SHALL draw every Card whose `floor` is `"basement"` as the Chained_Brute: the same hooded shape, stretched wider, with dark iron shackles on both wrists and chains hanging from them. It has no rim light.
 4. THE Scenic_Renderer SHALL take every colour of criteria 1 to 3 from the Scenic_Tokens, and no colour from the Shape_Data (Requirement 22).
 5. THE Scenic_Renderer SHALL use the same Ghost_Type for a ghost in every place it is drawn: the Ghost_Slot, the Ghost_Scene (from `ghost.floor`), the Bestiary and the Gallery.
-6. THE three Ghost_Types SHALL have different outlines. The outline is the body shape filled in one flat colour, with no inner details such as eyes. Each outline SHALL contain at least one part the other two lack: the Wisp has a ragged tail of tatters (`tail-ragged`) and no hood, the Lantern_Wraith has a hood and a spiral tail, and the Chained_Brute has horns. At the same Variant number, the Wisp SHALL have the smallest outline and the Chained_Brute the widest.
+6. THE three Ghost_Types SHALL share one hooded silhouette and SHALL be told apart by size, proportion and one piece of their own. The Lantern_Wraith SHALL have a `lantern` part that the other two lack, and the Chained_Brute SHALL have `shackles` and `chain` parts that the other two lack. The Wisp has neither. At the same Variant number, the Wisp SHALL have the smallest outline and the Chained_Brute the widest.
 7. WHILE Reduced_Motion is off, THE Scenic_Renderer SHALL give each Ghost_Type one idle animation, defined as a named CSS animation that differs from the idle animations of the other two Ghost_Types in name and in keyframes.
 8. THE Scenic_Renderer SHALL give each Card the Variant number equal to its position among the Cards of its floor, in report order, from 0 for the first Card of that floor to at most 4. Each floor counts from 0 on its own.
 9. THE Scenic_Renderer SHALL define 5 Variants (numbers 0 to 4) for each Ghost_Type. Any two Variants of the same Ghost_Type SHALL differ in at least one of size, tilt, eyes and accessory, so two ghosts of one floor never look the same.
@@ -452,18 +452,18 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 2. IF the previous render has a different `house.source`, or has no Card with that `path`, or that Card's state in the previous render is not `"haunted"`, THEN THE Scenic_Renderer SHALL show the Card as Exorcised without playing the Exorcised_Moment or the Return_Glow.
 3. THE Exorcised_Moment SHALL show the close-up ghost of the Ghost_Scene moving upward in a spiral and then splitting into orange spark shapes, after which that ghost drawing is no longer shown.
 4. THE Exorcised_Moment SHALL change the light of the Ghost_Scene room from the named cold-blue Scenic_Tokens colour to the named warm-orange Scenic_Tokens colour in 1.0 s to 1.4 s, measured from the render that starts it, and the warm orange light SHALL stay until the judge leaves the Ghost_Scene.
-5. WHILE `scene.kind` is `"house"` or `"floor"`, THE Scenic_Renderer SHALL draw the window of the Ghost_Slot of every Exorcised Card lit in the warm-orange Scenic_Tokens colour, and the window of every Haunted or Locked Card unlit.
-6. WHEN the Scenic_Renderer draws the first House_Scene or Floor_Scene after a Ghost_Scene in which one or more Exorcised_Moments played, THE Scenic_Renderer SHALL play the Return_Glow: the window of each of those Cards lights up from unlit to lit, and the Haunt_Meter moves from the share of the last House_Scene or Floor_Scene render before that Ghost_Scene to the new `house.progress.share`, in about 0.8 s (D5), ending at exactly the new share.
+5. (Withdrawn on 18 Nov: the Ghost_Slots have no window, because windows drawn over the walls of the scene illustration clashed with it. The Exorcised state of a Card shows in the drawing of the Ghost_Slot itself, Requirement 6.8.)
+6. WHEN the Scenic_Renderer draws the first House_Scene or Floor_Scene after a Ghost_Scene in which one or more Exorcised_Moments played, THE Scenic_Renderer SHALL play the Return_Glow: the Exorcised drawing of the Ghost_Slot of each of those Cards fades in, and the Haunt_Meter moves from the share of the last House_Scene or Floor_Scene render before that Ghost_Scene to the new `house.progress.share`, in about 0.8 s (D5), ending at exactly the new share.
 7. IF `house.progress` was `null` in the last House_Scene or Floor_Scene render before the current one, THEN THE Haunt_Meter SHALL show the new `house.progress.share` without moving from any earlier value.
 8. THE Scenic_Renderer SHALL start the Exorcised_Moment and the Return_Glow at most once per Haunted-to-Exorcised change of a Card: later renders in which that Card stays Exorcised, and later Scene changes or Transitions, SHALL NOT start them again.
 9. WHEN a new render arrives while the Exorcised_Moment plays and the Scene stays the same, THE Exorcised_Moment SHALL keep playing. WHEN the Scene changes while the Exorcised_Moment plays, THE Scenic_Renderer SHALL jump it to its end state (D5).
 
 #### Edge cases
 
-- The change happens in the render where the step becomes `self-check`, while the Ghost_Scene is open (`engine.ts`, `nextQuestion`), so the sparks play in the room and the window and the Haunt_Meter wait for the judge to come back.
+- The change happens in the render where the step becomes `self-check`, while the Ghost_Scene is open (`engine.ts`, `nextQuestion`), so the sparks play in the room and the Exorcised drawing of the slot and the Haunt_Meter wait for the judge to come back.
 - The judge answers "Not yet" in the self-check: the ghost stays Exorcised (the engine only records the self-check answer). No second Exorcised_Moment plays, and the Return_Glow still plays when the judge reaches the Floor_Scene.
 - The judge answers the self-check within 1.2 s: the Scene changes to the Floor_Scene, the Exorcised_Moment jumps to its end state (criterion 9) and the Return_Glow plays.
-- "Show the sample again" after a live report: the sample Cards come back already Exorcised. This is not a change from Haunted (the previous render had `house.source` `live`), so neither animation plays. Their windows are lit at once, and the Haunt_Meter shows the share without moving (criteria 2, 5 and 7).
+- "Show the sample again" after a live report: the sample Cards come back already Exorcised. This is not a change from Haunted (the previous render had `house.source` `live`), so neither animation plays. Their slots show the Exorcised drawing at once, and the Haunt_Meter shows the share without moving (criteria 2 and 7).
 - A live report: `house.progress` is `null` and no live Card can become Exorcised, so neither animation plays.
 - Locked Cards never change to Exorcised, so they never play either animation.
 - Under Reduced_Motion both animations become opacity fades of 200 ms or less with the same end state (Requirement 18.6).
@@ -610,7 +610,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 4. WHILE Reduced_Motion is on, THE Scenic_Renderer SHALL run no animation or transition that moves, rotates, scales or shakes an element. This means no shaking, no bobbing, no idle animation, no drifting fog, no falling rain (fog and rain are drawn still, D9), no Search_Beam sweep (Requirement 14.6), and no Telephone shake or vibration lines (Requirement 9.13).
 5. WHILE Reduced_Motion is on, THE Scenic_Renderer SHALL show no Lightning, and the Lightning_Toggle SHALL follow Requirement 15.9.
 6. WHILE Reduced_Motion is on, THE Scenic_Renderer SHALL limit every animation and transition to one opacity change that lasts 200 ms or less and does not repeat. An instant change with no animation (for example the "Missed it" size change) is allowed.
-7. WHILE Reduced_Motion is on, WHEN a Reaction, the Exorcised_Moment, the Return_Glow or the Finale starts, THE Scenic_Renderer SHALL replace its motion with an opacity fade of 200 ms or less. The fade SHALL end in the same state as with Reduced_Motion off: for the Exorcised_Moment the ghost gone and the warm room, for the Return_Glow the lit window and the new Haunt_Meter share, and for the Finale the stopped rain, parted clouds and dawn horizon.
+7. WHILE Reduced_Motion is on, WHEN a Reaction, the Exorcised_Moment, the Return_Glow or the Finale starts, THE Scenic_Renderer SHALL replace its motion with an opacity fade of 200 ms or less. The fade SHALL end in the same state as with Reduced_Motion off: for the Exorcised_Moment the ghost gone and the warm room, for the Return_Glow the Exorcised drawing of the slot and the new Haunt_Meter share, and for the Finale the stopped rain, parted clouds and dawn horizon.
 8. WHILE Reduced_Motion is on, THE Web_Page SHALL show, for the same ViewModel, the same texts, the same controls with the same accessible names, and the same Card states as with Reduced_Motion off.
 9. WHEN Reduced_Motion changes while the page is open, THE Scenic_Renderer SHALL apply the new setting within 1 s and without a reload. WHEN Reduced_Motion turns on, every one-shot animation already running (Intro, Camera move, Reaction, Exorcised_Moment, Return_Glow, Finale change) SHALL jump to its end state, and every looping animation (idle animations, fog, rain, Rings, Live_Call, Search_Beam) SHALL stop moving.
 
@@ -705,7 +705,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 7. THE Source_Scan SHALL fail and name the file when a non-test TypeScript file under `src/view/scenic/` contains a string literal that holds a hex colour, holds a colour function (`rgb(`, `rgba(`, `hsl(`, `hsla(`, `hwb(`, `lab(`, `lch(`, `oklab(`, `oklch(` or `color(`), or is exactly a CSS named colour (letter case ignored). The keywords `transparent`, `currentColor`, `none` and `inherit` SHALL NOT be caught.
 8. THE Source_Scan rules that already cover all of `src/view/**` (no browser storage, no raw HTML, no external address, Core imported only with `import type`, the word "Power" only in `powerTexts.ts`) SHALL cover `src/view/scenic/` as well. THE Source_Scan SHALL fail if it finds no `.ts` file or no `.css` file under `src/view/scenic/`.
 9. THE Source_Scan SHALL include self-check cases: a hex value, a colour function and a named colour, each inside a TypeScript string, are caught; a class name such as `"ghost--red-eyes"` and the four allowed keywords are not caught; and `DOMParser`, `createContextualFragment` and `setHTMLUnsafe` are caught by the raw-HTML pattern.
-10. THE Scenic_Renderer SHALL take graphics only from Shape_Data, which is code and not an asset. THE Scenic_Renderer SHALL NOT use the asset manifest (`src/view/assets/manifest.ts`), which stays for image files, and SHALL load no graphic file.
+10. THE Scenic_Renderer SHALL take every graphic except one from Shape_Data, which is code and not an asset. The one exception is the scene illustration (`house-scene.svg`, drafted with Claude and declared): the Scenic_Renderer SHALL show it as an `<image>` whose URL the entry file `src/view/scenicEntry.ts` resolves from the `scene.house` slot of the asset manifest (`src/view/assets/manifest.ts`) and passes in. No file under `src/view/scenic/` SHALL import `src/view/assets/` (Source_Scan item 15), and the Scenic_Renderer SHALL load no other graphic file.
 11. THE Source_Scan SHALL fail if any `.svg` file exists under `src/view/scenic/`.
 
 #### Edge cases
@@ -856,7 +856,7 @@ The director answered these on 17 Nov. They are constraints for `design.md`, not
 - **D2.** The Bestiary ranges are literal texts in `texts.ts`, guarded by the test of Requirement 7.3. Whether the Bestiary folds on narrow screens is the design's choice. The Bestiary drawings are `aria-hidden`; its texts are not.
 - **D3.** The Camera moves from the Ghost_Scene to a floor and from the Ghost_Scene to the house use the same 0.6 s to 0.8 s move. Dimmed floors are at about 35% brightness.
 - **D4.** The Search_Beam makes one sweep in about 2.5 s and loops while `live.busy` is true.
-- **D5.** A render that arrives during the Exorcised_Moment lets it keep playing; a Scene change makes it jump to its end state. The Haunt_Meter moves in about 0.8 s. Cold blue and warm orange are named Scenic_Tokens. Windows are lit in the Floor_Scene too.
+- **D5.** A render that arrives during the Exorcised_Moment lets it keep playing; a Scene change makes it jump to its end state. The Haunt_Meter moves in about 0.8 s. Cold blue and warm orange are named Scenic_Tokens. The Exorcised drawing of a slot shows in the Floor_Scene too.
 - **D6.** The order of the "Got it" Reaction and the Exorcised_Moment when both start in the same render; each keeps its own time limit (Requirements 11.10 and 12.4).
 - **D7.** Lightning flashes only in the House_Scene and the Floor_Scene, never during the Intro or in the Ghost_Scene.
 - **D8.** Whether Lightning still flashes while the Finale is shown.
