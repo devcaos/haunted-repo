@@ -1,7 +1,7 @@
 import type { Floor } from "@haunted-repo/core";
 import type { Scene } from "../../logic/viewModel.js";
 import { chainedDoorArt, slotArt } from "./art/props.js";
-import { houseLayer } from "./art/house.js";
+import { ATTIC_CLIP, houseLayer } from "./art/house.js";
 import { g, rect } from "./art/shapes.js";
 import { foregroundLayer, skyLayers, weatherLayer } from "./art/sky.js";
 import { el } from "./dom.js";
@@ -53,8 +53,10 @@ export function createStage(): Stage {
   // One Night overlay per floor rectangle, shown on the dimmed floors.
   const dimRects = FLOORS.map((floor) => {
     const r = FLOOR_RECT[floor];
+    // The attic dim follows the roof slopes, like the attic itself.
+    const clip = floor === "attic" ? { clip: ATTIC_CLIP } : {};
     const node = mountShape(
-      rect(DIM_CLASS[floor], r.x, r.y, r.w, r.h),
+      rect(DIM_CLASS[floor], r.x, r.y, r.w, r.h, clip),
       "house-",
     );
     return { floor, node };

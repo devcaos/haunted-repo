@@ -2,6 +2,7 @@ import type { Floor } from "@haunted-repo/core";
 import { FLOOR_RECT } from "../model/sceneLayout.js";
 import {
   circle,
+  defs,
   ellipse,
   g,
   path,
@@ -12,14 +13,21 @@ import {
 } from "./shapes.js";
 
 // The cutaway house in the viewBox `0 0 1600 1000` (design "House composition"
-// and "World geometry"). The ridge stands at x 790, left of the body centre
-// (870), and the tower leans on the right, so the house is not symmetric.
+// and "World geometry"). The body (x 548 to 1192) carries a symmetric gable
+// whose ridge stands over the body centre; the tower stands apart on the right.
 
-const ROOF = [545, 388, 790, 165, 1195, 388];
-/** The inner edge of the roof, drawn over the attic so its top corners follow the slopes. */
-const ROOF_EDGE = [
-  545, 388, 790, 165, 1195, 388, 1165, 388, 790, 200, 575, 388,
-];
+/** Outer roof outline: left eave, ridge, right eave. */
+export const ROOF = [530, 394, 870, 160, 1210, 394] as const;
+/** Inner roof line (the attic ceiling), parallel to the outer one, 17 units lower. */
+export const ROOF_INNER = [555, 394, 870, 177, 1185, 394] as const;
+/** Left and right outer faces of the body walls. */
+export const BODY = { left: 548, right: 1192 } as const;
+const [EAVE_L, EAVE_Y, RIDGE_X, RIDGE_Y, EAVE_R] = ROOF;
+const [INNER_L, , , INNER_Y, INNER_R] = ROOF_INNER;
+/** The roof as one band between the outer and the inner line. */
+const ROOF_BAND = `M${EAVE_L} ${EAVE_Y} L${RIDGE_X} ${RIDGE_Y} L${EAVE_R} ${EAVE_Y} H${INNER_R} L${RIDGE_X} ${INNER_Y} L${INNER_L} ${EAVE_Y} Z`;
+/** The moon-facing slope, drawn exactly on the roof polygon edge. */
+export const ROOF_RIM = `M${RIDGE_X} ${RIDGE_Y} L${EAVE_R} ${EAVE_Y}`;
 
 /** One class per floor; the floor group's room back is exactly the Scene_Layout floor rectangle. */
 export const FLOOR_CLASS: Readonly<Record<Floor, string>> = {
@@ -28,6 +36,9 @@ export const FLOOR_CLASS: Readonly<Record<Floor, string>> = {
   basement: "floor-basement",
 };
 
+/** Id of the clip that keeps the attic under the inner roof line (stage.ts clips its dim with it too). */
+export const ATTIC_CLIP = "attic-inside";
+
 function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
   const r = FLOOR_RECT[floor];
   const back = rect("room-back tone-slate", r.x, r.y, r.w, r.h, {
@@ -35,6 +46,7 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
   });
   return g(`floor ${FLOOR_CLASS[floor]}`, [back, ...contents], {
     part: FLOOR_CLASS[floor],
+    ...(floor === "attic" ? { clip: ATTIC_CLIP } : {}),
   });
 }
 
@@ -172,29 +184,49 @@ function basement(): ShapeNode[] {
 
 /** Walls, roof, chimney, tower, oculus, the three floors and the cut ground line. */
 export function houseLayer(): ShapeNode {
+  const { left, right } = BODY;
   return g("house", [
+    defs([
+      {
+        kind: "clipPath",
+        id: ATTIC_CLIP,
+        children: [
+          poly("clip-shape", [...ROOF_INNER, INNER_R, 510, INNER_L, 510]),
+        ],
+      },
+    ]),
     rect("ground tone-night", 0, 760, 1600, 240),
     tower(),
-    rect("chimney tone-night", 640, 250, 40, 90),
-    rect("chimney-cap tone-night", 634, 244, 52, 10),
-    poly("roof tone-night", ROOF, { part: "roof" }),
-    rect("walls tone-night", 548, 380, 644, 386),
+    rect("chimney tone-night", 1010, 220, 36, 70),
+    rect("chimney-cap tone-night", 1004, 212, 48, 10),
+    poly("walls tone-night", [
+      left,
+      760,
+      left,
+      EAVE_Y,
+      RIDGE_X,
+      RIDGE_Y + 10,
+      right,
+      EAVE_Y,
+      right,
+      760,
+    ]),
     g("oculus", [
-      circle("oculus-frame tone-mist", 790, 262, 24),
-      circle("oculus-glass tone-slate", 790, 262, 19),
-      circle("oculus-light", 790, 262, 19),
-      strokePath("oculus-bars", "M771 262 H809 M790 243 V281"),
+      circle("oculus-frame tone-mist", RIDGE_X, 262, 24),
+      circle("oculus-glass tone-slate", RIDGE_X, 262, 19),
+      circle("oculus-light", RIDGE_X, 262, 19),
+      strokePath("oculus-bars", "M851 262 H889 M870 243 V281"),
     ]),
     floorGroup("attic", attic()),
     floorGroup("middle floor", middleFloor()),
     floorGroup("basement", basement()),
-    poly("roof-edge tone-night", ROOF_EDGE),
-    rect("floor-slab tone-night", 548, 496, 644, 8),
+    path("roof tone-night", ROOF_BAND, { part: "roof" }),
+    rect("floor-slab tone-night", left, 496, right - left, 8),
     path("ground-cut tone-night", groundCut()),
     g("rims", [
-      strokePath("rim", "M790 165 L1195 388"),
-      strokePath("rim", "M1192 388 V760"),
-      strokePath("rim", "M680 250 V300"),
+      strokePath("rim", ROOF_RIM, { part: "roof-rim" }),
+      strokePath("rim", `M${right} ${EAVE_Y} V760`),
+      strokePath("rim", "M1046 222 V281 M1004 212 H1052 V222"),
     ]),
   ]);
 }

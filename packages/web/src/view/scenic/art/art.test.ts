@@ -24,7 +24,14 @@ import {
   type VariantNumber,
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, ghostArt } from "./ghosts.js";
-import { FLOOR_CLASS, houseLayer } from "./house.js";
+import {
+  BODY,
+  FLOOR_CLASS,
+  ROOF,
+  ROOF_INNER,
+  ROOF_RIM,
+  houseLayer,
+} from "./house.js";
 import { chainedDoorArt, slotArt } from "./props.js";
 import { foregroundLayer, rainPath, skyLayers, weatherLayer } from "./sky.js";
 
@@ -259,10 +266,24 @@ describe("house (Requirements 3.1, 3.4)", () => {
     const seen = new Set(points.map(([x, y]) => `${x},${y}`));
     const twins = points.filter(([x, y]) => seen.has(`${1600 - x},${y}`));
     expect(twins.length).toBeLessThan(points.length / 2);
+  });
+
+  it("has a symmetric gable over the body centre, with the rim on its edge", () => {
+    const [l, ly, rx, ry, r, rY] = ROOF;
+    expect(ly).toBe(rY);
+    expect(rx - l).toBe(r - rx);
+    expect(rx).toBe((BODY.left + BODY.right) / 2);
+    const [il, ily, irx, iry, ir, irY] = ROOF_INNER;
+    expect([ily, irY, irx]).toEqual([ly, ly, rx]);
+    expect(irx - il).toBe(ir - irx);
+    expect(iry).toBeGreaterThan(ry);
+    // Both lines have the same slope, so the band keeps one thickness.
+    expect((ly - iry) / (irx - il)).toBeCloseTo((ly - ry) / (rx - l), 2);
     const roof = nodesOf(houseLayer()).find((n) => n.part === "roof");
-    const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
-    expect(roof?.points?.[2]).toBeLessThan(800); // the ridge is left of centre
-    expect(tower?.transform?.translate?.[0]).toBeGreaterThan(800);
+    expect(roof?.d).toContain(`M${l} ${ly} L${rx} ${ry} L${r} ${ly}`);
+    const rim = nodesOf(houseLayer()).find((n) => n.part === "roof-rim");
+    expect(rim?.d).toBe(`M${rx} ${ry} L${r} ${ly}`);
+    expect(ROOF_RIM).toBe(rim?.d);
   });
 });
 
