@@ -35,6 +35,7 @@ import {
 } from "./house.js";
 import { chainedDoorArt, slotArt } from "./props.js";
 import {
+  MOON,
   RAIN_BOTTOM,
   RAIN_STEP,
   foregroundLayer,
@@ -198,6 +199,30 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(classesOf(foregroundLayer())).toEqual(
       expect.arrayContaining(["fence", "dead-tree", "rim-fg"]),
     );
+  });
+
+  it("hides the left edge of the moon behind the spire, inside a wide halo", () => {
+    const spire = nodesOf(houseLayer()).find((n) => n.part === "spire");
+    const pts = spire?.points ?? [];
+    const d = `M${pts.slice(0, 2).join(" ")} L${pts.slice(2, 4).join(" ")} L${pts.slice(4).join(" ")} Z`;
+    expect(winding(d, [MOON.cx - MOON.r + 6, MOON.cy])).not.toBe(0);
+    expect(winding(d, [MOON.cx, MOON.cy])).toBe(0);
+    const halo = nodesOf(skyLayers()).find((n) => n.cls === "moon-halo");
+    expect(halo?.r).toBeGreaterThan(5 * MOON.r);
+  });
+
+  it("lights only the hill crests that face the moon, on the hill outline", () => {
+    for (const hill of ["far", "near"]) {
+      const rim = nodesOf(skyLayers()).find((n) => n.part === `rim-${hill}`);
+      const outline = nodesOf(skyLayers()).find(
+        (n) => n.part === `hill-${hill}`,
+      );
+      const [start] = pathPoints(rim?.d ?? "");
+      expect(outline?.d).toContain(
+        (rim?.d ?? "").slice(`M${start?.join(" ")} `.length),
+      );
+      expect(start?.[0]).toBeGreaterThan(900); // the moon is on the right
+    }
   });
 
   it("puts the far hill higher than the near one, behind it", () => {

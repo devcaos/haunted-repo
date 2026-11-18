@@ -124,6 +124,17 @@
   stop-opacity: var(--sc-depth-cloud);
 }
 
+.house .stop-halo-mid {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.12;
+}
+
+/* Hill crests catch less moonlight than the house edges. */
+.house .rim.rim-hill {
+  stroke-width: 1.5;
+  opacity: var(--sc-fg-rim-opacity);
+}
+
 .house .stop-halo-1 {
   stop-color: var(--sc-spectral);
   stop-opacity: 0;

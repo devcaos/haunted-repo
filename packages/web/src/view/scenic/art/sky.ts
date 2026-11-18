@@ -17,10 +17,14 @@ import { houseOutline } from "./house.js";
 // (x < 400) only sky and hills, so the HUD stays readable.
 
 // Atmospheric perspective: the far hill is higher, paler and fainter than the near one.
-const FAR_HILLS =
-  "M0 650 C140 610 300 596 470 618 C620 638 760 600 920 590 C1080 580 1220 612 1360 600 C1460 592 1540 600 1600 612 V1000 H0 Z";
-const NEAR_HILLS =
-  "M0 735 C160 712 330 704 480 722 C560 732 620 744 700 748 L1000 748 C1180 730 1330 690 1460 684 C1530 681 1570 688 1600 694 V1000 H0 Z";
+// The rims are the crests that face the moon, cut from the same path data.
+const FAR_RIM =
+  "M920 590 C1080 580 1220 612 1360 600 C1460 592 1540 600 1600 612";
+const NEAR_RIM = "M1460 684 C1530 681 1570 688 1600 694";
+const FAR_HILLS = `M0 650 C140 610 300 596 470 618 C620 638 760 600 920 590 ${FAR_RIM.slice(9)} V1000 H0 Z`;
+const NEAR_HILLS = `M0 735 C160 712 330 704 480 722 C560 732 620 744 700 748 L1000 748 C1180 730 1330 690 1460 684 ${NEAR_RIM.slice(10)} V1000 H0 Z`;
+/** The moon sits behind the spire, which cuts its left edge. */
+export const MOON = { cx: 1340, cy: 196, r: 56 } as const;
 
 /** L0 to L3, back to front: sky gradient, moon and halo, far and near hills. */
 export function skyLayers(): ShapeNode {
@@ -31,28 +35,30 @@ export function skyLayers(): ShapeNode {
         "sky-fill",
         [
           ["stop-abyss", 0],
-          ["stop-night", 0.45],
-          ["stop-slate", 0.85],
+          ["stop-slate", 0.42],
         ],
         { x1: 0, y1: 0, x2: 0, y2: 1 },
       ),
       gradient("radialGradient", "moon-halo", [
         ["stop-halo-0", 0],
+        ["stop-halo-mid", 0.3],
         ["stop-halo-1", 1],
       ]),
     ]),
     g("sky", [rect("sky-fill", 0, 0, 1600, 1000, { paint: "sky-fill" })]),
     g("moon-sky", [
-      circle("moon-halo", 1210, 175, 200, { paint: "moon-halo" }),
-      circle("moon tone-bone", 1210, 175, 64, { part: "moon" }),
-      ellipse("moon-shade tone-mist", 1186, 160, 14, 10),
-      ellipse("moon-shade tone-mist", 1228, 198, 9, 7),
+      circle("moon-halo", MOON.cx, MOON.cy, 360, { paint: "moon-halo" }),
+      circle("moon tone-bone", MOON.cx, MOON.cy, MOON.r, { part: "moon" }),
+      ellipse("moon-shade tone-mist", MOON.cx + 14, MOON.cy - 14, 12, 9),
+      ellipse("moon-shade tone-mist", MOON.cx + 22, MOON.cy + 20, 8, 6),
     ]),
     g("hills-far", [
       path("hill-far tone-mist", FAR_HILLS, { part: "hill-far" }),
+      strokePath("rim rim-hill", FAR_RIM, { part: "rim-far" }),
     ]),
     g("hills-near", [
       path("hill-near tone-slate", NEAR_HILLS, { part: "hill-near" }),
+      strokePath("rim rim-hill", NEAR_RIM, { part: "rim-near" }),
     ]),
   ]);
 }
