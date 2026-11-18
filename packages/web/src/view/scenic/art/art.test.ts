@@ -862,11 +862,29 @@ describe("nothing floats (Requirement 3.1)", () => {
   const one = (cls: string): ShapeNode | undefined =>
     all.find((n) => n.cls?.split(" ").includes(cls));
 
-  it("the lintel rests on the door frame, and the door sits inside it", () => {
+  it("the lintel rests on a Brass door frame, and the door sits inside it", () => {
     const [lintel, frame, door] = ["lintel", "door-frame", "door"].map(one);
     expect((lintel?.y ?? 0) + (lintel?.height ?? 0)).toBe(frame?.y);
     expect(lintel?.x).toBeLessThan(frame?.x ?? 0);
     expect(door?.x).toBeGreaterThan(frame?.x ?? 0);
+    // Same tone, so the lintel and the jambs read as one surround.
+    expect(frame?.cls).toContain("tone-brass");
+    expect(lintel?.cls).toContain("tone-brass");
+  });
+
+  it("the hall is dark blue, not black, with warm light through the doorway", () => {
+    const hall = nodesOf(
+      all.find((n) => n.part === "entrance-hall") ?? g("none", []),
+    );
+    const back = hall.find((n) => n.cls === "hall-back");
+    const fill = hall.find((n) => n.id === back?.paint);
+    expect(fill?.children?.map((s) => s.cls)).toEqual([
+      "stop-hall-0",
+      "stop-hall-1",
+    ]);
+    expect(hall.some((n) => n.cls === "spill-light")).toBe(true);
+    const wall = all.find((n) => n.cls?.startsWith("partition"));
+    expect((wall?.y ?? 0) + (wall?.height ?? 0)).toBeLessThan(755);
   });
 
   it("the table legs stand on the middle floor and touch the top", () => {
@@ -946,6 +964,7 @@ describe("rooms (Requirements 3.1, 3.2)", () => {
   // are skipped: the books (relative path data) sit inside their bookcase rect.
   const xs = (name: string): number[] =>
     nodesOf(part(name) ?? g("none", [])).flatMap((n) => {
+      if (n.kind.endsWith("Gradient")) return []; // paint, not a shape
       if (n.kind === "rect") return [n.x ?? 0, (n.x ?? 0) + (n.width ?? 0)];
       const r = n.rx ?? n.r ?? 0;
       return n.cx === undefined ? [] : [n.cx - r, n.cx + r];

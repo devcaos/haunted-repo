@@ -307,8 +307,37 @@ function middleFloor(): ShapeNode[] {
   const hall = g(
     "entrance-hall",
     [
-      // One door unit: frame, lit transom and door inside it, lintel resting on the frame.
-      rect("door-frame tone-night", 571, 604, 88, 151),
+      // Very dark blue instead of black, and the parlour's fire spilling in through the doorway.
+      defs([
+        gradient(
+          "radialGradient",
+          "hall-dusk",
+          [
+            ["stop-hall-0", 0],
+            ["stop-hall-1", 1],
+          ],
+          {
+            units: "userSpaceOnUse",
+            cx: 660,
+            cy: 650,
+            r: 240,
+          },
+        ),
+        gradient(
+          "radialGradient",
+          "hall-spill",
+          [
+            ["stop-warmth-0", 0],
+            ["stop-warmth-1", 1],
+          ],
+          // Centred on the doorway; it fades out before any edge of the hall.
+          { units: "userSpaceOnUse", cx: 756, cy: 720, r: 170 },
+        ),
+      ]),
+      rect("hall-back", 560, 505, 196, 250, { paint: "hall-dusk" }),
+      rect("spill-light", 560, 505, 196, 250, { paint: "hall-spill" }),
+      // One Brass door surround: jambs and lintel touch, the lit transom and door sit inside.
+      rect("door-frame tone-brass", 571, 604, 88, 151),
       rect("transom tone-candle", 579, 612, 72, 12),
       rect("door tone-rust", 579, 628, 72, 127, { part: "front-door" }),
       circle("door-knob tone-brass", 640, 696, 4),
@@ -367,7 +396,8 @@ function middleFloor(): ShapeNode[] {
     ],
     { part: "parlour" },
   );
-  return [hall, rect("partition tone-night", 756, 500, 8, 260), parlour];
+  // The partition stops above a doorway (y 640 to 755) between hall and parlour.
+  return [hall, rect("partition tone-night", 756, 500, 8, 140), parlour];
 }
 
 /** Five bricks that suggest the wall, low down and clear of the panes, pipe and stairs. */
