@@ -6,11 +6,12 @@ import "../styles/gallery.css";
 import { ghostArt, GHOST_TYPES } from "../art/ghosts.js";
 import { el } from "../dom.js";
 import { loadScenicFonts } from "../fonts.js";
+import type { GhostType } from "../model/sceneLayout.js";
 import { createSvgRoot, mountShape } from "../svg.js";
 
 // Dev-only page (design "Gallery"): it is never built, because the build input
 // stays index.html. Task 9.8 fills the full grid; for now it draws the art that
-// exists, the Wisp at Variant 0, Haunted.
+// exists: the three Ghost_Types at Variant 0, Haunted.
 
 loadScenicFonts();
 document.documentElement.setAttribute("data-motion", "still");
@@ -22,15 +23,22 @@ function cell(label: string, art: SVGElement): HTMLElement {
   ]);
 }
 
-function wispCell(): HTMLElement {
-  const { w, h } = GHOST_TYPES.wisp.box;
+const NAMES: Readonly<Record<GhostType, string>> = {
+  wisp: "Wisp",
+  "lantern-wraith": "Lantern_Wraith",
+  "chained-brute": "Chained_Brute",
+};
+function ghostCell(type: GhostType): HTMLElement {
+  const { w, h } = GHOST_TYPES[type].box;
   // Room around the box for the glow and the shadow.
+  const mx = w * 0.6;
+  const my = h * 0.2;
   const svg = createSvgRoot(
-    { x: -24, y: -18, w: w + 48, h: h + 40 },
+    { x: -mx, y: -my, w: w + 2 * mx, h: h + 2 * my },
     "gallery-art",
   );
-  svg.append(mountShape(ghostArt("wisp", 0, "haunted"), "gallery-wisp-"));
-  return cell("Wisp, Variant 0, Haunted", svg);
+  svg.append(mountShape(ghostArt(type, 0, "haunted"), `gallery-${type}-`));
+  return cell(`${NAMES[type]}, Variant 0, Haunted`, svg);
 }
 
 const root = document.getElementById("gallery");
@@ -40,6 +48,10 @@ if (root === null) {
 root.append(
   el("main", { class: "gallery" }, [
     el("h1", {}, ["Ghost gallery"]),
-    el("div", { class: "gallery-grid" }, [wispCell()]),
+    el(
+      "div",
+      { class: "gallery-grid" },
+      (["wisp", "lantern-wraith", "chained-brute"] as const).map(ghostCell),
+    ),
   ]),
 );

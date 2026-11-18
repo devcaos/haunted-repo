@@ -3,82 +3,91 @@
  * Cold blue means code not understood yet; warm orange means code that is
  * yours (design "Palette").
  */
-
 /*
- * The Wisp: a body painted by its gradient (cold white to nothing at the
- * tail), Mist folds, Night eye sockets with glowing cold-white cores.
+ * The hooded wraith of all three types: a body painted by its gradient (pale
+ * blue-white at the hood to nothing at the robe points), faint folds, a dark
+ * oval face and two small pale eyes. No mouth, no outline.
  */
 .ghost .stop-spectre-0 {
-  stop-color: var(--sc-cold-white);
-  stop-opacity: 0.95;
+  stop-color: var(--sc-ghost-0);
+  stop-opacity: 0.85;
 }
-
 .ghost .stop-spectre-1 {
-  stop-color: var(--sc-spectral);
-  stop-opacity: 0.7;
+  stop-color: var(--sc-ghost-1);
+  stop-opacity: 0.55;
 }
-
 .ghost .stop-spectre-2 {
-  stop-color: var(--sc-cold-blue);
+  stop-color: var(--sc-ghost-2);
+  stop-opacity: 0.22;
+}
+.ghost .stop-spectre-3 {
+  stop-color: var(--sc-ghost-2);
   stop-opacity: 0;
 }
-
+.ghost .ghost-arm {
+  opacity: 0.75;
+}
 .ghost .ghost-fold {
-  stroke: var(--sc-mist);
-  stroke-width: 1.2;
+  stroke: var(--sc-ghost-shade);
+  stroke-width: 1;
   stroke-linecap: round;
   opacity: 0.35;
 }
-
-.ghost .ghost-eye {
-  fill: var(--sc-night);
+.ghost .ghost-face {
+  fill: var(--sc-abyss);
+  opacity: 0.92;
 }
-
-.ghost .ghost-pupil {
+.ghost .ghost-eye {
   fill: var(--sc-cold-white);
 }
-
 .ghost .stop-eye-0 {
-  stop-color: var(--sc-cold-blue);
+  stop-color: var(--sc-ghost-eye);
   stop-opacity: 0.9;
 }
-
 .ghost .stop-eye-1 {
-  stop-color: var(--sc-cold-blue);
+  stop-color: var(--sc-ghost-eye);
   stop-opacity: 0;
 }
-
-.ghost .ghost-cobweb {
-  stroke: var(--sc-bone);
-  stroke-width: 0.6;
-  stroke-linecap: round;
-  opacity: 0.45;
-}
-
-/* Rim light on the moon-facing edge of the ghost, in Bone. */
-.ghost .ghost-rim {
-  stroke: var(--sc-rim-ghost);
-  stroke-width: 2;
-  stroke-linecap: round;
-  opacity: var(--sc-rim-opacity);
-}
-
 .ghost .ghost-shadow {
   fill: var(--sc-night);
   opacity: 0.5;
 }
-
 /* Haunted glow: the named cold blue, fading out to the edge (Requirement 6.1). */
 .ghost .stop-cold-0 {
   stop-color: var(--sc-cold-blue);
-  stop-opacity: 0.55;
+  stop-opacity: 0.45;
 }
-
 .ghost .stop-cold-1 {
   stop-color: var(--sc-cold-blue);
   stop-opacity: 0;
 }
-
+/* The Lantern_Wraith's lantern: a dark frame with a cold, pale blue light. */
+.ghost .lantern-hanger {
+  stroke: var(--sc-ghost-2);
+  stroke-width: 0.75;
+}
+.ghost .lantern-frame {
+  fill: var(--sc-night);
+}
+.ghost .lantern-flame {
+  fill: var(--sc-lantern-flame);
+}
+.ghost .stop-lantern-0 {
+  stop-color: var(--sc-lantern-light);
+  stop-opacity: 0.55;
+}
+.ghost .stop-lantern-1 {
+  stop-color: var(--sc-lantern-light);
+  stop-opacity: 0;
+}
+/* The Chained_Brute's shackles and chains: dark iron, no light outline. */
+.ghost .ghost-shackle {
+  fill: var(--sc-iron);
+}
+.ghost .chain-link {
+  stroke: var(--sc-iron-dark);
+  stroke-width: 1;
+}
 /* Slot panes: unlit is Slate glass in a Mist frame; lit is Candle glass with a warm halo (Requirement 12.5). */
 .pane .pane-frame {
   fill: var(--sc-mist);

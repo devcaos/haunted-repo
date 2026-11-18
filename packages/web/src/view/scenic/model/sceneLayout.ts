@@ -47,11 +47,14 @@ export const SLOT_BAND: Readonly<Record<Floor, Rect>> = {
 };
 
 /** Natural size (Variant 0) of each ghost box, in viewBox units. */
+// The hooded wraith of the reference art is 124 x 272 reference units (126
+// wide with the lantern or a shackle); each type scales it (art/ghosts.ts).
+// The Wisp is the smallest, the Chained_Brute the widest (Requirement 5.6).
 export const GHOST_BOX: Readonly<Record<GhostType, { w: number; h: number }>> =
   {
-    wisp: { w: 56, h: 88 },
-    "lantern-wraith": { w: 72, h: 96 },
-    "chained-brute": { w: 96, h: 88 },
+    wisp: { w: 38.75, h: 85 },
+    "lantern-wraith": { w: 63, h: 136 },
+    "chained-brute": { w: 78.75, h: 136 },
   };
 
 /** Space between two neighbouring slots. */

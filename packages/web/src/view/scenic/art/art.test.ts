@@ -380,64 +380,175 @@ describe("scene backdrop (director's decision, 18 Nov)", () => {
   });
 });
 
-describe("the Wisp, Variant 0 (Requirements 5.1, 5.4, 6.1)", () => {
-  const wisp = ghostArt("wisp", 0, "haunted");
-  const parts = nodesOf(wisp).flatMap((n) =>
-    n.part === undefined ? [] : [n.part],
-  );
+describe("the three Ghost_Types, Variant 0 (Requirements 5.4, 5.6, 6.1; director's decision, 18 Nov)", () => {
+  const TYPES = ["wisp", "lantern-wraith", "chained-brute"] as const;
+  const art = (type: (typeof TYPES)[number]) => ghostArt(type, 0, "haunted");
+  const partsOf = (tree: ShapeNode): string[] =>
+    nodesOf(tree).flatMap((n) => (n.part === undefined ? [] : [n.part]));
+  const boxOfAll = (nodes: ShapeNode[]): Box => {
+    const pts = nodes.flatMap((n) => pointsOf(n));
+    const xs = pts.map(([x]) => x);
+    const ys = pts.map(([, y]) => y);
+    return {
+      x1: Math.min(...xs),
+      y1: Math.min(...ys),
+      x2: Math.max(...xs),
+      y2: Math.max(...ys),
+    };
+  };
 
-  it("passes the Shape_Data rules", () => {
-    expect(shapeProblems(wisp)).toEqual([]);
+  it("every type passes the Shape_Data rules", () => {
+    for (const type of TYPES) expect(shapeProblems(art(type))).toEqual([]);
   });
 
-  it("is a tall spectre with a ragged tail, a cobweb and a glow, and no mouth, hood or horns", () => {
-    expect(parts).toEqual(
-      expect.arrayContaining(["outline", "tail-ragged", "cobweb", "glow"]),
+  it("is a hooded wraith with a pointed hood, a dark face, a reaching arm and a glow, and no mouth", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      expect(partsOf(tree)).toEqual(
+        expect.arrayContaining([
+          "outline",
+          "hooded-robe",
+          "arm",
+          "face",
+          "glow",
+        ]),
+      );
+      expect(classesOf(tree)).not.toContain("ghost-mouth");
+      // The hood ends in one point: the path starts at its single topmost point.
+      const robe = nodesOf(tree).find((n) => n.part === "hooded-robe");
+      const pts = pathPoints(robe?.d ?? "");
+      const top = Math.min(...pts.map(([, y]) => y));
+      expect(pts[0]?.[1]).toBe(top);
+      expect(pts.filter(([, y]) => y === top)).toHaveLength(2); // start and close
+      // The face sits under the hood point, in the upper third.
+      const face = boxOf(nodesOf(tree).find((n) => n.part === "face")!);
+      expect(face?.y1 ?? 0).toBeGreaterThan(top);
+      expect(face?.y2 ?? 0).toBeLessThan(GHOST_BOX[type].h / 3);
+      const idle = nodesOf(tree).find((n) => n.cls === "ghost-idle");
+      expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
+    }
+  });
+
+  it("ends the robe in long asymmetric points", () => {
+    const robe = nodesOf(art("wisp")).find((n) => n.part === "hooded-robe");
+    const pts = pathPoints(robe?.d ?? "");
+    const h = GHOST_BOX.wisp.h;
+    // Tips: points in the lowest third that are lower than both neighbours.
+    const tips = pts.filter(
+      ([, y], i) =>
+        y > (2 * h) / 3 &&
+        y > (pts[i - 1]?.[1] ?? Infinity) &&
+        y > (pts[i + 1]?.[1] ?? Infinity),
     );
-    for (const other of ["hem-round", "tail-spiral", "hood", "horns"]) {
-      expect(parts).not.toContain(other);
-    }
-    expect(classesOf(wisp)).not.toContain("ghost-mouth");
-    expect(GHOST_BOX.wisp.h / GHOST_BOX.wisp.w).toBeGreaterThan(1.5);
-    const idle = nodesOf(wisp).find((n) => n.cls === "ghost-idle");
-    expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
+    expect(tips.length).toBeGreaterThanOrEqual(3);
+    expect(new Set(tips.map(([, y]) => y)).size).toBe(tips.length);
   });
 
-  it("paints the body with a vertical gradient that fades out at the tail", () => {
-    const body = nodesOf(wisp).find((n) => n.cls === "ghost-body");
-    const fill = nodesOf(wisp).find((n) => n.id === body?.paint);
-    expect(fill).toMatchObject({
-      kind: "linearGradient",
+  it("paints the body with a vertical gradient that fades out at the bottom", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      const body = nodesOf(tree).find((n) => n.cls === "ghost-body");
+      const fill = nodesOf(tree).find((n) => n.id === body?.paint);
+      expect(fill).toMatchObject({
+        kind: "linearGradient",
+        x1: 0,
+        x2: 0,
+        y1: 0,
+        y2: 1,
+      });
+      expect(fill?.children?.at(-1)).toMatchObject({
+        cls: "stop-spectre-3",
+        offset: 1,
+      });
+    }
+  });
+
+  it("makes its glow a radial-gradient ellipse behind the body", () => {
+    for (const type of TYPES) {
+      const tree = art(type);
+      const kids = tree.children ?? [];
+      const glowAt = kids.findIndex((n) => n.part === "glow");
+      const idleAt = kids.findIndex((n) => n.cls === "ghost-idle");
+      expect(glowAt).toBeGreaterThanOrEqual(0);
+      expect(glowAt).toBeLessThan(idleAt);
+      const glow = kids[glowAt]?.children?.[0];
+      expect(glow?.kind).toBe("ellipse");
+      const fill = nodesOf(tree).find((n) => n.id === glow?.paint);
+      expect(fill?.kind).toBe("radialGradient");
+      expect(fill?.children?.map((s) => s.cls)).toEqual([
+        "stop-cold-0",
+        "stop-cold-1",
+      ]);
+    }
+  });
+
+  it("has two small slanted pale eyes", () => {
+    for (const type of TYPES) {
+      const eyes = nodesOf(art(type)).filter((n) => n.part === "eye");
+      expect(eyes).toHaveLength(2);
+      const { box, eyeHeight } = GHOST_TYPES[type];
+      for (const eye of eyes) {
+        expect(2 * (eye.ry ?? 0)).toBeCloseTo(eyeHeight, 2);
+        expect(eye.transform?.rotate).not.toBe(0);
+      }
+      expect(eyeHeight / box.h).toBeLessThan(0.05);
+    }
+  });
+
+  it("gives each type its own part: the Wisp is plain, the Lantern_Wraith holds a lantern, the Chained_Brute wears shackles and chains", () => {
+    const parts = Object.fromEntries(
+      TYPES.map((type) => [type, partsOf(art(type))]),
+    );
+    const own = ["lantern", "shackles", "chain"];
+    expect(parts.wisp?.filter((p) => own.includes(p))).toEqual([]);
+    expect(parts["lantern-wraith"]).toContain("lantern");
+    expect(parts["lantern-wraith"]).not.toContain("shackles");
+    expect(parts["chained-brute"]).toEqual(
+      expect.arrayContaining(["shackles", "chain"]),
+    );
+    expect(parts["chained-brute"]).not.toContain("lantern");
+    // The lantern light is cold: its stops are the lantern tokens, never warm.
+    const lantern = nodesOf(art("lantern-wraith"));
+    const light = lantern.find((n) => n.cls === "lantern-light");
+    expect(
+      lantern.find((n) => n.id === light?.paint)?.children?.map((s) => s.cls),
+    ).toEqual(["stop-lantern-0", "stop-lantern-1"]);
+    expect(classesOf(art("lantern-wraith")).join(" ")).not.toMatch(
+      /warm|candle|pumpkin/,
+    );
+    // Dark iron with no light outline.
+    expect(classesOf(art("chained-brute"))).not.toContain("ghost-rim");
+  });
+
+  it("the Wisp outline box equals its box; every type fits its box; the Wisp is the smallest and the Chained_Brute the widest", () => {
+    const wispOutline = nodesOf(art("wisp")).find((n) => n.part === "outline");
+    expect(boxOfAll(wispOutline === undefined ? [] : [wispOutline])).toEqual({
       x1: 0,
-      x2: 0,
       y1: 0,
-      y2: 1,
+      x2: GHOST_BOX.wisp.w,
+      y2: GHOST_BOX.wisp.h,
     });
-    expect(fill?.children?.at(-1)).toMatchObject({
-      cls: "stop-spectre-2",
-      offset: 1,
-    });
-  });
-
-  it("has two small slanted eyes, 4/88 of its height", () => {
-    const eyes = nodesOf(wisp).filter((n) => n.part === "eye");
-    expect(eyes).toHaveLength(2);
-    for (const eye of eyes) {
-      expect((2 * (eye.ry ?? 0)) / GHOST_BOX.wisp.h).toBe(4 / 88);
-      expect(eye.transform?.rotate).not.toBe(0);
+    for (const type of TYPES) {
+      const nodes = nodesOf(art(type)).filter((n) =>
+        ["outline", "lantern-frame", "shackles", "chain"].includes(
+          n.part ?? "",
+        ),
+      );
+      const box = boxOfAll(nodes);
+      expect(box.x1).toBeGreaterThanOrEqual(0);
+      expect(box.y1).toBeGreaterThanOrEqual(0);
+      expect(box.x2).toBeLessThanOrEqual(GHOST_BOX[type].w);
+      expect(box.y2).toBeLessThanOrEqual(GHOST_BOX[type].h);
+      expect(GHOST_TYPES[type].box).toEqual(GHOST_BOX[type]);
     }
-    expect(GHOST_TYPES.wisp.eyeHeight / GHOST_TYPES.wisp.box.h).toBe(4 / 88);
-  });
-
-  it("its outline box equals the Wisp box of the Scene_Layout", () => {
-    const outline = nodesOf(wisp).find((n) => n.part === "outline");
-    const points = outline === undefined ? [] : pointsOf(outline);
-    const xs = points.map(([x]) => x);
-    const ys = points.map(([, y]) => y);
-    expect(Math.min(...xs)).toBe(0);
-    expect(Math.min(...ys)).toBe(0);
-    expect({ w: Math.max(...xs), h: Math.max(...ys) }).toEqual(GHOST_BOX.wisp);
-    expect(GHOST_TYPES.wisp.box).toEqual(GHOST_BOX.wisp);
+    const {
+      wisp,
+      "lantern-wraith": wraith,
+      "chained-brute": brute,
+    } = GHOST_BOX;
+    expect(wisp.w).toBeLessThan(wraith.w);
+    expect(wraith.w).toBeLessThan(brute.w);
+    expect(wisp.h).toBeLessThan(wraith.h);
   });
 });
 
@@ -507,13 +618,17 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
     }
   });
 
-  it("a Haunted attic slot draws the Wisp with its glow; other slots draw no ghost yet", () => {
+  it("a Haunted slot draws its floor's ghost with its glow; Locked and Exorcised slots draw no ghost yet", () => {
     for (const slot of allSlots) {
       const tree = slotArt(slot);
-      const ghost = slot.floor === "attic" && slot.state === "haunted";
+      const ghost = slot.state === "haunted";
       const parts = nodesOf(tree).map((n) => n.part);
       expect(parts.includes("glow")).toBe(ghost);
-      expect(classesOf(tree).includes("ghost--wisp")).toBe(ghost);
+      for (const type of ["wisp", "lantern-wraith", "chained-brute"]) {
+        expect(classesOf(tree).includes(`ghost--${type}`)).toBe(
+          ghost && type === GHOST_TYPE_OF[slot.floor],
+        );
+      }
       if (ghost) {
         const holder = nodesOf(tree).find((n) =>
           n.cls?.startsWith("slot-ghost "),
@@ -521,6 +636,26 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
         expect(holder?.cls).toContain(`ghost-phase-${slot.index % 4}`);
         expect(holder?.transform?.scale).toBeCloseTo(slot.ghostScale, 2);
       }
+    }
+  });
+
+  it("every ghost box lies inside its slot, so no ghost pokes through a roof or floor line", () => {
+    for (const slot of allSlots.filter((s) => s.state === "haunted")) {
+      const holder = nodesOf(slotArt(slot)).find((n) =>
+        n.cls?.startsWith("slot-ghost "),
+      );
+      const [x = 0, y = 0] = holder?.transform?.translate ?? [];
+      const k = holder?.transform?.scale ?? 1;
+      const { box, shadowY } = GHOST_TYPES[slot.ghostType];
+      const label = `${slot.key} of ${slot.rect.w}`;
+      expect(x, label).toBeGreaterThanOrEqual(slot.rect.x - 0.01);
+      expect(x + box.w * k, label).toBeLessThanOrEqual(
+        slot.rect.x + slot.rect.w + 0.01,
+      );
+      expect(y, label).toBeGreaterThanOrEqual(slot.rect.y);
+      expect(y + shadowY * k, label).toBeLessThanOrEqual(
+        slot.rect.y + slot.rect.h,
+      );
     }
   });
 

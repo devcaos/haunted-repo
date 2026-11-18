@@ -1,6 +1,6 @@
 import type { Floor } from "@haunted-repo/core";
-import { GHOST_BOX, type SlotPlacement } from "../model/sceneLayout.js";
-import { WISP_SHADOW_Y, ghostArt } from "./ghosts.js";
+import type { SlotPlacement } from "../model/sceneLayout.js";
+import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import {
   arch,
   circle,
@@ -26,7 +26,7 @@ const SILL_OVERHANG = 4;
 const PANE_TOP = 4;
 /** Width of the pane frame around the glass. */
 const PANE_FRAME = 3;
-/** The Wisp's floor shadow sits this far above the slot bottom. */
+/** A ghost's floor shadow sits this far above the slot bottom. */
 const SHADOW_LIFT = 4;
 
 function round2(value: number): number {
@@ -88,19 +88,19 @@ function pane(slot: SlotPlacement): ShapeNode {
 }
 
 /**
- * The Wisp of a Haunted attic slot, scaled by the floor factor, centred in the
- * slot and standing on its bottom edge. Until task 9.2 every attic Card uses
- * Variant 0 (decision Q15).
+ * The ghost of a Haunted slot, of its floor's Ghost_Type, scaled by the floor
+ * factor, centred in the slot and floating over its bottom edge. Until task
+ * 9.2 every Card uses Variant 0 (decision Q15).
  */
 function slotGhost(slot: SlotPlacement): ShapeNode {
   const k = slot.ghostScale;
-  const box = GHOST_BOX.wisp;
+  const { box, shadowY } = GHOST_TYPES[slot.ghostType];
   const x = round2(slot.rect.x + (slot.rect.w - box.w * k) / 2);
-  const y = round2(slot.rect.y + slot.rect.h - SHADOW_LIFT - WISP_SHADOW_Y * k);
+  const y = round2(slot.rect.y + slot.rect.h - SHADOW_LIFT - shadowY * k);
   // The phase class starts each idle loop at another point, so neighbours never float in step.
   return g(
     `slot-ghost ghost-phase-${slot.index % 4}`,
-    [ghostArt("wisp", 0, "haunted")],
+    [ghostArt(slot.ghostType, 0, "haunted")],
     {
       transform: { translate: [x, y], scale: round2(k) },
     },
@@ -108,13 +108,13 @@ function slotGhost(slot: SlotPlacement): ShapeNode {
 }
 
 /**
- * One Ghost_Slot: its back-wall pane and, for a Haunted attic Card, the Wisp.
- * Until task 9.3 middle-floor and basement slots draw only their pane, and
- * Locked or Exorcised attic Cards draw no ghost yet (decision Q15).
+ * One Ghost_Slot: its back-wall pane and, for a Haunted Card, its floor's
+ * ghost. Until task 9.3 Locked or Exorcised Cards draw no ghost yet
+ * (decision Q15).
  */
 export function slotArt(slot: SlotPlacement): ShapeNode {
   const children = [pane(slot)];
-  if (slot.floor === "attic" && slot.state === "haunted") {
+  if (slot.state === "haunted") {
     children.push(slotGhost(slot));
   }
   return g(`slot slot--${slot.state}`, children);

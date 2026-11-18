@@ -22,6 +22,14 @@
   --sc-iron: #2a303c;
   --sc-iron-dark: #1a202c;
   --sc-door-wood: #3a1d15;
+  /* The hooded wraiths, after the ghost reference art */
+  --sc-ghost-0: #eef4ff;
+  --sc-ghost-1: #c9d8f2;
+  --sc-ghost-2: #9fb4da;
+  --sc-ghost-shade: #5d7090;
+  --sc-ghost-eye: #d9f3ff;
+  --sc-lantern-light: #cfefff;
+  --sc-lantern-flame: #e6f6ff;
   /* Named lights */
   --sc-cold-blue: #6e9bd8;
   --sc-warm-orange: #f59a45;
@@ -142,6 +150,7 @@
   --sc-rain-step-y: 200px;
   --sc-fog-shift: 60px;
   --sc-float-rise: -8px;
+  --sc-sway-shift: 4px;
   --sc-mote-drift-x: -6px;
   --sc-mote-drift-y: 10px;
   /* Delays of the Animation Catalogue */

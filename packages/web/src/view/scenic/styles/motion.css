@@ -32,6 +32,25 @@
     transform: translateY(var(--sc-float-rise)) rotate(1.5deg);
   }
 }
+/* The Lantern_Wraith sways from its hood tip, as if the lantern swings it. */
+@keyframes wraith-sway {
+  from {
+    transform: translateX(calc(-1 * var(--sc-sway-shift))) rotate(-4deg);
+  }
+  to {
+    transform: translateX(var(--sc-sway-shift)) rotate(4deg);
+  }
+}
+/* The Chained_Brute heaves: a slow, heavy breath that strains the chains. */
+@keyframes brute-heave {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.03, 0.97);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   /* press: a small, quick push on every button (Game-feel rule 1). */
   .scenic button {
@@ -54,6 +73,18 @@
     transform-box: fill-box;
     transform-origin: center;
     animation: wisp-float var(--sc-dur-wisp-float) var(--sc-ease-in-out)
+      infinite;
+  }
+  .ghost--lantern-wraith .ghost-idle {
+    transform-box: fill-box;
+    transform-origin: top;
+    animation: wraith-sway var(--sc-dur-wraith-sway) var(--sc-ease-in-out)
+      infinite alternate;
+  }
+  .ghost--chained-brute .ghost-idle {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: brute-heave var(--sc-dur-brute-heave) var(--sc-ease-in-out)
       infinite;
   }
   /* Negative delays start neighbouring ghosts at other points of the loop. */
