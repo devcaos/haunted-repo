@@ -41,16 +41,25 @@ export function skyLayers(): ShapeNode {
       ),
       gradient("radialGradient", "moon-halo", [
         ["stop-halo-0", 0],
-        ["stop-halo-mid", 0.3],
+        ["stop-halo-mid", 0.22],
         ["stop-halo-1", 1],
+      ]),
+      gradient("radialGradient", "crater", [
+        ["stop-crater-0", 0],
+        ["stop-crater-1", 1],
       ]),
     ]),
     g("sky", [rect("sky-fill", 0, 0, 1600, 1000, { paint: "sky-fill" })]),
     g("moon-sky", [
-      circle("moon-halo", MOON.cx, MOON.cy, 360, { paint: "moon-halo" }),
+      circle("moon-halo", MOON.cx, MOON.cy, 520, { paint: "moon-halo" }),
       circle("moon tone-bone", MOON.cx, MOON.cy, MOON.r, { part: "moon" }),
-      ellipse("moon-shade tone-mist", MOON.cx + 14, MOON.cy - 14, 12, 9),
-      ellipse("moon-shade tone-mist", MOON.cx + 22, MOON.cy + 20, 8, 6),
+      // Craters with soft edges: each fades out to its rim.
+      ellipse("moon-shade", MOON.cx + 14, MOON.cy - 14, 12, 9, {
+        paint: "crater",
+      }),
+      ellipse("moon-shade", MOON.cx + 22, MOON.cy + 20, 8, 6, {
+        paint: "crater",
+      }),
     ]),
     g("hills-far", [
       path("hill-far tone-mist", FAR_HILLS, { part: "hill-far" }),

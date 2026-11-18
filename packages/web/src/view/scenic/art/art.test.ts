@@ -212,7 +212,14 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(winding(d, [MOON.cx - MOON.r + 6, MOON.cy])).not.toBe(0);
     expect(winding(d, [MOON.cx, MOON.cy])).toBe(0);
     const halo = nodesOf(skyLayers()).find((n) => n.cls === "moon-halo");
-    expect(halo?.r).toBeGreaterThan(5 * MOON.r);
+    expect(halo?.r).toBeGreaterThan(8 * MOON.r);
+    // Craters fade out to their rims instead of ending in a hard edge.
+    const sky = nodesOf(skyLayers());
+    for (const crater of sky.filter((n) => n.cls === "moon-shade")) {
+      expect(sky.find((n) => n.id === crater.paint)?.kind).toBe(
+        "radialGradient",
+      );
+    }
   });
 
   it("lights only the hill crests that face the moon, on the hill outline", () => {
