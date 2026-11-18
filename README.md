@@ -104,6 +104,10 @@ docs/            internal notes: idea, decisions, frictions, Kiro usage log
 
 Built for Kiroween 2026, in the Costume Contest category.
 
+## Credits
+
+Scene illustration drafted with Claude (Anthropic AI); integrated, animated and wired to the app with Kiro. The file (`packages/web/src/view/assets/files/house-scene.svg`) keeps its C2PA provenance block.
+
 ## Licence
 
 [MIT](LICENSE). The demo shows code from [lukeed/sirv](https://github.com/lukeed/sirv), which has its own MIT licence; its notice is shown on the page and served as `sirv-license.txt`.
