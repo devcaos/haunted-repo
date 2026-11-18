@@ -688,6 +688,52 @@ describe("furniture and slot panes (Requirement 12.5)", () => {
   });
 });
 
+describe("simple, iconic silhouettes (art review, item 13)", () => {
+  const FORBIDDEN =
+    /brick-wall|stone-joint|grain|wood|lightning|bolt|human|person|figure|ornate|carving|filigree/;
+  const trees = [
+    skyLayers(),
+    houseLayer(),
+    weatherLayer(),
+    foregroundLayer(),
+    ghostArt("wisp", 0, "haunted"),
+    ...["attic", "middle floor", "basement"].map((f) =>
+      chainedDoorArt(f as Floor),
+    ),
+  ];
+
+  it("draws no individual brick wall, wood texture, lightning, people or ornate furniture", () => {
+    const names = trees.flatMap((tree) =>
+      nodesOf(tree).flatMap((n) => [
+        ...(n.cls?.split(" ") ?? []),
+        n.part ?? "",
+      ]),
+    );
+    expect(names.filter((name) => FORBIDDEN.test(name))).toEqual([]);
+    expect(names.filter((name) => name === "brick").length).toBeLessThanOrEqual(
+      5,
+    );
+  });
+
+  it("keeps every piece of furniture to a few shapes", () => {
+    for (const floor of ["attic", "middle floor", "basement"] as const) {
+      const group = nodesOf(houseLayer()).find(
+        (n) => n.part === FLOOR_CLASS[floor],
+      );
+      const PIECES =
+        /^(?:trunk|telephone-table|shelves|fireplace|boiler|chain)\b/;
+      const pieces = nodesOf(group ?? g("none", [])).filter((n) =>
+        PIECES.test(n.cls ?? ""),
+      );
+      expect(pieces.length).toBeGreaterThan(0);
+      for (const piece of pieces) {
+        const leaves = nodesOf(piece).filter((n) => n.children === undefined);
+        expect(leaves.length, `${floor}: ${piece.cls}`).toBeLessThanOrEqual(14);
+      }
+    }
+  });
+});
+
 describe("walls with weight (Requirement 3.1)", () => {
   it("gives floors, foundation, partition and outer walls 8 to 12 units", () => {
     const parts = nodesOf(houseLayer()).find((n) => n.part === "structure");
