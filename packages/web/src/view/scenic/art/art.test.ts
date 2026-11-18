@@ -16,11 +16,13 @@ import {
 import type { Floor } from "@haunted-repo/core";
 import type { GhostState } from "../../../logic/viewModel.js";
 import {
+  FLOOR_RECT,
   GHOST_BOX,
   GHOST_TYPE_OF,
   SLOT_BAND,
   floorGhostScale,
   slotRects,
+  type Rect,
   type SlotPlacement,
   type VariantNumber,
 } from "../model/sceneLayout.js";
@@ -28,8 +30,11 @@ import { GHOST_TYPES, ghostArt } from "./ghosts.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
+  ATTIC_TRIANGLE,
   GROUND_Y,
   HOUSE_OUTLINE,
+  ILLUSTRATION_PROPS,
+  TELEPHONE_ANCHOR,
   atticClip,
   sceneBackdrop,
 } from "./house.js";
@@ -585,6 +590,73 @@ function boxOf(node: ShapeNode): Box | null {
     y2: Math.max(...ys),
   };
 }
+
+describe("slots on the scene illustration (director's decision, 18 Nov)", () => {
+  const FLOORS = ["attic", "middle floor", "basement"] as const;
+  const apart = (a: Rect, b: Rect): boolean =>
+    a.x + a.w <= b.x ||
+    b.x + b.w <= a.x ||
+    a.y + a.h <= b.y ||
+    b.y + b.h <= a.y;
+  const triangle = (() => {
+    const [ax, ay, bx, by, cx, cy] = ATTIC_TRIANGLE;
+    return `M${ax} ${ay} L${bx} ${by} L${cx} ${cy} Z`;
+  })();
+
+  it("the attic dim box is the floor rectangle around the attic triangle", () => {
+    const xs = ATTIC_TRIANGLE.filter((_, i) => i % 2 === 0);
+    const ys = ATTIC_TRIANGLE.filter((_, i) => i % 2 === 1);
+    const box = {
+      x: Math.min(...xs),
+      y: Math.min(...ys),
+      w: Math.max(...xs) - Math.min(...xs),
+      h: Math.max(...ys) - Math.min(...ys),
+    };
+    expect(box).toEqual({ ...ATTIC_BACK });
+    expect(FLOOR_RECT.attic).toEqual(box);
+    expect(atticClip().children?.[0]?.points).toEqual(ATTIC_TRIANGLE);
+  });
+
+  it("no slot covers the telephone, the boiler or the stairs, with 1 to 5 Cards", () => {
+    for (const floor of FLOORS) {
+      for (let count = 1; count <= 5; count += 1) {
+        for (const slot of slotRects(floor, count)) {
+          for (const [name, prop] of Object.entries(ILLUSTRATION_PROPS)) {
+            expect(apart(slot, prop), `${floor} ${count}: ${name}`).toBe(true);
+          }
+        }
+      }
+    }
+  });
+
+  it("no attic slot pokes through the roof, and every slot stands above its floor line", () => {
+    for (let count = 1; count <= 5; count += 1) {
+      for (const slot of slotRects("attic", count)) {
+        for (const corner of [
+          [slot.x, slot.y],
+          [slot.x + slot.w, slot.y],
+        ] as [number, number][]) {
+          expect(winding(triangle, corner), `${count}: ${corner}`).not.toBe(0);
+        }
+      }
+    }
+    for (const floor of FLOORS) {
+      const band = SLOT_BAND[floor];
+      const room = FLOOR_RECT[floor];
+      expect(band.y + band.h).toBeLessThanOrEqual(room.y + room.h);
+      expect(band.y).toBeGreaterThanOrEqual(room.y);
+    }
+  });
+
+  it("anchors the telephone on its table in the hall, left of every middle-floor slot", () => {
+    const phone = ILLUSTRATION_PROPS.telephone;
+    expect(TELEPHONE_ANCHOR.x).toBeGreaterThan(phone.x);
+    expect(TELEPHONE_ANCHOR.x).toBeLessThan(phone.x + phone.w);
+    expect(TELEPHONE_ANCHOR.y).toBeGreaterThan(phone.y);
+    expect(TELEPHONE_ANCHOR.y).toBeLessThan(phone.y + phone.h);
+    expect(TELEPHONE_ANCHOR.x).toBeLessThan(SLOT_BAND["middle floor"].x);
+  });
+});
 
 describe("chained doors stand on their floor", () => {
   it("every chained door stands on its floor inside a frame, over a threshold", () => {

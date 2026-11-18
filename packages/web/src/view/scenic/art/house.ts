@@ -32,19 +32,39 @@ export const HOUSE_OUTLINE = [
   1253, 711,
 ] as const;
 
-/** Id of the clip that keeps the attic dim inside the attic. */
+/** The attic of the illustration: left foot, ridge, right foot. Its floor line is y 473. */
+// prettier-ignore
+export const ATTIC_TRIANGLE = [437, 473, 756, 173, 1074, 473] as const;
+
+/** Id of the clip that keeps the attic dim inside the attic triangle. */
 export const ATTIC_CLIP = "attic-inside";
 
-/** The whole attic volume, from the ridge down to the attic floor. */
-export const ATTIC_BACK = { x: 555, y: 177, w: 630, h: 333 } as const;
+/** The box around the attic triangle; the clip cuts its top corners. */
+export const ATTIC_BACK = { x: 437, y: 173, w: 637, h: 300 } as const;
 
-/** The clip path of the attic dim. */
+/** The clip path of the attic dim: exactly the attic triangle. */
 export function atticClip(): ShapeNode {
   return {
     kind: "clipPath",
     id: ATTIC_CLIP,
-    children: [
-      poly("clip-shape", [555, 394, 870, 177, 1185, 394, 1185, 510, 555, 510]),
-    ],
+    children: [poly("clip-shape", ATTIC_TRIANGLE)],
   };
 }
+
+/**
+ * Where the old telephone stands in the hall of the illustration (the dial
+ * on the table, left of the parlour). Task 11.1 pins the Telephone widget
+ * here.
+ */
+export const TELEPHONE_ANCHOR = { x: 536, y: 611 } as const;
+
+/**
+ * Boxes around the pieces of the illustration that no ghost may cover,
+ * whatever the number of Cards: the telephone on its table, the boiler and
+ * the cellar stairs.
+ */
+export const ILLUSTRATION_PROPS = {
+  telephone: { x: 505, y: 605, w: 62, h: 85 },
+  boiler: { x: 466, y: 748, w: 82, h: 112 },
+  stairs: { x: 878, y: 718, w: 189, h: 195 },
+} as const;

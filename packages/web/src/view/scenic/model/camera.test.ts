@@ -87,13 +87,14 @@ describe("cameraFor", () => {
 
   it("gives the scales of the design within 0.01", () => {
     const expected: [string, ViewportClass, number][] = [
-      ["attic", "wide", 1.94],
-      ["middle floor", "wide", 1.76],
-      ["basement", "wide", 1.88],
-      ["house", "narrow", 1.7],
-      ["attic", "narrow", 2.45],
-      ["middle floor", "narrow", 2.24],
-      ["basement", "narrow", 2.38],
+      // The frames of the scene illustration (director's decision, 18 Nov).
+      ["attic", "wide", 1.77],
+      ["middle floor", "wide", 1.68],
+      ["basement", "wide", 1.68],
+      ["house", "narrow", 1.63],
+      ["attic", "narrow", 2.25],
+      ["middle floor", "narrow", 2.13],
+      ["basement", "narrow", 2.13],
     ];
     for (const [name, viewport, scale] of expected) {
       const frame = FRAMES.find((f) => f.name === name)!.frame;

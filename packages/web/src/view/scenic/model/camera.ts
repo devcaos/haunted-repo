@@ -20,10 +20,11 @@ export interface CameraTransform {
   counterScale: number; // 1 / scale, for HTML pinned inside the world
 }
 
+/** Each floor rectangle of the illustration with a 20-unit margin. */
 const FLOOR_FRAME: Readonly<Record<Floor, Rect>> = {
-  attic: { x: 560, y: 300, w: 620, h: 230 },
-  "middle floor": { x: 530, y: 470, w: 680, h: 320 },
-  basement: { x: 550, y: 730, w: 640, h: 240 },
+  attic: { x: 417, y: 153, w: 677, h: 340 },
+  "middle floor": { x: 398, y: 476, w: 715, h: 240 },
+  basement: { x: 398, y: 698, w: 715, h: 235 },
 };
 
 /** The frame rectangle with its margin, in world units ("Camera frames"). */
@@ -32,7 +33,7 @@ export function frameRect(frame: Frame, viewport: ViewportClass): Rect {
     case "house":
       return viewport === "wide"
         ? { x: 0, y: 0, w: WORLD_W, h: WORLD_H }
-        : { x: 510, y: 95, w: 850, h: 895 };
+        : { x: 350, y: 40, w: 920, h: 930 }; // the house and its tower
     case "floor":
       return FLOOR_FRAME[frame.floor];
     case "slot":
