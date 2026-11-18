@@ -87,6 +87,10 @@ body {
   color: var(--sc-text-link);
 }
 
+.scenic a:hover {
+  color: var(--sc-text-link-hover);
+}
+
 .scenic p {
   overflow-wrap: anywhere;
 }

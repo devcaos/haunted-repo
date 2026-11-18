@@ -76,6 +76,8 @@ const TEXT_PAIRS: [string, string, number][] = [
   ["--sc-night", "--sc-bone", 12.3],
   ["--sc-brass", "--sc-night", 5.63],
   ["--sc-mist", "--sc-night", 4.62],
+  // Links and the licence line: stone grey, well above the old Mist (4.62).
+  ["--sc-stone", "--sc-night", 8.36],
 ];
 
 const UI_PAIRS: [string, string, number][] = [
@@ -106,6 +108,8 @@ describe("Scenic_Tokens palette", () => {
       "--sc-text-heading",
       "--sc-text-muted",
       "--sc-text-link",
+      "--sc-text-link-hover",
+      "--sc-text-licence",
       "--sc-backing",
       "--sc-backing-raised",
       "--sc-border",

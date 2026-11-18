@@ -158,12 +158,16 @@
 
 .scenic .hud-foot .licence {
   margin: 0;
-  color: var(--sc-text-muted);
+  color: var(--sc-text-licence);
   font-size: var(--sc-text-small);
 }
 
 .scenic .hud-foot .licence a {
   color: var(--sc-text-link);
+}
+
+.scenic .hud-foot .licence a:hover {
+  color: var(--sc-text-link-hover);
 }
 
 /* Wide screens: the HUD column overlays the stage edge and scrolls inside itself. */

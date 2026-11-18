@@ -8,6 +8,8 @@
   --sc-night: #0b111b;
   /* Darker than Night: the ground and the foreground silhouettes */
   --sc-abyss: #05080d;
+  /* Stone grey for quiet links and the licence line */
+  --sc-stone: #a7adb4;
   --sc-slate: #202d3b;
   --sc-mist: #6f7f92;
   --sc-bone: #d5d0c5;
@@ -25,7 +27,9 @@
   --sc-text: var(--sc-bone);
   --sc-text-heading: var(--sc-candle);
   --sc-text-muted: var(--sc-mist);
-  --sc-text-link: var(--sc-spectral);
+  --sc-text-link: var(--sc-stone);
+  --sc-text-link-hover: var(--sc-pumpkin);
+  --sc-text-licence: var(--sc-stone);
   --sc-backing: var(--sc-night);
   --sc-backing-raised: var(--sc-slate);
   --sc-border: var(--sc-brass);
