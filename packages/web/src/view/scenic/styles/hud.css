@@ -162,7 +162,8 @@
   font-size: var(--sc-text-small);
 }
 
-.scenic .hud-foot .licence a {
+.scenic .hud-foot .licence a,
+.scenic .hud-foot .licence a:visited {
   color: var(--sc-text-link);
 }
 

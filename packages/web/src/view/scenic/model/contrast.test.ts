@@ -155,6 +155,41 @@ describe("contrast (WCAG 2.1)", () => {
   });
 });
 
+describe("link colours (art review 3, item 13)", () => {
+  const styles = (name: string): string =>
+    readFileSync(
+      fileURLToPath(new URL(`../styles/${name}`, import.meta.url)),
+      "utf8",
+    ).replace(/\s+/g, " ");
+
+  it("links use stone grey, visited links too, and turn Pumpkin on hover", () => {
+    expect(tokens.get("--sc-text-link")).toBe("var(--sc-stone)");
+    expect(tokens.get("--sc-text-link-hover")).toBe("var(--sc-pumpkin)");
+    const base = styles("base.css");
+    expect(base).toContain(
+      ".scenic a, .scenic a:visited { color: var(--sc-text-link); }",
+    );
+    expect(base).toContain(
+      ".scenic a:hover { color: var(--sc-text-link-hover); }",
+    );
+    const hud = styles("hud.css");
+    expect(hud).toContain(
+      ".scenic .hud-foot .licence a, .scenic .hud-foot .licence a:visited { color: var(--sc-text-link); }",
+    );
+    expect(hud).toContain(".scenic .view-link { color: var(--sc-text-link); }");
+  });
+
+  it("no scenic link rule falls back to a blue token", () => {
+    for (const name of ["base.css", "hud.css"]) {
+      for (const m of styles(name).matchAll(
+        /([^{}]*\ba\b[^{}]*)\{([^}]*)\}/g,
+      )) {
+        expect(m[2], `${name}: ${m[1]}`).not.toMatch(/spectral|cold-blue/);
+      }
+    }
+  });
+});
+
 describe("font tokens", () => {
   it("every font token ends with a generic family", () => {
     const fonts = [...tokens].filter(([name]) => name.startsWith("--font-"));
