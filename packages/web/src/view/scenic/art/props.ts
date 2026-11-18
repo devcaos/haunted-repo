@@ -4,7 +4,7 @@ import {
   SLOT_BAND,
   type SlotPlacement,
 } from "../model/sceneLayout.js";
-import { ghostArt } from "./ghosts.js";
+import { WISP_SHADOW_Y, ghostArt } from "./ghosts.js";
 import {
   circle,
   defs,
@@ -26,8 +26,7 @@ const PANE_SIZE: Readonly<Record<Floor, { w: number; h: number }>> = {
 const PANE_TOP = 4;
 /** Width of the pane frame around the glass. */
 const PANE_FRAME = 3;
-/** Local y of the Wisp's floor shadow, which sits this far above the slot bottom. */
-const SHADOW_Y = 72;
+/** The Wisp's floor shadow sits this far above the slot bottom. */
 const SHADOW_LIFT = 4;
 
 function round2(value: number): number {
@@ -87,10 +86,15 @@ function slotGhost(slot: SlotPlacement): ShapeNode {
   const k = slot.ghostScale;
   const box = GHOST_BOX.wisp;
   const x = round2(slot.rect.x + (slot.rect.w - box.w * k) / 2);
-  const y = round2(slot.rect.y + slot.rect.h - SHADOW_LIFT - SHADOW_Y * k);
-  return g("slot-ghost", [ghostArt("wisp", 0, "haunted")], {
-    transform: { translate: [x, y], scale: round2(k) },
-  });
+  const y = round2(slot.rect.y + slot.rect.h - SHADOW_LIFT - WISP_SHADOW_Y * k);
+  // The phase class starts each idle loop at another point, so neighbours never float in step.
+  return g(
+    `slot-ghost ghost-phase-${slot.index % 4}`,
+    [ghostArt("wisp", 0, "haunted")],
+    {
+      transform: { translate: [x, y], scale: round2(k) },
+    },
+  );
 }
 
 /**

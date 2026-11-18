@@ -4,34 +4,55 @@
  * yours (design "Palette").
  */
 
-/* The Wisp: Spectral body, Mist shade, Night eyes with Bone glints. */
-.ghost .ghost-body {
-  fill: var(--sc-spectral);
+/*
+ * The Wisp: a body painted by its gradient (cold white to nothing at the
+ * tail), Mist folds, Night eye sockets with glowing cold-white cores.
+ */
+.ghost .stop-spectre-0 {
+  stop-color: var(--sc-cold-white);
+  stop-opacity: 0.95;
 }
 
-.ghost .ghost-shade {
-  fill: var(--sc-mist);
-  opacity: 0.3;
+.ghost .stop-spectre-1 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.7;
+}
+
+.ghost .stop-spectre-2 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: 0;
+}
+
+.ghost .ghost-fold {
+  stroke: var(--sc-mist);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.35;
 }
 
 .ghost .ghost-eye {
   fill: var(--sc-night);
 }
 
-.ghost .ghost-glint {
-  fill: var(--sc-bone);
+.ghost .ghost-pupil {
+  fill: var(--sc-cold-white);
 }
 
-.ghost .ghost-mouth {
-  fill: var(--sc-night);
-  opacity: 0.8;
+.ghost .stop-eye-0 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: 0.9;
+}
+
+.ghost .stop-eye-1 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: 0;
 }
 
 .ghost .ghost-cobweb {
   stroke: var(--sc-bone);
-  stroke-width: 0.8;
+  stroke-width: 0.6;
   stroke-linecap: round;
-  opacity: 0.6;
+  opacity: 0.45;
 }
 
 /* Rim light on the moon-facing edge of the ghost, in Bone. */

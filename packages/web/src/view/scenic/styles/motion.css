@@ -36,15 +36,15 @@
   }
 }
 
-/* Playful by intent: a small rise with a rock from side to side. */
-@keyframes wisp-bob {
+/* A slow levitation with a slight sway: eerie, not playful. */
+@keyframes wisp-float {
   0%,
   100% {
-    transform: translateY(0) rotate(-3deg);
+    transform: translateY(0) rotate(-1.5deg);
   }
 
   50% {
-    transform: translateY(var(--sc-bob-rise)) rotate(3deg);
+    transform: translateY(var(--sc-float-rise)) rotate(1.5deg);
   }
 }
 
@@ -79,7 +79,21 @@
   .ghost--wisp .ghost-idle {
     transform-box: fill-box;
     transform-origin: center;
-    animation: wisp-bob var(--sc-dur-wisp-bob) var(--sc-ease-in-out) infinite;
+    animation: wisp-float var(--sc-dur-wisp-float) var(--sc-ease-in-out)
+      infinite;
+  }
+
+  /* Negative delays start neighbouring ghosts at other points of the loop. */
+  .ghost-phase-1 .ghost-idle {
+    animation-delay: calc(-1 * var(--sc-delay-phase-1));
+  }
+
+  .ghost-phase-2 .ghost-idle {
+    animation-delay: calc(-2 * var(--sc-delay-phase-1));
+  }
+
+  .ghost-phase-3 .ghost-idle {
+    animation-delay: calc(-3 * var(--sc-delay-phase-1));
   }
   /* The dev-only gallery draws every ghost in its resting pose. */
   [data-motion="still"] .ghost-idle {

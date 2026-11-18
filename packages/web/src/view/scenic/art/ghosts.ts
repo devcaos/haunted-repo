@@ -10,6 +10,9 @@ import {
   type ShapeNode,
 } from "./shapes.js";
 
+/** Local y of the floor shadow: the Wisp floats 8 units above it. */
+export const WISP_SHADOW_Y = 96;
+
 /** What every drawing of one Ghost_Type shares. */
 export interface GhostTypeSpec {
   /** Natural size at Variant 0, in viewBox units (the Scene_Layout box). */
@@ -25,28 +28,25 @@ export interface GhostTypeSpec {
  * Lantern_Wraith and the Chained_Brute.
  */
 export const GHOST_TYPES: Readonly<Record<"wisp", GhostTypeSpec>> = {
-  wisp: { box: GHOST_BOX.wisp, eyeHeight: 11, idle: "wisp-bob" },
+  wisp: { box: GHOST_BOX.wisp, eyeHeight: 4, idle: "wisp-float" },
 };
 
-// The Wisp, Variant 0, in local units: box 60 x 64, origin top left (design
-// "The Wisp, Variant 0"). A round dome, straight sides and a hem of five small
-// scallops: no tail and no horns.
+// The Wisp, Variant 0, in local units: box 56 x 88, origin top left. A tall
+// gothic spectre (director's art review, 18 Nov): a narrow head, sleeves that
+// sweep out, and a ragged tail of four Bezier tatters. No mouth, no horns.
 const WISP_OUTLINE =
-  "M30 0 C47 0 60 13 60 31 L60 54 Q55 64 50 56 Q45 64 40 56 Q35 64 30 56 Q25 64 20 56 Q15 64 10 56 Q5 64 0 54 L0 31 C0 13 13 0 30 0 Z";
-const WISP_SHADE = "M4 34 C6 48 14 54 24 55 Q14 58 8 54 Q2 48 2 36 Z";
-const WISP_RIM = "M34 1 C49 3 59 15 59.5 31 L59.5 38";
-/**
- * Cobweb on the top left of the head, centred on (6, 4): three radial threads,
- * two arcs at radius 6 and 11 across them, and one thread hanging down.
- */
-const WISP_COBWEB =
-  "M6 4 L0 18 M6 4 L16 12 M6 4 L14 0 " +
-  "M3.6 9.5 A6 6 0 0 0 10.7 7.8 A6 6 0 0 0 11.4 1.3 " +
-  "M1.7 14.1 A11 11 0 0 0 14.6 10.9 A11 11 0 0 0 15.8 -0.9 " +
-  "M0 18 L-4 26";
-const WISP_EYES: readonly (readonly [number, number])[] = [
-  [21, 27],
-  [39, 27],
+  "M28 0 C36 1 42 9 42 21 C42 29 49 34 56 42 C50 42 48 48 48 54 C48 62 46 68 44 72 " +
+  "Q44 80 46 86 Q40 80 38 76 Q37 84 34 88 Q30 80 27 76 Q25 82 22 84 Q19 77 17 72 " +
+  "Q13 76 10 78 Q12 70 10 62 C8 54 2 48 0 40 C6 40 12 34 14 26 C14 10 20 1 28 0 Z";
+/** Two cloth folds running down the body. */
+const WISP_FOLDS = "M24 34 C22 48 24 60 21 74 M34 36 C36 50 34 62 37 76";
+const WISP_RIM = "M30 1 C37 2 42 10 42 21 C42 29 49 34 55 41";
+/** A torn cobweb on the left sleeve: three threads from (9, 30) and one arc. */
+const WISP_COBWEB = "M9 30 L1 40 M9 30 L4 44 M9 30 L13 42 M3 37 Q8 38 12 38";
+/** The eyes: small slanted sockets, each with a glowing core. */
+const WISP_EYES: readonly (readonly [number, number, number])[] = [
+  [22, 19, 14],
+  [34, 19, -14],
 ];
 
 /**
@@ -57,33 +57,54 @@ const WISP_EYES: readonly (readonly [number, number])[] = [
  * then `g.ghost-idle`, the only part the idle animation moves.
  */
 export function ghostArt(type: "wisp", variant: 0, look: "haunted"): ShapeNode {
-  const glowId = `${type}-${variant}-glow`;
-  const eyes = WISP_EYES.flatMap(([cx, cy]) => [
-    ellipse("ghost-eye", cx, cy, 5, 5.5, { part: "eye" }),
-    circle("ghost-glint", cx + 1.8, cy - 2.2, 1.6),
+  const id = (name: string): string => `${type}-${variant}-${name}`;
+  const eyes = WISP_EYES.flatMap(([cx, cy, tilt]) => [
+    circle("ghost-eye-glow", cx, cy, 5, { paint: id("eye") }),
+    ellipse("ghost-eye", 0, 0, 3.6, 2, {
+      part: "eye",
+      transform: { translate: [cx, cy], rotate: tilt },
+    }),
+    circle("ghost-pupil", cx, cy, 0.8),
   ]);
   return g(`ghost ghost--${type} look-${look}`, [
     defs([
-      gradient("radialGradient", glowId, [
+      gradient("radialGradient", id("glow"), [
         ["stop-cold-0", 0],
         ["stop-cold-1", 1],
       ]),
+      gradient("radialGradient", id("eye"), [
+        ["stop-eye-0", 0],
+        ["stop-eye-1", 1],
+      ]),
+      // Cold white at the head, fading to nothing at the tail.
+      gradient(
+        "linearGradient",
+        id("body"),
+        [
+          ["stop-spectre-0", 0],
+          ["stop-spectre-1", 0.5],
+          ["stop-spectre-2", 1],
+        ],
+        { x1: 0, y1: 0, x2: 0, y2: 1 },
+      ),
     ]),
-    g("ghost-glow", [circle("glow", 30, 34, 52, { paint: glowId })], {
+    g("ghost-glow", [ellipse("glow", 28, 40, 46, 58, { paint: id("glow") })], {
       part: "glow",
     }),
-    ellipse("ghost-shadow", 30, 72, 20, 4),
+    ellipse("ghost-shadow", 28, WISP_SHADOW_Y, 16, 3),
     g("ghost-idle", [
       g(
         "ghost-outline",
-        [path("ghost-body", WISP_OUTLINE, { part: "hem-round" })],
-        {
-          part: "outline",
-        },
+        [
+          path("ghost-body", WISP_OUTLINE, {
+            part: "tail-ragged",
+            paint: id("body"),
+          }),
+        ],
+        { part: "outline" },
       ),
-      path("ghost-shade", WISP_SHADE),
+      strokePath("ghost-fold", WISP_FOLDS),
       ...eyes,
-      ellipse("ghost-mouth", 30, 40, 3, 2.5),
       strokePath("ghost-cobweb", WISP_COBWEB, { part: "cobweb" }),
       strokePath("ghost-rim", WISP_RIM),
     ]),

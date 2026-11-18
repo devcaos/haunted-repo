@@ -19,6 +19,7 @@
   /* Named lights */
   --sc-cold-blue: #6e9bd8;
   --sc-warm-orange: #f59a45;
+  --sc-cold-white: #e8f0fb;
   --sc-dawn: #e9894a;
   /* Roles */
   --sc-text: var(--sc-bone);
@@ -120,7 +121,7 @@
   --sc-dur-fog-drift: 24s;
   --sc-dur-bats-fly: 22s;
   --sc-dur-window-flicker: 3.2s;
-  --sc-dur-wisp-bob: 2.4s;
+  --sc-dur-wisp-float: 5.6s;
   --sc-dur-wraith-sway: 4.2s;
   --sc-dur-brute-heave: 3.2s;
   --sc-dur-flame-flicker: 1.6s;
@@ -130,9 +131,10 @@
   --sc-rain-step-x: -80px;
   --sc-rain-step-y: 200px;
   --sc-fog-shift: 60px;
-  --sc-bob-rise: -6px;
+  --sc-float-rise: -8px;
   /* Delays of the Animation Catalogue */
   --sc-delay-spiral: 400ms;
+  --sc-delay-phase-1: 1.4s;
   --sc-delay-sparks: 1000ms;
   --sc-delay-finale: 800ms;
   /* Reduced_Motion fades, never longer than 200 ms */

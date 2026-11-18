@@ -42,7 +42,7 @@ export const SLOT_BAND: Readonly<Record<Floor, Rect>> = {
 /** Natural size (Variant 0) of each ghost box, in viewBox units. */
 export const GHOST_BOX: Readonly<Record<GhostType, { w: number; h: number }>> =
   {
-    wisp: { w: 60, h: 64 },
+    wisp: { w: 56, h: 88 },
     "lantern-wraith": { w: 72, h: 96 },
     "chained-brute": { w: 96, h: 88 },
   };

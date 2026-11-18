@@ -378,24 +378,43 @@ describe("the Wisp, Variant 0 (Requirements 5.1, 5.4, 6.1)", () => {
     expect(shapeProblems(wisp)).toEqual([]);
   });
 
-  it("has a round hem, a cobweb and a glow, and no tail, hood or horns", () => {
+  it("is a tall spectre with a ragged tail, a cobweb and a glow, and no mouth, hood or horns", () => {
     expect(parts).toEqual(
-      expect.arrayContaining(["outline", "hem-round", "cobweb", "glow"]),
+      expect.arrayContaining(["outline", "tail-ragged", "cobweb", "glow"]),
     );
-    for (const other of ["tail-spiral", "hood", "horns"]) {
+    for (const other of ["hem-round", "tail-spiral", "hood", "horns"]) {
       expect(parts).not.toContain(other);
     }
+    expect(classesOf(wisp)).not.toContain("ghost-mouth");
+    expect(GHOST_BOX.wisp.h / GHOST_BOX.wisp.w).toBeGreaterThan(1.5);
     const idle = nodesOf(wisp).find((n) => n.cls === "ghost-idle");
     expect(idle === undefined ? [] : classesOf(idle)).toContain("ghost-body");
   });
 
-  it("eye height over body height is 11/64", () => {
+  it("paints the body with a vertical gradient that fades out at the tail", () => {
+    const body = nodesOf(wisp).find((n) => n.cls === "ghost-body");
+    const fill = nodesOf(wisp).find((n) => n.id === body?.paint);
+    expect(fill).toMatchObject({
+      kind: "linearGradient",
+      x1: 0,
+      x2: 0,
+      y1: 0,
+      y2: 1,
+    });
+    expect(fill?.children?.at(-1)).toMatchObject({
+      cls: "stop-spectre-2",
+      offset: 1,
+    });
+  });
+
+  it("has two small slanted eyes, 4/88 of its height", () => {
     const eyes = nodesOf(wisp).filter((n) => n.part === "eye");
     expect(eyes).toHaveLength(2);
     for (const eye of eyes) {
-      expect((2 * (eye.ry ?? 0)) / GHOST_BOX.wisp.h).toBe(11 / 64);
+      expect((2 * (eye.ry ?? 0)) / GHOST_BOX.wisp.h).toBe(4 / 88);
+      expect(eye.transform?.rotate).not.toBe(0);
     }
-    expect(GHOST_TYPES.wisp.eyeHeight / GHOST_TYPES.wisp.box.h).toBe(11 / 64);
+    expect(GHOST_TYPES.wisp.eyeHeight / GHOST_TYPES.wisp.box.h).toBe(4 / 88);
   });
 
   it("its outline box equals the Wisp box of the Scene_Layout", () => {
@@ -476,7 +495,10 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
       expect(parts.includes("glow")).toBe(ghost);
       expect(classesOf(tree).includes("ghost--wisp")).toBe(ghost);
       if (ghost) {
-        const holder = nodesOf(tree).find((n) => n.cls === "slot-ghost");
+        const holder = nodesOf(tree).find((n) =>
+          n.cls?.startsWith("slot-ghost "),
+        );
+        expect(holder?.cls).toContain(`ghost-phase-${slot.index % 4}`);
         expect(holder?.transform?.scale).toBeCloseTo(slot.ghostScale, 2);
       }
     }
