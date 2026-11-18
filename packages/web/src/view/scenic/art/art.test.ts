@@ -436,6 +436,106 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6, 12.5)", () => {
   });
 });
 
+interface Box {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+/** The points of absolute path data (M L H V C S Q T Z), with H and V read right. */
+function pathPoints(d: string): [number, number][] {
+  const pts: [number, number][] = [];
+  let [x, y] = [0, 0];
+  for (const [, cmd = "", args = ""] of d.matchAll(/([A-Za-z])([^A-Za-z]*)/g)) {
+    const n = (args.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+    if (cmd === "H") n.forEach((v) => pts.push([(x = v), y]));
+    else if (cmd === "V") n.forEach((v) => pts.push([x, (y = v)]));
+    else if (/[MLCSQT]/.test(cmd)) {
+      for (let i = 0; i + 1 < n.length; i += 2) {
+        [x, y] = [n[i] ?? 0, n[i + 1] ?? 0];
+        pts.push([x, y]);
+      }
+    } else if (cmd !== "Z") throw new Error(`relative path data: ${cmd}`);
+  }
+  return pts;
+}
+
+/** The box around a leaf's points (stroke paths included, so beams count). */
+function boxOf(node: ShapeNode): Box | null {
+  const pts =
+    node.d === undefined
+      ? pointsOf({ ...node, children: [] })
+      : pathPoints(node.d);
+  if (node.kind === "circle" || node.kind === "ellipse") {
+    const [cx = 0, cy = 0] = pts[0] ?? [];
+    const rx = node.rx ?? node.r ?? 0;
+    const ry = node.ry ?? node.r ?? 0;
+    return { x1: cx - rx, y1: cy - ry, x2: cx + rx, y2: cy + ry };
+  }
+  if (pts.length === 0) return null;
+  const xs = pts.map(([x]) => x);
+  const ys = pts.map(([, y]) => y);
+  return {
+    x1: Math.min(...xs),
+    y1: Math.min(...ys),
+    x2: Math.max(...xs),
+    y2: Math.max(...ys),
+  };
+}
+
+function overlaps(a: Box, b: Box): boolean {
+  return a.x1 < b.x2 && b.x1 < a.x2 && a.y1 < b.y2 && b.y1 < a.y2;
+}
+
+/** The furniture of one floor: every leaf of its group except the room back and its lights. */
+function furnitureOf(floor: Floor): ShapeNode[] {
+  const group = nodesOf(houseLayer()).find(
+    (n) => n.part === FLOOR_CLASS[floor],
+  );
+  return nodesOf(group ?? g("none", [])).filter(
+    (n) =>
+      n.children === undefined &&
+      n.part !== "room-back" &&
+      !(n.cls ?? "").includes("light"),
+  );
+}
+
+describe("furniture and slot panes (Requirement 12.5)", () => {
+  /** Every pane frame of a floor for 1 to 5 Cards. */
+  const panes = (floor: Floor): Box[] =>
+    [1, 2, 3, 4, 5].flatMap((count) =>
+      slotRects(floor, count).flatMap((rect, index) => {
+        const slot: SlotPlacement = {
+          key: `${floor}#${index}`,
+          floor,
+          index,
+          variant: 0,
+          ghostType: GHOST_TYPE_OF[floor],
+          path: "a.ts",
+          state: "locked",
+          rect,
+          ghostScale: 1,
+        };
+        const frame = nodesOf(slotArt(slot)).find(
+          (n) => n.cls === "pane-frame",
+        );
+        const box = frame === undefined ? null : boxOf(frame);
+        return box === null ? [] : [box];
+      }),
+    );
+
+  it("no pane covers furniture, whatever the number of Cards", () => {
+    for (const floor of ["attic", "middle floor"] as const) {
+      const hits = furnitureOf(floor).filter((n) => {
+        const box = boxOf(n);
+        return box !== null && panes(floor).some((p) => overlaps(p, box));
+      });
+      expect(hits.map((n) => `${floor}: ${n.cls ?? n.kind}`)).toEqual([]);
+    }
+  });
+});
+
 describe("rooms (Requirements 3.1, 3.2)", () => {
   const part = (name: string): ShapeNode | undefined =>
     nodesOf(houseLayer()).find((n) => n.part === name);

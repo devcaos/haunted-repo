@@ -124,7 +124,7 @@ function groundCut(): string {
 /** Attic: three beams, cobwebs in both upper corners, an old trunk on the right. */
 function attic(): ShapeNode[] {
   return [
-    strokePath("beams", "M620 350 H1120 M700 350 V500 M1040 350 V500", {
+    strokePath("beams", "M620 350 H1120 M800 330 V350 M940 330 V350", {
       part: "rafters",
     }),
     strokePath(
@@ -143,6 +143,19 @@ function attic(): ShapeNode[] {
   ];
 }
 
+/** [x, top, width, tone] of each book; a book stands on the shelf (680) or the case floor (752). */
+const BOOKS: readonly (readonly [number, number, number, string])[] = [
+  [786, 642, 10, "mist"],
+  [797, 636, 8, "rust"],
+  [806, 646, 12, "slate"],
+  [820, 640, 9, "mist"],
+  [831, 650, 10, "rust"],
+  [788, 712, 8, "rust"],
+  [798, 706, 12, "slate"],
+  [812, 716, 9, "mist"],
+  [834, 708, 10, "rust"],
+];
+
 /** Middle floor: the Entrance_Hall on the left, a wall at x 760, the Parlour on the right. */
 function middleFloor(): ShapeNode[] {
   const hall = g(
@@ -151,6 +164,9 @@ function middleFloor(): ShapeNode[] {
       rect("door tone-rust", 575, 610, 80, 150, { part: "front-door" }),
       circle("door-knob tone-brass", 643, 690, 4),
       rect("transom tone-candle", 583, 590, 64, 14),
+      rect("portrait-frame tone-brass", 680, 566, 56, 70),
+      rect("portrait tone-slate", 685, 571, 46, 60),
+      ellipse("portrait-face tone-mist", 708, 596, 10, 14),
       g("telephone-table tone-night", [
         rect("table-top", 664, 700, 88, 8),
         rect("table-leg", 672, 708, 6, 52),
@@ -163,24 +179,12 @@ function middleFloor(): ShapeNode[] {
     "parlour",
     [
       g("shelves", [
-        rect("bookcase tone-night", 790, 540, 90, 160),
-        path(
-          "books tone-mist",
-          "M796 562 h10 v38 h-10 Z M834 556 h9 v44 h-9 Z M806 656 h10 v38 h-10 Z",
+        rect("bookcase tone-night", 780, 612, 76, 143),
+        rect("shelf tone-slate", 780, 680, 76, 5),
+        ...BOOKS.map(([x, y, w, tone]) =>
+          rect(`books tone-${tone}`, x, y, w, (y < 680 ? 680 : 752) - y),
         ),
-        path(
-          "books tone-rust",
-          "M808 556 h8 v44 h-8 Z M846 560 h10 v40 h-10 Z M820 650 h9 v44 h-9 Z",
-        ),
-        path(
-          "books tone-slate",
-          "M818 564 h12 v36 h-12 Z M796 660 h8 v34 h-8 Z M840 662 h12 v32 h-12 Z",
-        ),
-        rect("shelf tone-slate", 790, 600, 90, 5),
       ]),
-      rect("portrait-frame tone-brass", 930, 552, 60, 76),
-      rect("portrait tone-slate", 936, 558, 48, 64),
-      ellipse("portrait-face tone-mist", 960, 584, 12, 16),
       g("fireplace", [
         rect("tone-mist", 1040, 630, 110, 130),
         rect("tone-night", 1030, 622, 130, 10),
