@@ -126,6 +126,7 @@
   --sc-dur-bats-fly: 22s;
   --sc-dur-window-flicker: 3.2s;
   --sc-dur-wisp-float: 5.6s;
+  --sc-dur-motes: 9s;
   --sc-dur-wraith-sway: 4.2s;
   --sc-dur-brute-heave: 3.2s;
   --sc-dur-flame-flicker: 1.6s;
@@ -136,6 +137,8 @@
   --sc-rain-step-y: 200px;
   --sc-fog-shift: 60px;
   --sc-float-rise: -8px;
+  --sc-mote-drift-x: -6px;
+  --sc-mote-drift-y: 10px;
   /* Delays of the Animation Catalogue */
   --sc-delay-spiral: 400ms;
   --sc-delay-phase-1: 1.4s;

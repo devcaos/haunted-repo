@@ -226,8 +226,20 @@
   stop-opacity: 0;
 }
 
-.house .light-cone-gap {
-  opacity: 0.5;
+/* Moonlight through the oculus: pale blue, very faint, normal blending. */
+.house .stop-moonbeam-0 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.12;
+}
+
+.house .stop-moonbeam-1 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0;
+}
+
+.house .mote {
+  fill: var(--sc-spectral);
+  opacity: 0.45;
 }
 
 .house .stop-lamp-0 {

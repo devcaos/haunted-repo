@@ -126,15 +126,13 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
   );
 }
 
-/** [polygon, gradient start, gradient end] of each light cone: two roof gaps, then the tower arch. */
+/** [polygon, gradient start, gradient end] of each light cone: the tower arch. */
 // prettier-ignore
 const CONES: readonly (readonly [number[], number[]])[] = [
-  [[632, 328, 652, 314, 610, 209, 549, 251], [642, 321, 580, 230]],
-  [[700, 281, 716, 270, 670, 168, 622, 201], [708, 276, 646, 184]],
   [[1264, 474, 1288, 474, 1368, 760, 1240, 760], [1276, 474, 1304, 760]],
 ];
 
-/** Gaps in the left roof slope and the warm cones that leave them and the tower arch. */
+/** The warm cone that leaves the tower arch. */
 function lightCones(): ShapeNode {
   return g(
     "light-cones",
@@ -159,13 +157,8 @@ function lightCones(): ShapeNode {
         ]),
       ),
       ...CONES.map(([points], i) =>
-        // The two roof-gap cones (0 and 1) are fainter than the tower's.
-        poly(i < 2 ? "light-cone light-cone-gap" : "light-cone", points, {
-          paint: `cone-${i}`,
-        }),
+        poly("light-cone", points, { paint: `cone-${i}` }),
       ),
-      poly("roof-gap tone-candle", [632, 328, 652, 314, 652, 323, 632, 337]),
-      poly("roof-gap tone-candle", [700, 281, 716, 270, 716, 279, 700, 290]),
     ],
     { part: "light-cones" },
   );
@@ -232,6 +225,10 @@ function tower(): ShapeNode {
   );
 }
 
+/** Dust motes floating in the moonlight under the round window. */
+// prettier-ignore
+const MOTES = [[846, 300], [828, 338], [840, 362], [812, 392], [824, 420], [796, 446], [778, 472]] as const;
+
 /** Attic: the round window in the gable, a collar beam, cobwebs in both corners, an old trunk. */
 function attic(): ShapeNode[] {
   return [
@@ -244,6 +241,35 @@ function attic(): ShapeNode[] {
         strokePath("oculus-bars", "M851 262 H889 M870 243 V281"),
       ],
       { part: "oculus" },
+    ),
+    // Cold moonlight falls from the round window down to the left, with dust in it.
+    defs([
+      gradient(
+        "linearGradient",
+        "moonbeam",
+        [
+          ["stop-moonbeam-0", 0],
+          ["stop-moonbeam-1", 1],
+        ],
+        {
+          units: "userSpaceOnUse",
+          x1: 870,
+          y1: 262,
+          x2: 700,
+          y2: 492,
+        },
+      ),
+    ]),
+    poly("moonlight", [858, 250, 884, 276, 790, 492, 712, 492], {
+      paint: "moonbeam",
+    }),
+    poly("moonlight", [850, 258, 866, 282, 664, 492, 626, 470], {
+      paint: "moonbeam",
+    }),
+    g(
+      "dust-motes",
+      MOTES.map(([x, y]) => circle("mote", x, y, 1.4)),
+      { part: "dust-motes" },
     ),
     // A collar beam ties the two slopes; it is not a ceiling.
     strokePath("beams", "M676 312 H1064", { part: "rafters" }),

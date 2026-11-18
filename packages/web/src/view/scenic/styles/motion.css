@@ -35,6 +35,16 @@
   }
 }
 
+@keyframes mote-drift {
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(var(--sc-mote-drift-x), var(--sc-mote-drift-y));
+  }
+}
+
 @keyframes window-flicker {
   0%,
   100% {
@@ -74,6 +84,12 @@
 
   .house .rain-far {
     animation-duration: var(--sc-dur-rain-far);
+  }
+
+  /* One animation moves every mote, so the running count stays low. */
+  .house .dust-motes {
+    animation: mote-drift var(--sc-dur-motes) var(--sc-ease-in-out) infinite
+      alternate;
   }
 
   .house .flames {

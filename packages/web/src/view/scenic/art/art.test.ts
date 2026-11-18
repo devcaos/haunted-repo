@@ -650,7 +650,7 @@ function furnitureOf(floor: Floor): ShapeNode[] {
     (n) =>
       n.children === undefined &&
       !(n.cls ?? "").startsWith("room-back") &&
-      !(n.cls ?? "").includes("light"),
+      !/light|mote/.test(n.cls ?? ""),
   );
 }
 
@@ -809,21 +809,29 @@ describe("light (Requirement 3.1)", () => {
     }
   });
 
-  it("every room back is a radial gradient, and three warm cones fade out", () => {
+  it("every room back is a radial gradient", () => {
     for (const back of all.filter((n) => n.part === "room-back")) {
       expect(all.find((n) => n.id === back.paint)?.kind).toBe("radialGradient");
     }
-    const cones = all.filter(
-      (n) => n.kind === "polygon" && n.cls?.startsWith("light-cone"),
+  });
+
+  it("has no warm light leaving the roof; cold moonlight and dust enter the attic", () => {
+    expect(all.filter((n) => n.cls?.includes("roof-gap"))).toEqual([]);
+    const attic = nodesOf(
+      all.find((n) => n.part === FLOOR_CLASS.attic) ?? g("none", []),
     );
-    expect(cones).toHaveLength(3);
-    for (const cone of cones) {
-      const fill = all.find((n) => n.id === cone.paint);
+    const shafts = attic.filter((n) => n.cls === "moonlight");
+    expect(shafts).toHaveLength(2);
+    for (const shaft of shafts) {
+      const fill = attic.find((n) => n.id === shaft.paint);
       expect(fill?.children?.map((s) => s.cls)).toEqual([
-        "stop-cone-0",
-        "stop-cone-1",
+        "stop-moonbeam-0",
+        "stop-moonbeam-1",
       ]);
     }
+    const motes = attic.find((n) => n.part === "dust-motes")?.children ?? [];
+    expect(motes.length).toBeGreaterThanOrEqual(6);
+    expect(motes.length).toBeLessThanOrEqual(8);
   });
 });
 
