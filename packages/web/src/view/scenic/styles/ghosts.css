@@ -112,6 +112,14 @@
   fill: var(--sc-rust);
 }
 
+.chained-door .door-frame {
+  fill: var(--sc-night);
+}
+
+.chained-door .door-threshold {
+  fill: var(--sc-mist);
+}
+
 .chained-door .door-planks {
   stroke: var(--sc-night);
   stroke-width: 2;

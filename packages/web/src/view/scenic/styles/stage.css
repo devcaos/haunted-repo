@@ -252,6 +252,29 @@
   stop-opacity: 0;
 }
 
+/* Cellar: a bent iron flue with a Brass valve, wooden stairs under the hatch. */
+.house .pipe {
+  stroke: var(--sc-mist);
+  stroke-width: 9;
+}
+
+.house .valve-wheel {
+  stroke: var(--sc-brass);
+  stroke-width: 2;
+}
+
+.house .tread {
+  fill: var(--sc-brass);
+}
+
+.house .stringer {
+  fill: var(--sc-rust);
+}
+
+.house .stringer-back {
+  fill: var(--sc-night);
+}
+
 .house .chain-link,
 .house .chain-ring {
   stroke: var(--sc-mist);

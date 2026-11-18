@@ -111,6 +111,12 @@ export function slotArt(slot: SlotPlacement): ShapeNode {
 }
 
 const DOOR_WIDTH = 70;
+/** Top of each floor's floor (where a door stands): the slab tops and the cellar floor. */
+export const FLOOR_LINE: Readonly<Record<Floor, number>> = {
+  attic: 495,
+  "middle floor": 755,
+  basement: 940,
+};
 const LINKS_PER_CHAIN = 7;
 
 /** One chain of oval links from (x1, y1) to (x2, y2), each link turned along the chain. */
@@ -141,15 +147,18 @@ function chainLinks(x1: number, y1: number, x2: number, y2: number): ShapeNode {
 export function chainedDoorArt(floor: Floor): ShapeNode {
   const band = SLOT_BAND[floor];
   const x = round2(band.x + (band.w - DOOR_WIDTH) / 2);
-  const y = band.y + 5;
   const h = band.h - 10;
+  // The door stands on its floor, inside a frame, over a stone threshold.
+  const y = FLOOR_LINE[floor] - h;
   const right = x + DOOR_WIDTH;
   const midX = round2(x + DOOR_WIDTH / 2);
   const midY = round2(y + h / 2);
   return g(
     "chained-door",
     [
+      rect("door-frame", x - 6, y - 6, DOOR_WIDTH + 12, h + 6),
       rect("door-panel", x, y, DOOR_WIDTH, h, { rx: 4 }),
+      rect("door-threshold", x - 10, FLOOR_LINE[floor] - 4, DOOR_WIDTH + 20, 4),
       strokePath(
         "door-planks",
         `M${x + 23} ${y + 6} V${y + h - 6} M${x + 47} ${y + 6} V${y + h - 6}`,

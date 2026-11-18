@@ -28,6 +28,7 @@ import {
   ATTIC_CLIP,
   BODY,
   FLOOR_CLASS,
+  HATCH,
   ROOF,
   ROOF_INNER,
   ROOF_RIM,
@@ -35,7 +36,7 @@ import {
   WALL,
   houseLayer,
 } from "./house.js";
-import { chainedDoorArt, slotArt } from "./props.js";
+import { FLOOR_LINE, chainedDoorArt, slotArt } from "./props.js";
 import {
   MOON,
   RAIN_BOTTOM,
@@ -875,6 +876,39 @@ describe("nothing floats (Requirement 3.1)", () => {
     for (const leg of legs) {
       expect(leg.y).toBe((top?.y ?? 0) + (top?.height ?? 0));
       expect((leg.y ?? 0) + (leg.height ?? 0)).toBe(755);
+    }
+  });
+
+  it("the cellar stairs start under an open hatch and reach the cellar floor", () => {
+    const slabs = all.filter((n) => n.cls === "floor-slab" && n.y === 755);
+    expect(slabs).toHaveLength(2);
+    const gapStart = Math.min(...slabs.map((n) => (n.x ?? 0) + (n.width ?? 0)));
+    const gapEnd = Math.max(...slabs.map((n) => n.x ?? 0));
+    expect([gapStart, gapEnd]).toEqual([HATCH.x1, HATCH.x2]);
+    const treads = all.filter((n) => n.cls === "tread");
+    const top = treads[0];
+    expect(top?.x ?? 0).toBeGreaterThanOrEqual(HATCH.x1);
+    expect(treads.at(-1)?.y).toBeGreaterThan(900);
+    expect(all.find((n) => n.part === "hatch-lid")).toBeDefined();
+  });
+
+  it("the flue bends twice, ends at a fitting and has a valve", () => {
+    const pipe = all.find((n) => n.cls === "pipe");
+    expect(pipe?.d?.match(/Q/g)).toHaveLength(2);
+    const end = pathPoints(pipe?.d ?? "").at(-1);
+    const fitting = one("pipe-fitting");
+    expect(end?.[1]).toBe((fitting?.y ?? 0) + (fitting?.height ?? 0));
+    expect(all.some((n) => n.cls === "valve")).toBe(true);
+  });
+
+  it("every chained door stands on its floor inside a frame, over a threshold", () => {
+    for (const floor of ["attic", "middle floor", "basement"] as const) {
+      const door = nodesOf(chainedDoorArt(floor));
+      const panel = door.find((n) => n.cls === "door-panel");
+      const sill = door.find((n) => n.cls === "door-threshold");
+      expect((panel?.y ?? 0) + (panel?.height ?? 0)).toBe(FLOOR_LINE[floor]);
+      expect((sill?.y ?? 0) + (sill?.height ?? 0)).toBe(FLOOR_LINE[floor]);
+      expect(door.some((n) => n.cls === "door-frame")).toBe(true);
     }
   });
 

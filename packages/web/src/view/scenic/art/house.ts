@@ -362,15 +362,73 @@ function middleFloor(): ShapeNode[] {
         ),
         rect("tone-rust", 1020, 746, 60, 7),
       ]),
+      // The hatch lid stands open against the wall.
+      rect("hatch-lid tone-rust", 1166, 712, 7, 43, { part: "hatch-lid" }),
     ],
     { part: "parlour" },
   );
   return [hall, rect("partition tone-night", 756, 500, 8, 260), parlour];
 }
 
-/** Five bricks that suggest the wall, in two corners away from the slot panes. */
+/** Five bricks that suggest the wall, low down and clear of the panes, pipe and stairs. */
 // prettier-ignore
-const BRICKS = [[594, 776, 30, 12], [606, 790, 24, 12], [1104, 912, 30, 12], [1120, 898, 26, 12], [1084, 926, 22, 10]] as const;
+const BRICKS = [[690, 904, 28, 12], [706, 918, 22, 10], [930, 880, 28, 12], [950, 894, 24, 12], [990, 866, 26, 10]] as const;
+
+/** The hatch in the middle floor, right of the fireplace, where the cellar stairs start. */
+export const HATCH = { x1: 1126, x2: 1160 } as const;
+/** The upper edge of the stairs runs from under the hatch down to the cellar floor. */
+const STAIR_TOP: readonly [number, number] = [1154, 765];
+const STAIR_FOOT: readonly [number, number] = [1050, 940];
+
+function stairX(y: number): number {
+  const [tx, ty] = STAIR_TOP;
+  const [fx, fy] = STAIR_FOOT;
+  return Math.round(tx + ((fx - tx) * (y - ty)) / (fy - ty));
+}
+
+/**
+ * The cellar stairs: a back and a front stringer and six thick treads. The
+ * front stringer is split at y 845 so each half keeps clear of the slot panes.
+ */
+function stairs(): ShapeNode {
+  const band = (
+    x: number,
+    y1: number,
+    y2: number,
+    dx: number,
+    dy: number,
+  ): number[] =>
+    [
+      stairX(y1) + dx,
+      y1 + dy,
+      stairX(y1) + dx + 14,
+      y1 + dy,
+      stairX(y2) + dx + 14,
+      y2 + dy,
+      stairX(y2) + dx,
+      y2 + dy,
+    ].map((v, i) => (i % 2 === 0 ? v + x : v));
+  const treads = [1, 2, 3, 4, 5, 6].map((i) => {
+    const y = 765 + 25 * i;
+    return rect("tread", stairX(y) - 4, y - 8, 26, 8);
+  });
+  return g(
+    "stairs",
+    [
+      poly(
+        "stair-light",
+        [HATCH.x1, 765, HATCH.x2, 765, 1124, 940, 1036, 940],
+        { paint: "stair-warmth" },
+      ),
+      poly("stringer stringer-back", band(6, 765, 845, 0, -4)),
+      poly("stringer stringer-back", band(6, 845, 940, 0, -4)),
+      ...treads,
+      poly("stringer", band(0, 765, 845, 0, 0)),
+      poly("stringer", band(0, 845, 940, 0, 0)),
+    ],
+    { part: "stairs" },
+  );
+}
 
 /** Basement: a few bricks, the boiler with its glowing dial on the left, two chains on the right. */
 function basement(): ShapeNode[] {
@@ -384,7 +442,16 @@ function basement(): ShapeNode[] {
     ]);
   return [
     ...BRICKS.map(([x, y, w, h]) => rect("brick", x, y, w, h)),
-    rect("pipe tone-mist", 610, 765, 10, 90),
+    // The flue leaves the boiler, bends twice and ends at a flange under the floor.
+    strokePath(
+      "pipe",
+      "M612 852 V818 Q612 808 602 808 H596 Q586 808 586 798 V771",
+    ),
+    rect("pipe-fitting tone-mist", 578, 765, 16, 6),
+    g("valve", [
+      circle("valve-wheel", 612, 834, 6, { fill: "none" }),
+      strokePath("valve-wheel", "M606 834 H618 M612 828 V840"),
+    ]),
     g("boiler", [
       rect("tone-rust", 598, 852, 76, 88, { rx: 10 }),
       circle("dial-light", 636, 882, 30, { paint: "dial-glow" }),
@@ -400,6 +467,7 @@ function basement(): ShapeNode[] {
     ]),
     chain(748),
     chain(774),
+    stairs(),
   ];
 }
 
@@ -423,6 +491,21 @@ export function houseLayer(): ShapeNode {
           ["stop-lamp-0", 0],
           ["stop-lamp-1", 1],
         ]),
+      ),
+      gradient(
+        "linearGradient",
+        "stair-warmth",
+        [
+          ["stop-warmth-0", 0],
+          ["stop-warmth-1", 1],
+        ],
+        {
+          units: "userSpaceOnUse",
+          x1: 1140,
+          y1: 765,
+          x2: 1080,
+          y2: 940,
+        },
       ),
       gradient(
         "radialGradient",
@@ -465,7 +548,9 @@ export function houseLayer(): ShapeNode {
       "structure tone-night",
       [
         rect("floor-slab", left, 495, right - left, WALL),
-        rect("floor-slab", left, 755, right - left, WALL),
+        // The middle floor is open over the hatch.
+        rect("floor-slab", left, 755, HATCH.x1 - left, WALL),
+        rect("floor-slab", HATCH.x2, 755, right - HATCH.x2, WALL),
         rect("foundation", 570, 760, WALL, 190),
         rect("foundation", 1160, 760, WALL, 190),
         rect("foundation", 570, 940, 600, WALL),
