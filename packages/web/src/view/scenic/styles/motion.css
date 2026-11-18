@@ -67,7 +67,8 @@
       alternate;
   }
 
-  .house .oculus-light {
+  .house .oculus-light,
+  .house .tower-glow {
     animation: window-flicker var(--sc-dur-window-flicker) steps(4) infinite;
   }
 
@@ -92,7 +93,8 @@
     opacity: var(--sc-fog-still);
   }
 
-  .scenic .house .oculus-light {
+  .scenic .house .oculus-light,
+  .scenic .house .tower-glow {
     opacity: 0.8;
   }
 }

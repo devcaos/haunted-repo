@@ -166,6 +166,27 @@
   opacity: 0.8;
 }
 
+/* The tower: a Candle pointed arch with a warm glow, and an iron weathervane. */
+.house .tower-arch-glass {
+  fill: var(--sc-candle);
+}
+
+.house .tower-arch-bars,
+.house .vane {
+  stroke: var(--sc-night);
+  stroke-width: 3;
+}
+
+.house .stop-lamp-0 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0.5;
+}
+
+.house .stop-lamp-1 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0;
+}
+
 .house .chain-link {
   stroke: var(--sc-mist);
   stroke-width: 2;

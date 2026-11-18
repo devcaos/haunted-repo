@@ -30,6 +30,7 @@ import {
   ROOF,
   ROOF_INNER,
   ROOF_RIM,
+  TOWER,
   houseLayer,
 } from "./house.js";
 import { chainedDoorArt, slotArt } from "./props.js";
@@ -284,6 +285,21 @@ describe("house (Requirements 3.1, 3.4)", () => {
     const rim = nodesOf(houseLayer()).find((n) => n.part === "roof-rim");
     expect(rim?.d).toBe(`M${rx} ${ry} L${r} ${ly}`);
     expect(ROOF_RIM).toBe(rim?.d);
+  });
+
+  it("has an upright tower apart from the roof, with a centred spire, vane and lit arch", () => {
+    const tower = nodesOf(houseLayer()).find((n) => n.part === "tower");
+    const inTower = tower === undefined ? [] : nodesOf(tower);
+    expect(inTower.filter((n) => n.transform !== undefined)).toEqual([]);
+    const spire = inTower.find((n) => n.part === "spire")?.points ?? [];
+    const centre = TOWER.x + TOWER.w / 2;
+    expect([spire[4], spire[5]]).toEqual([centre, TOWER.apex]);
+    expect(centre - (spire[0] ?? 0)).toBe((spire[2] ?? 0) - centre);
+    expect(TOWER.x).toBeGreaterThan(ROOF[4]); // clear of the right eave
+    const parts = inTower.map((n) => n.part);
+    expect(parts).toEqual(
+      expect.arrayContaining(["weathervane", "tower-arch"]),
+    );
   });
 });
 

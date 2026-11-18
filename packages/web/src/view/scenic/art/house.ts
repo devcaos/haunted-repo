@@ -5,6 +5,7 @@ import {
   defs,
   ellipse,
   g,
+  gradient,
   path,
   poly,
   rect,
@@ -50,18 +51,64 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
   });
 }
 
-/** The crooked tower, leaning 3 degrees clockwise about its foot (1225, 760). */
+/** The tower shaft: upright, apart from the right eave. */
+export const TOWER = {
+  x: 1226,
+  w: 84,
+  top: 312,
+  foot: 760,
+  apex: 118,
+} as const;
+
+/** A pointed (gothic) arch from its foot line, centre, half width and height. */
+function arch(cx: number, foot: number, half: number, h: number): string {
+  const spring = foot - h + half * 1.6;
+  const top = foot - h;
+  return `M${cx - half} ${foot} V${spring} Q${cx - half} ${top + half * 0.6} ${cx} ${top} Q${cx + half} ${top + half * 0.6} ${cx + half} ${spring} V${foot} Z`;
+}
+
+/** The upright tower: shaft, spire, weathervane and one lit pointed-arch opening. */
 function tower(): ShapeNode {
-  const shapes = [
-    rect("tower-shaft tone-night", 1160, 300, 130, 460),
-    poly("tower-spire tone-night", [1150, 300, 1300, 300, 1207, 125]),
-    rect("tower-slit tone-slate", 1212, 380, 26, 50),
-    strokePath("rim", "M1207 125 L1300 300 M1290 300 V760"),
-  ];
+  const { x, w, top, foot, apex } = TOWER;
+  const cx = x + w / 2;
+  const right = x + w;
   return g(
     "tower",
-    [g("tower-lean", shapes, { transform: { translate: [-1225, -760] } })],
-    { part: "tower", transform: { translate: [1225, 760], rotate: 3 } },
+    [
+      defs([
+        gradient("radialGradient", "tower-glow", [
+          ["stop-lamp-0", 0],
+          ["stop-lamp-1", 1],
+        ]),
+      ]),
+      rect("tower-shaft tone-night", x, top, w, foot - top),
+      rect("tower-cornice tone-night", x - 8, top - 12, w + 16, 12),
+      poly(
+        "tower-spire tone-night",
+        [x - 12, top - 8, right + 12, top - 8, cx, apex],
+        { part: "spire" },
+      ),
+      strokePath(
+        "vane",
+        `M${cx} ${apex} V${apex - 32} M${cx - 18} ${apex - 22} H${cx + 18} M${cx + 12} ${apex - 27} L${cx + 18} ${apex - 22} L${cx + 12} ${apex - 17}`,
+        { part: "weathervane" },
+      ),
+      circle("tone-night", cx, apex - 8, 3),
+      circle("tower-glow", cx, 432, 70, { paint: "tower-glow" }),
+      path("tower-arch-frame tone-slate", arch(cx, 476, 18, 92)),
+      path("tower-arch-glass", arch(cx, 472, 14, 84), { part: "tower-arch" }),
+      strokePath(
+        "tower-arch-bars",
+        `M${cx} 400 V472 M${cx - 14} 438 H${cx + 14}`,
+      ),
+      path("tower-slit tone-slate", arch(cx, 640, 7, 44)),
+      strokePath(
+        "rim",
+        `M${cx} ${apex} L${right + 12} ${top - 8} M${right} ${top} V${foot}`,
+      ),
+      strokePath("rim vane-rim", `M${cx + 2} ${apex} V${apex - 32}`),
+    ],
+    { part: "tower" },
   );
 }
 
