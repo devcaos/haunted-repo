@@ -14,20 +14,15 @@ import { houseOutline } from "./house.js";
 
 // Everything here is in the house viewBox `0 0 1600 1000` (design "World
 // geometry"). The top band (y < 110) holds only sky and the left column
-// (x < 400) only far hills, fence and gravestones, so the HUD stays readable.
+// (x < 400) only sky and hills, so the HUD stays readable.
 
-const CLOUDS_LEFT = [
-  "M420 160 C520 132 660 136 760 146 C840 134 900 142 940 158 C800 172 560 174 420 160 Z",
-  "M520 312 C620 292 760 294 860 304 C930 296 990 302 1020 314 C880 326 660 328 520 312 Z",
-];
-const CLOUD_RIGHT =
-  "M1030 228 C1130 202 1280 204 1380 214 C1460 204 1530 212 1570 226 C1420 242 1180 244 1030 228 Z";
+// Atmospheric perspective: the far hill is higher, paler and fainter than the near one.
 const FAR_HILLS =
-  "M0 690 C180 652 340 640 500 664 C680 692 840 668 1020 652 C1200 640 1400 668 1600 650 V1000 H0 Z";
+  "M0 650 C140 610 300 596 470 618 C620 638 760 600 920 590 C1080 580 1220 612 1360 600 C1460 592 1540 600 1600 612 V1000 H0 Z";
 const NEAR_HILLS =
-  "M0 760 C260 754 520 744 780 734 C1040 724 1300 712 1600 700 V1000 H0 Z";
+  "M0 735 C160 712 330 704 480 722 C560 732 620 744 700 748 L1000 748 C1180 730 1330 690 1460 684 C1530 681 1570 688 1600 694 V1000 H0 Z";
 
-/** L0 to L3, back to front: sky gradient, moon and halo, clouds, far and near hills. */
+/** L0 to L3, back to front: sky gradient, moon and halo, far and near hills. */
 export function skyLayers(): ShapeNode {
   return g("sky-layers", [
     defs([
@@ -35,8 +30,9 @@ export function skyLayers(): ShapeNode {
         "linearGradient",
         "sky-fill",
         [
-          ["stop-night", 0],
-          ["stop-slate", 0.7],
+          ["stop-abyss", 0],
+          ["stop-night", 0.45],
+          ["stop-slate", 0.85],
         ],
         { x1: 0, y1: 0, x2: 0, y2: 1 },
       ),
@@ -46,22 +42,20 @@ export function skyLayers(): ShapeNode {
       ]),
     ]),
     g("sky", [rect("sky-fill", 0, 0, 1600, 1000, { paint: "sky-fill" })]),
-    g("moon-clouds", [
+    g("moon-sky", [
       circle("moon-halo", 1210, 175, 200, { paint: "moon-halo" }),
       circle("moon tone-bone", 1210, 175, 64, { part: "moon" }),
       ellipse("moon-shade tone-mist", 1186, 160, 14, 10),
       ellipse("moon-shade tone-mist", 1228, 198, 9, 7),
-      g(
-        "clouds-left",
-        CLOUDS_LEFT.map((d) => path("cloud tone-mist", d)),
-      ),
-      g("clouds-right", [path("cloud tone-mist", CLOUD_RIGHT)]),
     ]),
-    g("hills-far", [path("hill-far tone-mist", FAR_HILLS)]),
-    g("hills-near", [path("hill-near tone-slate", NEAR_HILLS)]),
+    g("hills-far", [
+      path("hill-far tone-mist", FAR_HILLS, { part: "hill-far" }),
+    ]),
+    g("hills-near", [
+      path("hill-near tone-slate", NEAR_HILLS, { part: "hill-near" }),
+    ]),
   ]);
 }
-
 /**
  * Each column of streaks repeats every (-80, 200) units, the step of the
  * `rain-fall` animation (`--sc-rain-step-x`, `--sc-rain-step-y`), so one step
@@ -113,42 +107,134 @@ export function weatherLayer(): ShapeNode {
         id: "rain-sky",
         children: [path("clip-shape", rainClip())],
       },
+      gradient("radialGradient", "fog-puff", [
+        ["stop-fog-0", 0],
+        ["stop-fog-1", 1],
+      ]),
     ]),
     g("rain-wrap", [layer("far"), layer("near")], { clip: "rain-sky" }),
+    ...fogLayer(),
   ]);
 }
 
-const PICKETS = [256, 316, 376]
-  .map((x) => `M${x} 1000 V720 l6 -12 l6 12 V1000 Z`)
-  .join(" ");
-const DEAD_TREE =
-  "M1460 1000 C1470 860 1480 720 1470 600 C1440 520 1400 470 1385 420 L1395 416 C1420 470 1460 520 1478 560 C1480 470 1470 390 1450 300 L1462 300 C1490 390 1500 470 1494 560 C1520 500 1560 450 1595 420 L1600 432 C1560 470 1520 530 1500 610 C1495 740 1505 880 1520 1000 Z";
+/** [x, y, width, height] of each soft fog puff: sky streaks, then ground mist beside the house. */
+// prettier-ignore
+const FOG = {
+  back: [[560, 200, 230, 20], [930, 118, 240, 14], [1440, 330, 190, 22]],
+  front: [[440, 742, 110, 18], [1480, 736, 150, 20]],
+} as const;
 
-/** L5: gravestones and fence on the left, the dead tree on the right, with a faint moon rim. */
-export function foregroundLayer(): ShapeNode {
-  return g("foreground", [
-    g("gravestones tone-night", [
-      path("grave", "M30 1000 V740 C30 690 110 690 110 740 V1000 Z"),
-      path(
-        "grave",
-        "M150 1000 V790 H124 V762 H150 V720 H178 V762 H204 V790 H178 V1000 Z",
+/** Two drifting fog groups of soft gradient ellipses (no filter, decision Q5). */
+function fogLayer(): ShapeNode[] {
+  return (["back", "front"] as const).map((name) =>
+    g(
+      `fog fog-${name}`,
+      FOG[name].map(([cx, cy, rx, ry]) =>
+        ellipse("fog-puff", cx, cy, rx, ry, { paint: "fog-puff" }),
       ),
-      poly("grave", [212, 1000, 222, 770, 268, 764, 262, 1000]),
+    ),
+  );
+}
+
+/**
+ * A limb that tapers to a sharp tip: its spine (base first) offset to both
+ * sides by half a width that falls from `base` to 0. Returns the two sides.
+ */
+function taper(spine: readonly number[], base: number): [number[], number[]] {
+  const n = spine.length / 2;
+  const at = (i: number): [number, number] => [
+    spine[2 * i] ?? 0,
+    spine[2 * i + 1] ?? 0,
+  ];
+  const left: number[] = [];
+  const right: number[] = [];
+  for (let i = 0; i < n; i += 1) {
+    const [x, y] = at(i);
+    const [ax, ay] = at(Math.max(0, i - 1));
+    const [bx, by] = at(Math.min(n - 1, i + 1));
+    const len = Math.hypot(bx - ax, by - ay) || 1;
+    const half = (base * (1 - i / (n - 1))) / 2;
+    const [nx, ny] = [(-(by - ay) / len) * half, ((bx - ax) / len) * half];
+    left.push(Math.round(x - nx), Math.round(y - ny));
+    right.push(Math.round(x + nx), Math.round(y + ny));
+  }
+  return [left, right];
+}
+
+/** Open path data through flat x, y pairs. */
+function polyline(pts: readonly number[]): string {
+  const pairs: string[] = [];
+  for (let i = 0; i + 1 < pts.length; i += 2)
+    pairs.push(`${pts[i]} ${pts[i + 1]}`);
+  return `M${pairs.join(" L")}`;
+}
+
+/** Closes the two sides of a limb into one polygon. */
+function limb(sides: [number[], number[]]): number[] {
+  const [left, right] = sides;
+  const back: number[] = [];
+  for (let i = right.length - 2; i >= 0; i -= 2)
+    back.push(right[i] ?? 0, right[i + 1] ?? 0);
+  return [...left, ...back];
+}
+
+/** Trunk, then branches and twigs of the dead tree: [spine, base width]. */
+// prettier-ignore
+const TREE: readonly (readonly [number[], number])[] = [
+  [[1478, 1000, 1470, 900, 1484, 800, 1462, 700, 1474, 610, 1452, 520, 1458, 430], 48],
+  [[1462, 650, 1420, 612, 1404, 560, 1368, 520], 18],
+  [[1474, 700, 1518, 664, 1544, 610, 1590, 584], 20],
+  [[1454, 540, 1494, 500, 1506, 448], 13],
+  [[1410, 598, 1384, 604, 1356, 594], 8],
+  [[1530, 650, 1564, 646, 1596, 628], 9],
+  [[1456, 470, 1432, 432, 1440, 396], 10],
+  [[1544, 612, 1556, 570, 1580, 552], 7],
+];
+
+/** Spear-tipped iron pickets left of the house: [x, tip y]. */
+const PICKETS = [404, 421, 438, 455, 472, 489, 506, 523, 540].map(
+  (x, i) => [x, 722 + (i % 3) * 7] as const,
+);
+
+/** L5, near black: iron fence tips on the left, the twisted dead tree on the right, with a faint moon rim. */
+export function foregroundLayer(): ShapeNode {
+  const limbs = TREE.map(([spine, base]) => taper(spine, base));
+  const [trunkLeft] = limbs[0] ?? [[]];
+  return g("foreground", [
+    g("fence tone-abyss", [
+      ...PICKETS.map(([x, t]) =>
+        poly("picket", [
+          x,
+          1000,
+          x,
+          t + 14,
+          x - 4,
+          t + 14,
+          x + 2,
+          t,
+          x + 8,
+          t + 14,
+          x + 4,
+          t + 14,
+          x + 4,
+          1000,
+        ]),
+      ),
+      rect("rail", 398, 752, 152, 5),
+      rect("rail", 398, 800, 152, 5),
     ]),
-    g("fence tone-night", [
-      path("pickets", PICKETS),
-      rect("rail", 250, 770, 196, 6),
-      rect("rail", 250, 860, 196, 6),
-    ]),
-    path("dead-tree tone-night", DEAD_TREE, { part: "dead-tree" }),
+    g(
+      "dead-tree tone-abyss",
+      limbs.map((sides) => poly("limb", limb(sides))),
+      { part: "dead-tree" },
+    ),
     g("rim-fg", [
-      strokePath("rim", "M74 694 C96 698 110 716 110 740 V800"),
-      strokePath("rim", "M178 720 V762 H204 V790"),
-      strokePath("rim", "M222 770 L268 764 L266 840"),
       strokePath(
         "rim",
-        "M1595 420 L1600 432 M1500 610 C1495 740 1505 880 1520 1000",
+        PICKETS.map(([x, t]) => `M${x + 2} ${t} L${x + 8} ${t + 14}`).join(" "),
       ),
+      // Only above the ground line (spine points 3 to 6), where the moon reaches.
+      strokePath("rim", polyline(trunkLeft.slice(6, 14))),
     ]),
   ]);
 }

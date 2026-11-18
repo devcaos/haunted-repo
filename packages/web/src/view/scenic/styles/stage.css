@@ -133,8 +133,8 @@
   opacity: var(--sc-depth-cloud);
 }
 
-.house .cloud {
-  opacity: var(--sc-depth-cloud);
+.house .stop-abyss {
+  stop-color: var(--sc-abyss);
 }
 
 .house .hill-far {
@@ -260,9 +260,19 @@
   stroke-width: 1;
 }
 
+/* Soft fog: each puff fades from Mist at its centre to nothing at its edge. */
 .house .fog {
-  fill: var(--sc-mist);
   opacity: var(--sc-fog);
+}
+
+.house .stop-fog-0 {
+  stop-color: var(--sc-mist);
+  stop-opacity: 0.55;
+}
+
+.house .stop-fog-1 {
+  stop-color: var(--sc-mist);
+  stop-opacity: 0;
 }
 
 /* L5 foreground: Night silhouettes with a fainter, thinner rim. */

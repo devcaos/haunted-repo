@@ -192,16 +192,55 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     const layers = skyLayers()
       .children?.filter((n) => n.kind === "g")
       .map((n) => n.cls);
-    expect(layers).toEqual(["sky", "moon-clouds", "hills-far", "hills-near"]);
-    expect(classesOf(skyLayers())).toEqual(
-      expect.arrayContaining(["moon", "clouds-left", "clouds-right"]),
-    );
+    expect(layers).toEqual(["sky", "moon-sky", "hills-far", "hills-near"]);
+    expect(classesOf(skyLayers())).toContain("moon");
+    expect(classesOf(skyLayers())).not.toContain("cloud");
     expect(classesOf(foregroundLayer())).toEqual(
       expect.arrayContaining(["fence", "dead-tree", "rim-fg"]),
     );
-    expect(
-      classesOf(foregroundLayer()).filter((c) => c === "grave"),
-    ).toHaveLength(3);
+  });
+
+  it("puts the far hill higher than the near one, behind it", () => {
+    const top = (part: string): number =>
+      Math.min(
+        ...pathPoints(
+          nodesOf(skyLayers()).find((n) => n.part === part)?.d ?? "",
+        ).map(([, y]) => y),
+      );
+    expect(top("hill-far")).toBeLessThan(top("hill-near") - 60);
+  });
+
+  it("builds the dead tree from polygons that taper to sharp tips", () => {
+    const tree = nodesOf(foregroundLayer()).find((n) => n.part === "dead-tree");
+    const limbs = tree?.children ?? [];
+    expect(limbs.length).toBeGreaterThanOrEqual(6);
+    for (const limb of limbs) {
+      expect(limb.kind).toBe("polygon");
+      const pts = limb.points ?? [];
+      const half = pts.length / 2;
+      // The tip is where both sides meet: points half-1 and half are the same.
+      expect([pts[half - 2], pts[half - 1]]).toEqual([
+        pts[half],
+        pts[half + 1],
+      ]);
+      // The base is the widest part of the limb.
+      const baseWidth = Math.hypot(
+        (pts[0] ?? 0) - (pts.at(-2) ?? 0),
+        (pts[1] ?? 0) - (pts.at(-1) ?? 0),
+      );
+      expect(baseWidth).toBeGreaterThan(5);
+    }
+  });
+
+  it("draws the fog as soft gradient puffs in two drifting groups", () => {
+    const weather = nodesOf(weatherLayer());
+    const fogs = weather.filter((n) => n.cls?.startsWith("fog "));
+    expect(fogs.map((n) => n.cls)).toEqual(["fog fog-back", "fog fog-front"]);
+    for (const puff of fogs.flatMap((n) => n.children ?? [])) {
+      expect(puff.kind).toBe("ellipse");
+      const fill = weather.find((n) => n.id === puff.paint);
+      expect(fill?.kind).toBe("radialGradient");
+    }
   });
 });
 
@@ -714,7 +753,8 @@ describe("nothing floats (Requirement 3.1)", () => {
     expect(nodesOf(foregroundLayer()).map((n) => n.part)).not.toContain(
       "lantern",
     );
-    expect(classesOf(weatherLayer())).not.toContain("fog-front");
+    const fog = nodesOf(weatherLayer()).filter((n) => n.cls?.includes("fog"));
+    expect(fog.filter((n) => n.kind === "path")).toEqual([]);
   });
 });
 
