@@ -150,10 +150,11 @@ function floorGroup(floor: Floor, contents: readonly ShapeNode[]): ShapeNode {
  * The warm beam from the tower arch: its axis from the arch foot down to where
  * it has faded out, and its half width at both ends.
  */
+// It falls down and to the left, away from the tower, and opens as it goes.
 export const BEAM = {
-  top: [1276, 474],
-  end: [1304, 720],
-  half: [12, 60],
+  top: [1272, 474],
+  end: [1222, 724],
+  half: [12, 46],
 } as const;
 /** Width scale of the three nested layers; together they give the beam soft side edges. */
 const BEAM_LAYERS = [1, 0.66, 0.33] as const;

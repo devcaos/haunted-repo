@@ -445,6 +445,15 @@ describe("house (Requirements 3.1, 3.4)", () => {
     expect(pathPoints(door?.d ?? "").at(-1)?.[1]).toBe(TOWER.foot);
   });
 
+  it("tilts the tower beam down and to the left, opening as it falls", () => {
+    const [ax, ay, , , bx, by, cx] = beamPolygon();
+    const midTop = (ax ?? 0) + 12;
+    const midEnd = ((bx ?? 0) + (cx ?? 0)) / 2;
+    expect(midEnd).toBeLessThan(midTop - 30);
+    expect(by).toBeGreaterThan(ay ?? 0);
+    expect((bx ?? 0) - (cx ?? 0)).toBeGreaterThan(3 * 24);
+  });
+
   it("softens the tower beam: nested layers that fade out before the ground", () => {
     const layers = nodesOf(houseLayer()).filter((n) =>
       n.cls?.startsWith("light-cone "),
