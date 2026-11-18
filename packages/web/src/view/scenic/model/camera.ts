@@ -31,9 +31,11 @@ const FLOOR_FRAME: Readonly<Record<Floor, Rect>> = {
 export function frameRect(frame: Frame, viewport: ViewportClass): Rect {
   switch (frame.kind) {
     case "house":
+      // From the porch with its lantern (x 280) to the tower (x 1253) and
+      // from the spire tip down to the cellar floor, with a little air.
       return viewport === "wide"
-        ? { x: 0, y: 0, w: WORLD_W, h: WORLD_H }
-        : { x: 350, y: 40, w: 920, h: 930 }; // the house and its tower
+        ? { x: 280, y: 56, w: 973, h: 880 }
+        : { x: 270, y: 40, w: 1000, h: 900 };
     case "floor":
       return FLOOR_FRAME[frame.floor];
     case "slot":
@@ -46,11 +48,17 @@ export function frameRect(frame: Frame, viewport: ViewportClass): Rect {
   }
 }
 
-/** Where the frame must fit, in stage units (the wide stage is 1600 x 1000, the narrow one 1600 x 1600). */
+/**
+ * Where the frame must fit, in stage units (the wide stage is 1600 x 1000, the
+ * narrow one 1600 x 1600). On wide screens the HUD sidebar (22rem) covers the
+ * left of the stage, which is about x 0 to 400 at 1440 x 900, so every scene
+ * fits right of x 400. The House frame starts at y 66, below the scene
+ * heading bar at the top right, so the spire tip is never under it.
+ */
 export function sceneArea(frame: Frame, viewport: ViewportClass): Rect {
   if (viewport === "narrow") return { x: 40, y: 40, w: 1520, h: 1520 };
   return frame.kind === "house"
-    ? { x: 0, y: 0, w: WORLD_W, h: WORLD_H }
+    ? { x: 400, y: 66, w: 1200, h: 934 }
     : { x: 400, y: 110, w: 1200, h: 610 };
 }
 
