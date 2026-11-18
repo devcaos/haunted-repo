@@ -646,7 +646,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [ ] 9.1 Draw the Lantern_Wraith and the Chained_Brute, Variant 0
     - In `art/ghosts.ts` add both types to `GHOST_TYPES` and `ghostArt` for Variant 0, following the "Ghost types" table: Lantern_Wraith with `hood`, `tail-spiral` and `lantern`; Chained_Brute with `horns`, drips, `chain` and Pumpkin eye classes.
-    - Extend `art.test.ts`: each type has a part the other two lack (Wisp `hem-round`, Lantern_Wraith `hood` and `tail-spiral`, Chained_Brute `horns`); at Variant 0 the Wisp has the smallest box and the Chained_Brute the widest; the Wisp's eye share is the largest; boxes equal the Scene_Layout boxes.
+    - Extend `art.test.ts`: each type has a part the other two lack (Wisp `tail-ragged`, Lantern_Wraith `hood` and `tail-spiral`, Chained_Brute `horns`); at Variant 0 the Wisp has the smallest box and the Chained_Brute the widest; boxes equal the Scene_Layout boxes.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the lantern wraith and the chained brute`
     - _Requirements: 5.2, 5.3, 5.4, 5.6, 22.1_
@@ -676,7 +676,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Palette", "Ghost states"_
 
   - [ ] 9.5 Animate the idle loops
-    - Source_Scan item 11 first: the `@keyframes` `wisp-bob`, `wraith-sway` and `brute-heave` exist and their bodies differ.
+    - Source_Scan item 11 first: the `@keyframes` `wisp-float`, `wraith-sway` and `brute-heave` exist and their bodies differ.
     - In `motion.css` (no-preference block): `wraith-sway`, `brute-heave` and `flame-flicker`, with the catalogue durations; Locked ghosts have no idle animation.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): give each ghost type its own idle motion`
