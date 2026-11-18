@@ -23,6 +23,9 @@ const FAR_RIM =
 const NEAR_RIM = "M1460 684 C1530 681 1570 688 1600 694";
 const FAR_HILLS = `M0 650 C140 610 300 596 470 618 C620 638 760 600 920 590 ${FAR_RIM.slice(9)} V1000 H0 Z`;
 const NEAR_HILLS = `M0 735 C160 712 330 704 480 722 C560 732 620 744 700 748 L1000 748 C1180 730 1330 690 1460 684 ${NEAR_RIM.slice(10)} V1000 H0 Z`;
+/** [dx, dy, rx, ry, tilt] of each blotch on the moon, from its centre. */
+// prettier-ignore
+const BLOTCHES = [[12, -16, 14, 8, -25], [24, 16, 9, 6, 30], [-4, 10, 7, 11, 12], [30, -2, 6, 4, -40]] as const;
 /** The moon sits behind the spire, which cuts its left edge. */
 export const MOON = { cx: 1340, cy: 196, r: 56 } as const;
 
@@ -53,13 +56,13 @@ export function skyLayers(): ShapeNode {
     g("moon-sky", [
       circle("moon-halo", MOON.cx, MOON.cy, 520, { paint: "moon-halo" }),
       circle("moon tone-bone", MOON.cx, MOON.cy, MOON.r, { part: "moon" }),
-      // Craters with soft edges: each fades out to its rim.
-      ellipse("moon-shade", MOON.cx + 14, MOON.cy - 14, 12, 9, {
-        paint: "crater",
-      }),
-      ellipse("moon-shade", MOON.cx + 22, MOON.cy + 20, 8, 6, {
-        paint: "crater",
-      }),
+      // Soft, irregular blotches: tilted ellipses of different sizes, each fading to its rim.
+      ...BLOTCHES.map(([dx, dy, rx, ry, tilt]) =>
+        ellipse("moon-shade", 0, 0, rx, ry, {
+          paint: "crater",
+          transform: { translate: [MOON.cx + dx, MOON.cy + dy], rotate: tilt },
+        }),
+      ),
     ]),
     g("hills-far", [
       path("hill-far tone-mist", FAR_HILLS, { part: "hill-far" }),

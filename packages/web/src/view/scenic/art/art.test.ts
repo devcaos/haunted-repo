@@ -215,10 +215,15 @@ describe("sky, weather and foreground (Requirement 3.3)", () => {
     expect(halo?.r).toBeGreaterThan(8 * MOON.r);
     // Craters fade out to their rims instead of ending in a hard edge.
     const sky = nodesOf(skyLayers());
-    for (const crater of sky.filter((n) => n.cls === "moon-shade")) {
+    const blotches = sky.filter((n) => n.cls === "moon-shade");
+    expect(blotches.length).toBeGreaterThanOrEqual(3);
+    for (const crater of blotches) {
       expect(sky.find((n) => n.id === crater.paint)?.kind).toBe(
         "radialGradient",
       );
+      // Irregular: tilted and not round.
+      expect(crater.transform?.rotate).not.toBe(0);
+      expect(crater.rx).not.toBe(crater.ry);
     }
   });
 
