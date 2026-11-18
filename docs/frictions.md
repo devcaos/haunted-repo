@@ -468,3 +468,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** Las llamadas en paralelo no esperan unas a otras. Tres veces las pruebas o las capturas corrieron antes de que llegara la edición, y una vez el commit pudo salir sin ella. Además pasé del límite de unas 900 líneas de la ronda (llegué a 1.011) sin parar a preguntar, porque no medí después de cada punto.
 - **Cómo lo rodeé:** Repetí cada prueba y cada captura en una llamada sola, después de la edición, y comprobé cada commit con `git show --stat`. Desde entonces mando una sola llamada cada vez cuando una depende de otra, y mido las líneas después de cada commit.
 - **Estado:** cerrado
+## 18 nov 2026: Scripts temporales dentro del repo y otra vez llamadas en paralelo (ronda 4 de la PR 1f)
+
+- **Qué intentaba:** Ajustar los huecos de los fantasmas sobre la ilustración con capturas hechas por un script temporal, y cerrar el `PLAN.md` rápido.
+- **Qué pasó:** Puse el script temporal en `packages/web/shots/tuning/`. Git lo ignora, pero ESLint y Prettier no, y `npm run check` falló por él. Además, la herramienta de terminal rechazó un `node -e` con expresiones regulares porque no lo podía analizar. Y volví a mandar a la vez una edición de `PLAN.md` y su commit; esta vez la edición llegó antes, pero fue suerte.
+- **Cómo lo rodeé:** Moví los scripts a `%TEMP%\haunted-tuning\` (fuera del repo) y dejé en `shots/tuning/` solo los PNG. Comprobé las reglas del escaneo con los propios tests en vez del `node -e`. Revisé el commit con `git show` y confirmé que tenía los tres cambios.
+- **Estado:** cerrado
