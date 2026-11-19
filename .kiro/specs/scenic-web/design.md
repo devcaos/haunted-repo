@@ -29,7 +29,7 @@ Key decisions:
 | The strict fake GitHub has no imports and only erasable TypeScript | `fakeGitHub.testutil.ts` | Node 24 runs it directly from the Shots_Script with a `.ts` import. |
 | Vitest includes only `packages/*/src/**/*.test.ts` | `vitest.config.ts` | Pure tooling code goes in `packages/web/src/tooling/` so its tests run; the scripts in `packages/web/scripts/` stay thin. |
 | Test files in `src/` reference Node types, so Node's global `setTimeout` type is in the web `tsc` program | `source.test.ts`, `focus.test.ts` | Scenic code calls `window.setTimeout` and stores a `number`. |
-| Current build: 23,916 B gzipped JS, 1,425 B CSS, 341 B HTML | measured on `packages/web/dist` | Leaves a large part of the 307,200-byte budget for the scenic code and the fonts. |
+| Current build: 23,916 B gzipped JS, 1,425 B CSS, 341 B HTML | measured on `packages/web/dist` | Leaves a large part of the 512,000-byte budget for the scenic code and the fonts. |
 | Playwright `playwright` 1.65.1 is the latest release; the library package does not download browsers; `npx playwright install chromium` does | [npm registry](https://registry.npmjs.org/playwright/latest), [Playwright library docs](https://playwright.dev/docs/library) | `npm ci` in CI installs no browser. The Shots_Script names the install command when Chromium is missing. |
 | `page.emulateMedia({ reducedMotion: "reduce" })` exists; `page.screenshot({ animations: "disabled" })` fast-forwards finite animations to their end and resets infinite ones to their start | [Playwright Page API](https://playwright.dev/docs/api/class-page) | Reactions and the Exorcised_Moment are captured at their end state; loops at a fixed point. |
 | `route.fulfill` answers without the network; a cross-origin answer needs `Access-Control-Allow-Origin` | [Playwright network docs](https://playwright.dev/docs/network), [issue 12929](https://github.com/microsoft/playwright/issues/12929) | The interception adds CORS headers and answers `OPTIONS` itself. |
@@ -955,7 +955,9 @@ Every button and every link that is not inside a sentence has `min-width` and `m
 
 ## Performance Design
 
-### Size budget (gzipped, 307,200 bytes)
+### Size budget (gzipped, 512,000 bytes)
+
+Raised from 307,200 to 512,000 bytes on 19 Nov (director): the four Gate_Panel pictures add about 205 KB gzipped (panel-gargoyle 127, panel-pumpkin 35, panel-lantern 29, panel-frame 12). Measured on 19 Nov: total 401,165 bytes.
 
 | Part | Estimate (gzipped) | Basis |
 | --- | --- | --- |
@@ -994,8 +996,8 @@ The house's loops are paused in the Ghost_Scene, Bestiary drawings are still, th
 - Files: `packages/web/scripts/size.ts` (I/O) and `packages/web/src/tooling/distRules.ts` (pure, tested). `distRules.ts` has no relative import and no Node import, so the script can import it as `../src/tooling/distRules.ts` under Node's type stripping, like `make-sample.ts` does with `makeSample.ts`. `hasExternalAddress` and `SVG_NAMESPACES` move from `source.test.ts` into `distRules.ts`; `source.test.ts` imports them, and its existing self-check cases stay unchanged.
 - Root `package.json`: `"size": "node packages/web/scripts/size.ts"` and `"check": "npm run lint && npm run format:check && npm run build && npm run size && npm test"` (20.5).
 - Steps: resolve `packages/web/dist` from the script's own URL; if it does not exist, print `packages/web/dist was not found. Run npm run build first.` and exit 1 (20.6). Walk it with `readdirSync(dist, { recursive: true })` and `statSync`. For each file with a counted extension (`.js .css .svg .woff2 .woff .png .jpg .jpeg .gif .webp .avif .ico`) compute `gzipSync(bytes).length` at the default level (20.7). Read `.html`, `.css` and `.svg` files as text for the address check (20.9).
-- `checkDist(files)` returns `{ total, limit: 307200, counted, problems }`. Problems: total ≥ 307,200; an external address in an HTML, CSS or SVG file (same rule as the Source_Scan, SVG namespaces allowed); a file name containing `gallery` or a counted or HTML file containing the marker `data-scenic-gallery` (guard for 24.9); `index.html` containing `rel="stylesheet"` (guard for 1.9, 1.10).
-- Output, pass or fail (20.8): `Size check: 157,342 bytes gzipped (limit 307,200).`, then one line per counted file (largest first), then each problem. Exit 0 when there is no problem, 1 otherwise.
+- `checkDist(files)` returns `{ total, limit: 512000, counted, problems }`. Problems: total ≥ 512,000; an external address in an HTML, CSS or SVG file (same rule as the Source_Scan, SVG namespaces allowed); a file name containing `gallery` or a counted or HTML file containing the marker `data-scenic-gallery` (guard for 24.9); `index.html` containing `rel="stylesheet"` (guard for 1.9, 1.10).
+- Output, pass or fail (20.8): `Size check: 157,342 bytes gzipped (limit 512,000).`, then one line per counted file (largest first), then each problem. Exit 0 when there is no problem, 1 otherwise.
 - Only Node built-ins (`node:fs`, `node:path`, `node:url`, `node:zlib`); no shell command, no network (20.10, 25.10).
 
 ### Shots_Script (`npm run shots`)
@@ -1149,7 +1151,7 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 
 ### Property 18: The Size_Check fails exactly on budget or address problems
 
-*For any* list of generated dist files (random names with extensions from the counted list, `.html`, `.txt` and `.map`, random gzipped sizes, and texts that may contain `https://`, a protocol-relative `//` in `url(...)`, or the SVG namespace), `checkDist` reports a budget problem exactly when the sum of the gzipped sizes of the counted files is 307,200 or more, and an address problem exactly for the `.html`, `.css` and `.svg` files whose text has an external address by `hasExternalAddress`; `.js`, `.txt` and `.map` files never get an address problem.
+*For any* list of generated dist files (random names with extensions from the counted list, `.html`, `.txt` and `.map`, random gzipped sizes, and texts that may contain `https://`, a protocol-relative `//` in `url(...)`, or the SVG namespace), `checkDist` reports a budget problem exactly when the sum of the gzipped sizes of the counted files is 512,000 or more, and an address problem exactly for the `.html`, `.css` and `.svg` files whose text has an external address by `hasExternalAddress`; `.js`, `.txt` and `.map` files never get an address problem.
 
 **Validates: Requirements 20.7, 20.9**
 
