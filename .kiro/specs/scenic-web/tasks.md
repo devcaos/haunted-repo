@@ -686,7 +686,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 7.1, 7.2, 7.3, 7.5_
     - _Design: "New texts", "Test files" (scenicTexts.test.ts)_
 
-  - [ ] 9.7 Add the Bestiary and the ghost icons to the HUD
+  - [x] 9.7 Add the Bestiary and the ghost icons to the HUD
     - Create `packages/web/src/view/scenic/bestiary.ts`: `section.bestiary` with `h2` "Bestiary" and three list entries (small `aria-hidden` SVG of Variant 0 in the Haunted look, still; name in `strong`, floor title and range line as HTML text); below 64rem a `button` with `aria-expanded` and `aria-controls` folds the list (closed at load, D2).
     - In `hud.ts` add the Bestiary in every render, and replace the Ghost_Icon spans of task 1.9 with tiny `aria-hidden` SVGs (Candle flame for exorcised, Spectral Wisp head for haunted), exorcised first. Bestiary and icon styles in `hud.css`.
     - Extend `art.test.ts`: the Bestiary art is Variant 0 in the Haunted look for any input.

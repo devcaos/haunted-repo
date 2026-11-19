@@ -106,6 +106,10 @@
   .ghost-phase-3 .ghost-idle {
     animation-delay: calc(-3 * var(--sc-delay-phase-1));
   }
+  /* The Bestiary pictures stay still (Requirement 7.4). */
+  .bestiary-art .ghost-idle {
+    animation: none;
+  }
   /* A Locked ghost is held under glass: it does not float (Requirement 6.2). */
   .look-locked .ghost-idle {
     animation: none;

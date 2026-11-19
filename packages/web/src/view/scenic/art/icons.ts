@@ -1,7 +1,14 @@
+import type { GhostType } from "../model/sceneLayout.js";
+import { ghostArt } from "./ghosts.js";
 import { circle, g, path, type ShapeNode } from "./shapes.js";
 
 /** The viewBox side of a Ghost_Icon; colours come from `hud.css`. */
 export const ICON_BOX = 20;
+
+/** The Bestiary picture of a Ghost_Type: Variant 0 in the Haunted look. It never moves. */
+export function bestiaryArt(type: GhostType): ShapeNode {
+  return ghostArt(type, 0, "haunted");
+}
 
 /**
  * One tiny Ghost_Icon (design "Props and panels"): a Candle flame for an

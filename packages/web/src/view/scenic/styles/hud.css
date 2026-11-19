@@ -186,6 +186,61 @@
   color: var(--sc-text-link-hover);
 }
 
+/*
+ * Bestiary: three entries, each with its still picture. Below 64rem a button
+ * folds the list (closed at load); from 64rem the list is always open and
+ * the button and the duplicate heading of the button are not shown.
+ */
+.scenic .bestiary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-space-2);
+  align-self: stretch;
+}
+
+.scenic .bestiary h2 {
+  display: none;
+}
+
+.scenic .bestiary-toggle {
+  align-self: flex-start;
+}
+
+.scenic .bestiary[data-open="false"] .bestiary-list {
+  display: none;
+}
+
+.scenic .bestiary-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.scenic .bestiary-entry {
+  display: flex;
+  align-items: center;
+  gap: var(--sc-space-3);
+}
+
+.scenic .bestiary-art {
+  flex: none;
+  width: var(--sc-bestiary-art-w);
+  height: var(--sc-bestiary-art-h);
+}
+
+.scenic .bestiary-text {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--sc-text-small);
+}
+
+.scenic .bestiary-text strong {
+  color: var(--sc-text-heading);
+  font-size: var(--sc-text-body);
+}
 /* Wide screens: the HUD column overlays the stage edge and scrolls inside itself. */
 @media (min-width: 64rem) {
   .scenic .hud-logo {
@@ -195,5 +250,17 @@
   .scenic .hud-side {
     min-height: 0;
     overflow-y: auto;
+  }
+
+  .scenic .bestiary h2 {
+    display: block;
+  }
+
+  .scenic .bestiary-toggle {
+    display: none;
+  }
+
+  .scenic .bestiary[data-open] .bestiary-list {
+    display: flex;
   }
 }

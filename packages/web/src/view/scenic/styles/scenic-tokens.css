@@ -107,6 +107,8 @@
   --sc-stage-wide: min(100vw, 160dvh);
   --sc-viewport-height: 100vh;
   --sc-icon-size: 1.25rem;
+  --sc-bestiary-art-w: 3.5rem;
+  --sc-bestiary-art-h: 4.5rem;
   --sc-meter-height: 0.75rem;
   --sc-field-min: 12rem;
   /* Focus */

@@ -1,5 +1,6 @@
 import { TEXTS } from "../../logic/texts.js";
 import { ghostIconArt, ICON_BOX } from "./art/icons.js";
+import { createBestiary } from "./bestiary.js";
 import { el, setText } from "./dom.js";
 import type { HudView } from "./model/hudView.js";
 import { createSvgRoot, mountShape } from "./svg.js";
@@ -95,6 +96,7 @@ export function createHud(handlers: HudHandlers): Hud {
     showSample,
     powerLine,
     warnings,
+    createBestiary().element,
   ]);
 
   const announcer = el("p", { class: "announcer", "aria-live": "polite" });

@@ -29,7 +29,7 @@ import {
   type VariantNumber,
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, VARIANTS, ghostArt } from "./ghosts.js";
-import { ICON_BOX, ghostIconArt } from "./icons.js";
+import { ICON_BOX, bestiaryArt, ghostIconArt } from "./icons.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
@@ -1158,7 +1158,20 @@ describe("chained doors stand on their floor", () => {
   });
 });
 
-describe("Ghost_Icons (Requirements 4.4, 5.12)", () => {
+describe("Bestiary art and Ghost_Icons (Requirements 4.4, 5.12, 7.1, 7.4)", () => {
+  const TYPES = ["wisp", "lantern-wraith", "chained-brute"] as const;
+
+  it("the Bestiary art is Variant 0 in the Haunted look for any input", () => {
+    for (const type of TYPES) {
+      const tree = bestiaryArt(type);
+      expect(tree).toEqual(ghostArt(type, 0, "haunted"));
+      expect(tree.cls).toContain("look-haunted");
+      expect(tree.cls).not.toContain("look-locked");
+      expect(tree.transform).toBeUndefined();
+      expect(shapeProblems(tree)).toEqual([]);
+    }
+  });
+
   it("an exorcised icon is a flame and a haunted icon is a Wisp head", () => {
     const flame = nodesOf(ghostIconArt("exorcised"));
     const wisp = nodesOf(ghostIconArt("haunted"));
