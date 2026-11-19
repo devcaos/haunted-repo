@@ -159,6 +159,15 @@ button:disabled {
   gap: var(--space-4);
 }
 
+/* The scene illustration fits the page column, whatever its own size. */
+
+.ghost-list > img {
+  display: block;
+  width: var(--size-full);
+  max-width: var(--size-full);
+  height: auto;
+}
+
 .floor {
   min-width: 0;
 }
