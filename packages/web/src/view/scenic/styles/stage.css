@@ -194,7 +194,7 @@
     flex-direction: row;
     box-sizing: border-box;
     height: var(--sc-rail-height);
-    padding: var(--sc-space-2);
+    padding: var(--sc-space-tight);
     overflow-y: auto;
     background-color: var(--sc-backing);
     border-top: var(--sc-line-heavy) solid var(--sc-border);
@@ -202,6 +202,23 @@
   .scenic .nameplates > li {
     flex: 1 1 0;
     max-width: var(--sc-nameplate-max);
+  }
+  /* A card is only as tall as its content; the score and the state share one line. */
+  .scenic .nameplate {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    align-content: flex-start;
+    align-self: flex-start;
+    column-gap: var(--sc-space-2);
+    row-gap: var(--sc-nameplate-row-gap);
+    height: auto;
+    padding: var(--sc-nameplate-pad);
+  }
+  .scenic .nameplate-path,
+  .scenic .nameplate-reason,
+  .scenic .nameplate-locked {
+    flex: 1 1 var(--sc-full);
   }
 }
 /*

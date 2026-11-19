@@ -181,6 +181,10 @@
   --sc-rail-left: 25%;
   --sc-rail-top: 66%;
   --sc-rail-height: 34%;
+  /* Compact Nameplates on the rail */
+  --sc-space-tight: 0.375rem;
+  --sc-nameplate-row-gap: 2px;
+  --sc-nameplate-pad: var(--sc-space-tight) 0.75rem;
   --sc-notch: 0.5rem;
   /* Widest Nameplate on the rail: cards keep their four-Card size when a floor has fewer */
   --sc-nameplate-max: 16rem;
