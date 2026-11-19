@@ -18,10 +18,10 @@ describe("checkDist (Requirements 1.9, 20.6 to 20.9, 24.9)", () => {
     expect(MISSING_DIST_MESSAGE).toContain("npm run build");
   });
 
-  it("prints the total and the limit of 307,200 bytes (20.8)", () => {
+  it("prints the total and the limit of 512,000 bytes (20.8)", () => {
     const report = checkDist([file("assets/a.js", 157_342)]);
     expect(formatReport(report)[0]).toBe(
-      "Size check: 157,342 bytes gzipped (limit 307,200).",
+      "Size check: 157,342 bytes gzipped (limit 512,000).",
     );
     expect(report.problems).toEqual([]);
   });
@@ -40,7 +40,7 @@ describe("checkDist (Requirements 1.9, 20.6 to 20.9, 24.9)", () => {
     expect(report.total).toBe(510);
   });
 
-  it("passes just under the limit and fails at exactly 307,200 bytes", () => {
+  it("passes just under the limit and fails at exactly 512,000 bytes", () => {
     expect(checkDist([file("a.js", SIZE_LIMIT - 1)]).problems).toEqual([]);
     expect(checkDist([file("a.js", SIZE_LIMIT)]).problems).toHaveLength(1);
   });

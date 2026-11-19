@@ -252,4 +252,169 @@
   --sc-ease-in: cubic-bezier(0.55, 0, 1, 0.45);
   --sc-ease-in-out: ease-in-out;
   --sc-ease-linear: linear;
+  /* HUD redesign (director, 19 Nov): brass, dark wood and candlelight */
+  --sc-hud-glow: rgb(230 162 92 / 0.14);
+  --sc-drop-shadow: rgb(0 0 0 / 0.55);
+  --sc-hud-backing:
+    radial-gradient(ellipse 90% 40% at 50% 0%, var(--sc-hud-glow), transparent),
+    var(--sc-night);
+  --sc-hud-edge:
+    inset -1px 0 0 var(--sc-brass-dark), inset -4px 0 0 var(--sc-night),
+    inset -5px 0 0 var(--sc-brass);
+  --sc-logo-shadow: 0 0 18px var(--sc-pumpkin-glow), 0 3px 0 var(--sc-rust);
+  --sc-rule: linear-gradient(
+    90deg,
+    transparent,
+    var(--sc-brass) 30%,
+    var(--sc-brass) 70%,
+    transparent
+  );
+  --sc-rivets:
+    radial-gradient(
+      circle at 6px 6px,
+      var(--sc-brass-light) 1.5px,
+      transparent 2.5px
+    ),
+    radial-gradient(
+      circle at calc(100% - 6px) 6px,
+      var(--sc-brass-light) 1.5px,
+      transparent 2.5px
+    ),
+    radial-gradient(
+      circle at 6px calc(100% - 6px),
+      var(--sc-brass-light) 1.5px,
+      transparent 2.5px
+    ),
+    radial-gradient(
+      circle at calc(100% - 6px) calc(100% - 6px),
+      var(--sc-brass-light) 1.5px,
+      transparent 2.5px
+    );
+  --sc-plaque-backing: linear-gradient(
+    180deg,
+    var(--sc-wood-dark),
+    var(--sc-night)
+  );
+  --sc-plaque-lines:
+    inset 0 0 0 3px var(--sc-night), inset 0 0 0 4px var(--sc-brass-dark),
+    0 3px 0 var(--sc-brass-dark), 0 6px 14px var(--sc-drop-shadow);
+  --sc-cta-backing: linear-gradient(
+    180deg,
+    var(--sc-candle),
+    var(--sc-pumpkin) 55%,
+    var(--sc-brass)
+  );
+  --sc-cta-lines:
+    inset 0 1px 0 var(--sc-flame-pale), inset 0 0 0 1px var(--sc-brass-dark),
+    0 3px 0 var(--sc-rust), 0 6px 16px var(--sc-drop-shadow);
+  --sc-cta-hover: 0 3px 0 var(--sc-rust), 0 0 22px var(--sc-pumpkin-glow);
+  --sc-meter-backing: linear-gradient(
+    90deg,
+    var(--sc-rust),
+    var(--sc-pumpkin) 70%,
+    var(--sc-candle)
+  );
+  --sc-meter-glow: 0 0 10px var(--sc-pumpkin-glow);
+  --sc-meter-track-shadow: inset 0 2px 4px var(--sc-drop-shadow);
+  --sc-card-backing: linear-gradient(180deg, var(--sc-slate), var(--sc-night));
+  --sc-medallion:
+    radial-gradient(
+      circle at 50% 45%,
+      rgb(110 155 216 / 0.35),
+      transparent 70%
+    ),
+    var(--sc-abyss);
+  --sc-input-shadow: inset 0 2px 6px var(--sc-drop-shadow);
+  --sc-text-tagline-hud: 1.05rem;
+  --sc-text-label: 0.75rem;
+  --sc-text-bestiary-name: 1.2rem;
+  --sc-tracking-label: 0.08em;
+  --sc-radius: 3px;
+  --sc-radius-card: 6px;
+  --sc-radius-pill: 999px;
+  --sc-medallion-size: 3.5rem;
+  --sc-rule-h: 1px;
+  --sc-press-y: 2px;
+  /* Gate_Panel (director, 19 Nov): the HUD drawn as a stone gate. One gate
+     unit is 1/900 of the screen height, the height of the frame picture. */
+  --sc-gate-u: calc(var(--sc-viewport-height) / 900);
+  --sc-gate-w: calc(var(--sc-gate-u) * 480);
+  --sc-gate-art-w: calc(var(--sc-gate-u) * 640);
+  --sc-gate-inner-x: calc(var(--sc-gate-u) * 72);
+  --sc-gate-inner-w: calc(var(--sc-gate-u) * 316);
+  --sc-gate-top-pad: calc(var(--sc-gate-u) * 180);
+  --sc-gate-foot-pad: calc(var(--sc-gate-u) * 92);
+  --sc-gate-logo: min(2.4rem, calc(var(--sc-gate-u) * 38));
+  --sc-gate-logo-leading: 1;
+  --sc-gate-tagline: min(1.05rem, calc(var(--sc-gate-u) * 17));
+  --sc-gate-meter-h: 0.7rem;
+  --sc-gate-gap: calc(var(--sc-gate-u) * 5.6);
+  --sc-gate-gap-x: 0.75rem;
+  --sc-gate-side-gap: calc(var(--sc-gate-u) * 8.8);
+  --sc-gate-plaque-pad: calc(var(--sc-gate-u) * 12) 0.8rem
+    calc(var(--sc-gate-u) * 11);
+  --sc-gate-plaque-gap: 0.5rem;
+  --sc-gate-label: max(0.6rem, min(0.68rem, calc(var(--sc-gate-u) * 11)));
+  --sc-gate-input-h: min(2.4rem, calc(var(--sc-gate-u) * 38));
+  --sc-gate-cta: min(1.3rem, calc(var(--sc-gate-u) * 21));
+  --sc-gate-cta-pad-x: 1.5rem;
+  --sc-gate-cta-cut: polygon(
+    0 50%,
+    12px 0,
+    calc(100% - 12px) 0,
+    100% 50%,
+    calc(100% - 12px) 100%,
+    12px 100%
+  );
+  --sc-gate-bestiary-title: min(1.35rem, calc(var(--sc-gate-u) * 22));
+  --sc-gate-bestiary-gap: 0.45rem;
+  --sc-gate-niche-h: calc(var(--sc-gate-u) * 122);
+  --sc-gate-niche-arch: 3rem 3rem 4px 4px;
+  --sc-gate-niche-border: 2px;
+  --sc-gate-niche-pad: 0.35rem 0.2rem 0;
+  --sc-gate-niche-lines:
+    inset 0 0 0 3px var(--sc-night), inset 0 0 0 4px var(--sc-brass),
+    inset 0 -18px 24px var(--sc-drop-shadow);
+  --sc-gate-niche-text: max(0.6rem, min(0.68rem, calc(var(--sc-gate-u) * 11)));
+  --sc-gate-niche-name: min(0.92rem, calc(var(--sc-gate-u) * 15));
+  --sc-gate-niche-leading: 1.2;
+  --sc-gate-foot-text: max(0.6rem, min(0.72rem, calc(var(--sc-gate-u) * 11.5)));
+  --sc-gate-foot-leading: 1.35;
+  --sc-gate-diamond: "\25C6";
+  --sc-gate-diamond-size: 0.7em;
+  /* The gargoyle's eyes and the lantern's light. */
+  --sc-eye-brow: rgb(5 6 12 / 0.75);
+  --sc-eye-brow-end: rgb(5 6 12 / 0);
+  --sc-eye-glow: rgb(169 198 255 / 0.32);
+  --sc-eye-glow-mid: rgb(95 132 208 / 0.1);
+  --sc-eye-glow-end: rgb(95 132 208 / 0);
+  --sc-eye-hole: #000;
+  --sc-eye-hole-mid: #030408;
+  --sc-eye-hole-end: #0b0f1c;
+  --sc-eye-rim-soft: rgb(127 163 234 / 0.3);
+  --sc-eye-rim: rgb(185 208 255 / 0.8);
+  --sc-eye-rim-soft-w: 5;
+  --sc-eye-rim-w: 1.6;
+  --sc-eye-slit-haze: rgb(207 224 255 / 0.35);
+  --sc-eye-slit: #f6f9ff;
+  --sc-lamp-light: rgb(255 176 90 / 0.34);
+  --sc-lamp-light-mid: rgb(255 140 60 / 0.12);
+  --sc-lamp-light-end: rgb(255 140 60 / 0);
+  /* Narrow screens: the form, the Bestiary and the footer sit in a tombstone. */
+  --sc-crown-h: 8.6rem;
+  --sc-crown-pull: -0.3rem;
+  --sc-tomb-stone: #2c313e;
+  --sc-tomb-inner: #0f131d;
+  --sc-tomb-edge: 14px;
+  --sc-tomb-arch: 11rem 11rem 0 0;
+  --sc-tomb-arch-pad: 5.4rem;
+  --sc-tomb-foot-pad: 5.2rem;
+  --sc-tomb-margin: 0.6rem;
+  --sc-tomb-lines-top:
+    inset 1px 1px 0 var(--sc-brass-dark), inset -1px 0 0 var(--sc-brass-dark);
+  --sc-tomb-lines-foot:
+    inset 1px -1px 0 var(--sc-brass-dark), inset -1px 0 0 var(--sc-brass-dark);
+  --sc-tomb-pumpkin-w: 4.9rem;
+  --sc-tomb-pumpkin-x: -0.4rem;
+  --sc-tomb-pumpkin-y: -0.6rem;
 }

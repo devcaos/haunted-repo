@@ -108,6 +108,8 @@ Built for Kiroween 2026, in the Costume Contest category.
 
 Scene illustration drafted with Claude (Anthropic AI); integrated, animated and wired to the app with Kiro. The file (`packages/web/src/view/assets/files/house-scene.svg`) keeps its C2PA provenance block.
 
+Left panel (Gate_Panel): the gargoyle, the lantern and the pumpkin were drawn with ChatGPT (OpenAI) and vectorised with Claude (Anthropic AI); the stone frame and the gargoyle's eyes were drawn with Claude after a ChatGPT concept; integrated with Kiro. Files: `packages/web/src/view/assets/files/panel-*.svg`.
+
 ## Licence
 
 [MIT](LICENSE). The demo shows code from [lukeed/sirv](https://github.com/lukeed/sirv), which has its own MIT licence; its notice is shown on the page and served as `sirv-license.txt`.

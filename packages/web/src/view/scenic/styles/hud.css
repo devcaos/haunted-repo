@@ -9,9 +9,27 @@
   position: relative;
   z-index: 1;
   box-sizing: border-box;
-  padding: var(--sc-space-3);
+  padding: var(--sc-space-3) var(--sc-space-4);
   background-color: var(--sc-backing);
-  border: var(--sc-line) solid var(--sc-border);
+}
+
+/* Candlelight falls on the logo only, so the three parts read as one column. */
+.scenic .hud-top {
+  background: var(--sc-hud-backing);
+}
+
+/* Ornamental rule between the HUD parts: a Brass line that fades at both ends. */
+.scenic .hud-side::before,
+.scenic .hud-foot::before {
+  content: "";
+  display: block;
+  align-self: stretch;
+  height: var(--sc-rule-h);
+  background: var(--sc-rule);
+}
+
+.scenic .hud-foot::before {
+  margin-bottom: var(--sc-space-3);
 }
 
 .scenic .hud-top {
@@ -48,15 +66,18 @@
 }
 
 .scenic .hud-logo {
+  color: var(--sc-pumpkin);
   font-family: var(--font-logo);
   font-size: var(--sc-text-logo-narrow);
+  letter-spacing: var(--sc-line);
+  text-shadow: var(--sc-logo-shadow);
 }
 
 .scenic .hud-tagline {
   margin: 0;
   color: var(--sc-text-heading);
-  font-family: var(--font-logo);
-  font-size: var(--sc-text-tagline);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-tagline-hud);
   line-height: var(--sc-leading-title);
 }
 
@@ -72,15 +93,19 @@
 
 .scenic .meter-track {
   height: var(--sc-meter-height);
-  border: var(--sc-line-heavy) solid var(--sc-border);
-  background-color: var(--sc-backing);
+  border: var(--sc-line) solid var(--sc-border);
+  border-radius: var(--sc-radius-pill);
+  background-color: var(--sc-abyss);
+  box-shadow: var(--sc-meter-track-shadow);
   overflow: hidden;
 }
 
 .scenic .meter-fill {
   width: var(--sc-full);
   height: var(--sc-full);
-  background-color: var(--sc-cold-blue);
+  border-radius: var(--sc-radius-pill);
+  background: var(--sc-meter-backing);
+  box-shadow: var(--sc-meter-glow);
   transform-origin: left;
 }
 
@@ -120,15 +145,22 @@
   color: var(--sc-text-link);
 }
 
+.scenic .hud-top .view-link {
+  font-family: var(--font-title);
+}
+
 /* Live_Plaque: Brass plaque, Night field, Night text on a Pumpkin button. */
 .scenic .live-plaque {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: var(--sc-space-2);
-  padding: var(--sc-space-2);
+  gap: var(--sc-space-3);
+  align-self: stretch;
+  padding: var(--sc-space-4) var(--sc-space-3) var(--sc-space-3);
   border: var(--sc-line-heavy) solid var(--sc-border);
-  background-color: var(--sc-backing);
+  border-radius: var(--sc-radius);
+  background: var(--sc-rivets), var(--sc-plaque-backing);
+  box-shadow: var(--sc-plaque-lines);
 }
 
 .scenic .live-plaque .field {
@@ -139,16 +171,34 @@
 }
 
 .scenic .live-plaque label {
-  color: var(--sc-brass);
-  font-size: var(--sc-text-small);
+  color: var(--sc-candle);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-label);
+  letter-spacing: var(--sc-tracking-label);
+  text-transform: uppercase;
+}
+
+.scenic .live-plaque button[type="submit"] {
+  flex: 1 1 var(--sc-full);
+}
+
+.scenic .live-plaque button[type="submit"]:hover:not(:disabled) {
+  box-shadow: var(--sc-cta-lines), var(--sc-cta-hover);
+}
+
+.scenic .live-plaque button[type="submit"]:active:not(:disabled) {
+  transform: translateY(var(--sc-press-y));
 }
 
 .scenic .live-plaque input {
   box-sizing: border-box;
   min-height: var(--sc-touch);
   padding: var(--sc-space-1) var(--sc-space-2);
-  border: var(--sc-line) solid var(--sc-text-muted);
-  background-color: var(--sc-backing);
+  border: var(--sc-line) solid var(--sc-brass-dark);
+  border-bottom: var(--sc-line-heavy) solid var(--sc-brass);
+  border-radius: var(--sc-radius);
+  background-color: var(--sc-abyss);
+  box-shadow: var(--sc-input-shadow);
   color: var(--sc-text);
   font-family: var(--font-code);
   font-size: var(--sc-text-code);
@@ -200,6 +250,8 @@
 
 .scenic .bestiary h2 {
   display: none;
+  text-align: center;
+  font-size: var(--sc-text-h2);
 }
 
 /* A secondary button (class in bestiary.ts): it must not compete with "Find the ghosts". */
@@ -224,12 +276,23 @@
   display: flex;
   align-items: center;
   gap: var(--sc-space-3);
+  padding: var(--sc-space-2) var(--sc-space-3) var(--sc-space-2)
+    var(--sc-space-2);
+  border: var(--sc-line) solid var(--sc-brass-dark);
+  border-left: var(--sc-line-heavy) solid var(--sc-brass);
+  border-radius: var(--sc-radius-card);
+  background: var(--sc-card-backing);
 }
 
 .scenic .bestiary-art {
   flex: none;
-  width: var(--sc-bestiary-art-w);
-  height: var(--sc-bestiary-art-h);
+  box-sizing: border-box;
+  width: var(--sc-medallion-size);
+  height: var(--sc-medallion-size);
+  padding: var(--sc-space-1);
+  border: var(--sc-line) solid var(--sc-brass);
+  border-radius: var(--sc-radius-pill);
+  background: var(--sc-medallion);
 }
 
 .scenic .bestiary-text {
@@ -240,10 +303,20 @@
 
 .scenic .bestiary-text strong {
   color: var(--sc-text-heading);
-  font-size: var(--sc-text-body);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-bestiary-name);
+  font-weight: var(--sc-weight-body);
 }
+
 /* Wide screens: the HUD column overlays the stage edge and scrolls inside itself. */
 @media (min-width: 64rem) {
+  /* The double Brass edge where the HUD column meets the stage. */
+  .scenic .hud-top,
+  .scenic .hud-side,
+  .scenic .hud-foot {
+    box-shadow: var(--sc-hud-edge);
+  }
+
   .scenic .hud-logo {
     font-size: var(--sc-text-logo);
   }

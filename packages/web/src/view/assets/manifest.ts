@@ -1,6 +1,7 @@
 // The single inventory of graphics of the web demo. Plain data only.
-// Only `scene.house` has a file (director's decision, 18 Nov): the declared
-// scene illustration. Every other slot is empty and uses its fallback.
+// Files: the declared scene illustration `scene.house`, director's decision,
+// 18 Nov) and the four Gate_Panel pictures `panel.*`, director's decision,
+// 19 Nov). Every other slot is empty and uses its fallback.
 
 export type AssetSlotId =
   | "scene.house"
@@ -12,7 +13,11 @@ export type AssetSlotId =
   | "ghost.exorcised"
   | "ghost.locked"
   | "prop.door"
-  | "prop.candle";
+  | "prop.candle"
+  | "panel.frame"
+  | "panel.gargoyle"
+  | "panel.lantern"
+  | "panel.pumpkin";
 
 export interface AssetLayer {
   /** File name inside src/view/assets/files/, e.g. "attic-back.webp". */
@@ -101,6 +106,58 @@ export const ASSET_SLOTS: readonly AssetSlot[] = [
     id: "prop.candle",
     purpose: "Candle that decorates the house.",
     layers: [],
+    fallback: "none",
+  },
+  {
+    id: "panel.frame",
+    purpose: "Stone gate around the HUD on wide screens.",
+    layers: [
+      {
+        file: "panel-frame.svg",
+        alt: "",
+        source:
+          "Drawn with Claude (Anthropic AI) after a ChatGPT (OpenAI) concept, declared in the Devpost submission; integrated with Kiro. MIT licence, like the repo.",
+      },
+    ],
+    fallback: "none",
+  },
+  {
+    id: "panel.gargoyle",
+    purpose: "Gargoyle with a rose window on top of the gate.",
+    layers: [
+      {
+        file: "panel-gargoyle.svg",
+        alt: "",
+        source:
+          "Drawn with ChatGPT (OpenAI) and vectorised with Claude (Anthropic AI), declared in the Devpost submission; integrated with Kiro. MIT licence, like the repo.",
+      },
+    ],
+    fallback: "none",
+  },
+  {
+    id: "panel.lantern",
+    purpose: "Lantern hanging from the right pillar of the gate.",
+    layers: [
+      {
+        file: "panel-lantern.svg",
+        alt: "",
+        source:
+          "Drawn with ChatGPT (OpenAI) and vectorised with Claude (Anthropic AI), declared in the Devpost submission; integrated with Kiro. MIT licence, like the repo.",
+      },
+    ],
+    fallback: "none",
+  },
+  {
+    id: "panel.pumpkin",
+    purpose: "Lit pumpkin at the foot of the gate.",
+    layers: [
+      {
+        file: "panel-pumpkin.svg",
+        alt: "",
+        source:
+          "Drawn with ChatGPT (OpenAI) and vectorised with Claude (Anthropic AI), declared in the Devpost submission; integrated with Kiro. MIT licence, like the repo.",
+      },
+    ],
     fallback: "none",
   },
 ];

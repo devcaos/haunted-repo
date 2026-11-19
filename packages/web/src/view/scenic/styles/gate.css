@@ -1,0 +1,285 @@
+/*
+ * Gate_Panel (director's decision, 19 Nov): on wide screens the HUD is drawn
+ * as a stone gate inside the world; on narrow screens the gargoyle crowns the
+ * logo and the form, the Bestiary and the footer sit in a tombstone. The
+ * pictures are decoration (aria-hidden); every text stays real HTML. Tokens
+ * only. This file is still: the motion comes in a later pull request.
+ */
+
+/* ---------- The pictures' own paint (eyes and lantern light) ---------- */
+.scenic .gate-stop-brow {
+  stop-color: var(--sc-eye-brow);
+}
+
+.scenic .gate-stop-brow-end {
+  stop-color: var(--sc-eye-brow-end);
+}
+
+.scenic .gate-stop-glow {
+  stop-color: var(--sc-eye-glow);
+}
+
+.scenic .gate-stop-glow-mid {
+  stop-color: var(--sc-eye-glow-mid);
+}
+
+.scenic .gate-stop-glow-end {
+  stop-color: var(--sc-eye-glow-end);
+}
+
+.scenic .gate-stop-hole {
+  stop-color: var(--sc-eye-hole);
+}
+
+.scenic .gate-stop-hole-mid {
+  stop-color: var(--sc-eye-hole-mid);
+}
+
+.scenic .gate-stop-hole-end {
+  stop-color: var(--sc-eye-hole-end);
+}
+
+.scenic .gate-eye-rim-soft {
+  stroke: var(--sc-eye-rim-soft);
+  stroke-width: var(--sc-eye-rim-soft-w);
+  stroke-linecap: round;
+}
+
+.scenic .gate-eye-rim {
+  stroke: var(--sc-eye-rim);
+  stroke-width: var(--sc-eye-rim-w);
+  stroke-linecap: round;
+}
+
+.scenic .gate-eye-slit-haze {
+  fill: var(--sc-eye-slit-haze);
+}
+
+.scenic .gate-eye-slit-core {
+  fill: var(--sc-eye-slit);
+}
+
+.scenic .gate-stop-lamp {
+  stop-color: var(--sc-lamp-light);
+}
+
+.scenic .gate-stop-lamp-mid {
+  stop-color: var(--sc-lamp-light-mid);
+}
+
+.scenic .gate-stop-lamp-end {
+  stop-color: var(--sc-lamp-light-end);
+}
+
+/* ---------- Narrow screens: crown, tombstone and pumpkin ---------- */
+.scenic .gate-wide {
+  display: none;
+}
+
+.scenic .hud-top {
+  justify-content: center;
+  text-align: center;
+}
+
+.scenic .gate-crown-narrow {
+  display: block;
+  flex: 0 0 var(--sc-full);
+  height: var(--sc-crown-h);
+  margin-bottom: var(--sc-crown-pull);
+}
+
+.scenic .hud-side,
+.scenic .hud-foot {
+  margin: 0 var(--sc-tomb-margin);
+  border: var(--sc-tomb-edge) solid var(--sc-tomb-stone);
+  background: var(--sc-tomb-inner);
+}
+
+.scenic .hud-side {
+  padding-top: var(--sc-tomb-arch-pad);
+  border-bottom: none;
+  border-radius: var(--sc-tomb-arch);
+  box-shadow: var(--sc-tomb-lines-top);
+}
+
+.scenic .hud-foot {
+  position: relative;
+  padding-bottom: var(--sc-tomb-foot-pad);
+  border-top: none;
+  box-shadow: var(--sc-tomb-lines-foot);
+}
+
+.scenic .hud-side::before,
+.scenic .hud-foot::before {
+  display: none;
+}
+
+.scenic .gate-base-narrow {
+  position: absolute;
+  left: var(--sc-tomb-pumpkin-x);
+  bottom: var(--sc-tomb-pumpkin-y);
+  width: var(--sc-tomb-pumpkin-w);
+}
+
+/* ---------- Wide screens: the whole gate ---------- */
+@media (min-width: 64rem) {
+  .scenic {
+    --sc-hud-width: var(--sc-gate-w);
+  }
+
+  .scenic .gate-wide {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: var(--sc-gate-art-w);
+    height: var(--sc-viewport-height);
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .scenic .gate-crown-narrow,
+  .scenic .gate-base-narrow {
+    display: none;
+  }
+
+  /* The HUD text sits in the gate's opening: no backing of its own. */
+  .scenic .hud-top,
+  .scenic .hud-side,
+  .scenic .hud-foot {
+    z-index: 2;
+    width: var(--sc-gate-inner-w);
+    margin: 0 0 0 var(--sc-gate-inner-x);
+    padding-right: 0;
+    padding-left: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .scenic .hud-top {
+    gap: var(--sc-gate-gap) var(--sc-gate-gap-x);
+    padding-top: var(--sc-gate-top-pad);
+    padding-bottom: 0;
+  }
+
+  .scenic .hud-logo {
+    width: var(--sc-full);
+    font-size: var(--sc-gate-logo);
+    line-height: var(--sc-gate-logo-leading);
+  }
+
+  .scenic .hud-tagline {
+    width: var(--sc-full);
+    font-size: var(--sc-gate-tagline);
+  }
+
+  .scenic .haunt-meter {
+    flex-basis: var(--sc-full);
+  }
+
+  .scenic .meter-line {
+    margin-bottom: var(--sc-gate-gap);
+    font-family: var(--font-title);
+    font-size: var(--sc-gate-tagline);
+  }
+
+  .scenic .meter-track {
+    height: var(--sc-gate-meter-h);
+  }
+
+  .scenic .hud-side {
+    gap: var(--sc-gate-side-gap);
+    padding-top: var(--sc-gate-gap);
+  }
+
+  .scenic .live-plaque {
+    gap: var(--sc-gate-plaque-gap);
+    padding: var(--sc-gate-plaque-pad);
+  }
+
+  .scenic .live-plaque label {
+    font-size: var(--sc-gate-label);
+  }
+
+  .scenic .live-plaque input {
+    min-height: var(--sc-gate-input-h);
+  }
+
+  /* "Find the ghosts": an orange plaque with diamond ends. */
+  .scenic .live-plaque button[type="submit"] {
+    padding: 0 var(--sc-gate-cta-pad-x);
+    border: none;
+    font-size: var(--sc-gate-cta);
+    clip-path: var(--sc-gate-cta-cut);
+  }
+
+  /* The Bestiary: three tall arched niches in a row. */
+  .scenic .bestiary {
+    gap: var(--sc-gate-gap);
+  }
+
+  .scenic .bestiary h2 {
+    font-size: var(--sc-gate-bestiary-title);
+    line-height: var(--sc-gate-niche-leading);
+  }
+
+  .scenic .bestiary h2::before,
+  .scenic .bestiary h2::after {
+    content: var(--sc-gate-diamond);
+    margin: 0 var(--sc-gate-gap);
+    color: var(--sc-brass);
+    font-size: var(--sc-gate-diamond-size);
+    vertical-align: middle;
+  }
+
+  .scenic .bestiary[data-open] .bestiary-list {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--sc-gate-bestiary-gap);
+  }
+
+  .scenic .bestiary-entry {
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sc-space-1);
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    text-align: center;
+  }
+
+  .scenic .bestiary-art {
+    width: var(--sc-full);
+    height: var(--sc-gate-niche-h);
+    padding: var(--sc-gate-niche-pad);
+    border: var(--sc-gate-niche-border) solid var(--sc-brass-dark);
+    border-radius: var(--sc-gate-niche-arch);
+    box-shadow: var(--sc-gate-niche-lines);
+  }
+
+  .scenic .bestiary-text {
+    align-items: center;
+    font-size: var(--sc-gate-niche-text);
+    line-height: var(--sc-gate-niche-leading);
+  }
+
+  .scenic .bestiary-text strong {
+    font-size: var(--sc-gate-niche-name);
+  }
+
+  .scenic .hud-foot {
+    padding-top: var(--sc-space-1);
+    padding-bottom: var(--sc-gate-foot-pad);
+    text-align: center;
+  }
+
+  .scenic .hud-foot .licence {
+    font-size: var(--sc-gate-foot-text);
+    line-height: var(--sc-gate-foot-leading);
+  }
+}
