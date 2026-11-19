@@ -788,7 +788,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 9.7, 9.10, 9.14_
     - _Design: "New texts"_
 
-  - [ ] 11.2 Add the Telephone state machine
+  - [x] 11.2 Add the Telephone state machine
     - Create `packages/web/src/view/scenic/model/phoneBell.ts`: `PhoneInputs`, `PhoneEvent`, `PhoneEffect`, `PhoneState`, `phoneStep(state, event)` and `callWaiting(state)`, following the state diagram of the design.
     - Create `packages/web/src/view/scenic/model/phoneBell.test.ts` with examples: Opening_Rings after `intro-ended` with a sample target (9.2); no Opening_Rings when the first render has no target; the 20 s Rings stop after a `ghost-started` that did not come from the Answer_Button (9.3, Q17); the Live_Call starts on busy then done with a live report and stops on answer, other report, error or busy, not on Scene changes (9.5); `answered` yields `stop` (9.12); `callWaiting` (9.14).
     - Verify: `npm run check` exits `0`.
