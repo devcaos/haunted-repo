@@ -170,8 +170,8 @@ function lockedArt(slot: SlotPlacement): ShapeNode {
 /** A small lit candle on the slot bottom with a warm pool of light around it. */
 function exorcisedArt(slot: SlotPlacement): ShapeNode {
   const { y1, y2 } = CANDLE_EXTENT;
-  // About a third of the slot height, smaller when the floor is crowded.
-  const s = round4((slot.rect.h / 3 / (y2 - y1)) * slot.ghostScale);
+  // Half the slot height, made smaller only if it would not fit the slot width.
+  const s = round4(Math.min((slot.rect.h * 0.5) / (y2 - y1), slot.rect.w / 70));
   const flame = g(
     "flame",
     [
@@ -217,7 +217,7 @@ function exorcisedArt(slot: SlotPlacement): ShapeNode {
           ["stop-flame-2", 1],
         ]),
       ]),
-      ellipse("candle-light", 0, 250, 150, 110, {
+      ellipse("candle-light", 0, 236, 175, 84, {
         part: "candle-light",
         paint: "candle-pool",
       }),

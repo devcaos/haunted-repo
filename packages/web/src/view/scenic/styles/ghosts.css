@@ -203,11 +203,11 @@
  */
 .slot-exorcised .stop-pool-0 {
   stop-color: var(--sc-warm-orange);
-  stop-opacity: 0.55;
+  stop-opacity: 1;
 }
 .slot-exorcised .stop-pool-1 {
   stop-color: var(--sc-candle);
-  stop-opacity: 0.25;
+  stop-opacity: 0.5;
 }
 .slot-exorcised .stop-pool-2 {
   stop-color: var(--sc-candle);

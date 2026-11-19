@@ -862,12 +862,12 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
       const [x = 0, y = 0] = group?.transform?.translate ?? [];
       const s = group?.transform?.scale ?? 1;
       const { x1, y1, x2, y2 } = CANDLE_EXTENT;
-      // The candle stands on the slot bottom, inside the slot, about a third of its height.
+      // The candle stands on the slot bottom, inside the slot, up to half its height.
       expect(y + y2 * s).toBeCloseTo(slot.rect.y + slot.rect.h, 1);
       expect(x + x1 * s).toBeGreaterThanOrEqual(slot.rect.x);
       expect(x + x2 * s).toBeLessThanOrEqual(slot.rect.x + slot.rect.w);
-      expect((y2 - y1) * s).toBeLessThanOrEqual(slot.rect.h / 3 + 0.01);
-      expect((y2 - y1) * s).toBeGreaterThan(slot.rect.h / 3 / 2);
+      expect((y2 - y1) * s).toBeLessThanOrEqual(slot.rect.h / 2 + 0.01);
+      expect((y2 - y1) * s).toBeGreaterThan(slot.rect.h / 4);
     }
   });
 
