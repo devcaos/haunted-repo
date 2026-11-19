@@ -639,7 +639,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 2
 
-- [ ] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
+- [x] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
   - Branch: `feat/scenic-web-2a`. Stacks on: an up-to-date `main` (PR 1f is merged and task 8.1 is approved); the PR targets `main`.
   - Estimate: ~700 changed lines (task 9.1 is withdrawn). Model: Auto (Opus only with the director's yes).
   - Split on 19 Nov (director): part 1 = PR #62 (9.2, 9.3, 9.4, 9.8 and the visual fixes); part 2 = 9.5, 9.6, 9.7, 9.9 on branch `feat/scenic-web-2a-2` from main.
@@ -670,7 +670,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.1, 6.3, 6.8_
     - _Design: "Palette", "Ghost states"_
 
-  - [ ] 9.5 Finish the idle motion rules
+  - [x] 9.5 Finish the idle motion rules
     - Source_Scan item 11 first: the `@keyframes` `wisp-float`, `wraith-sway` and `brute-heave` already exist in `motion.css` with their `.ghost--<type> .ghost-idle` rules; the test asserts that they exist and that their bodies differ.
     - In `motion.css` (no-preference block): `flame-flicker` for the `.flame` of the Exorcised candle (`--sc-dur-flame-flicker`), and no idle animation on Locked ghosts (`.look-locked .ghost-idle`). Remove the unused tokens `--sc-dur-bats-fly` and `--sc-dur-window-flicker` from `scenic-tokens.css`.
     - Verify: `npm run check` exits `0`.
@@ -678,7 +678,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.7, 6.2, 18.4_
     - _Design: "Animation Catalogue", "Source_Scan additions" item 11_
 
-  - [ ] 9.6 Add the Bestiary texts and the texts test
+  - [x] 9.6 Add the Bestiary texts and the texts test
     - In `texts.ts` add `bestiary` (`title`, `names`, `ranges`, `rangeLine`) with the design values (additions only).
     - Create `packages/web/src/view/scenic/model/scenicTexts.test.ts`: three Bestiary entries in the order Wisp, Lantern_Wraith, Chained_Brute with names, floor titles from `TEXTS.floorTitles` and ranges; for each range `floorOf(low)` and `floorOf(high)` return its floor; every new `TEXTS` key added so far exists; every `POWER_TEXTS` addition contains "Power".
     - Verify: `npm run check` exits `0`.
@@ -686,7 +686,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 7.1, 7.2, 7.3, 7.5_
     - _Design: "New texts", "Test files" (scenicTexts.test.ts)_
 
-  - [ ] 9.7 Add the Bestiary and the ghost icons to the HUD
+  - [x] 9.7 Add the Bestiary and the ghost icons to the HUD
     - Create `packages/web/src/view/scenic/bestiary.ts`: `section.bestiary` with `h2` "Bestiary" and three list entries (small `aria-hidden` SVG of Variant 0 in the Haunted look, still; name in `strong`, floor title and range line as HTML text); below 64rem a `button` with `aria-expanded` and `aria-controls` folds the list (closed at load, D2).
     - In `hud.ts` add the Bestiary in every render, and replace the Ghost_Icon spans of task 1.9 with tiny `aria-hidden` SVGs (Candle flame for exorcised, Spectral Wisp head for haunted), exorcised first. Bestiary and icon styles in `hud.css`.
     - Extend `art.test.ts`: the Bestiary art is Variant 0 in the Haunted look for any input.
@@ -702,7 +702,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.8_
     - _Design: "Gallery (dev only)"_
 
-  - [ ] 9.9 Checkpoint and PR 2a
+  - [x] 9.9 Checkpoint and PR 2a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 2b, task 10.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.

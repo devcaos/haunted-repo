@@ -107,6 +107,8 @@
   --sc-stage-wide: min(100vw, 160dvh);
   --sc-viewport-height: 100vh;
   --sc-icon-size: 1.25rem;
+  --sc-bestiary-art-w: 3.5rem;
+  --sc-bestiary-art-h: 4.5rem;
   --sc-meter-height: 0.75rem;
   --sc-field-min: 12rem;
   /* Focus */
@@ -143,8 +145,6 @@
   --sc-dur-rain-fall: 600ms;
   --sc-dur-rain-far: 1600ms;
   --sc-dur-fog-drift: 24s;
-  --sc-dur-bats-fly: 22s;
-  --sc-dur-window-flicker: 3.2s;
   --sc-dur-wisp-float: 5.6s;
   --sc-dur-motes: 9s;
   --sc-dur-wraith-sway: 4.2s;

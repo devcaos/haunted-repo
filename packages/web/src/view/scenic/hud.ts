@@ -1,6 +1,9 @@
 import { TEXTS } from "../../logic/texts.js";
+import { ghostIconArt, ICON_BOX } from "./art/icons.js";
+import { createBestiary } from "./bestiary.js";
 import { el, setText } from "./dom.js";
 import type { HudView } from "./model/hudView.js";
+import { createSvgRoot, mountShape } from "./svg.js";
 
 export interface HudHandlers {
   /** The Live_Plaque was submitted (button or Enter); `url` is the field text as typed. */
@@ -18,6 +21,17 @@ export interface Hud {
   update(view: HudView): void;
 }
 
+/** One tiny decorative SVG: a Candle flame (exorcised) or a Spectral Wisp head (haunted). */
+function ghostIcon(state: "haunted" | "exorcised"): SVGSVGElement {
+  const svg = createSvgRoot(
+    { x: 0, y: 0, w: ICON_BOX, h: ICON_BOX },
+    "ghost-icon",
+  );
+  svg.setAttribute("data-icon-state", state);
+  svg.append(mountShape(ghostIconArt(state), `icon-${state}-`));
+  return svg;
+}
+
 /** Builds the HUD once (Requirements 4.1, 4.2, 4.5 to 4.11, 4.13 to 4.16). */
 export function createHud(handlers: HudHandlers): Hud {
   const logo = el("h1", { class: "hud-logo" });
@@ -28,7 +42,6 @@ export function createHud(handlers: HudHandlers): Hud {
     meterLine,
     el("div", { class: "meter-track", "aria-hidden": "true" }, [meterFill]),
   ]);
-  // Empty decorations until the Ghost_Type art exists (task 9.7).
   const icons = el("div", { class: "ghost-icons", "aria-hidden": "true" });
   const simpleLink = el("a", { class: "view-link", href: "?view=simple" }, [
     TEXTS.viewLinks.simple,
@@ -83,6 +96,7 @@ export function createHud(handlers: HudHandlers): Hud {
     showSample,
     powerLine,
     warnings,
+    createBestiary().element,
   ]);
 
   const announcer = el("p", { class: "announcer", "aria-live": "polite" });
@@ -112,15 +126,7 @@ export function createHud(handlers: HudHandlers): Hud {
       const signature = view.icons.join(",");
       if (signature !== iconSignature) {
         iconSignature = signature;
-        icons.replaceChildren(
-          ...view.icons.map((state) =>
-            el("span", {
-              class: "ghost-icon",
-              "aria-hidden": "true",
-              "data-icon-state": state,
-            }),
-          ),
-        );
+        icons.replaceChildren(...view.icons.map((state) => ghostIcon(state)));
       }
 
       plaque.hidden = !view.plaque.visible;

@@ -29,6 +29,7 @@ import {
   type VariantNumber,
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, VARIANTS, ghostArt } from "./ghosts.js";
+import { ICON_BOX, bestiaryArt, ghostIconArt } from "./icons.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
@@ -1153,6 +1154,46 @@ describe("chained doors stand on their floor", () => {
     ).toBeLessThanOrEqual(0.25);
     for (const name of ["door-frame", "door-threshold", "door-hook"]) {
       expect(rule(name)).toMatch(/var\(--sc-iron-dark\)/);
+    }
+  });
+});
+
+describe("Bestiary art and Ghost_Icons (Requirements 4.4, 5.12, 7.1, 7.4)", () => {
+  const TYPES = ["wisp", "lantern-wraith", "chained-brute"] as const;
+
+  it("the Bestiary art is Variant 0 in the Haunted look for any input", () => {
+    for (const type of TYPES) {
+      const tree = bestiaryArt(type);
+      expect(tree).toEqual(ghostArt(type, 0, "haunted"));
+      expect(tree.cls).toContain("look-haunted");
+      expect(tree.cls).not.toContain("look-locked");
+      expect(tree.transform).toBeUndefined();
+      expect(shapeProblems(tree)).toEqual([]);
+    }
+  });
+
+  it("an exorcised icon is a flame and a haunted icon is a Wisp head", () => {
+    const flame = nodesOf(ghostIconArt("exorcised"));
+    const wisp = nodesOf(ghostIconArt("haunted"));
+    expect(flame.map((n) => n.part)).toContain("icon-flame");
+    expect(flame.some((n) => n.part === "icon-wisp")).toBe(false);
+    expect(wisp.map((n) => n.part)).toContain("icon-wisp");
+    expect(wisp.some((n) => n.part === "icon-flame")).toBe(false);
+  });
+
+  it("both icons pass the Shape_Data rules and stay inside their box", () => {
+    for (const state of ["haunted", "exorcised"] as const) {
+      const tree = ghostIconArt(state);
+      expect(shapeProblems(tree), state).toEqual([]);
+      for (const node of nodesOf(tree)) {
+        for (const n of [node.d?.match(/-?\d+(?:\.\d+)?/g) ?? []].flat()) {
+          expect(Number(n)).toBeGreaterThanOrEqual(0);
+          expect(Number(n)).toBeLessThanOrEqual(ICON_BOX);
+        }
+        if (node.kind === "circle") {
+          expect((node.cx ?? 0) + (node.r ?? 0)).toBeLessThanOrEqual(ICON_BOX);
+        }
+      }
     }
   });
 });
