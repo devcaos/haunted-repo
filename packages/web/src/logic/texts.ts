@@ -69,6 +69,12 @@ export const TEXTS = {
   // Scenic view (scenic-web spec): shell texts.
   tagline: "Your repo is haunted. Let's fix that.",
   viewLinks: { simple: "Simple view", scenic: "Scenic view" },
+  phone: {
+    answer: "Answer the phone",
+    answerWaiting: "Answer the phone, a call is waiting",
+    quiet: "The line is quiet.",
+    ring: "RING!",
+  },
   viewLoadFailed: "The page could not be loaded. Please reload it.",
   floorButtonName: (title: string, action: string) => `${title}. ${action}`,
   nameplateName: (

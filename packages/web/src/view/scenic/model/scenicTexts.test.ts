@@ -79,6 +79,12 @@ describe("scenic texts (Requirements 2.2, 7.1 to 7.3, 7.5)", () => {
       "a.ts, Attic, difficulty 12 of 100, Haunted",
     );
     expect(TEXTS.bestiary).toBeDefined();
+    expect(TEXTS.phone).toEqual({
+      answer: "Answer the phone",
+      answerWaiting: "Answer the phone, a call is waiting",
+      quiet: "The line is quiet.",
+      ring: "RING!",
+    });
   });
 
   it("every POWER_TEXTS line names the Power", () => {

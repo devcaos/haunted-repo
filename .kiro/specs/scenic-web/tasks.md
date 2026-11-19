@@ -780,7 +780,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~630 changed lines. Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 2c_
 
-  - [ ] 11.1 Add the telephone texts
+  - [x] 11.1 Add the telephone texts
     - In `texts.ts` add `phone` (`answer`, `answerWaiting`, `quiet`, `ring`) with the design values (additions only); extend `scenicTexts.test.ts` so the new keys are checked.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the telephone texts`
