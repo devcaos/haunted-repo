@@ -70,8 +70,8 @@ const EYE_STYLES: Readonly<Record<VariantNumber, readonly EyeSpec[]>> = {
     { x: 5, y: 32, tilt: -12, rx: 1.9, ry: 1 },
   ],
   1: [
-    { x: -5, y: 33, tilt: 0, rx: 1.4, ry: 1.4 },
-    { x: 5, y: 33, tilt: 0, rx: 1.4, ry: 1.4 },
+    { x: -5, y: 33, tilt: 0, rx: 1.8, ry: 1.8 },
+    { x: 5, y: 33, tilt: 0, rx: 1.8, ry: 1.8 },
   ],
   2: [
     { x: -5, y: 33, tilt: 38, rx: 2.4, ry: 0.6 },
@@ -98,10 +98,10 @@ export interface Variant {
 /** The same five Variants for all three types, so the size order of 5.6 holds at each. */
 export const VARIANTS: Readonly<Record<VariantNumber, Variant>> = {
   0: { scale: 1, tilt: 0, eyes: 0 },
-  1: { scale: 0.9, tilt: -6, eyes: 1 },
-  2: { scale: 1.08, tilt: 5, eyes: 2 },
-  3: { scale: 0.95, tilt: 9, eyes: 3 },
-  4: { scale: 1.04, tilt: -3, eyes: 4 },
+  1: { scale: 0.82, tilt: -12, eyes: 1 },
+  2: { scale: 1.12, tilt: 7, eyes: 2 },
+  3: { scale: 0.92, tilt: 14, eyes: 3 },
+  4: { scale: 1.05, tilt: -7, eyes: 4 },
 };
 /**
  * The eyes are drawn twice the reference size: the ghosts are about a quarter
