@@ -24,6 +24,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 10. [ ] Vídeo, textos de Devpost y bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26 (se hacen todos; decidido el 15 nov). Es lo último: el código se congela el 27 nov y la entrega es el 4 dic 2026 a las 23:00 (hora de España)
 
 ## Pendientes (Low, ideas, "después si da tiempo")
+- Low (scenic-web, fix/scenic-nameplate-rail, 19 nov): a 1024x768 el raíl de Nameplates aún hace un poco de scroll con cuatro Cards; el botón "Start the exorcism" se alcanza con Tab, que lo desplaza a la vista.
 - Seguimiento (PR 1f, ronda 4, 18 nov): el fuego, el péndulo del reloj y los faroles de la ilustración están quietos, porque la imagen es un dibujo fijo. Si da tiempo, animarlos con capas propias de la página encima de la imagen (sin filtros), como la lluvia y la niebla.
 - Low (PR 1f, ronda 4, 18 nov): quedan tokens del arte borrado sin uso en `scenic-tokens.css` (`--sc-depth-*`, `--sc-dur-motes`, `--sc-mote-drift-*`, `--sc-dur-window-flicker`, `--sc-fg-rim-opacity`, entre otros). Quitarlos o reutilizarlos cuando se animen el fuego y los faroles.
 - Low (PR 1f, ronda 4, 18 nov): el encuadre de la casa (camera.ts, sceneArea) cuenta con que la barra lateral (22 rem) tapa hasta x 400 del escenario, que es cierto a 1440 x 900. A 1280 x 720 también sale bien (400), pero a 1024 de ancho la barra tapa hasta x 550 y el porche (x 280 a 362) queda medio detrás. Si hace falta, calcular el área visible con el ancho real de la ventana.
