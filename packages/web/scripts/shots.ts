@@ -5,10 +5,12 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import type { Floor } from "@haunted-repo/core";
 import {
   chromium,
   type Browser,
   type BrowserContext,
+  type Page,
   type Route,
 } from "playwright";
 import {
@@ -23,6 +25,7 @@ import {
   type ShotSize,
   type ShotState,
 } from "../src/tooling/shotList.ts";
+import { TEXTS } from "../src/logic/texts.ts";
 import { createFakeGitHub } from "../../core/src/ghost-detection/fakeGitHub.testutil.ts";
 
 const webDir = fileURLToPath(new URL("..", import.meta.url));
@@ -249,6 +252,7 @@ async function main(): Promise<void> {
     url: string,
     ready: string,
     fullPage = false,
+    act?: (page: Page) => Promise<void>,
   ): Promise<void> => {
     const fileName = shotFileName(state, size);
     await step(fileName, async () => {
@@ -256,6 +260,7 @@ async function main(): Promise<void> {
       page.setDefaultTimeout(10_000);
       await page.goto(url);
       await page.waitForSelector(ready);
+      if (act !== undefined) await act(page);
       await page.waitForFunction(noFiniteMotion);
       const result = await page.evaluate(runChecks);
       for (const warning of result.warnings) {
@@ -290,7 +295,42 @@ async function main(): Promise<void> {
     }
     const house = `${PREVIEW_ORIGIN}/haunted-repo/?view=scenic`;
     await shoot(normal, "01-house", size, house, "svg.house");
+    // Floors are reached the way a visitor does: a click on the floor button of the House.
+    const goTo = (floor: Floor, title: string) => async (page: Page) => {
+      await page.click(`nav.floor-stair button:has-text("${title}")`);
+      await page.waitForSelector(
+        `main.stage[data-scene="floor"][data-floor="${floor}"]`,
+      );
+      await page.waitForSelector("ul.nameplates:not([hidden])");
+    };
+    // The Nameplates sit under the stage on narrow screens, so those shots are full page.
+    const tall = size.width < 1024;
+    const floors: [ShotState, Floor, string][] = [
+      ["02-floor-attic", "attic", TEXTS.floorTitles.attic],
+      ["03-floor-middle", "middle floor", TEXTS.floorTitles["middle floor"]],
+      ["04-floor-basement", "basement", TEXTS.floorTitles.basement],
+    ];
+    for (const [state, floor, title] of floors) {
+      await shoot(
+        normal,
+        state,
+        size,
+        house,
+        "nav.floor-stair button",
+        tall,
+        goTo(floor, title),
+      );
+    }
     await shoot(reduced, "16-reduced-house", size, house, "svg.house");
+    await shoot(
+      reduced,
+      "17-reduced-floor-attic",
+      size,
+      house,
+      "nav.floor-stair button",
+      tall,
+      goTo("attic", TEXTS.floorTitles.attic),
+    );
     await shoot(
       normal,
       "19-gallery",

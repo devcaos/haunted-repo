@@ -759,7 +759,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 8.3, 17.12, 17.13, 19.4, 21.3_
     - _Design: "Props and panels" (Nameplate), "World geometry"_
 
-  - [ ] 10.7 Add the floor screenshots
+  - [x] 10.7 Add the floor screenshots
     - In `shotList.ts` and `shots.ts` add `02-floor-attic`, `03-floor-middle`, `04-floor-basement` and `17-reduced-floor-attic`; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot the floor scenes`
