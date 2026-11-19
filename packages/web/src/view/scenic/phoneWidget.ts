@@ -23,6 +23,8 @@ export interface PhoneUpdate {
   /** True in the render where the Scene changed: the Phone_Bubble goes away. */
   sceneChanged: boolean;
   phone: PhoneView;
+  /** `callWaiting(state)`: the accessible name also says a call is waiting (9.14). */
+  callWaiting: boolean;
 }
 
 export interface PhoneWidget {
@@ -49,6 +51,7 @@ export function createPhoneWidget(
   parents: PhoneParents,
   send: (action: UserAction) => boolean,
   announce: (text: string) => void,
+  onAnswered: () => void,
 ): PhoneWidget {
   const icon = createSvgRoot(
     { x: 0, y: 0, w: ICON_BOX, h: ICON_BOX },
@@ -82,6 +85,8 @@ export function createPhoneWidget(
   };
 
   button.addEventListener("click", () => {
+    // Answering stops any Ring or Live_Call first (9.12).
+    onAnswered();
     if (phone.source === "live") {
       showBubble(phone.powerLine ?? TEXTS.phone.quiet);
       return;
@@ -101,6 +106,10 @@ export function createPhoneWidget(
     element,
     update(update: PhoneUpdate): void {
       phone = update.phone;
+      button.setAttribute(
+        "aria-label",
+        update.callWaiting ? TEXTS.phone.answerWaiting : TEXTS.phone.answer,
+      );
       const parent = update.place === "pinned" ? parents.overlay : parents.dock;
       if (element.parentElement !== parent) {
         const hadFocus = element.contains(document.activeElement);

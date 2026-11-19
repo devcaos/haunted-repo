@@ -822,7 +822,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.7, 9.8, 9.9, 9.10, 9.11, 9.14, 17.4, 17.5_
     - _Design: "DOM modules" (phoneWidget.ts), D14_
 
-  - [ ] 11.6 Ring the Telephone from the renderer
+  - [x] 11.6 Ring the Telephone from the renderer
     - In `renderer.ts`: send `render` events with `PhoneInputs` every render; send `intro-ended` at the first House_Scene render (the Intro is cut, so the Opening_Rings start there, D13); send `ghost-started` whenever any `start-ghost` is sent (Answer_Button or Nameplate start button, Q17) and `answered` on the Answer_Button; run the effects with `window.setTimeout` (2 s per Ring, 20 s waits) and the `is-ringing` class; timers read `guard.current()` when they fire.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): ring the telephone in the house scenes`

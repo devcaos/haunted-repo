@@ -203,6 +203,16 @@ function runChecks(): CheckResult {
   }
   return { problems, warnings };
 }
+/** The shots of the House and of a floor, taken after the Opening_Rings. */
+const QUIET_PHONE_SHOTS: ReadonlySet<ShotState> = new Set<ShotState>([
+  "01-house",
+  "02-floor-attic",
+  "03-floor-middle",
+  "04-floor-basement",
+  "16-reduced-house",
+  "17-reduced-floor-attic",
+]);
+
 async function main(): Promise<void> {
   if (!existsSync(fileURLToPath(new URL("../dist", import.meta.url)))) {
     console.error("packages/web/dist was not found. Run npm run build first.");
@@ -260,6 +270,12 @@ async function main(): Promise<void> {
       page.setDefaultTimeout(10_000);
       await page.goto(url);
       await page.waitForSelector(ready);
+      // The Opening_Rings last about 6 s: wait for them to end so the frame is stable.
+      if (QUIET_PHONE_SHOTS.has(state)) {
+        await page.waitForFunction(
+          () => document.querySelector(".phone-widget.is-ringing") === null,
+        );
+      }
       if (act !== undefined) await act(page);
       await page.waitForFunction(noFiniteMotion);
       const result = await page.evaluate(runChecks);
