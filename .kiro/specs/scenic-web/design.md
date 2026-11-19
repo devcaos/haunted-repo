@@ -82,14 +82,14 @@ packages/web/
         sceneControls.ts            Scene_Heading, back, floor stair, Nameplates
         phoneWidget.ts              Answer_Button, RING! bubble, Phone_Bubble
         ghostScene.ts  grimoire.ts  close-up room and Grimoire DOM
-        intro.ts  effects.ts        Intro, Lightning, Return_Glow and Finale timers
+        effects.ts                  Lightning, Return_Glow and Finale timers
         model/                      PURE, no DOM (checked by the Source_Scan)
           actionGuard.ts  sceneLayout.ts  camera.ts  renderMemory.ts
           phoneBell.ts  lightningClock.ts  reactions.ts  scenicFocus.ts
           hudView.ts  grimoireView.ts
           viewModelArb.testutil.ts  *.test.ts  contrast.test.ts
         art/                        Shape_Data (pure data and builders)
-          shapes.ts  weather.ts  house.ts  props.ts  ghosts.ts  room.ts
+          shapes.ts  weather.ts  house.ts  props.ts  ghosts.ts  room.ts  effects.ts
           art.test.ts
         styles/
           scenic-tokens.css  base.css  hud.css  stage.css
@@ -109,7 +109,7 @@ flowchart LR
   SE --> Simple[view/simple/*]
   Simple --> Shared[view/shared/focus.ts]
   CE --> R[scenic/renderer.ts]
-  R --> DOM[hud, stage, sceneControls, phoneWidget, ghostScene, grimoire, intro, effects]
+  R --> DOM[hud, stage, sceneControls, phoneWidget, ghostScene, grimoire, effects]
   R --> M[scenic/model/* pure]
   M --> Shared
   DOM --> Art[scenic/art/* Shape_Data]
@@ -193,10 +193,9 @@ Everything below lives in the `createScenicRenderer` closure. None of it is stor
 | `phone` | `PhoneState` | `phoneStep` | Opening_Rings, 20 s Rings, ring after Return_Glow, Live_Call, "started once" flag |
 | `phoneTimer`, `ringTimer` | `number \| null` | phone effects | `setTimeout` handles |
 | `phoneBubble` | `string \| null` | Answer_Button | caller's words or "The line is quiet." until the next Scene change or activation (9.11) |
-| `intro` | `"pending" \| "playing" \| "done"` | first House_Scene render, any input, timer | Intro and the start of the Opening_Rings (D13) |
 | `lightningOn` | `boolean` | load (true unless Reduced_Motion), toggle | Lightning (15.5 to 15.9) |
 | `lightningTimer`, `nextFlashDue` | `number \| null` | `lightningClock` | flash schedule independent of renders (15.1) |
-| `reducedMotion`, `wide` | `boolean` | `motion.ts` media listeners | timers, Intro skip, Camera numbers, layout |
+| `reducedMotion`, `wide` | `boolean` | `motion.ts` media listeners | timers, Camera numbers, layout |
 | `vigour` | `Vigour` | `reactions.ts` | close-up ghost size and opacity (11.2 to 11.7) |
 | `reaction` | `{ kind; timer } \| null` | `send()` of a ghost action | playing Reaction (11.10, 11.11) |
 | `answerBox` | `{ key: string; el: HTMLTextAreaElement } \| null` | Grimoire render | keep the typed text for the same question (10.10) |
@@ -356,7 +355,7 @@ export interface PhoneInputs {
 }
 export type PhoneEvent =
   | { type: "render"; inputs: PhoneInputs }
-  | { type: "intro-ended" }           // or "no Intro": the first House_Scene is on screen
+  | { type: "intro-ended" }           // the first House_Scene is on screen (the Intro is cut, D13)
   | { type: "ring-ended" }
   | { type: "wait-ended" }
   | { type: "answered" }
@@ -407,9 +406,9 @@ export const FLASH_MAX_MS = 15_000;
 export function nextFlashDelay(random: number): number; // FLASH_MIN_MS + Math.floor(random * 5001)
 export function flashAllowed(input: {
   toggleOn: boolean; reducedMotion: boolean;
-  scene: "house" | "floor" | "ghost"; introPlaying: boolean; finale: boolean;
+  scene: "house" | "floor" | "ghost"; finale: boolean;
   ringPlaying: boolean; exorcisedMomentPlaying: boolean;
-}): boolean; // toggleOn && !reducedMotion && scene !== "ghost" && !introPlaying && !finale && !ringPlaying && !exorcisedMomentPlaying (D7, D8, Q7)
+}): boolean; // toggleOn && !reducedMotion && scene !== "ghost" && !finale && !ringPlaying && !exorcisedMomentPlaying (D7, D8, Q7)
 ```
 
 The renderer schedules the next due time from the previous due time (`due + nextFlashDelay(Math.random())`), never from a render (15.1). A due flash that is not allowed, including one that falls during a Ring or an Exorcised_Moment, is skipped and the next one is scheduled (15.2, decision Q7).
@@ -491,19 +490,18 @@ export type Keyword = "transparent" | "currentColor" | "none" | "inherit";
 export interface ShapeNode { /* see Data Models */ }
 export function g(cls: string, children: ShapeNode[], extra?: Partial<ShapeNode>): ShapeNode; // and path(), rect(), circle(), ellipse(), poly()
 
-// weather.ts, house.ts, props.ts, ghosts.ts, room.ts: builders that return ShapeNode trees
-export function skyLayers(): ShapeNode;        // sky, moon, clouds, far and near hills
-export function houseLayer(): ShapeNode;       // walls, roof, tower, rooms, telephone table, door
-export function foregroundLayer(): ShapeNode;  // fence, gravestones, dead tree
-export function weatherLayer(): ShapeNode;     // rain, fog
-export function effectsLayer(): ShapeNode;     // lightning, search beam, dawn, bats, facade (Intro)
-export function slotArt(slot: SlotPlacement): ShapeNode; // ghost | cloche | candle (no window)
+// weather.ts, house.ts, props.ts, ghosts.ts, effects.ts, room.ts: builders that return ShapeNode trees
+export function sceneBackdrop(href: string | null): ShapeNode; // house.ts: the scene illustration as one <image>, or a plain rectangle when the asset falls back
+export function weatherLayer(): ShapeNode;     // weather.ts: rain, fog
+export function effectsLayer(): ShapeNode;     // effects.ts: search beam, lightning, dawn
+export function slotArt(slot: SlotPlacement): ShapeNode; // ghost | cloche | candle (no ghost when exorcised)
 export function chainedDoorArt(floor: Floor): ShapeNode;
-export function telephoneArt(): ShapeNode;
+export function ringEffectsArt(): ShapeNode;   // phone-lines and phone-glow around TELEPHONE_ANCHOR (the telephone itself is in the illustration)
 export function ghostArt(type: GhostType, variant: VariantNumber, look: "haunted" | "locked"): ShapeNode;
 export function roomArt(): ShapeNode;          // close-up room, three Question_Candles, light overlays, sparks
 export const GHOST_TYPES: Readonly<Record<GhostType, GhostTypeSpec>>;
-export const VARIANTS: Readonly<Record<GhostType, readonly [VariantSpec, VariantSpec, VariantSpec, VariantSpec, VariantSpec]>>;
+export const EYE_STYLES: readonly [EyeStyle, EyeStyle, EyeStyle, EyeStyle, EyeStyle]; // shared by the three types
+export const VARIANTS: readonly [VariantSpec, VariantSpec, VariantSpec, VariantSpec, VariantSpec]; // scale, tilt, eye style; the same for the three types
 ```
 
 `svg.ts` (DOM):
@@ -529,7 +527,6 @@ export function mountShape(node: ShapeNode, idPrefix: string): SVGElement;
 | `phoneWidget.ts` | `.phone-widget`: RING! bubble (`aria-hidden`), Answer_Button, Phone_Bubble | Lives in `.world-overlay` for the house and middle-floor frames, in `.scene-dock` for attic and basement frames (D14). Hidden and out of the tab order in the Ghost_Scene (9.7). |
 | `ghostScene.ts` | `.room` layer: room `svg`, close-up ghost (`.ghost-vigour` > `.ghost-react` > `.ghost-idle` > art), Question_Candles, light overlays, sparks | Created on entering the Ghost_Scene, kept for the visit, removed on leaving after the fade. |
 | `grimoire.ts` | Grimoire `section` from `grimoireView` | Keeps the Answer_Box element while its key is unchanged; never reads `.value` and adds no `input` or `change` listener. |
-| `intro.ts` | facade doors, input swallowing | See Requirement 16 notes under "Animation Catalogue". |
 | `effects.ts` | Lightning timer, Return_Glow timer, Finale class timing, Search_Beam class | Uses `window.setTimeout` only. |
 | `motion.ts` | `watchMedia(query, onChange)` for `(prefers-reduced-motion: reduce)` and `WIDE_QUERY` | Applies changes within the same task (18.9). |
 | `fonts.ts` | `loadScenicFonts()` | `new FontFace(family, \`url("${url}") format("woff2")\`, { weight: "400", style: "normal", display: "swap" })`, `document.fonts.add(face)`, `face.load().catch(() => undefined)`. A failed font only leaves the fallback stack (21.7). |
@@ -603,7 +600,7 @@ export interface ShapeNode {
   kind: ShapeKind;
   cls?: string;          // class names: /^[a-z][a-z0-9-]*( [a-z][a-z0-9-]*)*$/
   id?: string;           // only on defs children (gradients, clip paths); prefixed at mount
-  part?: string;         // semantic part for tests ("outline", "horns", "tail-spiral"...); written as data-part
+  part?: string;         // semantic part for tests ("outline", "lantern", "shackles"...); written as data-part
   d?: string;            // path data: /^[MmLlHhVvCcSsQqTtAaZz0-9.,\s-]+$/ only
   points?: readonly number[];
   x?: number; y?: number; width?: number; height?: number; rx?: number; ry?: number;
@@ -631,19 +628,19 @@ The house SVG uses one viewBox for the whole scene. The world box always keeps t
 | HUD quiet column, left (wide) | 0, 110, 400, 890 | Far hills, fence and gravestones only. |
 | Nameplate rail (wide, Floor_Scene) | 400, 720, 1200, 280 | Stage area below the framed floor. |
 | Ground line of the illustration | y 711 | The rain stops here (`GROUND_Y`). |
-| House outline | polygon (362, 511), (756, 127), (1149, 511), (1144, 711), (367, 711) | `HOUSE_POLYGON` in `art/house.ts`; the symmetric gable and the porch lantern at x 280 are in the picture. |
+| House outline | polygon (362, 511), (756, 127), (1149, 511), (1144, 711), (367, 711) | `HOUSE_POLYGON` in `art/house.ts`; the symmetric gable and the porch lantern (about (354, 629)) are in the picture. |
 | Tower | polygon (1102, 711), (1102, 284), (1178, 56), (1253, 284), (1253, 711) | `TOWER_POLYGON`; a straight tower with a spire. |
 | Rain clip | the union of the two outlines above, cut out of the sky down to y 711 | `HOUSE_OUTLINE`, so the page rain never falls on the house. |
 | **Attic floor** | 437, 173, 637, 300 | A triangle under the roof (437, 473), (756, 173), (1074, 473); its floor line is y 473. |
 | Attic slot band | 570, 370, 370, 100 | Under both roof slopes. |
 | **Middle floor** | 418, 496, 675, 200 | Entrance_Hall on the left, Parlour on the right. |
-| Telephone | anchor (536, 611) | The old telephone on its table in the hall (`TELEPHONE_ANCHOR`). Task 11.1 pins the widget here. |
+| Telephone | anchor (536, 611) | The old telephone is painted in the illustration, on its table in the hall (`TELEPHONE_ANCHOR`). The page draws only the Ring effects here; task 11.5 pins the phone widget here. |
 | Middle slot band | 640, 515, 430, 170 | Starts right of the telephone. |
 | **Basement** | 418, 718, 675, 195 | Below the ground line. |
 | Basement slot band | 555, 740, 315, 160 | Between the boiler and the cellar stairs. |
 | Pieces no ghost may cover | telephone (505, 605, 62, 85), boiler (466, 748, 82, 112), stairs (878, 718, 189, 195) | `ILLUSTRATION_PROPS`. |
 | Moon | centre (1210, 175), r 64 | The one main light of the house scenes. |
-| Search_Beam origin | (440, 860) | Lantern on the last fence post. |
+| Search_Beam origin | (354, 629) | The porch lantern painted in the illustration (asset (319, 566) × 10/9). |
 | Lightning bolt | inside 420, 110, 110, 310 | Between the HUD column and the house. |
 | Floor stair (wide, stage units) | buttons centred at x 1460, y 415 (attic), 630 (middle floor), 850 (basement) | Outside the Camera; same place in every Scene. |
 | Scene dock (wide, stage units) | 1340, 930 | Phone widget when docked (D14). |
@@ -659,7 +656,7 @@ slot j = { x: B.x + j * cell + G / 2, y: B.y, w: cell - G, h: B.h }   for j = 0 
 
 Every slot lies inside `B`, and `B` lies inside its floor rectangle, so every slot is inside its floor. Two slots of one floor share at most an edge of width 0 (they are `G` apart). The ghost on a slot is drawn at its natural size times its Variant scale times one floor factor `k = min(1, (cell - G) / (1.08 * W), B.h / (1.08 * H))`, where `W × H` is the largest box of that floor's Ghost_Type. The same `k` is used for every slot of a floor, so the Variant sizes stay comparable. With `n = 5`: attic slots 66 × 100, middle floor 78 × 170, basement 55 × 160.
 
-The Ghost_Slots have no window and no shadow: windows drawn over the walls of the illustration clashed with it, and a ghost floats, so it casts no shadow (director's decision, 18 Nov).
+The Ghost_Slots have no shadow: a ghost floats, so it casts no shadow (director's decision, 18 Nov).
 
 A floor with no Card draws a chained door centred in its slot band: 70 wide, band height minus 10 (Requirement 8.6).
 
@@ -691,15 +688,17 @@ At every Variant number the three types use the same scale (table below), so the
 
 ### Variants (Requirement 5.9)
 
-| # | Scale | Tilt | Wisp eyes / accessory | Lantern_Wraith eyes / accessory | Chained_Brute eyes / accessory |
-| --- | --- | --- | --- | --- | --- |
-| 0 | 1.00 | 0° | small tilted ovals / none | slits / none | narrow / none |
-| 1 | 0.90 | −6° | wide / spider on the cobweb | round / scarf | angry / iron ball on the chain |
-| 2 | 1.08 | 5° | sleepy / dust puff | half-lidded / key ring | three eyes / broken shackle |
-| 3 | 0.95 | 9° | wink / moth | one glint / book | squint / rusty nail in the shoulder |
-| 4 | 1.04 | −3° | spiral (dizzy) / old key | star / hourglass | wide / cracked horn |
+The five Variants differ by scale, tilt and eye style only; there are no accessories. Scale and tilt are the same for the three types, so the size order of 5.6 holds at every Variant. The five eye styles are shared by the three types and are built from the shapes of the Variant 0 eyes (an ellipse with a soft glow circle). The Lantern_Wraith keeps its `lantern` and the Chained_Brute its `shackles` and `chain` at every Variant.
 
-Every pair of Variants of a type differs in scale, so all five look different; eyes and accessory make the difference easy to see.
+| # | Scale | Tilt | Eye style |
+| --- | --- | --- | --- |
+| 0 | 1.00 | 0° | pair: two small tilted ovals, as in the reference |
+| 1 | 0.90 | −6° | round: two untilted round eyes |
+| 2 | 1.08 | 5° | slits: two thin ovals, steeply tilted |
+| 3 | 0.95 | 9° | uneven: one larger oval and one smaller |
+| 4 | 1.04 | −3° | wide-set: the pair of Variant 0, further apart |
+
+Every pair of Variants of a type differs in scale, so all five differ; tilt and eye style make the difference easy to see. The eyes stay small at every Variant (eye height under 5 % of the box height, 5.1).
 
 ### Shots (Requirement 24.4, 24.5, 24.10)
 
@@ -707,7 +706,7 @@ File name: `<state>-<width>x<height>.png` in `packages/web/shots/`, sizes `1440x
 
 | State id | What is on screen |
 | --- | --- |
-| `01-house` | House_Scene of the sample after the Intro and the Opening_Rings |
+| `01-house` | House_Scene of the sample after the Opening_Rings |
 | `02-floor-attic`, `03-floor-middle`, `04-floor-basement` | Floor_Scenes (basement empty in the sample) |
 | `05-ghost-explaining`, `06-ghost-asking` | Ghost_Scene of `bench/static.js` |
 | `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know` | end state of each Reaction |
@@ -723,7 +722,7 @@ That is 19 states × 2 sizes = 38 PNG files.
 
 ## Art System
 
-- **One SVG for the house.** `stage.ts` mounts one `svg.house` with layers in this order (back to front): `sky`, `moon-clouds`, `hills-far`, `hills-near`, `house` (walls, rooms, telephone table, door), `slots`, `dims` (floor dim overlays), `telephone`, `weather` (rain, fog), `foreground`, `effects` (search beam, lightning, dawn, bats, facade). Each layer is a `g` with a class; the slot layer is rebuilt only when `slotSignature` changes.
+- **One SVG for the house.** `stage.ts` mounts one `svg.house` with layers in this order (back to front): the scene illustration (`scene-art`, one `<image>`, or `scene-fallback` when the asset falls back), `slots`, `dims` (floor dim overlays), `telephone` (the Ring effects), `weather` (rain, fog) and `effects` (search beam, lightning, dawn). Each layer is a `g` with a class; the slot layer is rebuilt only when `slotSignature` changes.
 - **HTML pinned to the art.** `.world-overlay` has the same box as the SVG and holds only the phone widget when the frame is the house or the middle floor. Its CSS is `transform: translate(-50%, -100%) scale(var(--cam-counter))`, so it keeps its CSS size while the Camera scales the world, and it moves with the art during a Camera move (both use the camera duration and easing).
 - **HTML outside the Camera.** Scene_Heading, back button, floor stair, Nameplates, docked phone widget and Finale banner are positioned in the stage, not in the world, so they never leave the screen when the Camera zooms (Requirements 8.13, 9.7, D14).
 - **Dimmed floors.** A `rect.dim` per floor (Night, `opacity: var(--sc-dim)` = 0.65) over the floor rectangle, visible on the two other floors in a Floor_Scene. A Night overlay at 0.65 leaves roughly 35 % of the brightness (D3).
@@ -794,15 +793,15 @@ The Lantern_Wraith and the Chained_Brute use the same drawing with the scale and
 ### Ghost states
 
 - **Haunted:** body Spectral, cold-blue glow, idle animation (Requirements 6.1, 6.2).
-- **Locked:** same Ghost_Type and Variant with class `look-locked` (body and eyes Mist, whole ghost at `--sc-locked` 0.45, no glow, no idle) inside the Cloche: a bell-jar dome 1.25 × the ghost box wide and 1.3 × high (glass fill Spectral at 0.12, a Bone highlight streak at 0.4 on the upper left, outline Mist), a Brass base plate, and a Brass padlock (body 14 × 12, Bone shackle) centred on the plate. The Cloche is the same for every Locked Card, scaled to the slot (6.3).
-- **Exorcised:** no ghost (6.7). A lit candle (Bone wax 10 × 22, Candle flame teardrop with a Pumpkin core) at the slot bottom, a warm-orange radial light r 40. The slot has no window (12.5 withdrawn). Built in task 9.3; until then an Exorcised slot draws nothing.
+- **Locked:** same Ghost_Type and Variant with class `look-locked` (body and eyes Mist, whole ghost at `--sc-locked` 0.45, no glow, no idle) inside the Cloche: a bell-jar dome 1.25 × the ghost box wide and 1.3 × high (glass fill Spectral at 0.12, a Bone highlight streak at 0.4 on the upper left, outline Mist), a Brass base plate, and a Brass padlock (body 14 × 12, Bone shackle) centred on the plate. The Cloche is the same for every Locked Card, scaled to the slot (6.3). Built in task 9.3.
+- **Exorcised** (director's decision, 19 Nov): no ghost (6.7). In one slot-exorcised group, a small lit candle stands at the slot bottom (parts `candle` and `flame`: Bone wax 10 × 22, Candle flame teardrop with a Pumpkin core) with a warm-orange radial pool of light around it (part `candle-light`, r 40, stops from `--sc-warm-orange`, 6.8), both scaled with the floor factor `k` and sized so they read at house scale over the dark illustration. Built in task 9.3; until then an Exorcised slot draws nothing.
 
 ### Props and panels
 
 | Piece | Look |
 | --- | --- |
-| Telephone | Original antique rotary desk telephone, no logo, no character: Night trapezoid base 70 × 28 with a Slate top bevel and a Brass trim line; rotary dial r 13 at the front (Brass ring, Bone face, 10 finger holes r 1.6 in Night); two Brass cradle prongs; dog-bone handset 64 × 14 (Slate, Brass ends) resting across the prongs; curly cord of 7 loops (Mist, width 2) from the handset's left end to the base. |
-| Ring | Handset rattle, 3 vibration arcs on each side (Bone), Pumpkin radial glow behind, and the HTML "RING!" bubble (Pumpkin text, Night backing, Pumpkin 2 px border, jagged-corner shape from `clip-path` polygon). |
+| Telephone | Painted in the illustration: the old rotary telephone on its table in the hall, at `TELEPHONE_ANCHOR`. The page draws no telephone of its own. |
+| Ring | Ring effects drawn by the page around the painted telephone: 3 vibration arcs on each side (`phone-lines`, Bone), a Pumpkin radial glow behind (`phone-glow`), and the HTML "RING!" bubble (Pumpkin text, Night backing, Pumpkin 2 px border, jagged-corner shape from `clip-path` polygon). |
 | Question_Candles | Three tall candles on a shelf at the lower right of the room (Bone wax, Brass holders). Unlit: black wick and a thin still Mist smoke line. Lit: Candle flame with a Pumpkin core and a warm glow r 30. |
 | Chained door | Rust door with two Mist chains crossing in an X and a black iron hook; no padlock, so it is never confused with a Locked ghost. |
 | Nameplate | HTML: Night backing, Brass 2 px border with notched corners, path in `--font-code` (Bone), difficulty line (Candle), state label (Spectral when Haunted, Candle when Exorcised, Mist when Locked), reason (Bone, small), locked line (Spectral), start button. |
@@ -814,9 +813,9 @@ The Lantern_Wraith and the Chained_Brute use the same drawing with the scale and
 | Live_Plaque | Brass plaque: Night backing, Brass border, label in Brass (5.63:1), Night input with Bone text and a Mist border, submit button with Night text on Pumpkin. |
 | Phone_Bubble | Speech bubble: Bone backing, Night text, tail pointing to the Telephone. |
 | Finale banner | Night backing, Candle 2 px border, line 1 in IM Fell English Candle, line 2 in the body font Bone. |
-| Search_Beam | A long fan from the lantern at (440, 860): linear gradient Candle 0.5 to 0, sweeping across the house. |
+| Search_Beam | A long fan from the porch lantern painted in the illustration, at (354, 629): linear gradient Candle 0.5 to 0, sweeping across the house. |
 | Lightning | A bolt path (Bone) in the sky plus a full-world Bone rect at 0.35, both in one group whose opacity flashes. |
-| Dawn (Finale) | A horizon band: linear gradient Dawn (bottom) to Rust (middle) to transparent (top), over L0. |
+| Dawn (Finale) | A horizon band clipped to the sky like the rain, so it never covers the house: linear gradient Dawn (bottom) to Rust (middle) to transparent (top), over the sky of the picture. |
 
 ### Typography
 
@@ -834,7 +833,7 @@ Creepster is used only by `.hud-logo` and `.hud-tagline`; IM Fell English by eve
 ### Game-feel rules
 
 1. **Every action answers within 100 ms.** Buttons get a pressed look on `:active` (transform 80 ms); the Logic_Layer renders synchronously inside `dispatch`, so the new state is on screen in the same frame; Reactions start in that render.
-2. **One eye-catching anomaly at a time.** Anomalies are the Intro, a Ring, the Live_Call, the Search_Beam, the Exorcised_Moment, the Return_Glow and the Finale change. They are queued: the Opening_Rings start after the Intro (D13); the Ring after an exorcism starts after the Return_Glow (9.4); the Finale change starts after a Return_Glow of the same render (animation delay of 0.8 s; a delayed start still counts as shown, decision Q8). Rain, fog, idle animations and Lightning are ambience, not anomalies; a flash that falls due during a Ring or an Exorcised_Moment is skipped and counting goes on (decision Q7).
+2. **One eye-catching anomaly at a time.** Anomalies are a Ring, the Live_Call, the Search_Beam, the Exorcised_Moment, the Return_Glow and the Finale change. They are queued: the Opening_Rings start at the first House_Scene render (D13); the Ring after an exorcism starts after the Return_Glow (9.4); the Finale change starts after a Return_Glow of the same render (animation delay of 0.8 s; a delayed start still counts as shown, decision Q8). Rain, fog, idle animations and Lightning are ambience, not anomalies; a flash that falls due during a Ring or an Exorcised_Moment is skipped and counting goes on (decision Q7).
 3. **At least 40 % deep shadow** in every Scene (see composition).
 4. **Nothing symmetric** (see composition).
 5. **One main light per scene:** the moon outside, the window light in the room.
@@ -851,13 +850,10 @@ Every animation animates only `transform` and `opacity` (Requirement 20.1). Ever
 | floor dim (transition) | `rect.dim` | opacity | 700 ms | same | one-shot | 150 ms fade |
 | `rain-fall` | `g.rain` | transform: translate(−40, 200) | 800 ms | linear | infinite | none; drawn still at 0.25 |
 | `fog-drift` | `g.fog` (both bands) | transform: translateX ±60 | 24 s | ease-in-out | infinite alternate | none; still at 0.35 |
-| `bats-fly` | `g.bats` | transform: translate across the sky | 22 s (8 s off screen) | linear | infinite | none; bats hidden |
-| `window-flicker` | `.oculus-light` | opacity 0.5 ↔ 0.9 | 3.2 s | steps(4) | infinite | none; still at 0.8 |
 | `wisp-float` | `.ghost--wisp .ghost-idle` | transform | 5.6 s | ease-in-out | infinite | none |
 | `wraith-sway` | `.ghost--lantern-wraith .ghost-idle` | transform | 4.2 s | ease-in-out | infinite alternate | none |
 | `brute-heave` | `.ghost--chained-brute .ghost-idle` | transform | 3.2 s | ease-in-out | infinite | none |
 | `flame-flicker` | `.flame` (Exorcised slot, lit Question_Candle) | transform: scaleY 1 ↔ 1.08 | 1.6 s | ease-in-out | infinite alternate | none |
-| `phone-rattle` | `.phone-handset` | transform: translateY −5, rotate ±7 | 2 s per Ring (shaking in the first 1.2 s) | linear | 1, 3, or infinite (Live_Call) | none |
 | `phone-buzz` | `.phone-lines` | opacity | 2 s per Ring | steps(10) | same | none; lines hidden |
 | `phone-glow` | `.phone-glow` | opacity 0 → 0.75 → 0.35 | 2 s per Ring | ease-in-out | same | none; still at 0.6 while Ringing |
 | `ring-pop` | `.ring-bubble` | transform scale 0.6 → 1.08 → 1, opacity | 250 ms | `--sc-ease-out` | one-shot per Ring | none; shown still while Ringing |
@@ -879,10 +875,8 @@ Every animation animates only `transform` and `opacity` (Requirement 20.1). Ever
 | `beam-sweep` | `g.search-beam` | transform: rotate −18° ↔ 12° about the lantern | 2.5 s per sweep | ease-in-out | infinite alternate | none; fixed at −3° |
 | `lightning-flash` | `g.lightning` | opacity 0, 1, 0.15, 0.8, 0, 0 at 0, 8, 20, 32, 50, 100 % | 600 ms | linear | one-shot per flash | never shown |
 | `finale-rain-stop` | `g.rain-wrap` | opacity 1 → 0 | 1200 ms (delay 800 ms after a Return_Glow) | ease-out | one-shot | 200 ms fade |
-| `finale-clouds-left`, `finale-clouds-right` | `g.clouds-left`, `g.clouds-right` | transform translateX −160 / +180 | 2000 ms | `--sc-ease-out` | one-shot | none: end position at once |
 | `finale-dawn` | `g.dawn` | opacity 0 → 1 | 2000 ms | ease-in-out | one-shot | 200 ms fade |
 | `banner-in` | `.finale-banner` | opacity, transform translateY 8 → 0 | 400 ms | ease-out | one-shot | 200 ms opacity |
-| `intro-door-left`, `intro-door-right` | `g.facade-left`, `g.facade-right` | transform: scaleX 1 → 0 with skewY ±6°, origin at the outer edge | 1500 ms | ease-in-out | one-shot | Intro skipped |
 | press (transition) | `button:active` | transform translateY(1 px) scale(0.98) | 80 ms | ease-out | one-shot | none (a Pumpkin border change shows the press) |
 | slot point (transition) | `.slot.is-pointed .slot-ring` | opacity | 150 ms | ease-out | one-shot | instant |
 
@@ -891,7 +885,6 @@ Notes:
 - **D6, order inside the room:** "Got it" on the third question starts `react-recoil` (0 to 400 ms), then `exorcise-spiral` (400 to 1000 ms), then `exorcise-sparks` (1000 to 1400 ms). `room-warm` starts in the same render and lasts 1200 ms. The Reaction ends within 1000 ms (11.10) and the room light change within 1.0 to 1.4 s (12.4).
 - **Jumping to an end state** (11.11, 12.9, 18.9): the renderer removes the one-shot class and applies the end classes (`is-gone`, `is-warm`, `is-lit`). Every one-shot keyframe ends on the element's resting style, so removing the class is the end state. A new Reaction on the same element restarts by removing the class, reading `getBoundingClientRect()` once, and adding the class again.
 - **Ghost_Scene pause:** `.stage[data-scene="ghost"] .world *` gets `animation-play-state: paused`, so the house's loops are not "running" behind the room (Requirement 20.4).
-- **Intro input:** while the Intro plays, capture-phase listeners on `window` for `keydown`, `keyup`, `pointerdown`, `mousedown` and `click` call `preventDefault()` and `stopImmediatePropagation()`, end the Intro at once (facade removed in the same task) and keep swallowing the matching `keyup` or `click` of that same input. So the input does not activate a control, move focus, type text or submit the Live_Plaque (16.3). The scene controls are `inert` while it plays (16.4). `render` keeps updating the HUD during the Intro (16.5).
 
 ## Accessibility Design
 
@@ -901,7 +894,7 @@ Notes:
 - The logo is the page `h1`. The Scene_Heading is an `h2` with `tabindex="-1"` (focus target, not a Tab stop). Grimoire section titles and the Bestiary title are `h3` and `h2`.
 - Status_Region: `p.status` with `role="status"` and `aria-live="polite"`, present from the first render, text = `status.text` (empty for `none`), written by `hud.update` only (4.10).
 - Scenic_Announcer: a separate visually hidden `p` with `aria-live="polite"`. The renderer writes the Phone_Bubble text (9.11) and the Finale banner text (13.8) there: it empties the element, then sets the text in a `setTimeout(…, 50)`, so the same sentence is announced again when it repeats.
-- `inert`: on `.world`, `.scene-dock`, `.floor-stair`, `.nameplates` and `.scene-bar` while the Ghost_Scene is shown (10.13, 17.14); on `.world`, `.scene-dock` and `.floor-stair` while the Intro plays (16.4). The HUD is never inert.
+- `inert`: on `.world`, `.scene-dock`, `.floor-stair`, `.nameplates` and `.scene-bar` while the Ghost_Scene is shown (10.13, 17.14). The HUD is never inert.
 
 ### Tab order per Scene (document order)
 
@@ -980,13 +973,13 @@ Only the Latin subset at weight 400, normal style, is bundled. Text outside Lati
 
 | Scene | Steady loops | Extra at worst | Worst total |
 | --- | --- | --- | --- |
-| House or Floor (sample) | rain 1, fog 1, bats 1, oculus flicker 1, slots up to 5 (idle or candle flame) = 9 | Ring 4 (rattle, buzz, glow, bubble), Lightning 1, Camera 1 | 15 |
-| House or Floor during the Finale change | 9 minus rain (stopped) | Finale 4 (rain fade, clouds 2, dawn), Return_Glow 2 (slot drawing, meter) | 15 |
+| House or Floor (sample) | rain 2 (far, near), fog 2 (back, front), slots up to 5 (idle or candle flame) = 9 | Ring 3 (buzz, glow, bubble), Lightning 1, Camera 1 | 14 |
+| House or Floor during the Finale change | 9 (the rain keeps looping while it fades out) | Finale 3 (rain fade, dawn, banner), Return_Glow 2 (slot drawing, meter) | 14 |
 | House or Floor, busy | 9 | Search_Beam 1, Camera 1 (no Ring: no Telephone_Target while busy) | 11 |
 | Ghost_Scene | room window rain 1, close-up idle 1, lit Question_Candles up to 3 | Reaction 2 (incl. smoke "?"), Exorcised_Moment 3, vigour 1, room fade 1 | 12 |
 | Any Scene with Reduced_Motion | 0 loops | fades of 200 ms or less | well under 15 |
 
-The house's loops are paused in the Ghost_Scene, Bestiary drawings are still, clouds are still until the Finale, and rain and fog are each one animated group. The Shots_Script checks the count in every captured state; it turns Lightning off first (24.6), so its real worst case is 14.
+The house's loops are paused in the Ghost_Scene, Bestiary drawings are still, the clouds are painted and always still, and rain and fog are each two animated groups (far and near rain, back and front fog). The Shots_Script checks the count in every captured state; it turns Lightning off first (24.6), so its real worst case is 13.
 
 ### Other choices
 
@@ -1015,7 +1008,7 @@ The house's loops are paused in the Ghost_Scene, Bestiary drawings are still, cl
   - `https://api.github.com/...`: `OPTIONS` gets 204 with `Access-Control-Allow-Origin: *`, `Access-Control-Allow-Methods: GET`, `Access-Control-Allow-Headers: accept, x-github-api-version` (what GitHub answered in the web-demo check). Other requests go to Core's strict fake `createFakeGitHub([{ owner: "lukeed", repo: "sirv", files: texts }])`, where `texts` comes from the committed `src/sample/files.json`. The handler adds `User-Agent: playwright-shots` only when the browser's request headers lack one, as `fakeDetect.testutil.ts` does, and fulfils with the fake's status, headers and body plus `Access-Control-Allow-Origin: *` and `Access-Control-Expose-Headers: x-ratelimit-remaining, x-ratelimit-reset, retry-after`.
   - Any other address: `route.abort()`.
   - For `14-live-busy` the handler waits on a promise before answering; the script takes the shot and then resolves it. Core aborts after 10 s, so the hold is always shorter (decision Q21).
-- **Flow per viewport** (one browser context per size; `reducedMotion: "no-preference"`): open `/haunted-repo/?view=scenic` (stage 4: `/haunted-repo/`), press `Shift` once to end the Intro, activate the Lightning_Toggle (off), wait for the Opening_Rings to end, then: house; attic, middle floor, basement; attic; start `bench/static.js`: explaining; Continue: asking; I don't know (`10`), Continue; Show the model answer + Missed it (`09`); Show + Partly (`08`); Show + Missed it on question 3: failed (`11`); Try again, Continue, Show + Got it (`07`); Show + Got it twice: self-check and Exorcised_Moment (`12`); Yes; start `builder.js`, exorcise it the same way, Yes: Finale (`13`); type `https://github.com/lukeed/sirv` in the Live_Plaque, hold the request: busy (`14`); release: live report (`15`). Then a second context with `reducedMotion: "reduce"` for `16` to `18`, and the Gallery page for `19`.
+- **Flow per viewport** (one browser context per size; `reducedMotion: "no-preference"`): open `/haunted-repo/?view=scenic` (stage 4: `/haunted-repo/`), activate the Lightning_Toggle (off), wait for the Opening_Rings to end, then: house; attic, middle floor, basement; attic; start `bench/static.js`: explaining; Continue: asking; I don't know (`10`), Continue; Show the model answer + Missed it (`09`); Show + Partly (`08`); Show + Missed it on question 3: failed (`11`); Try again, Continue, Show + Got it (`07`); Show + Got it twice: self-check and Exorcised_Moment (`12`); Yes; start `builder.js`, exorcise it the same way, Yes: Finale (`13`); type `https://github.com/lukeed/sirv` in the Live_Plaque, hold the request: busy (`14`); release: live report (`15`). Then a second context with `reducedMotion: "reduce"` for `16` to `18`, and the Gallery page for `19`.
 - **Stable frames.** Before each shot the script waits until no finite animation or transition is running (`page.waitForFunction` over `document.getAnimations()`), runs the checks below, then calls `page.screenshot({ path, animations: "disabled" })`, which ends finite animations and resets loops to their first frame (24.6).
 - **Checks in every captured state.** Required: at most 15 `document.getAnimations()` with `playState === "running"` (20.4); for every element whose computed `filter` is not `none` or that has a `filter` attribute, `el.getAnimations({ subtree: true }).length === 0` (20.2). Reported as warnings: any `svg` without `aria-hidden="true"`, any focusable element inside an `svg`, any button or non-inline link smaller than 44 × 44, horizontal page scroll at 390 px.
 - **Timeouts and errors** (24.13): `page.setDefaultTimeout(10_000)`; every step runs in `step(name, fn)`, which on failure prints `Shots failed at step "<name>": <message>`, runs the cleanup and exits 1. PNG files already written stay. A missing Chromium prints `Chromium for Playwright is not installed. Run: npx playwright install chromium`.
@@ -1205,8 +1198,8 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 | `src/view/scenic/model/hudView.test.ts` | P9; logo and tagline (4.2), licence (4.11), toggle texts and `aria-pressed` values for on, off and Reduced_Motion (15.5, 15.9). |
 | `src/view/scenic/model/grimoireView.test.ts` | P17; for every ghost step reached by the committed script: texts and titles (10.2), Answer_Box (10.3), code (10.6), licence after code (10.7, 25.5), lit candles (10.9), Answer_Box key rule (10.10). |
 | `src/view/scenic/model/scenicTexts.test.ts` | Bestiary: three entries in order with names, floor titles and ranges (7.1, 7.2); for each range `floorOf(low)` and `floorOf(high)` return its floor (7.3); every new `TEXTS` key exists and every `POWER_TEXTS` addition contains "Power". |
-| `src/view/scenic/model/contrast.test.ts` | The nine palette hex values are exact (22.4); the named cold-blue, warm-orange and dawn tokens exist; text pairs ≥ 4.5 and UI pairs ≥ 3 (17.11, 17.12); every font token ends with a generic family (21.6); the duration tokens match the catalogue (12.4: 1200 ms; 16.1: 1500 ms; reduced fades ≤ 200 ms). |
-| `src/view/scenic/art/art.test.ts` | Every Shape_Data tree that `skyLayers`, `houseLayer`, `foregroundLayer`, `weatherLayer`, `effectsLayer`, `telephoneArt`, `roomArt`, `chainedDoorArt` and `slotArt` (3 types × 5 Variants × 3 states) build passes the Shape_Data rules (22.1, 17.1); Ghost_Type parts (5.1 to 5.3, 5.6); size and eye-share order at every Variant (5.6); the 5 Variants of each type differ (5.9); the Cloche subtree is the same for every Locked slot up to its scale (6.3); a Haunted slot has a `glow` part, an Exorcised slot has no ghost and has a candle and a warm light (6.1, 6.7, 6.8); the room has three Question_Candles (10.8); the house layers are not a mirror image (3.4); the Bestiary uses Variant 0 in the Haunted look (5.12, 7.4). |
+| `src/view/scenic/model/contrast.test.ts` | The nine palette hex values are exact (22.4); the named cold-blue, warm-orange and dawn tokens exist; text pairs ≥ 4.5 and UI pairs ≥ 3 (17.11, 17.12); every font token ends with a generic family (21.6); the duration tokens match the catalogue (12.4: 1200 ms; reduced fades ≤ 200 ms). |
+| `src/view/scenic/art/art.test.ts` | Every Shape_Data tree that `weatherLayer`, `effectsLayer`, `ringEffectsArt`, `roomArt`, `chainedDoorArt` and `slotArt` (3 types × 5 Variants × 3 states) build passes the Shape_Data rules (22.1, 17.1); the scene backdrop is one `<image>` or the plain fallback rectangle; Ghost_Type parts (5.1 to 5.3, 5.6); size order and small eyes at every Variant (5.6); the 5 Variants of each type differ (5.9) and each type keeps its own part at every Variant; the Cloche subtree is the same for every Locked slot up to its scale (6.3); a Haunted slot has a `glow` part, an Exorcised slot has no ghost and has a candle and a warm light (6.1, 6.7, 6.8); the Ring effects have `phone-lines` and `phone-glow` and no handset or base; the effects layer starts the beam at the porch lantern and has no bats; the room has three Question_Candles (10.8); the Bestiary uses Variant 0 in the Haunted look (5.12, 7.4). |
 | `src/view/shared/focus.test.ts` | Moved test, same assertions (17.10, 25.11). |
 | `src/tooling/distRules.test.ts` | P18; missing-dist message names `npm run build` (20.6); the report line prints total and limit (20.8); Gallery marker and file name are problems (24.9); `index.html` with `rel="stylesheet"` is a problem (1.9). |
 | `src/tooling/shotList.test.ts` | 19 states × 2 sizes = 38 unique file names, each containing its state id and its size (24.4, 24.5, 24.10). |
@@ -1252,7 +1245,7 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 | 13 | P6, P11 | `13`, `15` (Finale gone), "Show the sample again" |
 | 14 | P7, P9 | `14`, `15` |
 | 15 | P16, lightningClock and hudView tests | Checklist: flashes, toggle, Reduced_Motion |
-| 16 | — | Checklist: Intro once, key / click / tap ends it without effect |
+| 16 | — | Not built: the Intro is cut (19 Nov) |
 | 17 | P8, scenicFocus, contrast, focus tests | Keyboard-only run in every Scene; screen reader spot check; Shots warnings |
 | 18 | Source_Scan 8, flashAllowed | `16` to `18`; system setting toggled while open |
 | 19 | camera geometry | 19.5: screenshots at 1440 × 900 and 390 × 844, browser at 360 px |
@@ -1272,26 +1265,26 @@ Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real 
 | **1. Skeleton, choice, layout, house, tokens, tooling** | 1a `feat/scenic-web-1a` | Renderer choice and HUD shell | ~850 | `viewChoice` + test 85, `main.ts` 45, `simpleEntry.ts` 5, Scenic_View_Link 12, texts 30, entry, renderer shell, `dom.ts`, announcer 230, `actionGuard` + test 85, `hud.ts` 190, `hudView` + test 170 |
 | | 1b `feat/scenic-web-1b` | Tokens, base and HUD CSS, fonts, Source_Scan rules | ~880 | tokens 170, `base.css` + `hud.css` 330, `fonts.ts`, deps, credits 50, contrast test 80, Source_Scan items 1 to 9, 12, 13, 15 to 18: 250 |
 | | 1c `feat/scenic-web-1c` | Scene_Layout and Camera with properties | ~860 | `sceneLayout` 180, `camera` 90, generators 160, tests (P1 to P8, headings) 340, camera test 70, Source_Scan item 10: 20 |
-| | 1d `feat/scenic-web-1d` | Art system and the house | ~900 | `shapes.ts` 110, `svg.ts` 70, `sky.ts` 260, `house.ts` 380, art test (rules, asymmetry) 80 |
-| | 1e `feat/scenic-web-1e` | Stage, slots and the finished Wisp | ~820 | `stage.ts` 160, window and chained door 60, Wisp in `ghosts.ts` 120, `stage.css` 220, Wisp CSS 50, rain, fog and Wisp motion 90, art test 60, renderer wiring 60 |
+| | 1d `feat/scenic-web-1d` | Art system and the scene illustration (reworked by PR #59) | ~900 | `shapes.ts`, `svg.ts`, `house.ts` and `weather.ts` (backdrop, geometry, rain, fog), art test (rules) |
+| | 1e `feat/scenic-web-1e` | Stage, slots and the finished Wisp | ~820 | `stage.ts`, chained door, Wisp in `ghosts.ts`, `stage.css`, Wisp CSS, rain, fog and Wisp motion, art test, renderer wiring |
 | | 1f `feat/scenic-web-1f` | Size_Check, Shots_Script, Gallery | ~800 | `distRules` + test 170, `size.ts` 70, `shotList` + test 110, `shots.ts` 300, Gallery 100, scripts and ignores 15, Source_Scan 30 |
 | | | **Stage 1 total** | **~5,100** | |
-| **2. Ghosts, Variants, states, Floor_Scene, Camera, Telephone** | 2a `feat/scenic-web-2a` | Ghost_Types, Variants, states, Bestiary | ~850 | rest of `ghosts.ts` 260, Cloche and candle 70, `bestiary.ts` 80, `ghosts.css` 150, idle motion 40, art tests 120, texts test 60, texts 20, Gallery grid 20, HUD 30 |
+| **2. Ghosts, Variants, states, Floor_Scene, Camera, Telephone** | 2a `feat/scenic-web-2a` | Ghost_Types, Variants, states, Bestiary | ~700 | Variants in `ghosts.ts` 140, Cloche and candle 90, `bestiary.ts` 80, `ghosts.css` 90, flame motion 20, art tests 130, texts test 60, texts 20, Gallery grid 30, HUD 30 |
 | | 2b `feat/scenic-web-2b` | Floor_Scene, Camera moves, Nameplates, focus | ~700 | `sceneControls` 170, focus move 15, `scenicFocus` + test 185, Camera wiring 80, floor CSS 150, renderer 60, shots 40 |
-| | 2c `feat/scenic-web-2c` | Telephone | ~690 | `telephoneArt` 100, `phoneWidget` 140, `phoneBell` + test 410, phone motion 40 |
-| | | **Stage 2 total** | **~2,240** | |
+| | 2c `feat/scenic-web-2c` | Telephone | ~630 | `ringEffectsArt` 40, `phoneWidget` 140, `phoneBell` + test 410, phone motion 40 |
+| | | **Stage 2 total** | **~2,030** | |
 | **3. Exorcism scene, Grimoire, Reactions, Exorcised_Moment** | 3a `feat/scenic-web-3a` | Room and Grimoire | ~900 | room art 160, `ghostScene` 150, `grimoire` 170, `grimoireView` + test 220, `room.css` 180, Source_Scan item 14: 20 |
 | | 3b `feat/scenic-web-3b` | Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules | ~780 | `reactions` + test 180, `renderMemory` + test 380, motion 100, renderer and effects 80, shots 40 |
 | | | **Stage 3 total** | **~1,680** | |
-| **4. Finale, live, Lightning, Intro, Reduced_Motion, responsive, accessibility** | 4a `feat/scenic-web-4a` | Finale, live analysis, Lightning | ~490 | `effects.ts` 130, `lightningClock` + test 85, dawn, bolt, beam, bats art 60, motion 90, toggle 40, texts 10, shots 30, renderer 40 |
-| | 4b `feat/scenic-web-4b` | Intro, Reduced_Motion audit, responsive polish, default switch | ~480 | `intro.ts` 110, `motion.ts` 50, facade art 40, reduce blocks 80, responsive CSS 80, Source_Scan item 8: 50, default switch + tests 30, full shot list and checks 40 |
-| | | **Stage 4 total** | **~970** | |
+| **4. Finale, live, Lightning, Reduced_Motion, responsive, accessibility** | 4a `feat/scenic-web-4a` | Finale, live analysis, Lightning | ~490 | `effects.ts` 130, `lightningClock` + test 85, dawn, bolt, beam art 60, motion 90, toggle 40, texts 10, shots 30, renderer 40 |
+| | 4b `feat/scenic-web-4b` | Reduced_Motion audit, responsive polish, default switch | ~330 | `motion.ts` 50, reduce blocks 80, responsive CSS 80, Source_Scan item 8: 50, default switch + tests 30, full shot list and checks 40 |
+| | | **Stage 4 total** | **~820** | |
 
 Every PR body carries the size warning and the line count measured with `git diff --shortstat` (lockfile excluded). Tests are never cut to fit.
 
-**Model note for the tasks:** PRs 1d, 1e, 2a, 2c and 3a (art and the trickiest state) are built with Opus; the others may use Auto.
+**Model note for the tasks:** PRs 1d and 1e were built with Opus. From PR 2a on the model is Auto, and Opus is used only with the director's yes.
 
-**Time check:** if stage 2 is not merged by 23 Nov 2026, apply cuts 1 to 3 of the Cut List at once (the director already agreed). Cut 4 still needs a new decision.
+**Time check:** if stage 2 is not merged by 23 Nov 2026, apply cut 1 of the Cut List at once (the director already agreed; cut 2 is withdrawn and cut 3 was applied on 19 Nov). Cut 4 still needs a new decision.
 
 ### Requirements per stage
 
@@ -1300,7 +1293,7 @@ Every PR body carries the size warning and the line count measured with `git dif
 | 1 | 2 (for the files touched so far), 3.1 to 3.5 and 3.8 to 3.10, 20, 21, 22, 23 | 1 (dark launch: scenic only at `?view=scenic` until stage 4); 3.6, 3.7 (floor buttons come with the Floor_Scene in 2b); 4 (no Bestiary, Haunt_Meter without the Return_Glow, no Lightning_Toggle until 4a); 5 and 6 (only the Wisp, Variant 0, Haunted); 17 and 18 for the house only; 19 house only; 24 (shots `01`, `16`, `19` with the Wisp only); 25 |
 | 2 | 3, 5, 6, 7, 8, 9 except 9.4 (needs the Exorcised_Moment of stage 3), 17.10 | 4.3, 4.4 (frozen values come with stage 3); 17; 18; 24 (shots `01` to `04`, `16`, `17`, full Gallery) |
 | 3 | 9.4, 10, 11, 12 | 4 (Lightning_Toggle of 4.12 comes in 4a); 18; 24 (adds `05` to `12`, `18`) |
-| 4 | 1, 4, 13, 14, 15, 16, 17, 18, 19, 24 (all 38 files), 25 | — |
+| 4 | 1, 4, 13, 14, 15, 17, 18, 19, 24 (all 38 files), 25 | 16 is not built (the Intro is cut) |
 
 **Accepted by the director (decision Q2):** Requirements 24.4 (18 states), 24.8 (3 × 5 × 3 Gallery) and 24.12 (exit 0 only when every shot is saved) are fully met only after stage 4. In stages 1 to 3, `shotList.ts` lists only the states that exist, and each PR body lists the shots it adds.
 
@@ -1308,11 +1301,11 @@ Every PR body carries the size warning and the line count measured with `git dif
 
 Stage 1 must end (PR 1f) with:
 
-- the House_Scene complete at the final quality of this style guide: sky, moon, clouds, hills, house with every room and its contents, cut ground line, foreground, rain and fog, rim light, palette, typography, HUD shell;
-- **one finished Wisp** (Variant 0, Haunted look, cold glow, rim light, cobweb, `wisp-float` idle) drawn in the attic slots;
+- the House_Scene complete at the final quality of this style guide: the scene illustration (sky, moon, hills, house with every room and its contents, ground line, foreground) with the rain and fog of the page over it, palette, typography, HUD shell;
+- **one finished Wisp** (Variant 0, Haunted look, cold glow, `wisp-float` idle) drawn in the attic slots;
 - the screenshots of `npm run shots` for that stage: `01-house` and `16-reduced-house` at 1440 × 900 and 390 × 844, and the Gallery with the Wisp.
 
-Luis Miguel reviews those screenshots before stage 2 starts. Changes to the look are cheapest at that point, because every later ghost, prop and Scene reuses the same tokens, layering and rim-light rules. Until stage 2a, every attic Card draws Variant 0 and the middle-floor and basement slots show only their window; this temporary state exists only behind `?view=scenic` (decision Q15).
+Luis Miguel reviewed those screenshots before stage 2 started and approved the gate on 18 Nov 2026, when he merged PR #59. Changes to the look are cheapest at that point, because every later ghost, prop and Scene reuses the same tokens and layering. Stage 1 drew the three Ghost_Types at Variant 0 in the Haunted look; Locked and Exorcised slots get their own art from task 9.3 on (decision Q15).
 
 ## Cut List
 
@@ -1321,11 +1314,11 @@ If time runs short before the code freeze (27 Nov 2026), cut in this order:
 | Order | Cut | Criteria affected | Director decision and `docs/decisiones.md` entry? |
 | --- | --- | --- | --- |
 | 1 | Variants 1 to 4 of the Lantern_Wraith and the Chained_Brute (they reuse Variant 0) | 5.9 (5 Variants per type) and the "different look" part of 23.5 for the middle floor and basement; the Variant numbers still differ, so P4 still passes. The sample is not affected (1 middle-floor ghost, 0 basement); only live reports with 2 or more ghosts on those floors. The Gallery shows repeated cells. | Yes: it changes approved criteria. |
-| 2 | Bats and window flicker | None (decoration outside the requirements); the animation budget gets 2 more slots. | No requirement change; note it in the PR body. |
-| 3 | Intro | None: Requirement 16 is "WHERE the Intro is built". 18.2 and the Intro part of 17.14 become empty. D13: the Opening_Rings start at the first House_Scene render. Shots lose nothing. | A director "yes" and a short `docs/decisiones.md` line (scope choice), no requirement text change. |
-| 4 | Fallback "one ghost body with three costumes": one shared body outline per type size, with the costume parts (cobweb; hood, spiral tail and lantern; horns, drips and chains) on top | 5.6 can still be met because the costume parts are part of each outline; the "different outlines" intent of the 16 Nov decision ("un diseño de fantasma distinto para cada planta") is weakened. 5.1 to 5.3 stay met. | Yes: it softens a recorded decision, so it needs a new row in `docs/decisiones.md`. |
+| 2 | Withdrawn on 19 Nov: the window flicker no longer exists and the bats are painted, still, in the illustration. | None. | None. |
+| 3 | Intro | Applied on 19 Nov (director's decision, recorded in `docs/decisiones.md`): the Intro is cut now. Requirement 16 is "WHERE the Intro is built", so 18.2 and the Intro part of 17.14 are empty. D13: the Opening_Rings start at the first House_Scene render. Shots lose nothing. | Done: a director "yes" and a short `docs/decisiones.md` line (scope choice), no requirement text change. |
+| 4 | Fallback "one ghost body with three costumes": one shared body outline per type size, with only the costume parts (the lantern; the shackles and chains) on top | 5.6 can still be met because the costume parts are part of each outline; the "different outlines" intent of the 16 Nov decision ("un diseño de fantasma distinto para cada planta") is weakened. 5.1 to 5.3 stay met. | Yes: it softens a recorded decision, so it needs a new row in `docs/decisiones.md`. |
 
-Cuts 1 to 3 are pre-approved by the director for the 23 Nov time check (see "PR Split"); the `docs/decisiones.md` lines for cuts 1 and 3 are still written when they are applied. Cut 4 needs a new decision.
+Cut 1 is pre-approved by the director for the 23 Nov time check (see "PR Split"); its `docs/decisiones.md` line is written when it is applied. Cut 2 is withdrawn and cut 3 was applied on 19 Nov and recorded. Cut 4 needs a new decision.
 
 ## Decisions Left to the Design (D1 to D14)
 
@@ -1335,15 +1328,15 @@ Cuts 1 to 3 are pre-approved by the director for the 23 Nov time check (see "PR 
 | D2 | Bestiary ranges are literal texts in `TEXTS.bestiary.ranges`, checked against `floorOf`. Below 64rem the Bestiary folds behind a `button` "Bestiary" with `aria-expanded` (closed at load); at 64rem and above it is always open and the button is not shown. Drawings `aria-hidden`, texts visible. | Saves about 200 px of height on phones; on wide screens there is room in the HUD column. |
 | D3 | All Camera moves (house, floors, into and out of the Ghost_Scene) last 700 ms with `cubic-bezier(0.65, 0, 0.35, 1)`. Dimmed floors get a Night overlay at 0.65 opacity (about 35 % brightness). | One timing feels consistent; an overlay is cheaper than a brightness filter and needs no filter (20.2). |
 | D4 | Search_Beam: one sweep in 2.5 s (`rotate(-18deg)` to `rotate(12deg)`), `infinite alternate` while `live.busy`. | As answered. |
-| D5 | A render during the Exorcised_Moment lets it play; a Scene change jumps it to the end. Haunt_Meter move 800 ms. Named tokens `--sc-cold-blue` and `--sc-warm-orange`. Windows are lit in House and Floor Scenes. | As answered. |
+| D5 | A render during the Exorcised_Moment lets it play; a Scene change jumps it to the end. Haunt_Meter move 800 ms. Named tokens `--sc-cold-blue` and `--sc-warm-orange`. The Exorcised candles are lit in House and Floor Scenes. | As answered. |
 | D6 | "Got it" Reaction first (0 to 400 ms), then spiral (400 to 1000 ms) and sparks (1000 to 1400 ms); the warm room light runs 0 to 1200 ms from the render. | The judge sees the hit, then the ghost leaving; both limits hold (11.10, 12.4). |
-| D7 | Lightning only in House and Floor Scenes, never during the Intro or in the Ghost_Scene. | As answered. |
+| D7 | Lightning only in House and Floor Scenes, never in the Ghost_Scene. | As answered. |
 | D8 | No Lightning while the Finale is shown: a due flash is skipped and counting goes on. | The storm is over when the rain stops and dawn comes; it also keeps one anomaly at a time. Requirement 15.1 and 15.2 list the Finale as an exception (decision Q20). |
 | D9 | Under Reduced_Motion rain is drawn still at 0.25 opacity and fog at 0.35. | As answered. |
 | D10 | Below 64rem (1024 px) the Grimoire goes under the drawing. | Under 1024 px a 45 % wide Grimoire column would be too narrow for the Code_Block; 64rem is also the HUD breakpoint, so there is one breakpoint. |
 | D11 | Code and paths `--font-code`; only Latin 400 normal of each font; other scenic text body stack, except headings and the first Finale banner line (IM Fell English). | As answered. |
 | D12 | `npm run shots` runs `npm run build -w @haunted-repo/core && npm run build -w @haunted-repo/web` first; the script itself also stops with a message naming `npm run build` if `dist/` is missing. | Screenshots never show an old build; the guard covers a direct `node` run. |
-| D13 | The Opening_Rings wait for the Intro to end (or start at the first House_Scene render when there is no Intro or Reduced_Motion is on). | One eye-catching anomaly at a time. |
+| D13 | The Intro is cut (director, 19 Nov): the Opening_Rings start at the first House_Scene render, and the renderer sends `intro-ended` there. | One eye-catching anomaly at a time. |
 | D14 | In the attic and basement frames the phone widget moves from the world overlay to the scene dock (bottom right of the stage, beside the floor stair on wide screens; in the control row under the stage on narrow ones). Same element, same label and name, same place in the tab order. | The Telephone is outside those frames; docking keeps the Answer_Button shown and reachable (9.7, 17.5). |
 
 ## Decisions on open questions
