@@ -670,7 +670,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.1, 6.3, 6.8_
     - _Design: "Palette", "Ghost states"_
 
-  - [ ] 9.5 Finish the idle motion rules
+  - [x] 9.5 Finish the idle motion rules
     - Source_Scan item 11 first: the `@keyframes` `wisp-float`, `wraith-sway` and `brute-heave` already exist in `motion.css` with their `.ghost--<type> .ghost-idle` rules; the test asserts that they exist and that their bodies differ.
     - In `motion.css` (no-preference block): `flame-flicker` for the `.flame` of the Exorcised candle (`--sc-dur-flame-flicker`), and no idle animation on Locked ghosts (`.look-locked .ghost-idle`). Remove the unused tokens `--sc-dur-bats-fly` and `--sc-dur-window-flicker` from `scenic-tokens.css`.
     - Verify: `npm run check` exits `0`.

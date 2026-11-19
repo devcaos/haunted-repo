@@ -51,6 +51,15 @@
     transform: scale(1.03, 0.97);
   }
 }
+/* The Exorcised candle flame stretches a little, as if a draught passed. */
+@keyframes flame-flicker {
+  from {
+    transform: scaleY(1);
+  }
+  to {
+    transform: scaleY(1.08);
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
   /* press: a small, quick push on every button (Game-feel rule 1). */
   .scenic button {
@@ -96,6 +105,17 @@
   }
   .ghost-phase-3 .ghost-idle {
     animation-delay: calc(-3 * var(--sc-delay-phase-1));
+  }
+  /* A Locked ghost is held under glass: it does not float (Requirement 6.2). */
+  .look-locked .ghost-idle {
+    animation: none;
+  }
+  /* CSS only: under Reduced_Motion the flame stays still. */
+  .flame {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: flame-flicker var(--sc-dur-flame-flicker) var(--sc-ease-in-out)
+      infinite alternate;
   }
   /* The dev-only gallery draws every ghost in its resting pose. */
   [data-motion="still"] .ghost-idle {

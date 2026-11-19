@@ -634,6 +634,22 @@ function filterBreaks(css: string): string[] {
   return breaks;
 }
 
+/** Item 11: the text inside `@keyframes <name> { ... }`, or null when absent. */
+function keyframesBody(css: string, name: string): string | null {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const start = new RegExp(`@keyframes\\s+${name}\\s*\\{`).exec(text);
+  if (start === null) return null;
+  let depth = 1;
+  let at = start.index + start[0].length;
+  const from = at;
+  while (at < text.length && depth > 0) {
+    if (text[at] === "{") depth += 1;
+    if (text[at] === "}") depth -= 1;
+    at += 1;
+  }
+  return text.slice(from, at - 1).trim();
+}
+
 const TIMER_CALL = /\b(?:requestAnimationFrame|setInterval)\b/;
 
 /** A TypeScript text with its comments removed. */
@@ -674,6 +690,21 @@ describe("scenic motion rules (Requirements 18.4, 20.1 to 20.3)", () => {
         .filter((f) => TIMER_CALL.test(withoutComments(f.text)))
         .map((f) => f.path),
     ).toEqual([]);
+  });
+
+  it("the three idle keyframes exist and their bodies differ (item 11)", () => {
+    const css = scenicCssFiles.map((f) => f.text).join("\n");
+    const bodies = ["wisp-float", "wraith-sway", "brute-heave"].map((name) =>
+      keyframesBody(css, name),
+    );
+    for (const body of bodies) expect(body).not.toBeNull();
+    expect(new Set(bodies).size).toBe(3);
+  });
+
+  it("self-check: item 11 reads a body and misses an absent name", () => {
+    const css = "@keyframes a { from { opacity: 0; } }\n@keyframes b { }";
+    expect(keyframesBody(css, "a")).toBe("from { opacity: 0; }");
+    expect(keyframesBody(css, "c")).toBeNull();
   });
 
   it("self-check: item 6 catches other properties and all", () => {
