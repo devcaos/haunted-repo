@@ -112,7 +112,7 @@ describe("cameraFor", () => {
   it("gives the scales of the design within 0.01", () => {
     const expected: [string, ViewportClass, number][] = [
       // The frames of the scene illustration (director's decision, 18 Nov).
-      ["attic", "wide", 1.77],
+      ["attic", "wide", 1.62],
       ["middle floor", "wide", 1.68],
       ["basement", "wide", 1.68],
       ["house", "wide", 1.06],

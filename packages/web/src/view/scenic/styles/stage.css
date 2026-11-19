@@ -184,15 +184,15 @@
     flex-wrap: nowrap;
     padding: 0;
   }
-  /* The rail hides the floor below the framed one; the Nameplates share its width in one row. */
+  /* The rail hides the floor below the framed one; it starts right of the HUD column and the Nameplates share its width in one row. */
   .scenic .nameplates {
     position: absolute;
     z-index: 1;
     top: var(--sc-rail-top);
-    left: var(--sc-rail-left);
+    left: max(var(--sc-rail-left), var(--sc-hud-width));
+    right: 0;
     flex-direction: row;
     box-sizing: border-box;
-    width: var(--sc-rail-width);
     height: var(--sc-rail-height);
     padding: var(--sc-space-2);
     overflow-y: auto;
