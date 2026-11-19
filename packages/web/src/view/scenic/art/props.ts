@@ -52,7 +52,9 @@ function round4(value: number): number {
 }
 
 /** What the Locked drawing covers, in reference units (`cx` is the Cloche's centre line). */
-export const CLOCHE_EXTENT = { x1: -96, y1: -57, x2: 112, y2: 307, cx: 8 };
+export const CLOCHE_EXTENT = { x1: -96, y1: -57, x2: 112, y2: 356, cx: 8 };
+/** One Cloche size on every floor, in slot units per reference unit. */
+const CLOCHE_SCALE = 0.27;
 /** What the Exorcised candle covers, in reference units: flame top to holder foot. */
 export const CANDLE_EXTENT = { x1: -30, y1: 192, x2: 30, y2: 308 };
 /** The ghost silhouette in the same units: its left edge, top and width. */
@@ -117,25 +119,32 @@ function padlockArt(): ShapeNode {
 }
 
 /**
- * A Locked Card: its own ghost, still and dim (the `look-locked` look),
- * inside the Cloche, standing on the slot bottom. One transform turns
- * reference units into slot units; the Cloche is made smaller if it would
- * not fit the slot.
+ * A Locked Card: its own ghost, still and a little dim (the `look-locked`
+ * look), inside the Cloche on a wooden pedestal with a contact shadow and a
+ * cold light trapped in the glass, standing on the slot bottom. One transform
+ * turns reference units into slot units. The Cloche has one size on every
+ * floor and is made smaller only if it would not fit the slot.
  */
 function lockedArt(slot: SlotPlacement): ShapeNode {
   const [sx, sy] = GHOST_REF_SCALE[slot.ghostType];
-  const r = sy * slot.ghostScale;
   const { x1, y1, x2, y2, cx } = CLOCHE_EXTENT;
-  const fit = Math.min(
-    1,
-    slot.rect.h / ((y2 - y1) * r),
-    slot.rect.w / ((x2 - x1) * r),
+  const c = round4(
+    Math.min(CLOCHE_SCALE, slot.rect.h / (y2 - y1), slot.rect.w / (x2 - x1)),
   );
-  const c = round4(r * fit);
   const ratio = sx / sy;
   return g(
     "slot-locked",
     [
+      defs([
+        gradient("radialGradient", "cloche-inner", [
+          ["stop-inner-0", 0],
+          ["stop-inner-1", 1],
+        ]),
+      ]),
+      ellipse("cloche-contact", 8, 350, 80, 6),
+      rect("cloche-pedestal", -38, 298, 92, 40, { rx: 3 }),
+      rect("cloche-pedestal-foot", -58, 336, 132, 14, { rx: 3 }),
+      ellipse("cloche-inner-light", 8, 140, 92, 150, { paint: "cloche-inner" }),
       // The ghost is drawn in its own units: bring it into reference units, centred in the jar.
       g("locked-ghost", [ghostArt(slot.ghostType, slot.variant, "locked")], {
         transform: {

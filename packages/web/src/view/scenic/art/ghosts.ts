@@ -262,9 +262,9 @@ function variantTransform(
 }
 
 /**
- * The drawing of one ghost at one of the five Variants. The `locked` look has
- * no glow: the stage draws it still, inside the Cloche (design "Ghost
- * states").
+ * The drawing of one ghost at one of the five Variants. The `locked` look
+ * keeps the glow like the haunted one, so the ghost reads inside its Cloche
+ * (director's decision, 19 Nov, which overrides design "Ghost states").
  *
  * Structure (design "Art System"): `g.ghost` > the static glow, then
  * `g.ghost-idle`, the only part the idle animation moves. A ghost floats, so
@@ -311,26 +311,23 @@ export function ghostArt(
           ]),
         ]
       : [];
-  // A Locked ghost has no glow: it sits still under glass.
-  const glow =
-    look === "haunted"
-      ? [
-          g(
-            "ghost-glow",
-            [
-              ellipse(
-                "glow",
-                gx,
-                gy,
-                round2(REF_GLOW.rx * sx),
-                round2(REF_GLOW.ry * sy),
-                { paint: id("glow") },
-              ),
-            ],
-            { part: "glow" },
-          ),
-        ]
-      : [];
+  // The Locked look keeps the glow: the trapped ghost must read inside the jar.
+  const glow = [
+    g(
+      "ghost-glow",
+      [
+        ellipse(
+          "glow",
+          gx,
+          gy,
+          round2(REF_GLOW.rx * sx),
+          round2(REF_GLOW.ry * sy),
+          { paint: id("glow") },
+        ),
+      ],
+      { part: "glow" },
+    ),
+  ];
   const tree = g(`ghost ghost--${type} look-${look}`, [
     defs([
       gradient("radialGradient", id("glow"), [

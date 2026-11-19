@@ -124,7 +124,7 @@ describe("Scenic_Tokens palette", () => {
   });
 
   it("holds the opacity, size and focus tokens", () => {
-    expect(tokens.get("--sc-locked")).toBe("0.45");
+    expect(tokens.get("--sc-locked")).toBe("0.8");
     expect(tokens.get("--sc-dim")).toBe("0.65");
     expect(tokens.get("--sc-touch")).toBe("2.75rem");
     expect(tokens.get("--sc-focus-width")).toBe("2px");

@@ -70,7 +70,7 @@
   --sc-rain-still: 0.25;
   --sc-fog: 0.4;
   --sc-fog-still: 0.35;
-  --sc-locked: 0.45;
+  --sc-locked: 0.8;
   /* Fonts: the display fonts come first, then a safe fallback stack */
   --font-logo: "Creepster", Impact, "Arial Black", sans-serif;
   --font-title: "IM Fell English", Georgia, "Times New Roman", serif;

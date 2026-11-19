@@ -735,11 +735,11 @@ describe("the five Variants (Requirements 5.6, 5.9)", () => {
     }
   });
 
-  it("draws the Locked look without a glow and with the look-locked class", () => {
+  it("draws the Locked look with a glow and with the look-locked class", () => {
     for (const type of TYPES) {
       const tree = ghostArt(type, 2, "locked");
       expect(tree.cls).toContain("look-locked");
-      expect(partsOf(tree)).not.toContain("glow");
+      expect(partsOf(tree)).toContain("glow");
     }
   });
 });
@@ -794,11 +794,11 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
     }
   });
 
-  it("a Haunted slot draws its ghost with its glow; a Locked slot draws it without a glow and still; an Exorcised slot draws no ghost", () => {
+  it("a Haunted slot draws its ghost with its glow; a Locked slot draws it with its glow, still, in a Cloche; an Exorcised slot draws no ghost", () => {
     for (const slot of allSlots) {
       const tree = slotArt(slot);
       const parts = nodesOf(tree).map((n) => n.part);
-      expect(parts.includes("glow")).toBe(slot.state === "haunted");
+      expect(parts.includes("glow")).toBe(slot.state !== "exorcised");
       for (const type of ["wisp", "lantern-wraith", "chained-brute"]) {
         expect(classesOf(tree).includes(`ghost--${type}`)).toBe(
           slot.state !== "exorcised" && type === GHOST_TYPE_OF[slot.floor],

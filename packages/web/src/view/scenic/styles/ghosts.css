@@ -119,23 +119,11 @@
 }
 
 /*
- * A Locked ghost (Requirement 6.3): the same drawing in Mist at the locked
- * opacity, with no glow, under glass. These rules come after the Haunted ones
- * and have the same weight, so they win.
+ * A Locked ghost (Requirement 6.3): the same drawing, with its own colours and
+ * glow, at the locked opacity under glass (director's decision, 19 Nov).
  */
 .ghost.look-locked {
   opacity: var(--sc-locked);
-}
-.look-locked .stop-spectre-0,
-.look-locked .stop-spectre-1,
-.look-locked .stop-spectre-2 {
-  stop-color: var(--sc-mist);
-}
-.look-locked .ghost-eye {
-  fill: var(--sc-mist);
-}
-.look-locked .stop-eye-0 {
-  stop-color: var(--sc-mist);
 }
 /* The Cloche: pale glass that is clearer in the middle, with two sheen strokes. */
 .cloche .stop-glass-edge {
@@ -144,12 +132,12 @@
 }
 .cloche .stop-glass-mid {
   stop-color: var(--sc-spectral);
-  stop-opacity: 0.05;
+  stop-opacity: 0.08;
 }
 .cloche .cloche-dome {
   stroke: var(--sc-spectral);
-  stroke-opacity: 0.55;
-  stroke-width: 2.5;
+  stroke-opacity: 0.6;
+  stroke-width: 5;
 }
 .cloche .cloche-sheen-wide,
 .cloche .cloche-sheen-thin {
@@ -157,7 +145,7 @@
   stroke-linecap: round;
 }
 .cloche .cloche-sheen-wide {
-  stroke-opacity: 0.35;
+  stroke-opacity: 0.5;
   stroke-width: 5;
 }
 .cloche .cloche-sheen-thin {
@@ -175,6 +163,25 @@
 }
 .cloche .cloche-base-foot {
   fill: var(--sc-brass-dark);
+}
+/* The pedestal, its contact shadow and the cold light trapped in the glass. */
+.slot-locked .cloche-pedestal {
+  fill: var(--sc-door-wood);
+}
+.slot-locked .cloche-pedestal-foot {
+  fill: var(--sc-brown-dark);
+}
+.slot-locked .cloche-contact {
+  fill: var(--sc-iron-dark);
+  opacity: 0.65;
+}
+.slot-locked .stop-inner-0 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.45;
+}
+.slot-locked .stop-inner-1 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0;
 }
 /* The padlock: a grey iron shackle on a Brass body with a dark keyhole. */
 .padlock .padlock-shackle {
