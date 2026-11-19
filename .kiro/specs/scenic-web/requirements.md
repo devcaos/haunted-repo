@@ -26,7 +26,7 @@ The web-demo spec is not edited by this spec. Its rules relate to the Scenic_Ren
 - For the Scenic_Renderer, Requirements 3, 5, 21 and 22 of this spec replace web-demo Requirements 11.1, 11.2, 11.4 and 11.6 and the web-demo Out of Scope line "Any drawing of the house, illustration, painted image, animation or sound" (sound stays out of scope here too). Those web-demo rules keep binding the Simple_Renderer only. The decision is recorded in `docs/decisiones.md` (17 Nov).
 - This spec is the "later spec" named in the web-demo Out of Scope ("The scenic renderer, rooms art, animations and any graphic asset").
 - New texts: this spec is the separate decision about texts that the web-demo design ("How to replace the look") asks for. New texts are additions only; no existing text in `texts.ts` or `powerTexts.ts` changes (Requirement 2.2).
-- Asset manifest: Shape_Data is code, not an asset. The asset manifest of web-demo Requirement 18.5 stays for image files. The Scenic_Renderer shows one image, the scene illustration, which `src/view/scenicEntry.ts` resolves from the manifest and hands in (Requirement 22.10).
+- Asset manifest: Shape_Data is code, not an asset. The asset manifest of web-demo Requirement 18.5 stays for image files. The Scenic_Renderer shows the scene illustration and the four Gate_Panel pictures (frame, gargoyle, lantern, pumpkin; director's decision, 19 Nov), which `src/view/scenicEntry.ts` resolves from the manifest and hands in (Requirement 22.10).
 - Every other web-demo requirement that binds any renderer still holds (Requirement 25), including 4.7 (the Power line of a live report), 9 (nothing stored), 10.1 and 10.2 (licence), 12.3 (no horizontal scroll at 360 px) and 17 (warnings).
 
 ### Style guide (short note)
@@ -113,6 +113,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - **Lightning_Toggle**: the visible HUD button "Lightning: on" / "Lightning: off".
 - **Intro**: the optional opening animation in which the facade of the house opens like two doors.
 - **Reduced_Motion**: the user setting `prefers-reduced-motion: reduce`.
+- **Gate_Panel**: the HUD drawn as a stone gate inside the world (director's decision, 19 Nov). Wide screens: a frame, a gargoyle with a rose window, a lantern and a pumpkin around the HUD text. Narrow screens: the gargoyle over the logo and the form, the Bestiary and the footer inside a tombstone. The pictures are decoration; every text stays HTML.
 - **Scenic_Tokens**: the one CSS file of the Scenic_Renderer that holds every colour, size and font as CSS custom properties.
 - **Shape_Data**: the plain data (lists of shapes with class names, coordinates and no colours) that describes each SVG piece. It is code, not an asset.
 - **Scene_Layout**: the pure functions of the Scenic_Renderer that turn a ViewModel into placed pieces (Ghost_Slots, Variants, start controls, Telephone_Target, Finale flag) without touching the DOM.
@@ -651,8 +652,8 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 4. WHEN the Shots_Script captures a state, THE Web_Page SHALL have at most 15 animations with `playState` `"running"`, as counted by `document.getAnimations()` at that moment.
 5. THE root `package.json` SHALL have a script `size` that runs the Size_Check, a Node script, and THE Check_Script SHALL run `npm run size` right after `npm run build` and before `npm test`.
 6. IF `packages/web/dist/` does not exist, THEN THE Size_Check SHALL fail with a non-zero exit code and a message that names `npm run build`.
-7. IF the size total of the files in `packages/web/dist/` and all its subfolders is 300 KB (307,200 bytes) or more, THEN THE Size_Check SHALL fail with a non-zero exit code. The size total is the sum of the gzipped sizes of every `.js`, `.css`, `.svg`, `.woff2`, `.woff`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.avif` and `.ico` file, each file gzipped separately at the default level of Node's zlib.
-8. WHEN the Size_Check runs, THE Size_Check SHALL print the measured total in bytes and the 307,200-byte limit, whether it passes or fails.
+7. IF the size total of the files in `packages/web/dist/` and all its subfolders is 500 KB (512,000 bytes) or more, THEN THE Size_Check SHALL fail with a non-zero exit code. The size total is the sum of the gzipped sizes of every `.js`, `.css`, `.svg`, `.woff2`, `.woff`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.avif` and `.ico` file, each file gzipped separately at the default level of Node's zlib.
+8. WHEN the Size_Check runs, THE Size_Check SHALL print the measured total in bytes and the 512,000-byte limit, whether it passes or fails.
 9. THE Size_Check SHALL also fail when a built file in `packages/web/dist/` contains an external address, by the rule of the Source_Scan (the SVG namespaces are allowed), but only for the built HTML, CSS and SVG files. THE Size_Check SHALL NOT check JavaScript or `.txt` files for external addresses.
 10. THE Size_Check SHALL run on Windows PowerShell and on Linux using only Node.js built-in modules and the project's npm dependencies, with no shell-specific commands and no network access.
 
@@ -662,7 +663,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - Both renderers are in `dist/`, so both count.
 - woff2 fonts barely shrink with gzip, so their gzipped size is close to their file size.
 - Image files in `dist/` count (criterion 7), even though the Scenic_Renderer adds none.
-- A total of exactly 307,200 bytes fails.
+- A total of exactly 512,000 bytes fails.
 - The built JavaScript bundle and `sirv-license.txt` hold `https://api.github.com`, `https://github.com/owner/repo` and `https://lukeed.com`. They are not checked for external addresses, so the Size_Check passes on them (criterion 9).
 - Files with other extensions (`.html`, `.txt` such as `sirv-license.txt` and the font licences, `.map`) do not count in the size.
 - `npm test` alone on a clean checkout does not need `dist/`, because the Size_Check is a separate script (web-demo Requirement 13.2 still holds).

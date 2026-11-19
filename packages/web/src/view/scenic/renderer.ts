@@ -1,6 +1,8 @@
 import type { ActionSink, UserAction } from "../../logic/actions.js";
 import type { Renderer, ViewModel } from "../../logic/viewModel.js";
+import type { GateHrefs } from "./art/gate.js";
 import { el } from "./dom.js";
+import { createGate } from "./gate.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
@@ -27,7 +29,16 @@ import { createStage, type StageView } from "./stage.js";
 export interface ScenicOptions {
   /** Built URL of the scene illustration, or null to draw the token-colour fallback. */
   sceneHref: string | null;
+  /** Built URLs of the Gate_Panel pictures; a missing one is not drawn. */
+  gate: GateHrefs;
 }
+
+const NO_GATE: GateHrefs = {
+  frame: null,
+  gargoyle: null,
+  lantern: null,
+  pumpkin: null,
+};
 
 /**
  * Safety net (Requirement 17.9): if this render removed or hid the element that had
@@ -70,7 +81,7 @@ function phonePlace(frame: Frame, viewport: ViewportClass): PhonePlace {
 export function createScenicRenderer(
   root: HTMLElement,
   onAction: ActionSink,
-  options: ScenicOptions = { sceneHref: null },
+  options: ScenicOptions = { sceneHref: null, gate: NO_GATE },
 ): Renderer {
   const guard = createActionGuard(onAction);
   const hud = createHud({
@@ -115,7 +126,14 @@ export function createScenicRenderer(
       dispatchPhone({ type: "answered" });
     },
   );
+  // The Gate_Panel is decoration around the HUD: the wide drawing comes
+  // first and is skipped by screen readers; the narrow pieces sit inside the
+  // header and the footer, so the Tab order does not change.
+  const gate = createGate(options.gate);
+  if (gate.crown !== null) hud.header.prepend(gate.crown);
+  if (gate.base !== null) hud.footer.append(gate.base);
   const shell = el("div", { class: "scenic", "data-scene": "house" }, [
+    gate.wide,
     hud.header,
     hud.aside,
     hud.announcer,
