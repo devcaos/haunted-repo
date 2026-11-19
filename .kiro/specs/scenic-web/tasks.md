@@ -752,7 +752,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 8.1, 8.2, 8.8, 8.10, 8.11, 18.3_
     - _Design: "Camera frames", "Animation Catalogue", D3_
 
-  - [ ] 10.6 Style the Floor_Scene controls
+  - [x] 10.6 Style the Floor_Scene controls
     - In `stage.css` (tokens only): scene bar, floor stair at the stage positions of "World geometry", Nameplate rail (Night backing, Brass notched border, state label colours), narrow layout under 64rem, touch targets, no horizontal scroll at 360 px.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): style the floor scene controls`

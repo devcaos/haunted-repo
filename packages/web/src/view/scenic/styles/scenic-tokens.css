@@ -111,6 +111,12 @@
   --sc-bestiary-art-h: 4.5rem;
   --sc-meter-height: 0.75rem;
   --sc-field-min: 12rem;
+  /* Nameplate rail of the wide stage: x 400 to 1600 and y 720 to 1000 of 1600 x 1000 */
+  --sc-rail-left: 25%;
+  --sc-rail-top: 72%;
+  --sc-rail-width: 75%;
+  --sc-rail-height: 28%;
+  --sc-notch: 0.5rem;
   /* Focus */
   --sc-focus-width: 2px;
   --sc-focus-offset: 2px;

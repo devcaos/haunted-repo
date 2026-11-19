@@ -1,19 +1,32 @@
-﻿/*
+/*
  * Stage and house styles of the Scenic_Renderer. Tokens only.
  * The stage is outside the Camera; `.world` inside it is the Camera. Stroke
  * widths are plain numbers in viewBox units.
  */
 
-/* Narrow screens: a square stage, full width (design "Camera frames"). */
+/*
+ * Narrow screens: `main.stage` is a normal block. `.stage-view` is the clipped
+ * square (the Camera frames it), then the floor stair as a wrapping row and the
+ * Nameplates as a column, all full width (design "Camera frames").
+ */
 .scenic .stage {
+  position: relative;
+  width: var(--sc-full);
+  background-color: var(--sc-backing);
+}
+.scenic .stage-view {
   position: relative;
   width: var(--sc-full);
   aspect-ratio: 1;
   overflow: hidden;
   background-color: var(--sc-backing);
 }
-
-/* Wide screens: 16:10 like the viewBox, as big as fits; 1440 x 900 fills it. */
+/*
+ * Wide screens: the stage is 16:10 like the viewBox, as big as fits (1440 x 900
+ * fills it). The stage view is the whole stage; the floor stair sits in the top
+ * left sky band, just right of the HUD column, and the Nameplate rail covers
+ * the stage area below the framed floor (x 400 to 1600, y 720 to 1000).
+ */
 @media (min-width: 64rem) {
   .scenic .stage {
     width: var(--sc-stage-wide);
@@ -21,9 +34,12 @@
     justify-self: center;
     align-self: center;
   }
-}
-
-/* The world box keeps the 16:10 ratio of the viewBox; the Camera moves it from its top left corner. */
+  .scenic .stage-view {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+  }
+} /* The world box keeps the 16:10 ratio of the viewBox; the Camera moves it from its top left corner. */
 .scenic .world {
   position: absolute;
   top: 0;
@@ -53,8 +69,11 @@
   top: var(--sc-space-2);
   left: var(--sc-space-2);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--sc-space-2);
+  box-sizing: border-box;
+  max-width: calc(var(--sc-full) - 2 * var(--sc-space-2));
   padding: var(--sc-space-1) var(--sc-space-3);
   background-color: var(--sc-backing);
   border: var(--sc-line) solid var(--sc-border);
@@ -72,6 +91,116 @@
   font-size: var(--sc-text-h2);
 }
 
+/* Floor buttons: a wrapping row under the stage view on narrow screens. */
+.scenic .floor-stair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc-space-2);
+  padding: var(--sc-space-3);
+}
+/* Nameplates: one card per Card of the framed floor, a column on narrow screens. */
+.scenic .nameplates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-space-3);
+  margin: 0;
+  padding: var(--sc-space-3);
+  list-style: none;
+}
+.scenic .nameplates > li {
+  min-width: 0;
+}
+.scenic .nameplate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sc-space-1);
+  box-sizing: border-box;
+  height: var(--sc-full);
+  padding: var(--sc-space-2) var(--sc-space-3);
+  background-color: var(--sc-backing);
+  border: var(--sc-line-heavy) solid var(--sc-border);
+  /* Notched corners, Brass border. */
+  clip-path: polygon(
+    var(--sc-notch) 0,
+    calc(var(--sc-full) - var(--sc-notch)) 0,
+    var(--sc-full) var(--sc-notch),
+    var(--sc-full) calc(var(--sc-full) - var(--sc-notch)),
+    calc(var(--sc-full) - var(--sc-notch)) var(--sc-full),
+    var(--sc-notch) var(--sc-full),
+    0 calc(var(--sc-full) - var(--sc-notch)),
+    0 var(--sc-notch)
+  );
+}
+.scenic .nameplate p {
+  margin: 0;
+  min-width: 0;
+}
+.scenic .nameplate-path {
+  color: var(--sc-text);
+  font-weight: var(--sc-weight-button);
+}
+.scenic .nameplate-reason {
+  font-size: var(--sc-text-small);
+}
+.scenic .nameplate-score {
+  color: var(--sc-candle);
+  font-size: var(--sc-text-small);
+}
+.scenic .nameplate-state {
+  font-size: var(--sc-text-small);
+  font-weight: var(--sc-weight-button);
+}
+.scenic .nameplate[data-ghost-state="haunted"] .nameplate-state {
+  color: var(--sc-spectral);
+}
+.scenic .nameplate[data-ghost-state="exorcised"] .nameplate-state {
+  color: var(--sc-candle);
+}
+.scenic .nameplate[data-ghost-state="locked"] .nameplate-state {
+  color: var(--sc-mist);
+}
+.scenic .nameplate-locked {
+  color: var(--sc-spectral);
+  font-size: var(--sc-text-small);
+}
+.scenic .nameplate-start {
+  margin-top: auto;
+}
+.scenic .nameplates-empty {
+  padding: var(--sc-space-2) var(--sc-space-3);
+}
+.scenic .nameplates-empty p {
+  margin: 0;
+}
+@media (min-width: 64rem) {
+  .scenic .floor-stair {
+    position: absolute;
+    z-index: 1;
+    top: var(--sc-space-3);
+    left: calc(var(--sc-hud-width) + var(--sc-space-3));
+    flex-wrap: nowrap;
+    padding: 0;
+  }
+  /* The rail hides the floor below the framed one; the Nameplates share its width in one row. */
+  .scenic .nameplates {
+    position: absolute;
+    z-index: 1;
+    top: var(--sc-rail-top);
+    left: var(--sc-rail-left);
+    flex-direction: row;
+    box-sizing: border-box;
+    width: var(--sc-rail-width);
+    height: var(--sc-rail-height);
+    padding: var(--sc-space-2);
+    overflow-y: auto;
+    background-color: var(--sc-backing);
+    border-top: var(--sc-line-heavy) solid var(--sc-border);
+  }
+  .scenic .nameplates > li {
+    flex: 1 1 0;
+  }
+}
 /*
  * The scene illustration (a still picture) and its fallback. The picture
  * keeps its own colours; the page adds only tokens on top of it.

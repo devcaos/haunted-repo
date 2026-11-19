@@ -119,6 +119,12 @@ body {
   cursor: pointer;
 }
 
+/* Secondary buttons: Night backing, Pumpkin label, Brass border. The Pumpkin fill is for primary actions only. */
+.scenic button.secondary {
+  border-color: var(--sc-border);
+  background-color: var(--sc-backing);
+  color: var(--sc-accent);
+}
 .scenic button:disabled {
   opacity: var(--sc-dim);
   cursor: not-allowed;
