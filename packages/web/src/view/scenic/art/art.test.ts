@@ -29,7 +29,7 @@ import {
   type VariantNumber,
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, VARIANTS, ghostArt } from "./ghosts.js";
-import { ICON_BOX, bestiaryArt, ghostIconArt } from "./icons.js";
+import { ICON_BOX, bestiaryArt, ghostIconArt, phoneIconArt } from "./icons.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
@@ -47,7 +47,11 @@ import {
   CANDLE_EXTENT,
   CLOCHE_EXTENT,
   FLOOR_LINE,
+  RING_ARC_RADII,
+  RING_CENTRE,
+  RING_GLOW_RADIUS,
   chainedDoorArt,
+  ringEffectsArt,
   slotArt,
 } from "./props.js";
 import { RAIN_BOTTOM, RAIN_STEP, rainPath, weatherLayer } from "./weather.js";
@@ -1194,6 +1198,101 @@ describe("Bestiary art and Ghost_Icons (Requirements 4.4, 5.12, 7.1, 7.4)", () =
           expect((node.cx ?? 0) + (node.r ?? 0)).toBeLessThanOrEqual(ICON_BOX);
         }
       }
+    }
+  });
+});
+
+describe("Ring effects over the painted telephone (Requirements 9.1, 22.1)", () => {
+  const tree = ringEffectsArt();
+  const nodes = nodesOf(tree);
+  const arcs = nodes.filter((n) => n.cls?.startsWith("phone-line "));
+  const glow = nodes.find((n) => n.part === "phone-glow");
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(tree)).toEqual([]);
+  });
+  it("has the phone-lines and phone-glow parts and no telephone of its own", () => {
+    const parts = nodes.map((n) => n.part);
+    expect(parts).toContain("phone-lines");
+    expect(parts).toContain("phone-glow");
+    const names = nodes.map((n) => `${n.cls ?? ""} ${n.part ?? ""}`).join(" ");
+    expect(names).not.toMatch(/handset|base|logo|text/);
+  });
+  it("draws three arcs on each side, at radius 26, 35 and 44", () => {
+    expect(arcs).toHaveLength(6);
+    const radii = arcs.map((n) => Number(/A(\d+) /.exec(n.d ?? "")?.[1]));
+    expect(radii.slice(0, 3)).toEqual([...RING_ARC_RADII]);
+    expect(radii.slice(3)).toEqual([...RING_ARC_RADII]);
+    expect([...RING_ARC_RADII]).toEqual([26, 35, 44]);
+  });
+  it("is centred on the telephone anchor, with a glow of radius about 60", () => {
+    expect(RING_CENTRE.x).toBe(TELEPHONE_ANCHOR.x);
+    expect(Math.abs(RING_CENTRE.y - TELEPHONE_ANCHOR.y)).toBeLessThanOrEqual(
+      10,
+    );
+    expect(glow?.cx).toBe(RING_CENTRE.x);
+    expect(glow?.cy).toBe(RING_CENTRE.y);
+    expect(glow?.r).toBe(RING_GLOW_RADIUS);
+    expect(RING_GLOW_RADIUS).toBeGreaterThanOrEqual(55);
+    expect(RING_GLOW_RADIUS).toBeLessThanOrEqual(65);
+    // The arcs mirror each other about the anchor's vertical line.
+    const ends = (n: ShapeNode): number[] =>
+      /^M([\d.]+) ([\d.]+) A\d+ \d+ 0 0 [01] ([\d.]+) ([\d.]+)$/
+        .exec(n.d ?? "")
+        ?.slice(1)
+        .map(Number) ?? [];
+    for (let i = 0; i < 3; i += 1) {
+      const left = ends(arcs[i] as ShapeNode);
+      const right = ends(arcs[i + 3] as ShapeNode);
+      expect(left).toHaveLength(4);
+      expect((left[0] ?? 0) + (right[0] ?? 0)).toBeCloseTo(
+        2 * TELEPHONE_ANCHOR.x,
+        1,
+      );
+      expect(left[1]).toBe(right[1]);
+      expect(left[3]).toBe(right[3]);
+    }
+  });
+  it("keeps the glow and every arc inside the middle floor rectangle", () => {
+    const room = FLOOR_RECT["middle floor"];
+    const inRoom = (x1: number, y1: number, x2: number, y2: number): void => {
+      expect(x1).toBeGreaterThanOrEqual(room.x);
+      expect(y1).toBeGreaterThanOrEqual(room.y);
+      expect(x2).toBeLessThanOrEqual(room.x + room.w);
+      expect(y2).toBeLessThanOrEqual(room.y + room.h);
+    };
+    const { x, y } = RING_CENTRE;
+    inRoom(
+      x - RING_GLOW_RADIUS,
+      y - RING_GLOW_RADIUS,
+      x + RING_GLOW_RADIUS,
+      y + RING_GLOW_RADIUS,
+    );
+    // An arc lies on the circle of its radius, so that circle's box bounds it.
+    for (const arc of arcs) {
+      const r = Number(/A(\d+) /.exec(arc.d ?? "")?.[1]);
+      inRoom(x - r, y - r, x + r, y + r);
+    }
+  });
+});
+
+describe("the Answer_Button icon (director's decision, 19 Nov)", () => {
+  const tree = phoneIconArt();
+  it("is a handset, a base and a dial that pass the Shape_Data rules", () => {
+    expect(shapeProblems(tree)).toEqual([]);
+    expect(nodesOf(tree).map((n) => n.cls)).toEqual(
+      expect.arrayContaining([
+        "icon-phone-handset",
+        "icon-phone-base",
+        "icon-phone-dial",
+      ]),
+    );
+  });
+  it("stays inside its box", () => {
+    for (const [x, y] of pointsOf(tree)) {
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(ICON_BOX);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(ICON_BOX);
     }
   });
 });

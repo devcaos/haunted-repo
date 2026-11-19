@@ -43,6 +43,18 @@
   --sc-warm-orange: #f59a45;
   --sc-cold-white: #e8f0fb;
   --sc-dawn: #e9894a;
+  /* The Ring: glow and arcs drawn over the painted telephone */
+  --sc-phone-glow-core: 0.55;
+  --sc-phone-arc-1: 0.9;
+  --sc-phone-arc-2: 0.65;
+  --sc-phone-arc-3: 0.4;
+  --sc-phone-glow-still: 0.6;
+
+  /* The phone widget: brass plaque, comic burst, paper note */
+  --sc-wood-dark: #2a1a10;
+  --sc-shadow-drop: rgba(0, 0, 0, 0.55);
+  --sc-pumpkin-glow: rgba(255, 122, 26, 0.6);
+
   /* Roles */
   --sc-text: var(--sc-bone);
   --sc-text-heading: var(--sc-candle);
@@ -107,6 +119,60 @@
   --sc-stage-wide: min(100vw, 160dvh);
   --sc-viewport-height: 100vh;
   --sc-icon-size: 1.25rem;
+  /* The phone widget: where it sits on the painted house, in percent of the world (x 1600, y 1000) */
+  --sc-phone-pin-x: 33.5%;
+  --sc-phone-button-y: 63.3%;
+  --sc-phone-note-y: 59.8%;
+  --sc-phone-ring-x: 31%;
+  --sc-phone-ring-y: 55.6%;
+  --sc-answer-min: 2.875rem;
+  --sc-burst-tilt: -12deg;
+  --sc-tail: 0.6rem;
+  --sc-half: 50%;
+  --sc-hang-below: translate(-50%, 0);
+  --sc-hang-above: translate(-50%, -100%);
+  --sc-centre-x: translateX(-50%);
+  --sc-centre-y: translateY(-50%);
+  --sc-tail-down: polygon(0 0, 100% 0, 50% 100%);
+  --sc-tail-left: polygon(100% 0, 100% 100%, 0 50%);
+  --sc-text-plaque: 1.2rem;
+  --sc-text-burst: 1.6rem;
+  --sc-text-burst-docked: 1.3rem;
+  --sc-phone-icon: 1.6rem;
+  --sc-plaque-radius: 3px;
+  --sc-plaque-depth: 3px;
+  --sc-plaque-glow-grow: 8px;
+  --sc-plaque-inset-1: 3px;
+  --sc-plaque-inset-2: 4px;
+  --sc-rivet-inset: 6px;
+  --sc-rivet-radius: 2px;
+  --sc-glow-fade: 70%;
+  --sc-burst-pad: 1.1rem 1.2rem;
+  --sc-note-max: 16rem;
+  --sc-note-pad: var(--sc-space-2) var(--sc-space-3);
+  /* A 20-point starburst for the RING! bubble */
+  --sc-burst-shape: polygon(
+    50% 0%,
+    61.4% 14.8%,
+    79.4% 9.5%,
+    79.9% 28.3%,
+    97.6% 34.5%,
+    87% 50%,
+    97.6% 65.5%,
+    79.9% 71.7%,
+    79.4% 90.5%,
+    61.4% 85.2%,
+    50% 100%,
+    38.6% 85.2%,
+    20.6% 90.5%,
+    20.1% 71.7%,
+    2.4% 65.5%,
+    13% 50%,
+    2.4% 34.5%,
+    20.1% 28.3%,
+    20.6% 9.5%,
+    38.6% 14.8%
+  );
   --sc-bestiary-art-w: 3.5rem;
   --sc-bestiary-art-h: 4.5rem;
   --sc-meter-height: 0.75rem;

@@ -6,7 +6,7 @@ import {
   atticClip,
   sceneBackdrop,
 } from "./art/house.js";
-import { chainedDoorArt, slotArt } from "./art/props.js";
+import { chainedDoorArt, ringEffectsArt, slotArt } from "./art/props.js";
 import { defs, g, rect } from "./art/shapes.js";
 import { weatherLayer } from "./art/weather.js";
 import { el } from "./dom.js";
@@ -29,6 +29,9 @@ export interface Stage {
   sceneBar: HTMLElement;
   floorStair: HTMLElement;
   nameplates: HTMLElement;
+  /** `div.world-overlay` (HTML pinned to the art) and `div.scene-dock` (the docked phone widget). */
+  overlay: HTMLElement;
+  dock: HTMLElement;
   update(view: StageView): void;
 }
 
@@ -51,8 +54,8 @@ function slotSignature(layout: SceneLayout): string {
  * Builds the stage once: `main.stage` > `div.stage-view` (the clipped box) >
  * `div.scene-bar` and `div.world` (the Camera) > one `svg.house` with its
  * layers back to front (the illustration, slots, dims, telephone, weather,
- * effects) and `div.world-overlay`; then `nav.floor-stair` and
- * `ul.nameplates`, outside the clipped box. Each
+ * effects) and `div.world-overlay`; then `div.scene-dock`, `nav.floor-stair`
+ * and `ul.nameplates`, outside the clipped box. Each
  * render changes only attributes, classes and the Camera transform; the slot
  * layer is rebuilt only when the slot signature changes, so idle animations
  * do not restart.
@@ -77,20 +80,23 @@ export function createStage(sceneHref: string | null): Stage {
     mountShape(sceneBackdrop(sceneHref), "house-"),
     slots,
     dims,
-    // Filled by the Telephone in task 11.1 and the effects in task 15.4.
-    mountShape(g("telephone", []), "house-"),
+    // The Ring effects; the renderer adds `is-ringing` to this layer (task 11.7).
+    mountShape(g("telephone", [ringEffectsArt()]), "house-"),
     mountShape(weatherLayer(), "house-"),
+    // Filled by the effects of task 15.4.
     mountShape(g("effects", []), "house-"),
   );
 
   const overlay = el("div", { class: "world-overlay" });
   const world = el("div", { class: "world" }, [svg, overlay]);
   const sceneBar = el("div", { class: "scene-bar" });
+  const dock = el("div", { class: "scene-dock", hidden: "" });
   const floorStair = el("nav", { class: "floor-stair", hidden: "" });
   const nameplates = el("ul", { class: "nameplates", hidden: "" });
   const stageView = el("div", { class: "stage-view" }, [sceneBar, world]);
   const element = el("main", { class: "stage", "data-scene": "house" }, [
     stageView,
+    dock,
     floorStair,
     nameplates,
   ]);
@@ -103,6 +109,8 @@ export function createStage(sceneHref: string | null): Stage {
     sceneBar,
     floorStair,
     nameplates,
+    overlay,
+    dock,
     update(view: StageView): void {
       const { layout, scene } = view;
       element.setAttribute("data-scene", scene.kind);

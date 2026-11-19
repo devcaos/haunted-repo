@@ -259,3 +259,247 @@
 .house .dim.is-dimmed {
   opacity: var(--sc-dim);
 }
+/*
+ * The Ring effects over the painted telephone: a Pumpkin glow that fades from
+ * its centre, and three Bone arcs on each side (fainter the farther out).
+ * Both are hidden until the telephone layer is ringing (motion.css).
+ */
+.house .phone-glow {
+  opacity: 0;
+}
+.house .stop-phone-0 {
+  stop-color: var(--sc-pumpkin);
+  stop-opacity: var(--sc-phone-glow-core);
+}
+.house .stop-phone-1 {
+  stop-color: var(--sc-pumpkin);
+  stop-opacity: 0;
+}
+.house .phone-lines {
+  opacity: 0;
+  stroke: var(--sc-bone);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.house .phone-line-1 {
+  opacity: var(--sc-phone-arc-1);
+}
+.house .phone-line-2 {
+  opacity: var(--sc-phone-arc-2);
+}
+.house .phone-line-3 {
+  opacity: var(--sc-phone-arc-3);
+}
+
+/*
+ * The scene dock holds the phone widget where it is not pinned under the
+ * painted telephone: a row under the stage view on narrow screens (before the
+ * floor stair, so the Answer_Button comes first in the tab order), and on wide
+ * screens a second row at the top left, under the floor buttons.
+ */
+.scenic .scene-dock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc-space-2);
+  padding: var(--sc-space-3);
+}
+.scenic .phone-widget.is-docked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc-space-3);
+}
+@media (min-width: 64rem) {
+  .scenic .scene-dock {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--sc-space-3) + var(--sc-touch) + var(--sc-space-2));
+    left: calc(var(--sc-hud-width) + var(--sc-space-3));
+    padding: 0;
+  }
+}
+/* Pinned: the widget is a set of pieces placed on the painted house, counter-scaled against the Camera. */
+.scenic .phone-widget.is-pinned .answer-slot,
+.scenic .phone-widget.is-pinned .ring-bubble,
+.scenic .phone-widget.is-pinned .phone-bubble {
+  position: absolute;
+}
+.scenic .phone-widget.is-pinned .answer-slot {
+  left: var(--sc-phone-pin-x);
+  top: var(--sc-phone-button-y);
+  transform: var(--sc-hang-below) scale(var(--cam-counter));
+  transform-origin: top;
+  pointer-events: auto;
+}
+.scenic .phone-widget.is-pinned .ring-bubble {
+  --ring-base: var(--sc-hang-above) scale(var(--cam-counter));
+  font-size: var(--sc-text-burst);
+  left: var(--sc-phone-ring-x);
+  top: var(--sc-phone-ring-y);
+  transform-origin: bottom;
+}
+.scenic .phone-widget.is-pinned .phone-bubble {
+  left: var(--sc-phone-pin-x);
+  top: var(--sc-phone-note-y);
+  transform: var(--sc-hang-above) scale(var(--cam-counter));
+  transform-origin: bottom;
+  /* Room for the tail that points down to the telephone. */
+  margin-top: calc(-1 * var(--sc-tail));
+}
+.scenic .answer-slot {
+  display: flex;
+  isolation: isolate;
+}
+/*
+ * The camera counter-scale is rounded, so a pinned button can land a hair
+ * under 44 px; the extra minimum height keeps every frame at 44 px or more.
+ */
+.scenic .answer-button {
+  min-height: var(--sc-answer-min);
+  white-space: nowrap;
+}
+/* "RING!" shows only while ringing (motion.css). */
+.scenic .ring-bubble {
+  --ring-base: none;
+  display: none;
+  transform: var(--ring-base) rotate(var(--sc-burst-tilt));
+}
+/* Phone_Bubble: Bone backing, Night text, a small tail that points to the telephone. */
+.scenic .phone-bubble {
+  position: relative;
+  box-sizing: border-box;
+  background-color: var(--sc-bone);
+  color: var(--sc-night);
+  overflow-wrap: anywhere;
+}
+.scenic .phone-bubble::after {
+  content: "";
+  position: absolute;
+  background-color: var(--sc-bone);
+}
+.scenic .phone-widget.is-pinned .phone-bubble::after {
+  top: calc(var(--sc-full) - var(--sc-line));
+  left: var(--sc-half);
+  width: var(--sc-tail);
+  height: var(--sc-tail);
+  transform: var(--sc-centre-x);
+  clip-path: var(--sc-tail-down);
+}
+.scenic .phone-widget.is-docked .phone-bubble {
+  margin-left: var(--sc-tail);
+}
+.scenic .phone-widget.is-docked .phone-bubble::after {
+  top: var(--sc-half);
+  right: calc(var(--sc-full) - var(--sc-line));
+  width: var(--sc-tail);
+  height: var(--sc-tail);
+  transform: var(--sc-centre-y);
+  clip-path: var(--sc-tail-left);
+}
+/* Answer_Button: a brass plaque with four rivets and an old telephone. */
+.scenic .answer-button {
+  --rivet:
+    var(--sc-brass-light) var(--sc-rivet-radius),
+    transparent calc(var(--sc-rivet-radius) + var(--sc-line));
+  --plaque-shadow:
+    inset 0 0 0 var(--sc-plaque-inset-1) var(--sc-night),
+    inset 0 0 0 var(--sc-plaque-inset-2) var(--sc-brass-dark),
+    0 var(--sc-plaque-depth) 0 var(--sc-brass-dark),
+    0 var(--sc-space-1) var(--sc-space-2) var(--sc-shadow-drop);
+  position: relative;
+  gap: var(--sc-space-2);
+  padding: var(--sc-space-1) var(--sc-space-4);
+  border: var(--sc-line-heavy) solid var(--sc-border);
+  border-radius: var(--sc-plaque-radius);
+  background:
+    radial-gradient(
+      circle at var(--sc-rivet-inset) var(--sc-rivet-inset),
+      var(--rivet)
+    ),
+    radial-gradient(
+      circle at calc(var(--sc-full) - var(--sc-rivet-inset))
+        var(--sc-rivet-inset),
+      var(--rivet)
+    ),
+    radial-gradient(
+      circle at var(--sc-rivet-inset)
+        calc(var(--sc-full) - var(--sc-rivet-inset)),
+      var(--rivet)
+    ),
+    radial-gradient(
+      circle at calc(var(--sc-full) - var(--sc-rivet-inset))
+        calc(var(--sc-full) - var(--sc-rivet-inset)),
+      var(--rivet)
+    ),
+    linear-gradient(to bottom, var(--sc-wood-dark), var(--sc-night));
+  box-shadow: var(--plaque-shadow);
+  color: var(--sc-candle);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-plaque);
+  font-weight: var(--sc-weight-body);
+}
+.scenic .answer-button:focus-visible {
+  box-shadow:
+    var(--plaque-shadow),
+    0 0 0 var(--sc-focus-halo-width) var(--sc-focus-halo);
+}
+/* Pressed: the plaque moves down by a line. It uses `top`, not a transform, so the glow stays behind it. */
+.scenic .answer-button:active {
+  top: var(--sc-line);
+  transform: none;
+}
+/* The warm glow behind the plaque while it rings: only its opacity changes. */
+.scenic .answer-button::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: calc(-1 * var(--sc-plaque-glow-grow));
+  border-radius: var(--sc-plaque-glow-grow);
+  background: radial-gradient(
+    ellipse at center,
+    var(--sc-pumpkin-glow),
+    transparent var(--sc-glow-fade)
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.scenic .answer-icon {
+  flex: none;
+  width: var(--sc-phone-icon);
+  height: var(--sc-phone-icon);
+}
+.scenic .icon-phone-handset,
+.scenic .icon-phone-base {
+  fill: var(--sc-brass-light);
+}
+.scenic .icon-phone-dial {
+  fill: var(--sc-brass-dark);
+}
+/* "RING!": a comic starburst in the logo font, tilted. */
+.scenic .ring-bubble {
+  box-sizing: border-box;
+  padding: var(--sc-burst-pad);
+  background-color: var(--sc-pumpkin);
+  clip-path: var(--sc-burst-shape);
+  color: var(--sc-night);
+  font-family: var(--font-logo);
+  font-size: var(--sc-text-burst-docked);
+  line-height: 1;
+  white-space: nowrap;
+}
+/* Phone_Bubble: an old paper note. */
+.scenic .phone-bubble {
+  max-width: var(--sc-note-max);
+  padding: var(--sc-note-pad);
+  border: var(--sc-line) solid var(--sc-brass-dark);
+  font-family: var(--font-title);
+  line-height: var(--sc-leading-title);
+}
+/* While the telephone rings: the burst shows and the plaque border turns Pumpkin. */
+.scenic .phone-widget.is-ringing .ring-bubble {
+  display: inline-block;
+}
+.scenic .phone-widget.is-ringing .answer-button {
+  border-color: var(--sc-pumpkin);
+}

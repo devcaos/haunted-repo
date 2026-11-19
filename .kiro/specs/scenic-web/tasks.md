@@ -776,11 +776,12 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: none (git workflow)_
 
 - [ ] 11. PR 2c — Telephone
+  - Split on 19 Nov (director): part 1 = PR #65 (11.1, 11.4, 11.5, 11.7, with the brass plaque look); part 2 = 11.2, 11.3, 11.6, 11.8 on branch `feat/scenic-web-2c-2` from main.
   - Branch: `feat/scenic-web-2c`. Stacks on: `feat/scenic-web-2b`.
   - Estimate: ~630 changed lines. Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 2c_
 
-  - [ ] 11.1 Add the telephone texts
+  - [x] 11.1 Add the telephone texts
     - In `texts.ts` add `phone` (`answer`, `answerWaiting`, `quiet`, `ring`) with the design values (additions only); extend `scenicTexts.test.ts` so the new keys are checked.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the telephone texts`
@@ -806,7 +807,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.3, 9.4, 9.12_
     - _Design: "Correctness Properties", Property 15_
 
-  - [ ] 11.4 Draw the Ring effects
+  - [x] 11.4 Draw the Ring effects
     - The telephone is painted in the illustration, at `TELEPHONE_ANCHOR` (536, 611); the page does not redraw it. In `art/props.ts` add `ringEffectsArt()`: only the vibration arcs (`phone-lines`, 3 on each side, Bone) and the Pumpkin radial glow (`phone-glow`) around that point, with no handset and no base, no logo and no text. `stage.ts` mounts it in the existing `telephone` layer.
     - Extend `art.test.ts`: the tree passes the rules, has the `phone-lines` and `phone-glow` parts, has no handset or base part, and is centred on `TELEPHONE_ANCHOR`.
     - Verify: `npm run check` exits `0`.
@@ -814,7 +815,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.1, 22.1_
     - _Design: "Props and panels" (Telephone, Ring)_
 
-  - [ ] 11.5 Add the phone widget
+  - [x] 11.5 Add the phone widget
     - Create `packages/web/src/view/scenic/phoneWidget.ts`: `.phone-widget` with the `aria-hidden` "RING!" bubble, the Answer_Button (visible "Answer the phone", `aria-label` from `callWaiting`, updated in the same render) and the Phone_Bubble. It sits in `.world-overlay` for the house and middle-floor frames and in `.scene-dock` for attic and basement (D14), same element and tab place. Activation: live report shows `house.powerLine` and sends nothing; sample with a Telephone_Target sends `start-ghost` for it through the guard; otherwise shows `TEXTS.phone.quiet`; the bubble text is announced through the Scenic_Announcer and stays until the next Scene change or activation. Styles in `stage.css` (Phone_Bubble Bone backing, Night text).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the answer the phone button`
@@ -828,7 +829,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.1, 9.2, 9.3, 9.5, 9.6, 9.12, 2.7_
     - _Design: "Purely visual state of the Scenic_Renderer" (phone), "scenic/model/phoneBell.ts"_
 
-  - [ ] 11.7 Animate the Ring
+  - [x] 11.7 Animate the Ring
     - In `motion.css`: `phone-buzz`, `phone-glow`, `ring-pop`, `bubble-in` and the counter-scale transition in the no-preference block; under `reduce`, while Ringing, the "RING!" bubble and the glow are shown still (glow at 0.6), with no lines.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate the ringing telephone`

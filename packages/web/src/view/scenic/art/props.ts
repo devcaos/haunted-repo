@@ -1,5 +1,6 @@
 import type { Floor } from "@haunted-repo/core";
 import type { SlotPlacement } from "../model/sceneLayout.js";
+import { TELEPHONE_ANCHOR } from "./house.js";
 import { GHOST_REF_SCALE, GHOST_TYPES, ghostArt } from "./ghosts.js";
 import {
   circle,
@@ -386,4 +387,52 @@ export function chainedDoorArt(floor: Floor): ShapeNode {
     ],
     { part: "chained-door" },
   );
+}
+
+/** Where the Ring effects are centred: the dial of the painted telephone, a little below its anchor. */
+export const RING_CENTRE = { x: TELEPHONE_ANCHOR.x, y: 618 } as const;
+/** Radius of the Pumpkin glow behind the telephone, in house units. */
+export const RING_GLOW_RADIUS = 60;
+/** Radii of the three vibration arcs on each side, from the inside out. */
+export const RING_ARC_RADII = [26, 35, 44] as const;
+/** Each arc spans this many degrees above and below the horizontal. */
+const RING_ARC_SPAN = 38;
+
+/** One vibration arc on the left (-1) or right (1) of the telephone, drawn top to bottom. */
+function ringArc(side: -1 | 1, r: number): string {
+  const a = (RING_ARC_SPAN * Math.PI) / 180;
+  const x = round2(RING_CENTRE.x + side * r * Math.cos(a));
+  const dy = round2(r * Math.sin(a));
+  const top = round2(RING_CENTRE.y - dy);
+  const bottom = round2(RING_CENTRE.y + dy);
+  const sweep = side === 1 ? 1 : 0;
+  return `M${x} ${top} A${r} ${r} 0 0 ${sweep} ${x} ${bottom}`;
+}
+
+/**
+ * The Ring effects over the painted telephone (it is in the illustration, so
+ * the page draws no handset or base): three Bone vibration arcs on each side
+ * (`phone-lines`) and a Pumpkin radial glow behind them (`phone-glow`). Both
+ * are hidden until the `telephone` layer gets `is-ringing`. Every part stays
+ * inside the middle floor rectangle.
+ */
+export function ringEffectsArt(): ShapeNode {
+  const arcs = ([-1, 1] as const).flatMap((side) =>
+    RING_ARC_RADII.map((r, i) =>
+      strokePath(`phone-line phone-line-${i + 1}`, ringArc(side, r)),
+    ),
+  );
+  return g("ring-effects", [
+    defs([
+      gradient("radialGradient", "phone-glow", [
+        ["stop-phone-0", 0],
+        ["stop-phone-1", 1],
+      ]),
+    ]),
+    circle("phone-glow", RING_CENTRE.x, RING_CENTRE.y, RING_GLOW_RADIUS, {
+      paint: "phone-glow",
+      part: "phone-glow",
+    }),
+    g("phone-lines", arcs, { part: "phone-lines" }),
+  ]);
 }
