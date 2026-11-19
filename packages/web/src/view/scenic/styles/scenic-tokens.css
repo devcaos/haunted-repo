@@ -253,9 +253,7 @@
   --sc-ease-in-out: ease-in-out;
   --sc-ease-linear: linear;
   /* HUD redesign (director, 19 Nov): brass, dark wood and candlelight */
-  --sc-wood-dark: #2a1a10;
   --sc-hud-glow: rgb(230 162 92 / 0.14);
-  --sc-pumpkin-glow: rgb(255 122 26 / 0.45);
   --sc-drop-shadow: rgb(0 0 0 / 0.55);
   --sc-hud-backing:
     radial-gradient(ellipse 90% 40% at 50% 0%, var(--sc-hud-glow), transparent),
@@ -328,7 +326,6 @@
     var(--sc-abyss);
   --sc-input-shadow: inset 0 2px 6px var(--sc-drop-shadow);
   --sc-text-tagline-hud: 1.05rem;
-  --sc-text-plaque: 1.2rem;
   --sc-text-label: 0.75rem;
   --sc-text-bestiary-name: 1.2rem;
   --sc-tracking-label: 0.08em;
