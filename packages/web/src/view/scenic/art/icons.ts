@@ -1,6 +1,6 @@
 import type { GhostType } from "../model/sceneLayout.js";
 import { ghostArt } from "./ghosts.js";
-import { circle, g, path, type ShapeNode } from "./shapes.js";
+import { circle, g, path, poly, type ShapeNode } from "./shapes.js";
 
 /** The viewBox side of a Ghost_Icon; colours come from `hud.css`. */
 export const ICON_BOX = 20;
@@ -46,5 +46,23 @@ export function ghostIconArt(state: "haunted" | "exorcised"): ShapeNode {
       circle("icon-wisp-eye", 11.6, 12, 1),
     ],
     { part: "icon-wisp" },
+  );
+}
+/**
+ * The icon of the Answer_Button: an old rotary telephone with a curved
+ * handset on top, a trapezoid base and a dial. Colours come from `stage.css`.
+ */
+export function phoneIconArt(): ShapeNode {
+  return g(
+    "icon-phone",
+    [
+      path(
+        "icon-phone-handset",
+        "M2.5 8 C2.5 4 5.5 3 10 3 C14.5 3 17.5 4 17.5 8 L15.5 8 C15.5 6 13.5 5.2 10 5.2 C6.5 5.2 4.5 6 4.5 8 Z",
+      ),
+      poly("icon-phone-base", [6, 9, 14, 9, 18, 17, 2, 17]),
+      circle("icon-phone-dial", 10, 13, 2.6),
+    ],
+    { part: "icon-phone" },
   );
 }

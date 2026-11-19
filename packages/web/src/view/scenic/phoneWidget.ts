@@ -1,6 +1,8 @@
 import type { UserAction } from "../../logic/actions.js";
 import { TEXTS } from "../../logic/texts.js";
+import { ICON_BOX, phoneIconArt } from "./art/icons.js";
 import { el, setText } from "./dom.js";
+import { createSvgRoot, mountShape } from "./svg.js";
 
 /** Where the widget sits: over the painted telephone, or in the scene dock. */
 export type PhonePlace = "pinned" | "docked";
@@ -48,6 +50,11 @@ export function createPhoneWidget(
   send: (action: UserAction) => boolean,
   announce: (text: string) => void,
 ): PhoneWidget {
+  const icon = createSvgRoot(
+    { x: 0, y: 0, w: ICON_BOX, h: ICON_BOX },
+    "answer-icon",
+  );
+  icon.append(mountShape(phoneIconArt(), "answer-"));
   const button = el(
     "button",
     {
@@ -55,7 +62,7 @@ export function createPhoneWidget(
       class: "answer-button",
       "aria-label": TEXTS.phone.answer,
     },
-    [TEXTS.phone.answer],
+    [icon, TEXTS.phone.answer],
   );
   const ring = el("span", { class: "ring-bubble", "aria-hidden": "true" }, [
     TEXTS.phone.ring,

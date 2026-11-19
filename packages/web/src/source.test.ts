@@ -922,6 +922,8 @@ function fontRules(css: string): FontRule[] {
 }
 
 const LOGO_SELECTOR = /(?:^|\s)\.(?:hud-logo|hud-tagline)(?:$|[\s:.[])/;
+/** The comic "RING!" burst also uses Creepster (director, 19 Nov, `docs/decisiones.md`). */
+const RING_SELECTOR = /(?:^|\s)\.ring-bubble$/;
 const HEADING_SELECTOR = /(?:^|\s)h[123]$/;
 const BANNER_LINE_SELECTOR = /\.finale-banner\s+\.line-1$/;
 
@@ -930,7 +932,11 @@ function fontRoleBreaks(css: string): string[] {
   const breaks: string[] = [];
   for (const { selectors, family } of fontRules(css)) {
     for (const selector of selectors) {
-      if (family.includes(FONT_LOGO) && !LOGO_SELECTOR.test(selector)) {
+      if (
+        family.includes(FONT_LOGO) &&
+        !LOGO_SELECTOR.test(selector) &&
+        !RING_SELECTOR.test(selector)
+      ) {
         breaks.push(`${selector} uses the logo font`);
       }
       const isTitle =
@@ -960,7 +966,7 @@ function widthQueries(css: string): string[] {
 describe("scenic fonts and breakpoint (Requirements 21.1 to 21.3, 19.1)", () => {
   const scenicStyles = [...scenicCssFiles];
 
-  it("the logo font is used only for the logo and the tagline", () => {
+  it("the logo font is used only for the logo, the tagline and the RING! burst", () => {
     expect(
       scenicStyles
         .map((f) => ({ path: f.path, breaks: fontRoleBreaks(f.text) }))

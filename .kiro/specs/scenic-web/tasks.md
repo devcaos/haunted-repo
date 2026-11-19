@@ -814,7 +814,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.1, 22.1_
     - _Design: "Props and panels" (Telephone, Ring)_
 
-  - [ ] 11.5 Add the phone widget
+  - [x] 11.5 Add the phone widget
     - Create `packages/web/src/view/scenic/phoneWidget.ts`: `.phone-widget` with the `aria-hidden` "RING!" bubble, the Answer_Button (visible "Answer the phone", `aria-label` from `callWaiting`, updated in the same render) and the Phone_Bubble. It sits in `.world-overlay` for the house and middle-floor frames and in `.scene-dock` for attic and basement (D14), same element and tab place. Activation: live report shows `house.powerLine` and sends nothing; sample with a Telephone_Target sends `start-ghost` for it through the guard; otherwise shows `TEXTS.phone.quiet`; the bubble text is announced through the Scenic_Announcer and stays until the next Scene change or activation. Styles in `stage.css` (Phone_Bubble Bone backing, Night text).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the answer the phone button`

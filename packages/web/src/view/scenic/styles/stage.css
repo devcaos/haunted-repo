@@ -334,6 +334,7 @@
 }
 .scenic .phone-widget.is-pinned .ring-bubble {
   --ring-base: var(--sc-hang-above) scale(var(--cam-counter));
+  font-size: var(--sc-text-burst);
   left: var(--sc-phone-ring-x);
   top: var(--sc-phone-ring-y);
   transform-origin: bottom;
@@ -395,4 +396,103 @@
   height: var(--sc-tail);
   transform: var(--sc-centre-y);
   clip-path: var(--sc-tail-left);
+}
+/* Answer_Button: a brass plaque with four rivets and an old telephone. */
+.scenic .answer-button {
+  --rivet:
+    var(--sc-brass-light) var(--sc-rivet-radius),
+    transparent calc(var(--sc-rivet-radius) + var(--sc-line));
+  --plaque-shadow:
+    inset 0 0 0 var(--sc-plaque-inset-1) var(--sc-night),
+    inset 0 0 0 var(--sc-plaque-inset-2) var(--sc-brass-dark),
+    0 var(--sc-plaque-depth) 0 var(--sc-brass-dark),
+    0 var(--sc-space-1) var(--sc-space-2) var(--sc-shadow-drop);
+  position: relative;
+  gap: var(--sc-space-2);
+  padding: var(--sc-space-1) var(--sc-space-4);
+  border: var(--sc-line-heavy) solid var(--sc-border);
+  border-radius: var(--sc-plaque-radius);
+  background:
+    radial-gradient(
+      circle at var(--sc-rivet-inset) var(--sc-rivet-inset),
+      var(--rivet)
+    ),
+    radial-gradient(
+      circle at calc(var(--sc-full) - var(--sc-rivet-inset))
+        var(--sc-rivet-inset),
+      var(--rivet)
+    ),
+    radial-gradient(
+      circle at var(--sc-rivet-inset)
+        calc(var(--sc-full) - var(--sc-rivet-inset)),
+      var(--rivet)
+    ),
+    radial-gradient(
+      circle at calc(var(--sc-full) - var(--sc-rivet-inset))
+        calc(var(--sc-full) - var(--sc-rivet-inset)),
+      var(--rivet)
+    ),
+    linear-gradient(to bottom, var(--sc-wood-dark), var(--sc-night));
+  box-shadow: var(--plaque-shadow);
+  color: var(--sc-candle);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-plaque);
+  font-weight: var(--sc-weight-body);
+}
+.scenic .answer-button:focus-visible {
+  box-shadow:
+    var(--plaque-shadow),
+    0 0 0 var(--sc-focus-halo-width) var(--sc-focus-halo);
+}
+/* Pressed: the plaque moves down by a line. It uses `top`, not a transform, so the glow stays behind it. */
+.scenic .answer-button:active {
+  top: var(--sc-line);
+  transform: none;
+}
+/* The warm glow behind the plaque while it rings: only its opacity changes. */
+.scenic .answer-button::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: calc(-1 * var(--sc-plaque-glow-grow));
+  border-radius: var(--sc-plaque-glow-grow);
+  background: radial-gradient(
+    ellipse at center,
+    var(--sc-pumpkin-glow),
+    transparent var(--sc-glow-fade)
+  );
+  opacity: 0;
+  pointer-events: none;
+}
+.scenic .answer-icon {
+  flex: none;
+  width: var(--sc-phone-icon);
+  height: var(--sc-phone-icon);
+}
+.scenic .icon-phone-handset,
+.scenic .icon-phone-base {
+  fill: var(--sc-brass-light);
+}
+.scenic .icon-phone-dial {
+  fill: var(--sc-brass-dark);
+}
+/* "RING!": a comic starburst in the logo font, tilted. */
+.scenic .ring-bubble {
+  box-sizing: border-box;
+  padding: var(--sc-burst-pad);
+  background-color: var(--sc-pumpkin);
+  clip-path: var(--sc-burst-shape);
+  color: var(--sc-night);
+  font-family: var(--font-logo);
+  font-size: var(--sc-text-burst-docked);
+  line-height: 1;
+  white-space: nowrap;
+}
+/* Phone_Bubble: an old paper note. */
+.scenic .phone-bubble {
+  max-width: var(--sc-note-max);
+  padding: var(--sc-note-pad);
+  border: var(--sc-line) solid var(--sc-brass-dark);
+  font-family: var(--font-title);
+  line-height: var(--sc-leading-title);
 }

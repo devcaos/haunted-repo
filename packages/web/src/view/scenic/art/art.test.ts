@@ -29,7 +29,7 @@ import {
   type VariantNumber,
 } from "../model/sceneLayout.js";
 import { GHOST_TYPES, VARIANTS, ghostArt } from "./ghosts.js";
-import { ICON_BOX, bestiaryArt, ghostIconArt } from "./icons.js";
+import { ICON_BOX, bestiaryArt, ghostIconArt, phoneIconArt } from "./icons.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
@@ -1271,6 +1271,28 @@ describe("Ring effects over the painted telephone (Requirements 9.1, 22.1)", () 
     for (const arc of arcs) {
       const r = Number(/A(\d+) /.exec(arc.d ?? "")?.[1]);
       inRoom(x - r, y - r, x + r, y + r);
+    }
+  });
+});
+
+describe("the Answer_Button icon (director's decision, 19 Nov)", () => {
+  const tree = phoneIconArt();
+  it("is a handset, a base and a dial that pass the Shape_Data rules", () => {
+    expect(shapeProblems(tree)).toEqual([]);
+    expect(nodesOf(tree).map((n) => n.cls)).toEqual(
+      expect.arrayContaining([
+        "icon-phone-handset",
+        "icon-phone-base",
+        "icon-phone-dial",
+      ]),
+    );
+  });
+  it("stays inside its box", () => {
+    for (const [x, y] of pointsOf(tree)) {
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(ICON_BOX);
+      expect(y).toBeGreaterThanOrEqual(0);
+      expect(y).toBeLessThanOrEqual(ICON_BOX);
     }
   });
 });
