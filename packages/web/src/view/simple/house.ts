@@ -12,7 +12,7 @@ import type {
 import type { AssetSlotId } from "../assets/manifest.js";
 import { resolveSlot } from "../assets/resolve.js";
 import { el } from "./dom.js";
-import { focusKeyOf } from "./focus.js";
+import { focusKeyOf } from "../shared/focus.js";
 
 const SCENE_SLOT: Record<Floor, AssetSlotId> = {
   attic: "scene.attic",

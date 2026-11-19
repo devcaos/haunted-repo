@@ -9,7 +9,11 @@ import { el } from "./dom.js";
 import { createAnswerBox, renderGhost } from "./ghost.js";
 import { renderHouse } from "./house.js";
 import { renderLicence } from "./licence.js";
-import { type FocusBefore, focusAfterRender, focusKeyOf } from "./focus.js";
+import {
+  type FocusBefore,
+  focusAfterRender,
+  focusKeyOf,
+} from "../shared/focus.js";
 
 // Dark launch (decision Q14): task 16.8 changes this to "./".
 const SCENIC_HREF = "?view=scenic";

@@ -2,7 +2,7 @@ import type { ActionSink, UserAction } from "../../logic/actions.js";
 import { TEXTS } from "../../logic/texts.js";
 import type { GhostView, ViewModel } from "../../logic/viewModel.js";
 import { el } from "./dom.js";
-import { focusKeyOf } from "./focus.js";
+import { focusKeyOf } from "../shared/focus.js";
 import { renderLicence } from "./licence.js";
 
 /** The label of a ghost action, or null for an action the panel does not show. */

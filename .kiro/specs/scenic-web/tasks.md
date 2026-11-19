@@ -716,7 +716,7 @@ These are settled by the approved design and are not reopened in these tasks:
   - Estimate: ~700 changed lines. Model: Auto.
   - _Design: "PR Split" row 2b_
 
-  - [ ] 10.1 Move the focus rule to `view/shared`
+  - [x] 10.1 Move the focus rule to `view/shared`
     - Move `packages/web/src/view/simple/focus.ts` and `focus.test.ts` to `packages/web/src/view/shared/` with no code change; update the imports in `simple/renderer.ts`, `simple/house.ts` and `simple/ghost.ts` (`../shared/focus.js`) and the test's relative paths.
     - Verify: `npm run check` exits `0`; the moved test has the same assertions.
     - Commit message: `refactor(web): move the focus rule to view/shared`

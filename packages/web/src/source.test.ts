@@ -177,7 +177,7 @@ describe("source scan", () => {
     for (const added of [
       GHOST_TS,
       RENDERER_TS,
-      "src/view/simple/focus.ts",
+      "src/view/shared/focus.ts",
       "src/logic/demoScript.ts",
       "src/logic/exorcism.ts",
     ]) {
