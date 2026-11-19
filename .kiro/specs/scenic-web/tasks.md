@@ -828,7 +828,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.1, 9.2, 9.3, 9.5, 9.6, 9.12, 2.7_
     - _Design: "Purely visual state of the Scenic_Renderer" (phone), "scenic/model/phoneBell.ts"_
 
-  - [ ] 11.7 Animate the Ring
+  - [x] 11.7 Animate the Ring
     - In `motion.css`: `phone-buzz`, `phone-glow`, `ring-pop`, `bubble-in` and the counter-scale transition in the no-preference block; under `reduce`, while Ringing, the "RING!" bubble and the glow are shown still (glow at 0.6), with no lines.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate the ringing telephone`

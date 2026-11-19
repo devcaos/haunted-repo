@@ -60,7 +60,75 @@
     transform: scaleY(1.08);
   }
 }
+/* The vibration arcs flicker on and off while the telephone rings. */
+@keyframes phone-buzz {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  60% {
+    opacity: 1;
+  }
+  40%,
+  80% {
+    opacity: 0.4;
+  }
+}
+/* The warm glow swells once per Ring. */
+@keyframes phone-glow {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+/* The RING! burst pops in; it keeps its place and its tilt. */
+@keyframes ring-pop {
+  0% {
+    opacity: 0;
+    transform: var(--ring-base) rotate(var(--sc-burst-tilt)) scale(0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: var(--ring-base) rotate(var(--sc-burst-tilt)) scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: var(--ring-base) rotate(var(--sc-burst-tilt)) scale(1);
+  }
+}
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 @media (prefers-reduced-motion: no-preference) {
+  /* The pinned widget keeps its size on screen while the Camera moves. */
+  .scenic .world-overlay .phone-widget .answer-slot,
+  .scenic .world-overlay .phone-widget .phone-bubble {
+    transition: transform var(--sc-dur-camera) var(--sc-ease-camera);
+  }
+  .house .telephone.is-ringing .phone-lines {
+    animation: phone-buzz var(--sc-dur-ring) steps(10) infinite;
+  }
+  .house .telephone.is-ringing .phone-glow,
+  .scenic .phone-widget.is-ringing .answer-button::after {
+    animation: phone-glow var(--sc-dur-ring) var(--sc-ease-in-out) infinite;
+  }
+  .scenic .phone-bubble {
+    animation: bubble-in var(--sc-dur-bubble-in) var(--sc-ease-out);
+  }
+  .scenic .phone-widget.is-ringing .ring-bubble {
+    animation: ring-pop var(--sc-dur-ring-pop) var(--sc-ease-out);
+  }
   /* press: a small, quick push on every button (Game-feel rule 1). */
   .scenic button {
     transition: transform var(--sc-dur-press) var(--sc-ease-out);
@@ -148,5 +216,14 @@
   }
   .scenic .house .fog {
     opacity: var(--sc-fog-still);
+  }
+  /* The Phone_Bubble still fades in: opacity only, 200 ms. */
+  .scenic .phone-bubble {
+    animation: bubble-in var(--sc-rm-fade-long) var(--sc-ease-out);
+  }
+  /* While ringing: the glow and the RING! burst are shown still, with no lines. */
+  .house .telephone.is-ringing .phone-glow,
+  .scenic .phone-widget.is-ringing .answer-button::after {
+    opacity: var(--sc-phone-glow-still);
   }
 }

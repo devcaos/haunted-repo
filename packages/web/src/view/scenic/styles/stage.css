@@ -496,3 +496,10 @@
   font-family: var(--font-title);
   line-height: var(--sc-leading-title);
 }
+/* While the telephone rings: the burst shows and the plaque border turns Pumpkin. */
+.scenic .phone-widget.is-ringing .ring-bubble {
+  display: inline-block;
+}
+.scenic .phone-widget.is-ringing .answer-button {
+  border-color: var(--sc-pumpkin);
+}
