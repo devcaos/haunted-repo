@@ -51,7 +51,7 @@ export function createBestiary(): Bestiary {
     "button",
     {
       type: "button",
-      class: "bestiary-toggle",
+      class: "secondary bestiary-toggle",
       "aria-expanded": "false",
       "aria-controls": LIST_ID,
     },

@@ -711,19 +711,19 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 10. PR 2b — Floor_Scene, Camera moves, Nameplates, focus
+- [x] 10. PR 2b — Floor_Scene, Camera moves, Nameplates, focus
   - Branch: `feat/scenic-web-2b`. Stacks on: `feat/scenic-web-2a`.
   - Estimate: ~700 changed lines. Model: Auto.
   - _Design: "PR Split" row 2b_
 
-  - [ ] 10.1 Move the focus rule to `view/shared`
+  - [x] 10.1 Move the focus rule to `view/shared`
     - Move `packages/web/src/view/simple/focus.ts` and `focus.test.ts` to `packages/web/src/view/shared/` with no code change; update the imports in `simple/renderer.ts`, `simple/house.ts` and `simple/ghost.ts` (`../shared/focus.js`) and the test's relative paths.
     - Verify: `npm run check` exits `0`; the moved test has the same assertions.
     - Commit message: `refactor(web): move the focus rule to view/shared`
     - _Requirements: 2.10, 17.10, 25.11_
     - _Design: "view/shared/focus.ts (moved)"_
 
-  - [ ] 10.2 Add the scenic focus rule
+  - [x] 10.2 Add the scenic focus rule
     - Create `packages/web/src/view/scenic/model/scenicFocus.ts`: `ScenicFocusTarget` and `scenicFocusAfterRender(prev, next, before, layout)` with the three rules of the design (from the Ghost_Scene to the start button key when it is in `layout.startControls`; any other transition to the Scene_Heading; no transition delegates to `focusAfterRender`).
     - Create `packages/web/src/view/scenic/model/scenicFocus.test.ts` with the real controller: house to floor gives the Scene_Heading; ghost to floor after `leave-ghost` gives `start-ghost:<path>`; after an exorcism gives the Scene_Heading; transition `null` follows `focusAfterRender`.
     - Verify: `npm run check` exits `0`.
@@ -731,42 +731,42 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 17.7, 17.8_
     - _Design: "scenic/model/scenicFocus.ts"_
 
-  - [ ] 10.3 Build the scene controls
+  - [x] 10.3 Build the scene controls
     - Create `packages/web/src/view/scenic/sceneControls.ts`, rebuilt every render from `sceneLayout`: `.scene-bar` (Scene_Heading `h2` with `tabindex="-1"`, taken over from task 5.8, and "Back to the house"), `nav.floor-stair` (one button per floor button, visible label the title, `aria-label` the accessible name), `ul.nameplates` (`article.nameplate` with `aria-label`, `data-ghost-state`, path in `--font-code`, reason, score line, state label, the always-visible locked line, and the start button with `aria-describedby` when `hasStart`; no focusable element on Locked Nameplates), the empty-floor line. Every control sends through the guard.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add floor buttons and nameplates`
     - _Requirements: 3.6, 3.7, 3.10, 6.4, 6.5, 6.6, 6.9, 6.10, 8.3, 8.4, 8.5, 8.6, 8.7, 8.9, 8.12, 8.13, 17.3_
     - _Design: "DOM modules" (sceneControls.ts), "Accessible names"_
 
-  - [ ] 10.4 Apply focus after each render
+  - [x] 10.4 Apply focus after each render
     - In `renderer.ts`: record `FocusBefore` before the rebuild, apply `scenicFocusAfterRender` after it, then the safety net (if focus is on `body`, not connected, or inside `[hidden]` or `[inert]`, focus the Scene_Heading) before `render` returns. DOM order gives the tab order of the design table.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): move focus with the scenic scenes`
     - _Requirements: 17.4, 17.5, 17.7, 17.8, 17.9_
     - _Design: "scenic/model/scenicFocus.ts" (safety net), "Tab order per Scene"_
 
-  - [ ] 10.5 Move the Camera between scenes
+  - [x] 10.5 Move the Camera between scenes
     - In `stage.ts` and `renderer.ts`: a render with a `transition` sets the new Camera transform (the CSS transition runs from the current position, so a newer render wins); a `transition` of `null` keeps the framing; the two other floors are dimmed in a Floor_Scene. In `motion.css`: the `camera` and `floor dim` transitions (700 ms, `cubic-bezier(0.65, 0, 0.35, 1)`) in the no-preference block; under `reduce` the Camera has no transition (instant cut) and the dim is a 150 ms opacity fade.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): move the camera to each floor`
     - _Requirements: 8.1, 8.2, 8.8, 8.10, 8.11, 18.3_
     - _Design: "Camera frames", "Animation Catalogue", D3_
 
-  - [ ] 10.6 Style the Floor_Scene controls
+  - [x] 10.6 Style the Floor_Scene controls
     - In `stage.css` (tokens only): scene bar, floor stair at the stage positions of "World geometry", Nameplate rail (Night backing, Brass notched border, state label colours), narrow layout under 64rem, touch targets, no horizontal scroll at 360 px.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): style the floor scene controls`
     - _Requirements: 8.3, 17.12, 17.13, 19.4, 21.3_
     - _Design: "Props and panels" (Nameplate), "World geometry"_
 
-  - [ ] 10.7 Add the floor screenshots
+  - [x] 10.7 Add the floor screenshots
     - In `shotList.ts` and `shots.ts` add `02-floor-attic`, `03-floor-middle`, `04-floor-basement` and `17-reduced-floor-attic`; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot the floor scenes`
     - _Requirements: 24.4, 24.5_
     - _Design: "Shots", "Flow per viewport"_
 
-  - [ ] 10.8 Checkpoint and PR 2b
+  - [x] 10.8 Checkpoint and PR 2b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 2c, task 11.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-2a -- . ':(exclude)package-lock.json'`.
