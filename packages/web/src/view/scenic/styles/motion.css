@@ -68,6 +68,14 @@
   .scenic button:active {
     transform: translateY(var(--sc-line)) scale(0.98);
   }
+  /* The Camera glides to the new frame; a newer render starts from where it is (D3). */
+  .scenic .world {
+    transition: transform var(--sc-dur-camera) var(--sc-ease-camera);
+  }
+  /* The two other floors fade to their dimmed look as the Camera arrives. */
+  .house .dim {
+    transition: opacity var(--sc-dur-camera) var(--sc-ease-camera);
+  }
   .house .rain {
     animation: rain-fall var(--sc-dur-rain-fall) var(--sc-ease-linear) infinite;
   }
@@ -128,6 +136,13 @@
 }
 /* Reduced_Motion: rain and fog are drawn still (D9). */
 @media (prefers-reduced-motion: reduce) {
+  /* Reduced_Motion: the Camera cuts to the new frame and the dim is a short fade. */
+  .scenic .world {
+    transition: none;
+  }
+  .house .dim {
+    transition: opacity var(--sc-rm-fade) var(--sc-ease-out);
+  }
   .scenic .house .rain {
     opacity: var(--sc-rain-still);
   }

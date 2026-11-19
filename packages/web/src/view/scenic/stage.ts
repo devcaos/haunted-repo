@@ -96,6 +96,7 @@ export function createStage(sceneHref: string | null): Stage {
   ]);
 
   let signature: string | null = null;
+  let lastTransform: string | null = null;
 
   return {
     element,
@@ -129,9 +130,15 @@ export function createStage(sceneHref: string | null): Stage {
         node.classList.toggle("is-dimmed", layout.dimmedFloors.includes(floor));
       }
 
+      // Set only when the frame or the viewport changed, so a render that keeps
+      // the framing never touches a Camera move that is still running.
       const camera = cameraFor(layout.frame, view.viewport);
-      world.style.transform = cssTransform(camera);
-      world.style.setProperty("--cam-counter", String(camera.counterScale));
+      const transform = cssTransform(camera);
+      if (transform !== lastTransform) {
+        lastTransform = transform;
+        world.style.transform = transform;
+        world.style.setProperty("--cam-counter", String(camera.counterScale));
+      }
     },
   };
 }

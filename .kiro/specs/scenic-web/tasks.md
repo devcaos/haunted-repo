@@ -745,7 +745,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 17.4, 17.5, 17.7, 17.8, 17.9_
     - _Design: "scenic/model/scenicFocus.ts" (safety net), "Tab order per Scene"_
 
-  - [ ] 10.5 Move the Camera between scenes
+  - [x] 10.5 Move the Camera between scenes
     - In `stage.ts` and `renderer.ts`: a render with a `transition` sets the new Camera transform (the CSS transition runs from the current position, so a newer render wins); a `transition` of `null` keeps the framing; the two other floors are dimmed in a Floor_Scene. In `motion.css`: the `camera` and `floor dim` transitions (700 ms, `cubic-bezier(0.65, 0, 0.35, 1)`) in the no-preference block; under `reduce` the Camera has no transition (instant cut) and the dim is a 150 ms opacity fade.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): move the camera to each floor`
