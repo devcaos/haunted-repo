@@ -1,5 +1,7 @@
-﻿/*
+/*
  * Layout of the dev-only gallery page. Tokens only.
+ * Each Ghost_Type is a section; inside it every column is one Variant and its
+ * three rows are Haunted, Locked and Exorcised.
  */
 .gallery {
   padding: var(--sc-space-4);
@@ -15,19 +17,37 @@
   font-size: var(--sc-text-h2);
   font-weight: var(--sc-weight-body);
 }
+.gallery h2 {
+  margin: 0 0 var(--sc-space-2);
+  color: var(--sc-text-heading);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-h3);
+  font-weight: var(--sc-weight-body);
+}
+.gallery-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sc-space-3);
+}
+.gallery-type {
+  flex: 1 1 var(--sc-field-min);
+  min-width: 0;
+}
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--sc-field-min), 1fr));
-  gap: var(--sc-space-3);
+  grid-auto-flow: column;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  gap: var(--sc-space-1);
 }
 .gallery-cell {
   margin: 0;
-  padding: var(--sc-space-2);
+  padding: var(--sc-space-1);
   background-color: var(--sc-backing-raised);
 }
 .gallery-art {
   display: block;
-  width: var(--sc-field-min);
+  width: var(--sc-full);
 }
 .gallery-cell figcaption {
   color: var(--sc-text-muted);

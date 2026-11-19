@@ -694,7 +694,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.4, 4.12, 5.12, 7.1, 7.4, 7.5, 7.6_
     - _Design: "Props and panels" (Bestiary, Ghost_Icons), D2, decision Q31_
 
-  - [ ] 9.8 Fill the Gallery grid
+  - [x] 9.8 Fill the Gallery grid
     - In `gallery/gallery.ts` (today: the three types at Variant 0, Haunted) draw 3 Ghost_Types × 5 Variants × 3 states (Haunted, Locked in its Cloche, Exorcised candle) with HTML labels, using `ghostArt` and the slot drawings of `art/props.ts`.
     - Verify: `npm run check` exits `0`; `npm run shots` writes the full `19-gallery`.
     - Commit message: `feat(web): show every ghost variant in the gallery`
