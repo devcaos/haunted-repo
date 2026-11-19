@@ -43,6 +43,13 @@
   --sc-warm-orange: #f59a45;
   --sc-cold-white: #e8f0fb;
   --sc-dawn: #e9894a;
+  /* The Ring: glow and arcs drawn over the painted telephone */
+  --sc-phone-glow-core: 0.55;
+  --sc-phone-arc-1: 0.9;
+  --sc-phone-arc-2: 0.65;
+  --sc-phone-arc-3: 0.4;
+  --sc-phone-glow-still: 0.6;
+
   /* Roles */
   --sc-text: var(--sc-bone);
   --sc-text-heading: var(--sc-candle);

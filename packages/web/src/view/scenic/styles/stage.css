@@ -259,3 +259,34 @@
 .house .dim.is-dimmed {
   opacity: var(--sc-dim);
 }
+/*
+ * The Ring effects over the painted telephone: a Pumpkin glow that fades from
+ * its centre, and three Bone arcs on each side (fainter the farther out).
+ * Both are hidden until the telephone layer is ringing (motion.css).
+ */
+.house .phone-glow {
+  opacity: 0;
+}
+.house .stop-phone-0 {
+  stop-color: var(--sc-pumpkin);
+  stop-opacity: var(--sc-phone-glow-core);
+}
+.house .stop-phone-1 {
+  stop-color: var(--sc-pumpkin);
+  stop-opacity: 0;
+}
+.house .phone-lines {
+  opacity: 0;
+  stroke: var(--sc-bone);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.house .phone-line-1 {
+  opacity: var(--sc-phone-arc-1);
+}
+.house .phone-line-2 {
+  opacity: var(--sc-phone-arc-2);
+}
+.house .phone-line-3 {
+  opacity: var(--sc-phone-arc-3);
+}

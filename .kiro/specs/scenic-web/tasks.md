@@ -806,7 +806,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.3, 9.4, 9.12_
     - _Design: "Correctness Properties", Property 15_
 
-  - [ ] 11.4 Draw the Ring effects
+  - [x] 11.4 Draw the Ring effects
     - The telephone is painted in the illustration, at `TELEPHONE_ANCHOR` (536, 611); the page does not redraw it. In `art/props.ts` add `ringEffectsArt()`: only the vibration arcs (`phone-lines`, 3 on each side, Bone) and the Pumpkin radial glow (`phone-glow`) around that point, with no handset and no base, no logo and no text. `stage.ts` mounts it in the existing `telephone` layer.
     - Extend `art.test.ts`: the tree passes the rules, has the `phone-lines` and `phone-glow` parts, has no handset or base part, and is centred on `TELEPHONE_ANCHOR`.
     - Verify: `npm run check` exits `0`.

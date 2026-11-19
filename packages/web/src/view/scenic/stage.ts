@@ -6,7 +6,7 @@ import {
   atticClip,
   sceneBackdrop,
 } from "./art/house.js";
-import { chainedDoorArt, slotArt } from "./art/props.js";
+import { chainedDoorArt, ringEffectsArt, slotArt } from "./art/props.js";
 import { defs, g, rect } from "./art/shapes.js";
 import { weatherLayer } from "./art/weather.js";
 import { el } from "./dom.js";
@@ -77,9 +77,10 @@ export function createStage(sceneHref: string | null): Stage {
     mountShape(sceneBackdrop(sceneHref), "house-"),
     slots,
     dims,
-    // Filled by the Telephone in task 11.1 and the effects in task 15.4.
-    mountShape(g("telephone", []), "house-"),
+    // The Ring effects; the renderer adds `is-ringing` to this layer (task 11.7).
+    mountShape(g("telephone", [ringEffectsArt()]), "house-"),
     mountShape(weatherLayer(), "house-"),
+    // Filled by the effects of task 15.4.
     mountShape(g("effects", []), "house-"),
   );
 
