@@ -678,7 +678,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.7, 6.2, 18.4_
     - _Design: "Animation Catalogue", "Source_Scan additions" item 11_
 
-  - [ ] 9.6 Add the Bestiary texts and the texts test
+  - [x] 9.6 Add the Bestiary texts and the texts test
     - In `texts.ts` add `bestiary` (`title`, `names`, `ranges`, `rangeLine`) with the design values (additions only).
     - Create `packages/web/src/view/scenic/model/scenicTexts.test.ts`: three Bestiary entries in the order Wisp, Lantern_Wraith, Chained_Brute with names, floor titles from `TEXTS.floorTitles` and ranges; for each range `floorOf(low)` and `floorOf(high)` return its floor; every new `TEXTS` key added so far exists; every `POWER_TEXTS` addition contains "Power".
     - Verify: `npm run check` exits `0`.

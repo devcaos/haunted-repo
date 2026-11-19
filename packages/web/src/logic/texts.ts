@@ -79,4 +79,20 @@ export const TEXTS = {
     lockedLine: string | null,
   ) =>
     `${path}, ${floor}, difficulty ${score} of 100, ${state}${lockedLine === null ? "" : `, ${lockedLine}`}`,
+  // The Bestiary: one entry per Ghost_Type, in floor order. The ranges are
+  // literal texts, checked against floorOf in scenicTexts.test.ts.
+  bestiary: {
+    title: "Bestiary",
+    names: {
+      attic: "Wisp",
+      "middle floor": "Lantern Wraith",
+      basement: "Chained Brute",
+    },
+    ranges: {
+      attic: "0 to 33",
+      "middle floor": "34 to 66",
+      basement: "67 to 100",
+    },
+    rangeLine: (range: string) => `Difficulty ${range}`,
+  },
 } as const;
