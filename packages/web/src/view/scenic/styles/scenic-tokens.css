@@ -117,6 +117,8 @@
   --sc-rail-width: 75%;
   --sc-rail-height: 28%;
   --sc-notch: 0.5rem;
+  /* Widest Nameplate on the rail: cards keep their four-Card size when a floor has fewer */
+  --sc-nameplate-max: 16rem;
   /* Focus */
   --sc-focus-width: 2px;
   --sc-focus-offset: 2px;

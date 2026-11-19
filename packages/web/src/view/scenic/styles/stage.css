@@ -199,6 +199,7 @@
   }
   .scenic .nameplates > li {
     flex: 1 1 0;
+    max-width: var(--sc-nameplate-max);
   }
 }
 /*
