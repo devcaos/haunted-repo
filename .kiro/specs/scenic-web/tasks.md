@@ -776,6 +776,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: none (git workflow)_
 
 - [ ] 11. PR 2c — Telephone
+  - Split on 19 Nov (director): part 1 = PR #65 (11.1, 11.4, 11.5, 11.7, with the brass plaque look); part 2 = 11.2, 11.3, 11.6, 11.8 on branch `feat/scenic-web-2c-2` from main.
   - Branch: `feat/scenic-web-2c`. Stacks on: `feat/scenic-web-2b`.
   - Estimate: ~630 changed lines. Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 2c_
