@@ -105,6 +105,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 - Low (web-demo PR 2, fix de foco): durante un análisis en vivo se desactiva el botón de enviar del formulario y algunos navegadores sueltan el foco de un botón desactivado; el formulario está fuera de `main` y `focusAfterRender` no lo trata.
 - Low (revisión PR #29, web-demo PR 2 pieza 4): `renderer.ts`: el test de la caja de respuesta (`source.test.ts`) solo lo detecta si la variable se llama `answerBox`.
 - Low (revisión PR #29, web-demo PR 2 pieza 4): la parte del renderizador que mueve el foco del teclado en la página real no tiene test; solo tiene tests la función pura que decide adónde va el foco. Se cubre con la comprobación manual.
+- Gallery (dev only): the candle light is cut at the card edges and the type titles show underscores. Low.
 - Cerrado (revisión PR #29): `docs/kiro-usage-log.md` citaba el commit `8c4ab18`, que tras el rebase se llama `69b2b50`. Corregido en la rama `docs/cleanup-after-exorcism`.
 
 ## Hecho

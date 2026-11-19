@@ -474,3 +474,13 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 - **Qué pasó:** Puse el script temporal en `packages/web/shots/tuning/`. Git lo ignora, pero ESLint y Prettier no, y `npm run check` falló por él. Además, la herramienta de terminal rechazó un `node -e` con expresiones regulares porque no lo podía analizar. Y volví a mandar a la vez una edición de `PLAN.md` y su commit; esta vez la edición llegó antes, pero fue suerte.
 - **Cómo lo rodeé:** Moví los scripts a `%TEMP%\haunted-tuning\` (fuera del repo) y dejé en `shots/tuning/` solo los PNG. Comprobé las reglas del escaneo con los propios tests en vez del `node -e`. Revisé el commit con `git show` y confirmé que tenía los tres cambios.
 - **Estado:** cerrado
+## 19 nov 2026: Las tareas 9.2 y 9.3 pasaron el límite de ~200 líneas cambiadas
+- **Qué intentaba:** Hacer las tareas 9.2 y 9.3 de la PR 2a, cada una en su commit.
+- **Qué pasó:** Las dos pasaron de unas 200 líneas cambiadas y no me di cuenta hasta después de hacer el commit.
+- **Cómo lo rodeé:** Lo avisé al director. Lección: ejecutar `git diff --shortstat` antes de cada commit.
+- **Estado:** cerrado
+## 19 nov 2026: La banda del ático aprobada pasaba del suelo del ático (arreglos visuales de la PR 2a)
+- **Qué intentaba:** Hacer el commit C: banda del ático `{ x: 570, y: 370, w: 370, h: 106 }`.
+- **Qué pasó:** La banda acababa en y 476, 3 unidades por debajo del suelo del ático (`FLOOR_RECT` y `FLOOR_LINE`, 473). Fallaron la propiedad «Ghost_Slots fit their floor and never overlap» y el test «every slot stands above its floor line». La regla del encargo era no cambiar esas pruebas, así que paré y pregunté.
+- **Cómo lo rodeé:** El director eligió subir la banda a y 367 con la misma altura (106). `FLOOR_RECT` y `FLOOR_LINE` no cambian.
+- **Estado:** cerrado
