@@ -803,7 +803,7 @@ The Lantern_Wraith and the Chained_Brute use the same drawing with the scale and
 | Telephone | Painted in the illustration: the old rotary telephone on its table in the hall, at `TELEPHONE_ANCHOR`. The page draws no telephone of its own. |
 | Ring | Ring effects drawn by the page around the painted telephone: 3 vibration arcs on each side (`phone-lines`, Bone), a Pumpkin radial glow behind (`phone-glow`), and the HTML "RING!" bubble (Pumpkin text, Night backing, Pumpkin 2 px border, jagged-corner shape from `clip-path` polygon). |
 | Question_Candles | Three tall candles on a shelf at the lower right of the room (Bone wax, Brass holders). Unlit: black wick and a thin still Mist smoke line. Lit: Candle flame with a Pumpkin core and a warm glow r 30. |
-| Chained door | Rust door with two Mist chains crossing in an X and a black iron hook; no padlock, so it is never confused with a Locked ghost. |
+| Chained door | Dark wooden arched door in a dark iron surround, two dark iron chains crossing in an X and an iron hook; no padlock, so it is never confused with a Locked ghost. |
 | Nameplate | HTML: Night backing, Brass 2 px border with notched corners, path in `--font-code` (Bone), difficulty line (Candle), state label (Spectral when Haunted, Candle when Exorcised, Mist when Locked), reason (Bone, small), locked line (Spectral), start button. |
 | Grimoire | HTML book page: Slate backing, Brass corner pieces, IM Fell English headings in Candle, body text Bone; choices are full-width rows with a Pumpkin triangle marker drawn with `clip-path` (no text content). Code_Block: Night backing, Bone text, `--font-code`. |
 | HUD panels | Solid Night (opacity 1) with a Brass 1 px line; never translucent (4.18). |
@@ -848,7 +848,7 @@ Every animation animates only `transform` and `opacity` (Requirement 20.1). Ever
 | camera (transition) | `.world` | transform | 700 ms | `cubic-bezier(0.65, 0, 0.35, 1)` | one-shot | none: instant cut |
 | counter-scale (transition) | `.world-overlay .phone-widget` | transform | 700 ms | same | one-shot | none |
 | floor dim (transition) | `rect.dim` | opacity | 700 ms | same | one-shot | 150 ms fade |
-| `rain-fall` | `g.rain` | transform: translate(−40, 200) | 800 ms | linear | infinite | none; drawn still at 0.25 |
+| `rain-fall` | `g.rain` (far and near) | transform: translate(−80, 200) | 600 ms near, 1600 ms far | linear | infinite | none; drawn still at 0.25 |
 | `fog-drift` | `g.fog` (both bands) | transform: translateX ±60 | 24 s | ease-in-out | infinite alternate | none; still at 0.35 |
 | `wisp-float` | `.ghost--wisp .ghost-idle` | transform | 5.6 s | ease-in-out | infinite | none |
 | `wraith-sway` | `.ghost--lantern-wraith .ghost-idle` | transform | 4.2 s | ease-in-out | infinite alternate | none |
