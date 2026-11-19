@@ -723,7 +723,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.10, 17.10, 25.11_
     - _Design: "view/shared/focus.ts (moved)"_
 
-  - [ ] 10.2 Add the scenic focus rule
+  - [x] 10.2 Add the scenic focus rule
     - Create `packages/web/src/view/scenic/model/scenicFocus.ts`: `ScenicFocusTarget` and `scenicFocusAfterRender(prev, next, before, layout)` with the three rules of the design (from the Ghost_Scene to the start button key when it is in `layout.startControls`; any other transition to the Scene_Heading; no transition delegates to `focusAfterRender`).
     - Create `packages/web/src/view/scenic/model/scenicFocus.test.ts` with the real controller: house to floor gives the Scene_Heading; ghost to floor after `leave-ghost` gives `start-ghost:<path>`; after an exorcism gives the Scene_Heading; transition `null` follows `focusAfterRender`.
     - Verify: `npm run check` exits `0`.
