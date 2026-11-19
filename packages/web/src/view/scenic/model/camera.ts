@@ -53,13 +53,15 @@ export function frameRect(frame: Frame, viewport: ViewportClass): Rect {
  * narrow one 1600 x 1600). On wide screens the HUD sidebar (22rem) covers the
  * left of the stage, which is about x 0 to 400 at 1440 x 900, so every scene
  * fits right of x 400. The House frame starts at y 66, below the scene
- * heading bar at the top right, so the spire tip is never under it.
+ * heading bar at the top right, so the spire tip is never under it. Floor and
+ * slot frames fit y 110 to 660: the Nameplate rail covers y 660 to 1000, so
+ * its start buttons stay on screen on short laptop screens.
  */
 export function sceneArea(frame: Frame, viewport: ViewportClass): Rect {
   if (viewport === "narrow") return { x: 40, y: 40, w: 1520, h: 1520 };
   return frame.kind === "house"
     ? { x: 400, y: 66, w: 1200, h: 934 }
-    : { x: 400, y: 110, w: 1200, h: 610 };
+    : { x: 400, y: 110, w: 1200, h: 550 };
 }
 
 function round4(value: number): number {
