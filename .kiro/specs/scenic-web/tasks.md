@@ -642,6 +642,7 @@ These are settled by the approved design and are not reopened in these tasks:
 - [ ] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
   - Branch: `feat/scenic-web-2a`. Stacks on: an up-to-date `main` (PR 1f is merged and task 8.1 is approved); the PR targets `main`.
   - Estimate: ~700 changed lines (task 9.1 is withdrawn). Model: Auto (Opus only with the director's yes).
+  - Split on 19 Nov (director): part 1 = PR #62 (9.2, 9.3, 9.4, 9.8 and the visual fixes); part 2 = 9.5, 9.6, 9.7, 9.9 on branch `feat/scenic-web-2a-2` from main.
   - _Design: "PR Split" row 2a_
 
   - [x] 9.1 (Withdrawn 19 Nov: the three Ghost_Types already exist at Variant 0 with their tests since PR #59)
