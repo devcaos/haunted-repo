@@ -114,6 +114,22 @@
   --sc-stage-wide: min(100vw, 160dvh);
   --sc-viewport-height: 100vh;
   --sc-icon-size: 1.25rem;
+  /* The phone widget: where it sits on the painted house, in percent of the world (x 1600, y 1000) */
+  --sc-phone-pin-x: 33.5%;
+  --sc-phone-button-y: 63.3%;
+  --sc-phone-note-y: 59.8%;
+  --sc-phone-ring-x: 31%;
+  --sc-phone-ring-y: 55.6%;
+  --sc-answer-min: 2.875rem;
+  --sc-burst-tilt: -12deg;
+  --sc-tail: 0.6rem;
+  --sc-half: 50%;
+  --sc-hang-below: translate(-50%, 0);
+  --sc-hang-above: translate(-50%, -100%);
+  --sc-centre-x: translateX(-50%);
+  --sc-centre-y: translateY(-50%);
+  --sc-tail-down: polygon(0 0, 100% 0, 50% 100%);
+  --sc-tail-left: polygon(100% 0, 100% 100%, 0 50%);
   --sc-bestiary-art-w: 3.5rem;
   --sc-bestiary-art-h: 4.5rem;
   --sc-meter-height: 0.75rem;

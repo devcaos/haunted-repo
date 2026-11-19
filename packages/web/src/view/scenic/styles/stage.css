@@ -290,3 +290,109 @@
 .house .phone-line-3 {
   opacity: var(--sc-phone-arc-3);
 }
+
+/*
+ * The scene dock holds the phone widget where it is not pinned under the
+ * painted telephone: a row under the stage view on narrow screens (before the
+ * floor stair, so the Answer_Button comes first in the tab order), and on wide
+ * screens a second row at the top left, under the floor buttons.
+ */
+.scenic .scene-dock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc-space-2);
+  padding: var(--sc-space-3);
+}
+.scenic .phone-widget.is-docked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sc-space-3);
+}
+@media (min-width: 64rem) {
+  .scenic .scene-dock {
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--sc-space-3) + var(--sc-touch) + var(--sc-space-2));
+    left: calc(var(--sc-hud-width) + var(--sc-space-3));
+    padding: 0;
+  }
+}
+/* Pinned: the widget is a set of pieces placed on the painted house, counter-scaled against the Camera. */
+.scenic .phone-widget.is-pinned .answer-slot,
+.scenic .phone-widget.is-pinned .ring-bubble,
+.scenic .phone-widget.is-pinned .phone-bubble {
+  position: absolute;
+}
+.scenic .phone-widget.is-pinned .answer-slot {
+  left: var(--sc-phone-pin-x);
+  top: var(--sc-phone-button-y);
+  transform: var(--sc-hang-below) scale(var(--cam-counter));
+  transform-origin: top;
+  pointer-events: auto;
+}
+.scenic .phone-widget.is-pinned .ring-bubble {
+  --ring-base: var(--sc-hang-above) scale(var(--cam-counter));
+  left: var(--sc-phone-ring-x);
+  top: var(--sc-phone-ring-y);
+  transform-origin: bottom;
+}
+.scenic .phone-widget.is-pinned .phone-bubble {
+  left: var(--sc-phone-pin-x);
+  top: var(--sc-phone-note-y);
+  transform: var(--sc-hang-above) scale(var(--cam-counter));
+  transform-origin: bottom;
+  /* Room for the tail that points down to the telephone. */
+  margin-top: calc(-1 * var(--sc-tail));
+}
+.scenic .answer-slot {
+  display: flex;
+  isolation: isolate;
+}
+/*
+ * The camera counter-scale is rounded, so a pinned button can land a hair
+ * under 44 px; the extra minimum height keeps every frame at 44 px or more.
+ */
+.scenic .answer-button {
+  min-height: var(--sc-answer-min);
+  white-space: nowrap;
+}
+/* "RING!" shows only while ringing (motion.css). */
+.scenic .ring-bubble {
+  --ring-base: none;
+  display: none;
+  transform: var(--ring-base) rotate(var(--sc-burst-tilt));
+}
+/* Phone_Bubble: Bone backing, Night text, a small tail that points to the telephone. */
+.scenic .phone-bubble {
+  position: relative;
+  box-sizing: border-box;
+  background-color: var(--sc-bone);
+  color: var(--sc-night);
+  overflow-wrap: anywhere;
+}
+.scenic .phone-bubble::after {
+  content: "";
+  position: absolute;
+  background-color: var(--sc-bone);
+}
+.scenic .phone-widget.is-pinned .phone-bubble::after {
+  top: calc(var(--sc-full) - var(--sc-line));
+  left: var(--sc-half);
+  width: var(--sc-tail);
+  height: var(--sc-tail);
+  transform: var(--sc-centre-x);
+  clip-path: var(--sc-tail-down);
+}
+.scenic .phone-widget.is-docked .phone-bubble {
+  margin-left: var(--sc-tail);
+}
+.scenic .phone-widget.is-docked .phone-bubble::after {
+  top: var(--sc-half);
+  right: calc(var(--sc-full) - var(--sc-line));
+  width: var(--sc-tail);
+  height: var(--sc-tail);
+  transform: var(--sc-centre-y);
+  clip-path: var(--sc-tail-left);
+}
