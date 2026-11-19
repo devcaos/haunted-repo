@@ -117,3 +117,139 @@
   stroke-width: 3;
   stroke-linecap: round;
 }
+
+/*
+ * A Locked ghost (Requirement 6.3): the same drawing, with its own colours and
+ * glow, at the locked opacity under glass (director's decision, 19 Nov).
+ */
+.ghost.look-locked {
+  opacity: var(--sc-locked);
+}
+/* The Cloche: pale glass that is clearer in the middle, with two sheen strokes. */
+.cloche .stop-glass-edge {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.22;
+}
+.cloche .stop-glass-mid {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.08;
+}
+.cloche .cloche-dome {
+  stroke: var(--sc-spectral);
+  stroke-opacity: 0.6;
+  stroke-width: 5;
+}
+.cloche .cloche-sheen-wide,
+.cloche .cloche-sheen-thin {
+  stroke: var(--sc-cold-white);
+  stroke-linecap: round;
+}
+.cloche .cloche-sheen-wide {
+  stroke-opacity: 0.5;
+  stroke-width: 5;
+}
+.cloche .cloche-sheen-thin {
+  stroke-opacity: 0.18;
+  stroke-width: 3;
+}
+.cloche .cloche-knob {
+  fill: var(--sc-brass);
+}
+.cloche .stop-brass-light {
+  stop-color: var(--sc-brass-light);
+}
+.cloche .stop-brass-dark {
+  stop-color: var(--sc-brass-dark);
+}
+.cloche .cloche-base-foot {
+  fill: var(--sc-brass-dark);
+}
+/* The pedestal, its contact shadow and the cold light trapped in the glass. */
+.slot-locked .cloche-pedestal {
+  fill: var(--sc-door-wood);
+}
+.slot-locked .cloche-pedestal-foot {
+  fill: var(--sc-brown-dark);
+}
+.slot-locked .cloche-contact {
+  fill: var(--sc-iron-dark);
+  opacity: 0.65;
+}
+.slot-locked .stop-inner-0 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0.45;
+}
+.slot-locked .stop-inner-1 {
+  stop-color: var(--sc-spectral);
+  stop-opacity: 0;
+}
+/* The padlock: a grey iron shackle on a Brass body with a dark keyhole. */
+.padlock .padlock-shackle {
+  stroke: var(--sc-iron-light);
+  stroke-width: 5;
+}
+.padlock .padlock-body {
+  fill: var(--sc-brass);
+  stroke: var(--sc-brown-dark);
+  stroke-width: 1.5;
+}
+.padlock .padlock-keyhole {
+  fill: var(--sc-brown-dark);
+}
+/*
+ * The Exorcised candle (Requirement 6.8): warm light means code that is
+ * yours. The pool is warm orange at the middle, Candle in the ring, then
+ * nothing.
+ */
+.slot-exorcised .stop-pool-0 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 1;
+}
+.slot-exorcised .stop-pool-1 {
+  stop-color: var(--sc-candle);
+  stop-opacity: 0.5;
+}
+.slot-exorcised .stop-pool-2 {
+  stop-color: var(--sc-candle);
+  stop-opacity: 0;
+}
+.slot-exorcised .stop-wax-shade {
+  stop-color: var(--sc-wax-shade);
+}
+.slot-exorcised .stop-wax-light {
+  stop-color: var(--sc-wax-light);
+}
+.slot-exorcised .candle-holder {
+  fill: var(--sc-brass-dark);
+}
+.slot-exorcised .candle-cup {
+  fill: var(--sc-brass);
+}
+.slot-exorcised .candle-drip {
+  fill: var(--sc-wax-light);
+}
+.slot-exorcised .candle-wick {
+  stroke: var(--sc-brown-dark);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.slot-exorcised .stop-halo-0 {
+  stop-color: var(--sc-candle);
+  stop-opacity: 0.45;
+}
+.slot-exorcised .stop-halo-1 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0;
+}
+.slot-exorcised .stop-flame-0 {
+  stop-color: var(--sc-flame-pale);
+}
+.slot-exorcised .stop-flame-1 {
+  stop-color: var(--sc-candle);
+}
+.slot-exorcised .stop-flame-2 {
+  stop-color: var(--sc-warm-orange);
+}
+.slot-exorcised .flame-core {
+  fill: var(--sc-flame-pale);
+}

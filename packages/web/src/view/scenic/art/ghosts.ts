@@ -1,4 +1,8 @@
-import { GHOST_BOX, type GhostType } from "../model/sceneLayout.js";
+import {
+  GHOST_BOX,
+  type GhostType,
+  type VariantNumber,
+} from "../model/sceneLayout.js";
 import {
   circle,
   defs,
@@ -46,17 +50,66 @@ const REF_FOLDS =
   "M-14 70 C-18 110 -16 150 -12 186 M8 66 C10 110 8 150 10 190 M-2 60 C-4 120 -2 170 1 230";
 const REF_FACE =
   "M-13 32 C-12 18 -4 12 1 12 C8 13 13 22 12 34 C11 47 6 54 0 54 C-7 54 -14 45 -13 32 Z";
-/** [cx, cy, tilt] of each eye. */
-const REF_EYES = [
-  [-5, 33, 16],
-  [5, 32, -12],
-] as const;
+/** One eye in reference units: centre, tilt in degrees and radii. */
+interface EyeSpec {
+  x: number;
+  y: number;
+  tilt: number;
+  rx: number;
+  ry: number;
+}
+/**
+ * The five eye styles shared by the three types (design "Variants"). Each is
+ * built from the Variant 0 shapes (an oval with a soft glow circle) and
+ * changes only their size, tilt or spacing. Style 0 is the pair of the
+ * reference.
+ */
+const EYE_STYLES: Readonly<Record<VariantNumber, readonly EyeSpec[]>> = {
+  0: [
+    { x: -5, y: 33, tilt: 16, rx: 1.9, ry: 1 },
+    { x: 5, y: 32, tilt: -12, rx: 1.9, ry: 1 },
+  ],
+  1: [
+    { x: -5, y: 33, tilt: 0, rx: 1.8, ry: 1.8 },
+    { x: 5, y: 33, tilt: 0, rx: 1.8, ry: 1.8 },
+  ],
+  2: [
+    { x: -5, y: 33, tilt: 38, rx: 2.4, ry: 0.6 },
+    { x: 5, y: 33, tilt: -38, rx: 2.4, ry: 0.6 },
+  ],
+  3: [
+    { x: -5, y: 33, tilt: 16, rx: 2.4, ry: 1.3 },
+    { x: 5, y: 32, tilt: -12, rx: 1.4, ry: 0.7 },
+  ],
+  4: [
+    { x: -7, y: 33, tilt: 16, rx: 1.9, ry: 1 },
+    { x: 7, y: 32, tilt: -12, rx: 1.9, ry: 1 },
+  ],
+};
+
+/** Scale, tilt and eye style of one Variant (design "Variants"). */
+export interface Variant {
+  scale: number;
+  /** Degrees, clockwise, about the centre of the ghost box. */
+  tilt: number;
+  /** Key of `EYE_STYLES`. */
+  eyes: VariantNumber;
+}
+/** The same five Variants for all three types, so the size order of 5.6 holds at each. */
+export const VARIANTS: Readonly<Record<VariantNumber, Variant>> = {
+  0: { scale: 1, tilt: 0, eyes: 0 },
+  1: { scale: 0.82, tilt: -12, eyes: 1 },
+  2: { scale: 1.12, tilt: 7, eyes: 2 },
+  3: { scale: 0.92, tilt: 14, eyes: 3 },
+  4: { scale: 1.05, tilt: -7, eyes: 4 },
+};
 /**
  * The eyes are drawn twice the reference size: the ghosts are about a quarter
  * of the reference size on the stage, and the eyes must still read.
  */
 const EYE_BOOST = 2;
-const REF_EYE = { rx: 1.9, ry: 1, glow: 2.8 } as const;
+/** Radius of the soft glow circle behind each eye. */
+const REF_EYE_GLOW = 2.8;
 /** The cold lantern of the Lantern_Wraith, hanging from the reaching claw. */
 const REF_LANTERN_HANGER = "M64 128 L64 144";
 const REF_LANTERN =
@@ -82,7 +135,9 @@ const REF_GLOW = { cx: 0, cy: 80, rx: 90, ry: 130 } as const;
  * plain shape and the smallest; the Chained_Brute is stretched wider, as in
  * the reference (1.8 : 1.4).
  */
-const SCALE: Readonly<Record<GhostType, readonly [number, number]>> = {
+export const GHOST_REF_SCALE: Readonly<
+  Record<GhostType, readonly [number, number]>
+> = {
   wisp: [0.3125, 0.3125],
   "lantern-wraith": [0.5, 0.5],
   "chained-brute": [0.625, 0.5],
@@ -92,7 +147,7 @@ const round2 = (v: number): number => Math.round(v * 100) / 100;
 
 /** Reference point to local point: shifted so the silhouette starts at 0, 0. */
 function at(type: GhostType, x: number, y: number): [number, number] {
-  const [sx, sy] = SCALE[type];
+  const [sx, sy] = GHOST_REF_SCALE[type];
   return [round2((x + REF_ORIGIN[0]) * sx), round2((y + REF_ORIGIN[1]) * sy)];
 }
 
@@ -123,7 +178,11 @@ function spec(type: GhostType, idle: string): GhostTypeSpec {
   const box = GHOST_BOX[type];
   return {
     box,
-    eyeHeight: 2 * round2(REF_EYE.ry * EYE_BOOST * SCALE[type][1]),
+    eyeHeight:
+      2 *
+      round2(
+        (EYE_STYLES[0][0]?.ry ?? 1) * EYE_BOOST * GHOST_REF_SCALE[type][1],
+      ),
     idle,
   };
 }
@@ -133,7 +192,7 @@ function lantern(id: (name: string) => string): ShapeNode {
   const t: GhostType = "lantern-wraith";
   const [cx, cy] = at(t, 64, 158);
   const [fx, fy] = at(t, 64, 157);
-  const [sx, sy] = SCALE[t];
+  const [sx, sy] = GHOST_REF_SCALE[t];
   return g(
     "ghost-lantern",
     [
@@ -154,7 +213,7 @@ function lantern(id: (name: string) => string): ShapeNode {
 /** Dark iron shackles on both wrists and two hanging chains. */
 function shackles(): ShapeNode[] {
   const t: GhostType = "chained-brute";
-  const [sx, sy] = SCALE[t];
+  const [sx, sy] = GHOST_REF_SCALE[t];
   return [
     path("ghost-shackle", fit(t, REF_SHACKLES), { part: "shackles" }),
     g(
@@ -178,9 +237,34 @@ function shackles(): ShapeNode[] {
 }
 
 /**
- * The drawing of one ghost. Until group 9 only Variant 0 in the Haunted look
- * exists (the other Variants and the Cloche come with task 9), so the types
- * accept only those values.
+ * The Variant's scale and tilt as one transform that keeps the centre of the
+ * ghost box where it is (translate, then rotate, then scale), or `undefined`
+ * for the identity.
+ */
+function variantTransform(
+  type: GhostType,
+  variant: VariantNumber,
+): NonNullable<ShapeNode["transform"]> | undefined {
+  const { scale, tilt } = VARIANTS[variant];
+  if (scale === 1 && tilt === 0) return undefined;
+  const { w, h } = GHOST_BOX[type];
+  const [px, py] = [w / 2, h / 2];
+  const angle = (tilt * Math.PI) / 180;
+  const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
+  return {
+    translate: [
+      round2(px - scale * (cos * px - sin * py)),
+      round2(py - scale * (sin * px + cos * py)),
+    ],
+    rotate: tilt,
+    scale,
+  };
+}
+
+/**
+ * The drawing of one ghost at one of the five Variants. The `locked` look
+ * keeps the glow like the haunted one, so the ghost reads inside its Cloche
+ * (director's decision, 19 Nov, which overrides design "Ghost states").
  *
  * Structure (design "Art System"): `g.ghost` > the static glow, then
  * `g.ghost-idle`, the only part the idle animation moves. A ghost floats, so
@@ -188,29 +272,30 @@ function shackles(): ShapeNode[] {
  */
 export function ghostArt(
   type: GhostType,
-  variant: 0,
-  look: "haunted",
+  variant: VariantNumber,
+  look: "haunted" | "locked",
 ): ShapeNode {
   const id = (name: string): string => `${type}-${variant}-${name}`;
-  const [sx, sy] = SCALE[type];
+  const [sx, sy] = GHOST_REF_SCALE[type];
 
   const [gx, gy] = at(type, REF_GLOW.cx, REF_GLOW.cy);
-  const eyes = REF_EYES.flatMap(([x, y, tilt]) => {
-    const [cx, cy] = at(type, x, y);
+  const eyes = EYE_STYLES[VARIANTS[variant].eyes].flatMap((eye) => {
+    const [cx, cy] = at(type, eye.x, eye.y);
     return [
-      circle("ghost-eye-glow", cx, cy, round2(REF_EYE.glow * EYE_BOOST * sx), {
+      circle("ghost-eye-glow", cx, cy, round2(REF_EYE_GLOW * EYE_BOOST * sx), {
         paint: id("eye"),
       }),
       ellipse(
         "ghost-eye",
         0,
         0,
-        round2(REF_EYE.rx * EYE_BOOST * sx),
-        round2(REF_EYE.ry * EYE_BOOST * sy),
-        { part: "eye", transform: { translate: [cx, cy], rotate: tilt } },
+        round2(eye.rx * EYE_BOOST * sx),
+        round2(eye.ry * EYE_BOOST * sy),
+        { part: "eye", transform: { translate: [cx, cy], rotate: eye.tilt } },
       ),
     ];
   });
+  const transform = variantTransform(type, variant);
   const extra =
     type === "lantern-wraith"
       ? [lantern(id)]
@@ -226,7 +311,24 @@ export function ghostArt(
           ]),
         ]
       : [];
-  return g(`ghost ghost--${type} look-${look}`, [
+  // The Locked look keeps the glow: the trapped ghost must read inside the jar.
+  const glow = [
+    g(
+      "ghost-glow",
+      [
+        ellipse(
+          "glow",
+          gx,
+          gy,
+          round2(REF_GLOW.rx * sx),
+          round2(REF_GLOW.ry * sy),
+          { paint: id("glow") },
+        ),
+      ],
+      { part: "glow" },
+    ),
+  ];
+  const tree = g(`ghost ghost--${type} look-${look}`, [
     defs([
       gradient("radialGradient", id("glow"), [
         ["stop-cold-0", 0],
@@ -250,22 +352,7 @@ export function ghostArt(
       ),
       ...lanternGlow,
     ]),
-    g(
-      "ghost-glow",
-      [
-        ellipse(
-          "glow",
-          gx,
-          gy,
-          round2(REF_GLOW.rx * sx),
-          round2(REF_GLOW.ry * sy),
-          {
-            paint: id("glow"),
-          },
-        ),
-      ],
-      { part: "glow" },
-    ),
+    ...glow,
     g("ghost-idle", [
       g(
         "ghost-outline",
@@ -287,4 +374,5 @@ export function ghostArt(
       ...extra,
     ]),
   ]);
+  return transform === undefined ? tree : { ...tree, transform };
 }

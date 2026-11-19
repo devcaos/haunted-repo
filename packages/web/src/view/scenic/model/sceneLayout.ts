@@ -41,8 +41,8 @@ export const FLOOR_RECT: Readonly<Record<Floor, Rect>> = {
  * boiler and the stairs.
  */
 export const SLOT_BAND: Readonly<Record<Floor, Rect>> = {
-  attic: { x: 570, y: 370, w: 370, h: 100 },
-  "middle floor": { x: 640, y: 515, w: 430, h: 170 },
+  attic: { x: 570, y: 367, w: 370, h: 106 },
+  "middle floor": { x: 600, y: 515, w: 300, h: 180 },
   basement: { x: 555, y: 740, w: 315, h: 160 },
 };
 

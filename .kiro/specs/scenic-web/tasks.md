@@ -642,11 +642,12 @@ These are settled by the approved design and are not reopened in these tasks:
 - [ ] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
   - Branch: `feat/scenic-web-2a`. Stacks on: an up-to-date `main` (PR 1f is merged and task 8.1 is approved); the PR targets `main`.
   - Estimate: ~700 changed lines (task 9.1 is withdrawn). Model: Auto (Opus only with the director's yes).
+  - Split on 19 Nov (director): part 1 = PR #62 (9.2, 9.3, 9.4, 9.8 and the visual fixes); part 2 = 9.5, 9.6, 9.7, 9.9 on branch `feat/scenic-web-2a-2` from main.
   - _Design: "PR Split" row 2a_
 
   - [x] 9.1 (Withdrawn 19 Nov: the three Ghost_Types already exist at Variant 0 with their tests since PR #59)
 
-  - [ ] 9.2 Add Variants 1 to 4
+  - [x] 9.2 Add Variants 1 to 4
     - In `art/ghosts.ts` add `VARIANTS` with the scale, tilt and eye style of the "Variants" table, the same five for all three types, and let `ghostArt` take Variant 0 to 4 (today it accepts only 0). Variants differ by scale, tilt and eye style only, with no accessories (Requirement 5.9 asks for at least one of size, tilt, eyes and accessory). `EYE_STYLES` holds five eye styles shared by the three types, built from the existing eye shapes (the `ghost-eye` ellipse with its `ghost-eye-glow` circle): the pair of the reference at Variant 0 and four more that change only the size, tilt or spacing of those shapes. The Lantern_Wraith keeps its `lantern` and the Chained_Brute its `shackles` and `chain` at every Variant.
     - Extend `art.test.ts`: any two Variants of one type differ; at every Variant the size order of 5.6 (Wisp smallest outline, Chained_Brute widest) and the small-eye rule (eye height under 5 % of the box height) hold; each type keeps its own part at every Variant (`lantern`; `shackles` and `chain`; the Wisp has none of them); every tree passes the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
@@ -654,7 +655,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.6, 5.9_
     - _Design: "Variants (Requirement 5.9)"_
 
-  - [ ] 9.3 Draw Locked and Exorcised slots on every floor
+  - [x] 9.3 Draw Locked and Exorcised slots on every floor
     - In `art/props.ts`: `slotArt` draws each Card with its own Variant (`slot.variant`; the Variant 0 limit of decision Q15 ends here), and `ghostArt` takes the `locked` look. A Locked Card is its ghost in `look-locked` inside the Cloche (bell jar with parts `cloche` and `padlock`, Brass base), as in "Ghost states", the same Cloche for every Locked Card up to scale. An Exorcised Card (director's decision, 19 Nov) draws no ghost (6.7), in one slot-exorcised group (the target of slot-return, task 14.9) a small lit candle standing at the slot bottom (`candle`, with a `flame` part) and a warm-orange radial pool of light around it (`candle-light`, 6.8), sized so it reads at house scale over the dark illustration. No window is drawn anywhere.
     - Extend `art.test.ts` (updating the two stage-1 tests that say Locked and Exorcised slots draw nothing; the no-window check stays): each slot draws the Variant of its Card; Haunted slots have a `glow` part; the Cloche subtree is the same for every Locked slot up to its scale and lies inside the slot; Exorcised slots have no ghost part and have a `candle` and a `candle-light` part; all 3 types × 5 Variants × 3 states pass the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
@@ -662,7 +663,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.1, 6.3, 6.7, 6.8, 6.10, 22.1_
     - _Design: "Ghost states", "Props and panels"_
 
-  - [ ] 9.4 Style the Locked and Exorcised states
+  - [x] 9.4 Style the Locked and Exorcised states
     - In `styles/ghosts.css` (tokens only) add only the styles still missing: `look-locked` with `--sc-locked`, the Cloche glass and padlock, the candle wax and flame, and the warm-orange light stops. The Lantern_Wraith and Chained_Brute parts are already styled.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): colour the locked and exorcised states`
@@ -694,7 +695,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.4, 4.12, 5.12, 7.1, 7.4, 7.5, 7.6_
     - _Design: "Props and panels" (Bestiary, Ghost_Icons), D2, decision Q31_
 
-  - [ ] 9.8 Fill the Gallery grid
+  - [x] 9.8 Fill the Gallery grid
     - In `gallery/gallery.ts` (today: the three types at Variant 0, Haunted) draw 3 Ghost_Types × 5 Variants × 3 states (Haunted, Locked in its Cloche, Exorcised candle) with HTML labels, using `ghostArt` and the slot drawings of `art/props.ts`.
     - Verify: `npm run check` exits `0`; `npm run shots` writes the full `19-gallery`.
     - Commit message: `feat(web): show every ghost variant in the gallery`

@@ -248,6 +248,7 @@ async function main(): Promise<void> {
     size: ShotSize,
     url: string,
     ready: string,
+    fullPage = false,
   ): Promise<void> => {
     const fileName = shotFileName(state, size);
     await step(fileName, async () => {
@@ -267,6 +268,7 @@ async function main(): Promise<void> {
       await page.screenshot({
         path: join(shotsDir, fileName),
         animations: "disabled",
+        fullPage,
       });
       written++;
       await page.close();
@@ -295,6 +297,7 @@ async function main(): Promise<void> {
       size,
       `${DEV_ORIGIN}/haunted-repo/gallery.html`,
       "svg.gallery-art",
+      true,
     );
     await normal.close();
     await reduced.close();

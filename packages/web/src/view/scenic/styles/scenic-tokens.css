@@ -30,6 +30,14 @@
   --sc-ghost-eye: #d9f3ff;
   --sc-lantern-light: #cfefff;
   --sc-lantern-flame: #e6f6ff;
+  /* The Cloche, the padlock and the Exorcised candle */
+  --sc-brass-light: #e0a468;
+  --sc-brass-dark: #7a4720;
+  --sc-iron-light: #8a929e;
+  --sc-brown-dark: #1a0f0a;
+  --sc-wax-light: #f3e9d2;
+  --sc-wax-shade: #b3a58b;
+  --sc-flame-pale: #fff0b8;
   /* Named lights */
   --sc-cold-blue: #6e9bd8;
   --sc-warm-orange: #f59a45;
@@ -62,7 +70,7 @@
   --sc-rain-still: 0.25;
   --sc-fog: 0.4;
   --sc-fog-still: 0.35;
-  --sc-locked: 0.45;
+  --sc-locked: 0.8;
   /* Fonts: the display fonts come first, then a safe fallback stack */
   --font-logo: "Creepster", Impact, "Arial Black", sans-serif;
   --font-title: "IM Fell English", Georgia, "Times New Roman", serif;

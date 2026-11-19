@@ -96,11 +96,11 @@ function ghostViewOf(path: string, floor: Floor): GhostView {
 }
 
 describe("slotRects", () => {
-  it("gives 66 x 100, 78 x 170 and 55 x 160 slots with 5 Cards", () => {
+  it("gives 66 x 106, 52 x 180 and 55 x 160 slots with 5 Cards", () => {
     const size = (rect: { w: number; h: number }) => [rect.w, rect.h];
-    expect(slotRects("attic", 5).map(size)).toEqual(Array(5).fill([66, 100]));
+    expect(slotRects("attic", 5).map(size)).toEqual(Array(5).fill([66, 106]));
     expect(slotRects("middle floor", 5).map(size)).toEqual(
-      Array(5).fill([78, 170]),
+      Array(5).fill([52, 180]),
     );
     expect(slotRects("basement", 5).map(size)).toEqual(
       Array(5).fill([55, 160]),
