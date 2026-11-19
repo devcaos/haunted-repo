@@ -731,7 +731,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 17.7, 17.8_
     - _Design: "scenic/model/scenicFocus.ts"_
 
-  - [ ] 10.3 Build the scene controls
+  - [x] 10.3 Build the scene controls
     - Create `packages/web/src/view/scenic/sceneControls.ts`, rebuilt every render from `sceneLayout`: `.scene-bar` (Scene_Heading `h2` with `tabindex="-1"`, taken over from task 5.8, and "Back to the house"), `nav.floor-stair` (one button per floor button, visible label the title, `aria-label` the accessible name), `ul.nameplates` (`article.nameplate` with `aria-label`, `data-ghost-state`, path in `--font-code`, reason, score line, state label, the always-visible locked line, and the start button with `aria-describedby` when `hasStart`; no focusable element on Locked Nameplates), the empty-floor line. Every control sends through the guard.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add floor buttons and nameplates`

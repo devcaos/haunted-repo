@@ -25,8 +25,10 @@ export interface StageView {
 export interface Stage {
   /** `main.stage`, built once. */
   element: HTMLElement;
-  /** `div.scene-bar`: the renderer puts the Scene_Heading here. */
+  /** `div.scene-bar`, `nav.floor-stair` and `ul.nameplates`: `sceneControls.ts` fills them. */
   sceneBar: HTMLElement;
+  floorStair: HTMLElement;
+  nameplates: HTMLElement;
   update(view: StageView): void;
 }
 
@@ -46,9 +48,11 @@ function slotSignature(layout: SceneLayout): string {
 }
 
 /**
- * Builds the stage once: `main.stage` > `div.scene-bar` and `div.world` (the
- * Camera) > one `svg.house` with its layers back to front (the illustration,
- * slots, dims, telephone, weather, effects) and `div.world-overlay`. Each
+ * Builds the stage once: `main.stage` > `div.stage-view` (the clipped box) >
+ * `div.scene-bar` and `div.world` (the Camera) > one `svg.house` with its
+ * layers back to front (the illustration, slots, dims, telephone, weather,
+ * effects) and `div.world-overlay`; then `nav.floor-stair` and
+ * `ul.nameplates`, outside the clipped box. Each
  * render changes only attributes, classes and the Camera transform; the slot
  * layer is rebuilt only when the slot signature changes, so idle animations
  * do not restart.
@@ -82,9 +86,13 @@ export function createStage(sceneHref: string | null): Stage {
   const overlay = el("div", { class: "world-overlay" });
   const world = el("div", { class: "world" }, [svg, overlay]);
   const sceneBar = el("div", { class: "scene-bar" });
+  const floorStair = el("nav", { class: "floor-stair", hidden: "" });
+  const nameplates = el("ul", { class: "nameplates", hidden: "" });
+  const stageView = el("div", { class: "stage-view" }, [sceneBar, world]);
   const element = el("main", { class: "stage", "data-scene": "house" }, [
-    sceneBar,
-    world,
+    stageView,
+    floorStair,
+    nameplates,
   ]);
 
   let signature: string | null = null;
@@ -92,6 +100,8 @@ export function createStage(sceneHref: string | null): Stage {
   return {
     element,
     sceneBar,
+    floorStair,
+    nameplates,
     update(view: StageView): void {
       const { layout, scene } = view;
       element.setAttribute("data-scene", scene.kind);

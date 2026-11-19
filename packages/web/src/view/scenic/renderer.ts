@@ -1,12 +1,13 @@
 import type { ActionSink } from "../../logic/actions.js";
 import type { Renderer, ViewModel } from "../../logic/viewModel.js";
-import { el, setText } from "./dom.js";
+import { el } from "./dom.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
 import { hudView } from "./model/hudView.js";
 import { sceneLayout } from "./model/sceneLayout.js";
 import { watchMedia } from "./motion.js";
+import { createSceneControls } from "./sceneControls.js";
 import { createStage, type StageView } from "./stage.js";
 
 /** What the entry outside `view/scenic/` hands in. */
@@ -36,9 +37,7 @@ export function createScenicRenderer(
     },
   });
   const stage = createStage(options.sceneHref);
-  // The Scene_Heading is a focus target, never a Tab stop.
-  const heading = el("h2", { class: "scene-heading", tabindex: "-1" });
-  stage.sceneBar.append(heading);
+  const controls = createSceneControls(stage, (action) => guard.send(action));
   const shell = el("div", { class: "scenic", "data-scene": "house" }, [
     hud.header,
     hud.aside,
@@ -77,7 +76,7 @@ export function createScenicRenderer(
         viewport,
       };
       stage.update(lastView);
-      setText(heading, layout.heading);
+      controls.update(layout);
     },
   };
 }
