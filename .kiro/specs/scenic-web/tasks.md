@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/web` gets a second Renderer, the Scenic_Renderer, in `packages/web/src/view/scenic/`, built in the order of the design's "PR Split": 13 stacked pull requests in four stages. Stage 1 (PRs 1a to 1f) builds the renderer choice, the HUD shell, the tokens, the fonts, the Source_Scan rules, the Scene_Layout, the Camera, the house art, the first Wisp and the tooling (Size_Check, Shots_Script, Gallery), and ends with the Vertical Slice Gate. Stage 2 (2a to 2c) adds the three Ghost_Types, the Floor_Scene and the Telephone. Stage 3 (3a, 3b) adds the exorcism room, the Grimoire, the Reactions and the Exorcised_Moment. Stage 4 (4a, 4b) adds the Finale, the live Search_Beam, Lightning, the Intro, the Reduced_Motion audit, the responsive polish and the switch to the scenic view as the default.
+`packages/web` gets a second Renderer, the Scenic_Renderer, in `packages/web/src/view/scenic/`, built in the order of the design's "PR Split": 13 stacked pull requests in four stages. Stage 1 (PRs 1a to 1f) builds the renderer choice, the HUD shell, the tokens, the fonts, the Source_Scan rules, the Scene_Layout, the Camera, the scene illustration, the first Wisp and the tooling (Size_Check, Shots_Script, Gallery), and ends with the Vertical Slice Gate. Stage 2 (2a to 2c) adds the three Ghost_Types, the Floor_Scene and the Telephone. Stage 3 (3a, 3b) adds the exorcism room, the Grimoire, the Reactions and the Exorcised_Moment. Stage 4 (4a, 4b) adds the Finale, the live Search_Beam, Lightning, the Reduced_Motion audit, the responsive polish and the switch to the scenic view as the default.
 
 Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node environment. DOM modules are covered by `npm run build`, the Source_Scan, the hand-run Shots_Script and the manual checks in each PR body. No file under `packages/core/`, `packages/web/src/sample/` or `packages/web/public/sirv-license.txt` changes; under `packages/web/src/logic/` only `texts.ts` and `powerTexts.ts` change, by additions only (Requirement 2).
 
@@ -10,8 +10,8 @@ Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node envi
 
 ## Pull requests
 
-- 13 stacked pull requests, one per group below, in this order: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b, 2c, 3a, 3b, 4a, 4b (decision Q1). Each branch is created from the tip of the previous one: `git checkout <previous branch>` then `git checkout -b <new branch>`. PR 1a is created from an up-to-date `main`.
-- PR 1a targets `main`; every other PR targets the previous PR's branch until that one is merged. After each merge, retarget the next pull request with `gh pr edit <number> --base main`.
+- 13 stacked pull requests, one per group below, in this order: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b, 2c, 3a, 3b, 4a, 4b (decision Q1). Each branch is created from the tip of the previous one: `git checkout <previous branch>` then `git checkout -b <new branch>`. PR 1a is created from an up-to-date `main`. PRs 1a to 1f are merged, so PR 2a is also created from an up-to-date `main` (`git checkout main`, `git pull`, `git checkout -b feat/scenic-web-2a`); PRs 2b onward are stacked as described.
+- PRs 1a to 1f and PR 2a target `main`; every PR from 2b on targets the previous PR's branch until that one is merged. After each merge, retarget the next pull request with `gh pr edit <number> --base main`.
 - The director (Luis Miguel) merges, in order, each with "Create a merge commit" (no squash, no rebase merge). Kiro never merges.
 - Reviews happen per stage, not per PR (decision Q1).
 - Each PR body fills `.github/pull_request_template.md` and carries the size warning: the whole spec is about 10,000 changed lines, split into 13 stacked PRs of at most about 900 lines each (decision Q1), plus this PR's line count measured with `git diff --shortstat`. Tests are never cut to fit the size.
@@ -629,57 +629,51 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 8. Vertical Slice Gate (STOP)
-  - [ ] 8.1 Director review of the vertical slice
+- [x] 8. Vertical Slice Gate (STOP)
+  - [x] 8.1 Director review of the vertical slice
     - **STOP.** Kiro runs `npm run shots`. The director (Luis Miguel) reviews the screenshots in `packages/web/shots/`: `01-house` and `16-reduced-house` at 1440x900 and 390x844, and the Gallery with the Wisp (`19-gallery`).
-    - Do not start group 9 (PR 2a) without the director's explicit "yes". Changes to the look asked for here are made on `feat/scenic-web-1f` as extra commits before 2a starts.
-    - No commit of its own; mark it `[x]` in the first commit of PR 2a.
+    - Approved on 18 Nov 2026: the director merged PR #59 (the scene illustration), after PR 1f. Group 9 may start.
+    - No commit of its own; marked `[x]` in the docs PR of 19 Nov.
     - _Requirements: 24.4, 24.8_
     - _Design: "Vertical Slice Gate"_
 
 ### Stage 2
 
 - [ ] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
-  - Branch: `feat/scenic-web-2a`. Stacks on: `feat/scenic-web-1f`. Only after the director's "yes" in task 8.1.
-  - Estimate: ~850 changed lines. Model: Opus.
+  - Branch: `feat/scenic-web-2a`. Stacks on: an up-to-date `main` (PR 1f is merged and task 8.1 is approved); the PR targets `main`.
+  - Estimate: ~700 changed lines (task 9.1 is withdrawn). Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 2a_
 
-  - [ ] 9.1 Draw the Lantern_Wraith and the Chained_Brute, Variant 0
-    - In `art/ghosts.ts` add both types to `GHOST_TYPES` and `ghostArt` for Variant 0, following the "Ghost types" table: Lantern_Wraith with `hood`, `tail-spiral` and `lantern`; Chained_Brute with `horns`, drips, `chain` and Pumpkin eye classes.
-    - Extend `art.test.ts`: each type has a part the other two lack (Wisp `tail-ragged`, Lantern_Wraith `hood` and `tail-spiral`, Chained_Brute `horns`); at Variant 0 the Wisp has the smallest box and the Chained_Brute the widest; boxes equal the Scene_Layout boxes.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(web): draw the lantern wraith and the chained brute`
-    - _Requirements: 5.2, 5.3, 5.4, 5.6, 22.1_
-    - _Design: "Ghost types (natural size, Variant 0)"_
+  - [x] 9.1 (Withdrawn 19 Nov: the three Ghost_Types already exist at Variant 0 with their tests since PR #59)
 
   - [ ] 9.2 Add Variants 1 to 4
-    - In `art/ghosts.ts` add `VARIANTS` with the scale, tilt, eyes and accessory of the "Variants" table for all three types.
-    - Extend `art.test.ts`: any two Variants of one type differ in at least one of size, tilt, eyes and accessory; the size order and the eye-share order of 5.6 hold at every Variant number.
+    - In `art/ghosts.ts` add `VARIANTS` with the scale, tilt and eye style of the "Variants" table, the same five for all three types, and let `ghostArt` take Variant 0 to 4 (today it accepts only 0). Variants differ by scale, tilt and eye style only, with no accessories (Requirement 5.9 asks for at least one of size, tilt, eyes and accessory). `EYE_STYLES` holds five eye styles shared by the three types, built from the existing eye shapes (the `ghost-eye` ellipse with its `ghost-eye-glow` circle): the pair of the reference at Variant 0 and four more that change only the size, tilt or spacing of those shapes. The Lantern_Wraith keeps its `lantern` and the Chained_Brute its `shackles` and `chain` at every Variant.
+    - Extend `art.test.ts`: any two Variants of one type differ; at every Variant the size order of 5.6 (Wisp smallest outline, Chained_Brute widest) and the small-eye rule (eye height under 5 % of the box height) hold; each type keeps its own part at every Variant (`lantern`; `shackles` and `chain`; the Wisp has none of them); every tree passes the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add five variants per ghost type`
     - _Requirements: 5.6, 5.9_
     - _Design: "Variants (Requirement 5.9)"_
 
   - [ ] 9.3 Draw Locked and Exorcised slots on every floor
-    - In `art/props.ts`: `slotArt` now draws the Ghost_Type of each floor with the slot's Variant (ending the stage-1 temporary art, Q15); a Locked Card draws its ghost with `look-locked` inside the Cloche (bell jar, Brass base, padlock), the same for every Locked Card up to scale; an Exorcised Card draws no ghost, a lit candle and a warm-orange light.
-    - Extend `art.test.ts`: Haunted slots have a `glow` part; the Cloche subtree is the same for every Locked slot up to its scale; Exorcised slots have no ghost part and have a candle and a warm light; all 3 types × 5 Variants × 3 states pass the rules.
+    - In `art/props.ts`: `slotArt` draws each Card with its own Variant (`slot.variant`; the Variant 0 limit of decision Q15 ends here), and `ghostArt` takes the `locked` look. A Locked Card is its ghost in `look-locked` inside the Cloche (bell jar with parts `cloche` and `padlock`, Brass base), as in "Ghost states", the same Cloche for every Locked Card up to scale. An Exorcised Card (director's decision, 19 Nov) draws no ghost (6.7), in one slot-exorcised group (the target of slot-return, task 14.9) a small lit candle standing at the slot bottom (`candle`, with a `flame` part) and a warm-orange radial pool of light around it (`candle-light`, 6.8), sized so it reads at house scale over the dark illustration. No window is drawn anywhere.
+    - Extend `art.test.ts` (updating the two stage-1 tests that say Locked and Exorcised slots draw nothing; the no-window check stays): each slot draws the Variant of its Card; Haunted slots have a `glow` part; the Cloche subtree is the same for every Locked slot up to its scale and lies inside the slot; Exorcised slots have no ghost part and have a `candle` and a `candle-light` part; all 3 types × 5 Variants × 3 states pass the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw locked and exorcised ghosts`
     - _Requirements: 6.1, 6.3, 6.7, 6.8, 6.10, 22.1_
     - _Design: "Ghost states", "Props and panels"_
 
-  - [ ] 9.4 Style the ghost types and states
-    - In `styles/ghosts.css` (tokens only): Lantern_Wraith and Chained_Brute parts, `look-locked` with `--sc-locked`, Cloche glass and padlock, candle wax and flame, the warm-orange light stops.
+  - [ ] 9.4 Style the Locked and Exorcised states
+    - In `styles/ghosts.css` (tokens only) add only the styles still missing: `look-locked` with `--sc-locked`, the Cloche glass and padlock, the candle wax and flame, and the warm-orange light stops. The Lantern_Wraith and Chained_Brute parts are already styled.
     - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(web): colour every ghost type and state`
-    - _Requirements: 5.2, 5.3, 5.4, 6.1, 6.3, 6.8_
+    - Commit message: `feat(web): colour the locked and exorcised states`
+    - _Requirements: 6.1, 6.3, 6.8_
     - _Design: "Palette", "Ghost states"_
 
-  - [ ] 9.5 Animate the idle loops
-    - Source_Scan item 11 first: the `@keyframes` `wisp-float`, `wraith-sway` and `brute-heave` exist and their bodies differ.
-    - In `motion.css` (no-preference block): `wraith-sway`, `brute-heave` and `flame-flicker`, with the catalogue durations; Locked ghosts have no idle animation.
+  - [ ] 9.5 Finish the idle motion rules
+    - Source_Scan item 11 first: the `@keyframes` `wisp-float`, `wraith-sway` and `brute-heave` already exist in `motion.css` with their `.ghost--<type> .ghost-idle` rules; the test asserts that they exist and that their bodies differ.
+    - In `motion.css` (no-preference block): `flame-flicker` for the `.flame` of the Exorcised candle (`--sc-dur-flame-flicker`), and no idle animation on Locked ghosts (`.look-locked .ghost-idle`). Remove the unused tokens `--sc-dur-bats-fly` and `--sc-dur-window-flicker` from `scenic-tokens.css`.
     - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(web): give each ghost type its own idle motion`
+    - Commit message: `feat(web): flicker the exorcised candle`
     - _Requirements: 5.7, 6.2, 18.4_
     - _Design: "Animation Catalogue", "Source_Scan additions" item 11_
 
@@ -701,7 +695,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Props and panels" (Bestiary, Ghost_Icons), D2, decision Q31_
 
   - [ ] 9.8 Fill the Gallery grid
-    - In `gallery/gallery.ts` draw 3 Ghost_Types × 5 Variants × 3 states (Haunted, Locked in its Cloche, Exorcised candle) with HTML labels.
+    - In `gallery/gallery.ts` (today: the three types at Variant 0, Haunted) draw 3 Ghost_Types × 5 Variants × 3 states (Haunted, Locked in its Cloche, Exorcised candle) with HTML labels, using `ghostArt` and the slot drawings of `art/props.ts`.
     - Verify: `npm run check` exits `0`; `npm run shots` writes the full `19-gallery`.
     - Commit message: `feat(web): show every ghost variant in the gallery`
     - _Requirements: 24.8_
@@ -710,9 +704,9 @@ These are settled by the approved design and are not reopened in these tasks:
   - [ ] 9.9 Checkpoint and PR 2a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 2b, task 10.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2a`.
     - Run `npm run check`; it must exit `0`.
-    - Measure: `git diff --shortstat feat/scenic-web-1f -- . ':(exclude)package-lock.json'`.
+    - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
     - Push with `git push -u origin feat/scenic-web-2a`. Body in `$env:TEMP\pr-scenic-web-2a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, and "Shots added: none new; `19-gallery` now shows the full 3 × 5 × 3 grid and `01-house` shows every ghost type".
-    - Run `gh pr create --base feat/scenic-web-1f --head feat/scenic-web-2a --title "feat: add the three ghost types, variants and bestiary" --body-file $env:TEMP\pr-scenic-web-2a-body.md`.
+    - Run `gh pr create --base main --head feat/scenic-web-2a --title "feat: add the three ghost types, variants and bestiary" --body-file $env:TEMP\pr-scenic-web-2a-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
@@ -782,7 +776,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 - [ ] 11. PR 2c — Telephone
   - Branch: `feat/scenic-web-2c`. Stacks on: `feat/scenic-web-2b`.
-  - Estimate: ~690 changed lines. Model: Opus.
+  - Estimate: ~630 changed lines. Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 2c_
 
   - [ ] 11.1 Add the telephone texts
@@ -811,11 +805,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.3, 9.4, 9.12_
     - _Design: "Correctness Properties", Property 15_
 
-  - [ ] 11.4 Draw the Telephone
-    - In `art/props.ts` add `telephoneArt()`: the original antique rotary desk telephone of "Props and panels" (base, dial, prongs, handset `phone-handset`, cord, vibration lines `phone-lines`, glow `phone-glow`), no logo and no text. `stage.ts` mounts it in the telephone layer on the table of the Entrance_Hall.
-    - Extend `art.test.ts`: the tree passes the rules and has the handset, lines and glow parts.
+  - [ ] 11.4 Draw the Ring effects
+    - The telephone is painted in the illustration, at `TELEPHONE_ANCHOR` (536, 611); the page does not redraw it. In `art/props.ts` add `ringEffectsArt()`: only the vibration arcs (`phone-lines`, 3 on each side, Bone) and the Pumpkin radial glow (`phone-glow`) around that point, with no handset and no base, no logo and no text. `stage.ts` mounts it in the existing `telephone` layer.
+    - Extend `art.test.ts`: the tree passes the rules, has the `phone-lines` and `phone-glow` parts, has no handset or base part, and is centred on `TELEPHONE_ANCHOR`.
     - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(web): draw the antique telephone`
+    - Commit message: `feat(web): draw the ring effects over the telephone`
     - _Requirements: 9.1, 22.1_
     - _Design: "Props and panels" (Telephone, Ring)_
 
@@ -827,14 +821,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "DOM modules" (phoneWidget.ts), D14_
 
   - [ ] 11.6 Ring the Telephone from the renderer
-    - In `renderer.ts`: send `render` events with `PhoneInputs` every render; send `intro-ended` at the first House_Scene render (no Intro exists yet; task 16.2 moves it after the Intro, D13); send `ghost-started` whenever any `start-ghost` is sent (Answer_Button or Nameplate start button, Q17) and `answered` on the Answer_Button; run the effects with `window.setTimeout` (2 s per Ring, 20 s waits) and the `is-ringing` class; timers read `guard.current()` when they fire.
+    - In `renderer.ts`: send `render` events with `PhoneInputs` every render; send `intro-ended` at the first House_Scene render (the Intro is cut, so the Opening_Rings start there, D13); send `ghost-started` whenever any `start-ghost` is sent (Answer_Button or Nameplate start button, Q17) and `answered` on the Answer_Button; run the effects with `window.setTimeout` (2 s per Ring, 20 s waits) and the `is-ringing` class; timers read `guard.current()` when they fire.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): ring the telephone in the house scenes`
     - _Requirements: 9.1, 9.2, 9.3, 9.5, 9.6, 9.12, 2.7_
     - _Design: "Purely visual state of the Scenic_Renderer" (phone), "scenic/model/phoneBell.ts"_
 
   - [ ] 11.7 Animate the Ring
-    - In `motion.css`: `phone-rattle`, `phone-buzz`, `phone-glow`, `ring-pop`, `bubble-in` and the counter-scale transition in the no-preference block; under `reduce`, while Ringing, the "RING!" bubble and the glow are shown still (glow at 0.6), with no shake and no lines.
+    - In `motion.css`: `phone-buzz`, `phone-glow`, `ring-pop`, `bubble-in` and the counter-scale transition in the no-preference block; under `reduce`, while Ringing, the "RING!" bubble and the glow are shown still (glow at 0.6), with no lines.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate the ringing telephone`
     - _Requirements: 9.6, 9.13, 18.4, 20.1_
@@ -844,14 +838,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is the time check, group 12, then PR 3a, task 13.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2c`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-2b -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-2c`. Body in `$env:TEMP\pr-scenic-web-2c-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: none new; `01` to `04` now show the telephone", and the manual check: rings at load and every 20 s until a ghost is started; answering starts the first ghost; a live report starts the Live_Call.
+    - Push with `git push -u origin feat/scenic-web-2c`. Body in `$env:TEMP\pr-scenic-web-2c-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: none new", and the manual check: rings at load and every 20 s until a ghost is started; answering starts the first ghost; a live report starts the Live_Call.
     - Run `gh pr create --base feat/scenic-web-2b --head feat/scenic-web-2c --title "feat: add the ringing telephone" --body-file $env:TEMP\pr-scenic-web-2c-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
 - [ ] 12. Time check, 23 Nov 2026 (conditional)
-  - Do this check on 23 Nov 2026, whatever task is in progress. It sits before PR 3a because stage 2 should be merged by then. If PRs 2a, 2b and 2c are all merged into `main` on 23 Nov 2026, write "Not triggered" under tasks 12.2 to 12.5 and mark them `[x]` with no other change.
-  - If they are not all merged, run tasks 12.2 to 12.5 as commits on the branch in progress (the newest open PR branch, or `feat/scenic-web-3a` if it is about to start) and list them in that PR's body. Cuts 1 to 3 are already approved by the director (design "Cut List"). **Cut 4 is NOT pre-approved**: it needs a new director decision and is not a task here.
+  - Do this check on 23 Nov 2026, whatever task is in progress. It sits before PR 3a because stage 2 should be merged by then. If PRs 2a, 2b and 2c are all merged into `main` on 23 Nov 2026, write "Not triggered" under tasks 12.2 and 12.5 and mark them `[x]` with no other change.
+  - If they are not all merged, run tasks 12.2 and 12.5 as commits on the branch in progress (the newest open PR branch, or `feat/scenic-web-3a` if it is about to start) and list them in that PR's body. Cut 1 is already approved by the director (design "Cut List"). Cut 2 is withdrawn and cut 3 was applied on 19 Nov (tasks 12.3 and 12.4). **Cut 4 is NOT pre-approved**: it needs a new director decision and is not a task here.
   - These tasks are conditional, not optional: they run when the time check triggers.
   - _Design: "Cut List", "PR Split" (Time check)_
 
@@ -861,30 +855,23 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: none (planning)_
 
   - [ ] 12.2 Conditional cut 1: reuse Variant 0 for the Lantern_Wraith and the Chained_Brute
-    - Only if task 12.1 says "Triggered". In `art/ghosts.ts` Variants 1 to 4 of the Lantern_Wraith and the Chained_Brute reuse the Variant 0 art; the Variant numbers still follow the position, so P4 still passes. In `art.test.ts` the "Variants differ" check (5.9) applies to the Wisp only. The Gallery shows repeated cells.
+    - Only if task 12.1 says "Triggered". In `art/ghosts.ts` Variants 1 to 4 of the Lantern_Wraith and the Chained_Brute reuse Variant 0 (the same scale, tilt and eye style); the Variant numbers still follow the position, so P4 still passes. In `art.test.ts` the "Variants differ" check (5.9) applies to the Wisp only; the size order of 5.6 and "each type keeps its own part" still run at every Variant. The Gallery shows repeated cells.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): reuse variant 0 for the wraith and the brute`
     - _Requirements: 5.9, 23.5_
     - _Design: "Cut List" order 1_
 
-  - [ ] 12.3 Conditional cut 2: drop the bats and the window flicker
-    - Only if task 12.1 says "Triggered". Remove the `window-flicker` animation from `motion.css` (the oculus stays still at 0.8), and write "Cut (time check)" under the bats part of task 15.4 so the `bats` group and `bats-fly` are never built. No requirement changes; it is noted only in the PR body, not in `docs/decisiones.md`.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `chore(web): drop the window flicker`
-    - _Requirements: none (decoration outside the requirements)_
-    - _Design: "Cut List" order 2_
+  - [x] 12.3 (Withdrawn 19 Nov: the window flicker no longer exists and the bats are painted, still, in the illustration)
 
-  - [ ] 12.4 Conditional cut 3: drop the Intro
-    - Only if task 12.1 says "Triggered". Write "Cut (time check)" under tasks 16.1 and 16.2 and mark them `[x]` without building them. The renderer keeps sending `intro-ended` at the first House_Scene render, so the Opening_Rings start there (D13). Requirement 16 is "WHERE the Intro is built", so 18.2 and the Intro part of 17.14 become empty. The Shots flow has no Intro step.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `docs: cut the intro from the scenic tasks`
+  - [x] 12.4 Conditional cut 3: drop the Intro
+    - Applied 19 Nov (director): the Intro is cut now, ahead of the time check. Tasks 16.1 and 16.2 are withdrawn. The renderer keeps sending `intro-ended` at the first House_Scene render, so the Opening_Rings start there (D13). Requirement 16 is "WHERE the Intro is built", so 18.2 and the Intro part of 17.14 are empty. The Shots flow has no Intro step.
     - _Requirements: 16.1, 18.2, 17.14_
     - _Design: "Cut List" order 3, D13_
 
-  - [ ] 12.5 Conditional: record cuts 1 and 3 in `docs/decisiones.md`
-    - Only if task 12.1 says "Triggered". Add one line for cut 1 (it changes 5.9 and the "different look" part of 23.5 for the middle floor and the basement) and one line for cut 3 (scope choice, no requirement text change), with the date and the director's pre-approval. Cut 2 is only noted in the PR body. Spanish is allowed.
+  - [ ] 12.5 Conditional: record cut 1 in `docs/decisiones.md`
+    - Only if task 12.1 says "Triggered". Add one line for cut 1 (it changes 5.9 and the "different look" part of 23.5 for the middle floor and the basement), with the date and the director's pre-approval. Cut 3 is already recorded (19 Nov) and cut 2 is withdrawn. Spanish is allowed.
     - Verify: `npm run check` exits `0`.
-    - Commit message: `docs: record the scenic-web time-check cuts`
+    - Commit message: `docs: record the scenic-web time-check cut`
     - _Requirements: none (decision record)_
     - _Design: "Cut List"_
 
@@ -892,7 +879,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 - [ ] 13. PR 3a — Room and Grimoire
   - Branch: `feat/scenic-web-3a`. Stacks on: `feat/scenic-web-2c`.
-  - Estimate: ~900 changed lines. Model: Opus.
+  - Estimate: ~900 changed lines. Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 3a_
 
   - [ ] 13.1 Add the Grimoire view
@@ -1035,14 +1022,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Purely visual state" (vigour, reaction), "Animation Catalogue" notes (Jumping to an end state)_
 
   - [ ] 14.8 Play the Exorcised_Moment and the Return_Glow
-    - Create `packages/web/src/view/scenic/effects.ts` with the Return_Glow timer. In `renderer.ts` and `ghostScene.ts`: `effects.exorcisedMoments` starts the spiral, sparks and warm room (order of D6); a render in the same Scene lets it play, a Scene change jumps it to its end; `effects.returnGlow` adds `is-returning` to those slots for 800 ms; send `exorcised-moment` and `return-glow-ended` to `phoneStep`, so one Ring follows the Return_Glow when a Telephone_Target exists (9.4).
+    - Create `packages/web/src/view/scenic/effects.ts` with the Return_Glow timer. In `renderer.ts` and `ghostScene.ts`: `effects.exorcisedMoments` starts the spiral, sparks and warm room (order of D6); a render in the same Scene lets it play, a Scene change jumps it to its end; `effects.returnGlow` adds `is-returning` to those slots for 800 ms, so the Exorcised candle and its light fade in (`slot-return`); send `exorcised-moment` and `return-glow-ended` to `phoneStep`, so one Ring follows the Return_Glow when a Telephone_Target exists (9.4).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): reward the exorcism with sparks and warm light`
-    - _Requirements: 9.4, 12.1, 12.3, 12.4, 12.5, 12.6, 12.8, 12.9_
+    - _Requirements: 6.8, 9.4, 12.1, 12.3, 12.4, 12.6, 12.8, 12.9_
     - _Design: "effects.ts" row of "DOM modules", D5, D6_
 
   - [ ] 14.9 Animate Reactions and the exorcism
-    - In `motion.css`: `react-recoil`, `react-shudder`, `react-laugh`, `react-puzzle`, `smoke-question`, the vigour transition, `exorcise-spiral`, `exorcise-sparks`, `room-warm`, `window-light-up` and the meter transition in the no-preference block; under `reduce`, `react-fade`, `ghost-fade-out` and the 200 ms fades of the catalogue, the meter instant, the vigour scale instant.
+    - In `motion.css`: `react-recoil`, `react-shudder`, `react-laugh`, `react-puzzle`, `smoke-question`, the vigour transition, `exorcise-spiral`, `exorcise-sparks`, `room-warm`, `slot-return` (duration token `--sc-dur-slot-return`; rename the unused 800 ms light-up token of `scenic-tokens.css`) and the meter transition in the no-preference block; under `reduce`, `react-fade`, `ghost-fade-out` and the 200 ms fades of the catalogue, the meter instant, the vigour scale instant.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate reactions and the exorcised moment`
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 12.3, 12.4, 12.6, 18.7, 20.1_
@@ -1059,7 +1046,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4a, task 15.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-3a -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-3b`. Body in `$env:TEMP\pr-scenic-web-3b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know`, `12-exorcised-moment`, each at both sizes", and the manual check: after an exorcism, back on the floor the window lights up, the Haunt_Meter moves, then the telephone rings once.
+    - Push with `git push -u origin feat/scenic-web-3b`. Body in `$env:TEMP\pr-scenic-web-3b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know`, `12-exorcised-moment`, each at both sizes", and the manual check: after an exorcism, back on the floor the candle lights up, the Haunt_Meter moves, then the telephone rings once.
     - Run `gh pr create --base feat/scenic-web-3a --head feat/scenic-web-3b --title "feat: add ghost reactions and the exorcised moment" --body-file $env:TEMP\pr-scenic-web-3b-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
@@ -1080,7 +1067,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [ ] 15.2 Add the Lightning clock
     - Create `packages/web/src/view/scenic/model/lightningClock.ts`: `FLASH_MIN_MS`, `FLASH_MAX_MS`, `nextFlashDelay(random)` and `flashAllowed(input)`.
-    - Create `packages/web/src/view/scenic/model/lightningClock.test.ts` with the `flashAllowed` table: no flash with the toggle off, under Reduced_Motion, in the Ghost_Scene, during the Intro, during the Finale (D8), during a Ring or an Exorcised_Moment (Q7).
+    - Create `packages/web/src/view/scenic/model/lightningClock.test.ts` with the `flashAllowed` table: no flash with the toggle off, under Reduced_Motion, in the Ghost_Scene, during the Finale (D8), during a Ring or an Exorcised_Moment (Q7).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): schedule lightning flashes`
     - _Requirements: 15.1, 15.2, 18.5_
@@ -1098,8 +1085,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Correctness Properties", Property 16_
 
   - [ ] 15.4 Draw the effects layer
-    - In `art/sky.ts` (or a new builder in `art/props.ts`) add `effectsLayer()`: the Search_Beam fan from the lantern at (440, 860), the lightning bolt with the full-world flash rect in one `lightning` group, the dawn band, and the `bats` group. `stage.ts` mounts it in the effects layer.
-    - Extend `art.test.ts`: the tree passes the rules.
+    - There is no `art/sky.ts`: the weather overlay is in `art/weather.ts`. In a new `art/effects.ts` add `effectsLayer()`: the Search_Beam fan from the porch lantern painted in the illustration, at (354, 629) in house units (the lantern's lit centre in the asset is (319, 566), times 10/9; checked against `house-scene.svg`, element `porch-lantern-glow`); the lightning bolt with the full-world flash rect in one `lightning` group; and the dawn band in a `dawn` group, clipped to the sky like the rain (the clip of `weatherLayer`). No bats. `stage.ts` mounts it in place of the empty `effects` group.
+    - Extend `art.test.ts`: the tree passes the rules; the beam starts at (354, 629); the dawn band uses the sky clip and never covers the house; there is no `bats` part.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the search beam, lightning and dawn`
     - _Requirements: 13.3, 14.1, 15.1, 22.1_
@@ -1127,7 +1114,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "scenic/model/lightningClock.ts", D7, D8_
 
   - [ ] 15.8 Animate the Finale, the beam and the Lightning
-    - In `motion.css`: `finale-rain-stop`, `finale-clouds-left`, `finale-clouds-right`, `finale-dawn`, `banner-in`, `beam-sweep`, `lightning-flash` (at most 3 flashes per second) and `bats-fly` in the no-preference block; under `reduce` the 200 ms fades, the beam fixed at −3°, no Lightning, bats hidden.
+    - In `motion.css`: `finale-rain-stop`, `finale-dawn`, `banner-in`, `beam-sweep` and `lightning-flash` (at most 3 flashes per second) in the no-preference block; under `reduce` the 200 ms fades, the beam fixed at −3° and no Lightning. The Finale is: the page rain stops, the dawn band fades in over the sky, the banner appears. The clouds are painted and stay still. Remove the unused token `--sc-dur-finale-clouds` from `scenic-tokens.css`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate the finale and the search beam`
     - _Requirements: 13.3, 13.7, 14.6, 15.4, 18.4, 18.5, 18.7_
@@ -1141,35 +1128,25 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Shots", "No real GitHub, no network", decision Q21_
 
   - [ ] 15.10 Checkpoint and PR 4a
-    - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4b, task 16.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4a`.
+    - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4b, task 16.3; tasks 16.1 and 16.2 are withdrawn), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-3b -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-4a`. Body in `$env:TEMP\pr-scenic-web-4a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `13-finale`, `14-live-busy`, `15-live-report`, each at both sizes", any cut-2 note of group 12, and the manual check: flashes every 10 to 15 s; the toggle stops them; under Reduced_Motion the toggle is off and disabled with its reason.
+    - Push with `git push -u origin feat/scenic-web-4a`. Body in `$env:TEMP\pr-scenic-web-4a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `13-finale`, `14-live-busy`, `15-live-report`, each at both sizes", and the manual check: flashes every 10 to 15 s; the toggle stops them; under Reduced_Motion the toggle is off and disabled with its reason.
     - Run `gh pr create --base feat/scenic-web-3b --head feat/scenic-web-4a --title "feat: add the finale, live search beam and lightning" --body-file $env:TEMP\pr-scenic-web-4a-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 16. PR 4b — Intro, Reduced_Motion audit, responsive polish, default switch
+- [ ] 16. PR 4b — Reduced_Motion audit, responsive polish, default switch
   - Branch: `feat/scenic-web-4b`. Stacks on: `feat/scenic-web-4a`.
-  - Estimate: ~480 changed lines. Model: Auto.
+  - Estimate: ~330 changed lines (the Intro, tasks 16.1 and 16.2, is cut). Model: Auto.
   - _Design: "PR Split" row 4b_
 
-  - [ ] 16.1 Draw the facade
-    - In the effects layer add the facade groups `facade-left` and `facade-right` that cover the house front. Extend `art.test.ts`: the tree passes the rules.
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(web): draw the house facade for the intro`
-    - _Requirements: 16.1, 22.1_
-    - _Design: "Art System" (effects layer), "Animation Catalogue" (intro rows)_
+  - [x] 16.1 (Withdrawn 19 Nov: the Intro is cut now, director's decision)
 
-  - [ ] 16.2 Play the Intro
-    - Create `packages/web/src/view/scenic/intro.ts`: on the first House_Scene render the facade opens in 1500 ms (`intro-door-left`, `intro-door-right` in the no-preference block); it plays once per page load; under Reduced_Motion it is skipped; while it plays `.world`, `.scene-dock` and `.floor-stair` are `inert` and the HUD stays visible and updated by `render`; capture-phase listeners for `keydown`, `keyup`, `pointerdown`, `mousedown` and `click` end it within 100 ms and swallow that input and its matching `keyup` or `click`. `intro-ended` is now sent to `phoneStep` when the Intro ends (D13).
-    - Verify: `npm run check` exits `0`.
-    - Commit message: `feat(web): open the house like a doll's house`
-    - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 17.14, 18.2_
-    - _Design: "Animation Catalogue" notes (Intro input), D13_
+  - [x] 16.2 (Withdrawn 19 Nov: the Intro is cut now, director's decision; `intro-ended` is sent at the first House_Scene render, D13)
 
   - [ ] 16.3 Apply Reduced_Motion changes while the page is open
-    - In `motion.ts` and `renderer.ts`: when Reduced_Motion turns on, every one-shot (Intro, Camera move, Reaction, Exorcised_Moment, Return_Glow, Finale change) jumps to its end state, loops stop through the media query, Lightning stops within 1 s and its toggle becomes off and disabled; when it turns off, loops start again and the toggle is enabled and stays off. Texts, controls, accessible names and Card states never depend on it.
+    - In `motion.ts` and `renderer.ts`: when Reduced_Motion turns on, every one-shot (Camera move, Reaction, Exorcised_Moment, Return_Glow, Finale change) jumps to its end state, loops stop through the media query, Lightning stops within 1 s and its toggle becomes off and disabled; when it turns off, loops start again and the toggle is enabled and stays off. Texts, controls, accessible names and Card states never depend on it.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): follow reduced motion changes without a reload`
     - _Requirements: 15.9, 18.1, 18.8, 18.9_
@@ -1183,7 +1160,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Source_Scan additions" item 8_
 
   - [ ] 16.5 Complete the reduce blocks
-    - In `motion.css` audit every row of the "Animation Catalogue" against its RM column and complete the `reduce` blocks: instant Camera cut, still loops, 200 ms fades with the same end states as with motion on.
+    - In `motion.css` audit every row of the "Animation Catalogue" against its RM column and complete the `reduce` blocks: instant Camera cut, still loops, 200 ms fades with the same end states as with motion on. Remove the unused token `--sc-dur-intro` from `scenic-tokens.css` and its line in `contrast.test.ts` (the Intro is cut).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): complete the reduced motion styles`
     - _Requirements: 18.3, 18.4, 18.5, 18.6, 18.7_
@@ -1197,7 +1174,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Camera frames", D10, decisions Q9 and Q22_
 
   - [ ] 16.7 Complete the shot list
-    - In `shotList.ts` and `shots.ts`: all 19 states × 2 sizes = 38 PNG files; the flow presses `Shift` once to end the Intro (skipped if cut 3 applied); the `shotList` test expects 38 unique names; the script prints `Wrote 38 PNG files to packages/web/shots/`.
+    - In `shotList.ts` and `shots.ts`: all 19 states × 2 sizes = 38 PNG files; the flow has no Intro step (the Intro is cut); the `shotList` test expects 38 unique names; the script prints `Wrote 38 PNG files to packages/web/shots/`.
     - Verify: `npm run check` exits `0`; `npm run shots` writes 38 files and exits `0`.
     - Commit message: `feat(web): take every scenic screenshot`
     - _Requirements: 24.4, 24.5, 24.6, 24.10, 24.12_
@@ -1214,8 +1191,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - Update `PLAN.md` ("En curso": scenic-web complete after merge; "Pendientes"; "Para retomar": task 17.1 for the director after deploy), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-4a -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-4b`. Body in `$env:TEMP\pr-scenic-web-4b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: none new; the full set of 38 files", and the manual checklist: the Intro plays once and a key, click or tap ends it with no other effect; keyboard only in every Scene; screen reader spot check; Network tab shows no simple CSS at the default and no scenic CSS at `?view=simple`; 360 px with no horizontal scroll; system Reduced_Motion toggled while the page is open.
-    - Run `gh pr create --base feat/scenic-web-4a --head feat/scenic-web-4b --title "feat: add the intro, reduced motion and scenic default" --body-file $env:TEMP\pr-scenic-web-4b-body.md`.
+    - Push with `git push -u origin feat/scenic-web-4b`. Body in `$env:TEMP\pr-scenic-web-4b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: none new; the full set of 38 files", and the manual checklist: keyboard only in every Scene; screen reader spot check; Network tab shows no simple CSS at the default and no scenic CSS at `?view=simple`; 360 px with no horizontal scroll; system Reduced_Motion toggled while the page is open.
+    - Run `gh pr create --base feat/scenic-web-4a --head feat/scenic-web-4b --title "feat: add the reduced motion audit and the scenic default" --body-file $env:TEMP\pr-scenic-web-4b-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
@@ -1230,9 +1207,9 @@ These are settled by the approved design and are not reopened in these tasks:
 ## Notes
 
 - No task is optional: the design marks no property and no test as optional. Every property P1 to P18 has its own sub-task: P12, P13 and P9 in PR 1a; P1 to P8 in PR 1c; P18 in PR 1f; P15 in PR 2c; P17 in PR 3a; P14, P10 and P11 in PR 3b; P16 in PR 4a.
-- The tasks of group 12 are conditional: they run only if the time check of 23 Nov 2026 triggers. They are not optional in the `*` sense. Cut 4 of the design's Cut List needs a new director decision and has no task.
-- Tasks 6.1, 8.1 and 17.1 involve the director by hand. Task 8.1 is a hard stop: PR 2a starts only after the director's "yes".
-- DOM modules (`hud.ts`, `stage.ts`, `sceneControls.ts`, `phoneWidget.ts`, `ghostScene.ts`, `grimoire.ts`, `intro.ts`, `effects.ts`, `renderer.ts`) have no automated test because the design adds no jsdom or happy-dom. They are covered by `npm run build`, the Source_Scan, the Shots_Script checks and the manual checks in each PR body.
+- Tasks 12.1, 12.2 and 12.5 are conditional: they run only if the time check of 23 Nov 2026 triggers. They are not optional in the `*` sense. Task 12.3 is withdrawn and 12.4 was applied on 19 Nov (director). Cut 4 of the design's Cut List needs a new director decision and has no task.
+- Tasks 6.1 and 17.1 involve the director by hand. Task 8.1 was a hard stop and is approved (18 Nov, merge of PR #59).
+- DOM modules (`hud.ts`, `stage.ts`, `sceneControls.ts`, `phoneWidget.ts`, `ghostScene.ts`, `grimoire.ts`, `effects.ts`, `renderer.ts`) have no automated test because the design adds no jsdom or happy-dom. They are covered by `npm run build`, the Source_Scan, the Shots_Script checks and the manual checks in each PR body.
 - The scenic view adds no external service. The only network use is the existing live form, already covered by the web-demo real-service check. The Shots_Script uses Core's strict fake and aborts every other request.
 - Requirement 19 is checked by hand on the Shots_Script screenshots and in a browser at 360 px (Requirement 19.5); no automated layout test is added to `npm run check`.
 

@@ -107,7 +107,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - **Reaction**: a short ghost animation in the Ghost_Scene that follows a UserAction the Scenic_Renderer itself dispatched.
 - **Exorcised_Moment**: the animation in the Ghost_Scene when a Card changes from Haunted to Exorcised between two renders: the ghost spirals up into orange sparks and the room turns from cold to warm.
 - **Return_Glow**: the animation when the judge comes back to the House_Scene or a Floor_Scene after an Exorcised_Moment: the Exorcised drawing of the ghost's slot fades in and the Haunt_Meter moves.
-- **Finale**: the "demo complete" scene change: the rain stops, the clouds part, the horizon turns dawn orange and a banner appears.
+- **Finale**: the "demo complete" scene change: the rain stops, the horizon turns dawn orange and a banner appears.
 - **Search_Beam**: the visible searching animation shown while a live analysis runs (a lantern beam that sweeps the house).
 - **Lightning**: a short flash that lights the house.
 - **Lightning_Toggle**: the visible HUD button "Lightning: on" / "Lightning: off".
@@ -476,7 +476,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 
 1. WHILE `house` is not `null`, `house.source` is `"sample"`, every Card of `house.floors` is Locked or Exorcised, at least one Card is Exorcised, and `scene.kind` is `"house"` or `"floor"`, THE Scenic_Renderer SHALL show the Finale.
 2. WHILE the condition of criterion 1 is false, THE Scenic_Renderer SHALL NOT show the Finale or its banner, and SHALL draw the sky, rain and horizon as in Requirement 3.3.
-3. WHILE the Finale is shown, THE Scenic_Renderer SHALL draw no rain, SHALL draw the clouds moved apart from the moon and the horizon, and SHALL paint the horizon with a dawn orange colour defined in Scenic_Tokens.
+3. WHILE the Finale is shown, THE Scenic_Renderer SHALL draw no rain and SHALL paint the horizon with a dawn orange colour defined in Scenic_Tokens. The clouds are part of the scene illustration and stay still.
 4. WHILE the Finale is shown and `house.houseClean` is `null`, THE Finale SHALL show a banner as real HTML text (not text inside the SVG) with two lines: one saying that the demo is complete (a new text in `texts.ts`), and one saying that the other ghosts wait for the user's own Kiro (a new text in `powerTexts.ts`, because it names the Power).
 5. WHILE the Finale is shown and `house.houseClean` is not `null`, THE Finale banner SHALL show `house.houseClean` (which equals `TEXTS.houseClean`) in place of the two lines of criterion 4.
 6. THE Scenic_Renderer SHALL decide whether the Finale is shown from the current ViewModel only (the Finale flag of Scene_Layout): two equal ViewModels SHALL give the same decision, whatever was rendered before, and no new ViewModel field SHALL be added (property test in Requirement 23.7).
@@ -610,7 +610,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 4. WHILE Reduced_Motion is on, THE Scenic_Renderer SHALL run no animation or transition that moves, rotates, scales or shakes an element. This means no shaking, no bobbing, no idle animation, no drifting fog, no falling rain (fog and rain are drawn still, D9), no Search_Beam sweep (Requirement 14.6), and no Telephone shake or vibration lines (Requirement 9.13).
 5. WHILE Reduced_Motion is on, THE Scenic_Renderer SHALL show no Lightning, and the Lightning_Toggle SHALL follow Requirement 15.9.
 6. WHILE Reduced_Motion is on, THE Scenic_Renderer SHALL limit every animation and transition to one opacity change that lasts 200 ms or less and does not repeat. An instant change with no animation (for example the "Missed it" size change) is allowed.
-7. WHILE Reduced_Motion is on, WHEN a Reaction, the Exorcised_Moment, the Return_Glow or the Finale starts, THE Scenic_Renderer SHALL replace its motion with an opacity fade of 200 ms or less. The fade SHALL end in the same state as with Reduced_Motion off: for the Exorcised_Moment the ghost gone and the warm room, for the Return_Glow the Exorcised drawing of the slot and the new Haunt_Meter share, and for the Finale the stopped rain, parted clouds and dawn horizon.
+7. WHILE Reduced_Motion is on, WHEN a Reaction, the Exorcised_Moment, the Return_Glow or the Finale starts, THE Scenic_Renderer SHALL replace its motion with an opacity fade of 200 ms or less. The fade SHALL end in the same state as with Reduced_Motion off: for the Exorcised_Moment the ghost gone and the warm room, for the Return_Glow the Exorcised drawing of the slot and the new Haunt_Meter share, and for the Finale the stopped rain and dawn horizon.
 8. WHILE Reduced_Motion is on, THE Web_Page SHALL show, for the same ViewModel, the same texts, the same controls with the same accessible names, and the same Card states as with Reduced_Motion off.
 9. WHEN Reduced_Motion changes while the page is open, THE Scenic_Renderer SHALL apply the new setting within 1 s and without a reload. WHEN Reduced_Motion turns on, every one-shot animation already running (Intro, Camera move, Reaction, Exorcised_Moment, Return_Glow, Finale change) SHALL jump to its end state, and every looping animation (idle animations, fog, rain, Rings, Live_Call, Search_Beam) SHALL stop moving.
 
