@@ -27,7 +27,7 @@ export function hasExternalAddress(text: string): boolean {
   return FULL_ADDRESS.test(rest) || PROTOCOL_RELATIVE.some((p) => p.test(rest));
 }
 
-export const SIZE_LIMIT = 307_200;
+export const SIZE_LIMIT = 512_000;
 export const COUNTED_EXTENSIONS = [
   ".js",
   ".css",

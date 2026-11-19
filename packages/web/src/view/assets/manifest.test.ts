@@ -17,7 +17,20 @@ const ALL_IDS: readonly AssetSlotId[] = [
   "ghost.locked",
   "prop.door",
   "prop.candle",
+  "panel.frame",
+  "panel.gargoyle",
+  "panel.lantern",
+  "panel.pumpkin",
 ];
+
+/** Slots with a file: the scene illustration and the Gate_Panel pictures. */
+const FILLED: Readonly<Partial<Record<AssetSlotId, string>>> = {
+  "scene.house": "house-scene.svg",
+  "panel.frame": "panel-frame.svg",
+  "panel.gargoyle": "panel-gargoyle.svg",
+  "panel.lantern": "panel-lantern.svg",
+  "panel.pumpkin": "panel-pumpkin.svg",
+};
 
 const FALLBACKS = ["none", "token-colour", "text-label"];
 
@@ -65,18 +78,25 @@ describe("asset manifest", () => {
     }
   });
 
-  it("fills only scene.house, with the declared illustration", () => {
+  it("fills only the scene illustration and the Gate_Panel pictures", () => {
     for (const slot of ASSET_SLOTS) {
-      if (slot.id === "scene.house") continue;
-      expect(slot.layers).toEqual([]);
+      const file = FILLED[slot.id];
+      expect(slot.layers.map((layer) => layer.file)).toEqual(
+        file === undefined ? [] : [file],
+      );
     }
-    const house = ASSET_SLOTS.find((slot) => slot.id === "scene.house");
-    expect(house?.layers.map((layer) => layer.file)).toEqual([
-      "house-scene.svg",
-    ]);
-    // Where the art came from is never hidden (director's decision, 18 Nov).
-    expect(house?.layers[0]?.source).toMatch(/Claude \(Anthropic AI\)/);
-    expect(house?.layers[0]?.source).toMatch(/Kiro/);
+    // Where the art came from is never hidden (director's decisions, 18 and 19 Nov).
+    for (const id of Object.keys(FILLED)) {
+      const source = ASSET_SLOTS.find((slot) => slot.id === id)?.layers[0]
+        ?.source;
+      expect(source).toMatch(/Claude \(Anthropic AI\)/);
+      expect(source).toMatch(/Kiro/);
+    }
+    for (const id of ["panel.gargoyle", "panel.lantern", "panel.pumpkin"]) {
+      const source = ASSET_SLOTS.find((slot) => slot.id === id)?.layers[0]
+        ?.source;
+      expect(source).toMatch(/ChatGPT \(OpenAI\)/);
+    }
   });
 
   it("keeps the C2PA provenance block inside the scene illustration", () => {
