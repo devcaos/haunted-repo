@@ -202,12 +202,9 @@
   display: none;
 }
 
-/* A secondary button: it must not compete with "Find the ghosts". */
+/* A secondary button (class in bestiary.ts): it must not compete with "Find the ghosts". */
 .scenic .bestiary-toggle {
   align-self: flex-start;
-  border-color: var(--sc-border);
-  background-color: var(--sc-backing);
-  color: var(--sc-accent);
 }
 
 .scenic .bestiary[data-open="false"] .bestiary-list {

@@ -39,7 +39,9 @@
     inset: 0;
     aspect-ratio: auto;
   }
-} /* The world box keeps the 16:10 ratio of the viewBox; the Camera moves it from its top left corner. */
+}
+
+/* The world box keeps the 16:10 ratio of the viewBox; the Camera moves it from its top left corner. */
 .scenic .world {
   position: absolute;
   top: 0;
