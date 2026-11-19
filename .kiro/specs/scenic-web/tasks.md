@@ -662,7 +662,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.1, 6.3, 6.7, 6.8, 6.10, 22.1_
     - _Design: "Ghost states", "Props and panels"_
 
-  - [ ] 9.4 Style the Locked and Exorcised states
+  - [x] 9.4 Style the Locked and Exorcised states
     - In `styles/ghosts.css` (tokens only) add only the styles still missing: `look-locked` with `--sc-locked`, the Cloche glass and padlock, the candle wax and flame, and the warm-orange light stops. The Lantern_Wraith and Chained_Brute parts are already styled.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): colour the locked and exorcised states`
