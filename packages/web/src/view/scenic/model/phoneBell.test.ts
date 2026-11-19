@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
   INITIAL_PHONE_STATE,
@@ -240,5 +241,86 @@ describe("phoneBell", () => {
     expect(callWaiting(run([render(SAMPLE)]).state)).toBe(true);
     expect(callWaiting(run([render(NO_TARGET)]).state)).toBe(false);
     expect(callWaiting(run([render(LIVE_DONE)]).state)).toBe(false);
+  });
+});
+
+const inputsArb: fc.Arbitrary<PhoneInputs> = fc.record({
+  source: fc.constantFrom<PhoneInputs["source"]>("sample", "live", null),
+  target: fc.constantFrom<PhoneInputs["target"]>("a.ts", "b.ts", null),
+  scene: fc.constantFrom<PhoneInputs["scene"]>("house", "floor", "ghost"),
+  status: fc.constantFrom<PhoneInputs["status"]>(
+    "none",
+    "busy",
+    "done",
+    "error",
+    "fallback",
+  ),
+  reportKey: fc.constantFrom<PhoneInputs["reportKey"]>("r1", "r2", null),
+});
+
+const eventArb: fc.Arbitrary<PhoneEvent> = fc.oneof(
+  inputsArb.map((inputs): PhoneEvent => ({ type: "render", inputs })),
+  fc.constantFrom<PhoneEvent>(
+    { type: "intro-ended" },
+    { type: "ring-ended" },
+    { type: "wait-ended" },
+    { type: "answered" },
+    { type: "ghost-started" },
+    { type: "exorcised-moment" },
+    { type: "return-glow-ended" },
+  ),
+);
+
+describe("phoneBell properties", () => {
+  // Feature: scenic-web, Property 15: After the first start the Telephone rings only for an exorcism
+  // **Validates: Requirements 9.3, 9.4, 9.12**
+  it("rings after the first start only for an exorcism", () => {
+    fc.assert(
+      fc.property(fc.array(eventArb, { maxLength: 60 }), (events) => {
+        let state = INITIAL_PHONE_STATE;
+        let started = false;
+        let exorcisedSinceRing = false;
+        for (const event of events) {
+          const before = state;
+          const step = phoneStep(state, event);
+          state = step.state;
+          const oneRings = step.effects.filter(
+            (e) => e.type === "ring" && e.rings === 1,
+          );
+          // At most one Ring per event.
+          expect(oneRings.length).toBeLessThanOrEqual(1);
+          if (event.type === "answered") {
+            expect(step.effects).toContainEqual({ type: "stop" });
+          }
+          if (event.type === "wait-ended" && before.mode === "idle") {
+            // Clarification: a wait that ends in another mode is a stale timer.
+            const last = before.last;
+            const ready =
+              last !== null &&
+              last.source === "sample" &&
+              last.target !== null &&
+              last.scene !== "ghost";
+            expect(oneRings.length === 1).toBe(!started && ready);
+          }
+          if (event.type === "wait-ended" && started) {
+            expect(oneRings).toEqual([]);
+          }
+          if (oneRings.length === 1 && event.type !== "wait-ended") {
+            expect(event.type).toBe("return-glow-ended");
+            expect(started).toBe(true);
+            expect(exorcisedSinceRing).toBe(true);
+            expect(before.last?.target ?? null).not.toBeNull();
+          }
+          if (event.type === "exorcised-moment") exorcisedSinceRing = true;
+          if (step.effects.some((e) => e.type === "ring")) {
+            exorcisedSinceRing = false;
+          }
+          if (event.type === "answered" || event.type === "ghost-started") {
+            started = true;
+          }
+        }
+      }),
+      { numRuns: 200 },
+    );
   });
 });

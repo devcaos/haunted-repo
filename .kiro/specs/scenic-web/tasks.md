@@ -796,7 +796,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.2, 9.3, 9.5, 9.6, 9.12, 9.14_
     - _Design: "scenic/model/phoneBell.ts", D13, decision Q17_
 
-  - [ ] 11.3 Property test for the Telephone
+  - [x] 11.3 Property test for the Telephone
     - **Property 15: After the first start the Telephone rings only for an exorcism**
     - **Validates: Requirements 9.3, 9.4, 9.12**
     - Generator: sequences of `PhoneEvent` values (renders with random `PhoneInputs`, timer ends, answers, ghost starts, exorcised moments, return-glow ends), at least 100 runs.
