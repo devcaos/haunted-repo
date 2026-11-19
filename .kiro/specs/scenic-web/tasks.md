@@ -646,7 +646,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [x] 9.1 (Withdrawn 19 Nov: the three Ghost_Types already exist at Variant 0 with their tests since PR #59)
 
-  - [ ] 9.2 Add Variants 1 to 4
+  - [x] 9.2 Add Variants 1 to 4
     - In `art/ghosts.ts` add `VARIANTS` with the scale, tilt and eye style of the "Variants" table, the same five for all three types, and let `ghostArt` take Variant 0 to 4 (today it accepts only 0). Variants differ by scale, tilt and eye style only, with no accessories (Requirement 5.9 asks for at least one of size, tilt, eyes and accessory). `EYE_STYLES` holds five eye styles shared by the three types, built from the existing eye shapes (the `ghost-eye` ellipse with its `ghost-eye-glow` circle): the pair of the reference at Variant 0 and four more that change only the size, tilt or spacing of those shapes. The Lantern_Wraith keeps its `lantern` and the Chained_Brute its `shackles` and `chain` at every Variant.
     - Extend `art.test.ts`: any two Variants of one type differ; at every Variant the size order of 5.6 (Wisp smallest outline, Chained_Brute widest) and the small-eye rule (eye height under 5 % of the box height) hold; each type keeps its own part at every Variant (`lantern`; `shackles` and `chain`; the Wisp has none of them); every tree passes the Shape_Data rules.
     - Verify: `npm run check` exits `0`.

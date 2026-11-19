@@ -1,4 +1,4 @@
-﻿/// <reference types="node" />
+/// <reference types="node" />
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
@@ -28,7 +28,7 @@ import {
   type SlotPlacement,
   type VariantNumber,
 } from "../model/sceneLayout.js";
-import { GHOST_TYPES, ghostArt } from "./ghosts.js";
+import { GHOST_TYPES, VARIANTS, ghostArt } from "./ghosts.js";
 import {
   ATTIC_BACK,
   ATTIC_CLIP,
@@ -631,6 +631,110 @@ describe("the three Ghost_Types, Variant 0 (Requirements 5.4, 5.6, 6.1; director
     expect(wisp.w).toBeLessThan(wraith.w);
     expect(wraith.w).toBeLessThan(brute.w);
     expect(wisp.h).toBeLessThan(wraith.h);
+  });
+});
+
+describe("the five Variants (Requirements 5.6, 5.9)", () => {
+  const TYPES = ["wisp", "lantern-wraith", "chained-brute"] as const;
+  const NUMBERS: readonly VariantNumber[] = [0, 1, 2, 3, 4];
+  const partsOf = (tree: ShapeNode): string[] =>
+    nodesOf(tree).flatMap((n) => (n.part === undefined ? [] : [n.part]));
+  const eyesOf = (tree: ShapeNode): ShapeNode[] =>
+    nodesOf(tree).filter((n) => n.part === "eye");
+
+  it("every type at every Variant passes the Shape_Data rules, in both looks", () => {
+    for (const type of TYPES) {
+      for (const v of NUMBERS) {
+        expect(shapeProblems(ghostArt(type, v, "haunted"))).toEqual([]);
+        expect(shapeProblems(ghostArt(type, v, "locked"))).toEqual([]);
+      }
+    }
+  });
+
+  it("any two Variants of one type differ, in scale and in eye style", () => {
+    for (const type of TYPES) {
+      const trees = NUMBERS.map((v) => ghostArt(type, v, "haunted"));
+      for (const [i, a] of trees.entries()) {
+        for (const b of trees.slice(i + 1)) {
+          expect(JSON.stringify(a)).not.toBe(JSON.stringify(b));
+          expect(JSON.stringify(eyesOf(a))).not.toBe(JSON.stringify(eyesOf(b)));
+        }
+      }
+    }
+    expect(new Set(NUMBERS.map((v) => VARIANTS[v].scale)).size).toBe(5);
+  });
+
+  it("uses the same scale and tilt for the three types, so the size order holds at every Variant", () => {
+    for (const v of NUMBERS) {
+      const { scale, tilt } = VARIANTS[v];
+      const widths = TYPES.map((type) => {
+        const root = ghostArt(type, v, "haunted");
+        expect(root.transform?.scale ?? 1).toBe(scale);
+        expect(root.transform?.rotate ?? 0).toBe(tilt);
+        return GHOST_BOX[type].w * (root.transform?.scale ?? 1);
+      });
+      expect(widths[0]).toBeLessThan(widths[1] ?? 0);
+      expect(widths[1]).toBeLessThan(widths[2] ?? 0);
+      expect(GHOST_BOX.wisp.h * scale).toBeLessThan(
+        GHOST_BOX["lantern-wraith"].h * scale,
+      );
+    }
+  });
+
+  it("keeps the centre of the box where it is, so a Variant never moves the ghost", () => {
+    for (const type of TYPES) {
+      for (const v of NUMBERS) {
+        const t = ghostArt(type, v, "haunted").transform;
+        const { scale, tilt } = VARIANTS[v];
+        const [tx, ty] = t?.translate ?? [0, 0];
+        const { w, h } = GHOST_BOX[type];
+        const a = (tilt * Math.PI) / 180;
+        const [px, py] = [w / 2, h / 2];
+        expect(tx + scale * (Math.cos(a) * px - Math.sin(a) * py)).toBeCloseTo(
+          px,
+          1,
+        );
+        expect(ty + scale * (Math.sin(a) * px + Math.cos(a) * py)).toBeCloseTo(
+          py,
+          1,
+        );
+      }
+    }
+  });
+
+  it("keeps the eyes small at every Variant: two eyes, each under 5 % of the box height", () => {
+    for (const type of TYPES) {
+      for (const v of NUMBERS) {
+        const eyes = eyesOf(ghostArt(type, v, "haunted"));
+        expect(eyes).toHaveLength(2);
+        for (const eye of eyes) {
+          expect((2 * (eye.ry ?? 0)) / GHOST_BOX[type].h).toBeLessThan(0.05);
+        }
+      }
+    }
+  });
+
+  it("keeps each type's own part at every Variant: the lantern, or the shackles and chain, or neither", () => {
+    for (const v of NUMBERS) {
+      const own = ["lantern", "shackles", "chain"];
+      expect(
+        partsOf(ghostArt("wisp", v, "haunted")).filter((p) => own.includes(p)),
+      ).toEqual([]);
+      const wraith = partsOf(ghostArt("lantern-wraith", v, "haunted"));
+      expect(wraith).toContain("lantern");
+      expect(wraith).not.toContain("shackles");
+      const brute = partsOf(ghostArt("chained-brute", v, "haunted"));
+      expect(brute).toEqual(expect.arrayContaining(["shackles", "chain"]));
+      expect(brute).not.toContain("lantern");
+    }
+  });
+
+  it("draws the Locked look without a glow and with the look-locked class", () => {
+    for (const type of TYPES) {
+      const tree = ghostArt(type, 2, "locked");
+      expect(tree.cls).toContain("look-locked");
+      expect(partsOf(tree)).not.toContain("glow");
+    }
   });
 });
 
