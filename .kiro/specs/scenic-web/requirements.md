@@ -107,7 +107,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 - **Reaction**: a short ghost animation in the Ghost_Scene that follows a UserAction the Scenic_Renderer itself dispatched.
 - **Exorcised_Moment**: the animation in the Ghost_Scene when a Card changes from Haunted to Exorcised between two renders: the ghost spirals up into orange sparks and the room turns from cold to warm.
 - **Return_Glow**: the animation when the judge comes back to the House_Scene or a Floor_Scene after an Exorcised_Moment: the Exorcised drawing of the ghost's slot fades in and the Haunt_Meter moves.
-- **Finale**: the "demo complete" scene change: the rain stops, the clouds part, the horizon turns dawn orange and a banner appears.
+- **Finale**: the "demo complete" scene change: the rain stops, the horizon turns dawn orange and a banner appears.
 - **Search_Beam**: the visible searching animation shown while a live analysis runs (a lantern beam that sweeps the house).
 - **Lightning**: a short flash that lights the house.
 - **Lightning_Toggle**: the visible HUD button "Lightning: on" / "Lightning: off".
@@ -476,7 +476,7 @@ Names in `code font` are the exact names in the code (checked on 17 Nov). Names 
 
 1. WHILE `house` is not `null`, `house.source` is `"sample"`, every Card of `house.floors` is Locked or Exorcised, at least one Card is Exorcised, and `scene.kind` is `"house"` or `"floor"`, THE Scenic_Renderer SHALL show the Finale.
 2. WHILE the condition of criterion 1 is false, THE Scenic_Renderer SHALL NOT show the Finale or its banner, and SHALL draw the sky, rain and horizon as in Requirement 3.3.
-3. WHILE the Finale is shown, THE Scenic_Renderer SHALL draw no rain, SHALL draw the clouds moved apart from the moon and the horizon, and SHALL paint the horizon with a dawn orange colour defined in Scenic_Tokens.
+3. WHILE the Finale is shown, THE Scenic_Renderer SHALL draw no rain and SHALL paint the horizon with a dawn orange colour defined in Scenic_Tokens. The clouds are part of the scene illustration and stay still.
 4. WHILE the Finale is shown and `house.houseClean` is `null`, THE Finale SHALL show a banner as real HTML text (not text inside the SVG) with two lines: one saying that the demo is complete (a new text in `texts.ts`), and one saying that the other ghosts wait for the user's own Kiro (a new text in `powerTexts.ts`, because it names the Power).
 5. WHILE the Finale is shown and `house.houseClean` is not `null`, THE Finale banner SHALL show `house.houseClean` (which equals `TEXTS.houseClean`) in place of the two lines of criterion 4.
 6. THE Scenic_Renderer SHALL decide whether the Finale is shown from the current ViewModel only (the Finale flag of Scene_Layout): two equal ViewModels SHALL give the same decision, whatever was rendered before, and no new ViewModel field SHALL be added (property test in Requirement 23.7).
