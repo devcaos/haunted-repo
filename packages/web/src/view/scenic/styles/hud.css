@@ -94,11 +94,26 @@
   display: block;
   width: var(--sc-icon-size);
   height: var(--sc-icon-size);
-  background-color: var(--sc-spectral);
 }
 
-.scenic .ghost-icon[data-icon-state="exorcised"] {
-  background-color: var(--sc-candle);
+.scenic .ghost-icon .icon-flame-outer {
+  fill: var(--sc-candle);
+}
+
+.scenic .ghost-icon .icon-flame-core {
+  fill: var(--sc-flame-pale);
+}
+
+.scenic .ghost-icon .icon-wisp-hood {
+  fill: var(--sc-spectral);
+}
+
+.scenic .ghost-icon .icon-wisp-face {
+  fill: var(--sc-abyss);
+}
+
+.scenic .ghost-icon .icon-wisp-eye {
+  fill: var(--sc-cold-white);
 }
 
 .scenic .view-link {
