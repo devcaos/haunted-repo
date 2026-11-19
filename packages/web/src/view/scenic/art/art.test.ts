@@ -42,7 +42,13 @@ import {
   atticClip,
   sceneBackdrop,
 } from "./house.js";
-import { FLOOR_LINE, chainedDoorArt, slotArt } from "./props.js";
+import {
+  CANDLE_EXTENT,
+  CLOCHE_EXTENT,
+  FLOOR_LINE,
+  chainedDoorArt,
+  slotArt,
+} from "./props.js";
 import { RAIN_BOTTOM, RAIN_STEP, rainPath, weatherLayer } from "./weather.js";
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
@@ -778,30 +784,27 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
     }
   });
 
-  it("draws no window in any slot: Locked and Exorcised slots are empty until the ghost's own looks come (director's decision, 18 Nov)", () => {
+  it("draws no window in any slot (director's decision, 18 Nov)", () => {
     for (const slot of allSlots) {
-      const tree = slotArt(slot);
-      const names = nodesOf(tree).flatMap((n) => [
+      const names = nodesOf(slotArt(slot)).flatMap((n) => [
         ...(n.cls?.split(" ") ?? []),
         n.part ?? "",
       ]);
       expect(names.filter((name) => /pane|window|sill/.test(name))).toEqual([]);
-      if (slot.state !== "haunted") expect(tree.children).toEqual([]);
     }
   });
 
-  it("a Haunted slot draws its floor's ghost with its glow; Locked and Exorcised slots draw no ghost yet", () => {
+  it("a Haunted slot draws its ghost with its glow; a Locked slot draws it without a glow and still; an Exorcised slot draws no ghost", () => {
     for (const slot of allSlots) {
       const tree = slotArt(slot);
-      const ghost = slot.state === "haunted";
       const parts = nodesOf(tree).map((n) => n.part);
-      expect(parts.includes("glow")).toBe(ghost);
+      expect(parts.includes("glow")).toBe(slot.state === "haunted");
       for (const type of ["wisp", "lantern-wraith", "chained-brute"]) {
         expect(classesOf(tree).includes(`ghost--${type}`)).toBe(
-          ghost && type === GHOST_TYPE_OF[slot.floor],
+          slot.state !== "exorcised" && type === GHOST_TYPE_OF[slot.floor],
         );
       }
-      if (ghost) {
+      if (slot.state === "haunted") {
         const holder = nodesOf(tree).find((n) =>
           n.cls?.startsWith("slot-ghost "),
         );
@@ -811,6 +814,74 @@ describe("slots and chained doors (Requirements 3.5, 6.1, 8.6)", () => {
     }
   });
 
+  it("each slot draws the Variant of its Card, in the look of its state", () => {
+    for (const slot of allSlots.filter((s) => s.state !== "exorcised")) {
+      const look = slot.state === "haunted" ? "haunted" : "locked";
+      const ghost = nodesOf(slotArt(slot)).find((n) =>
+        n.cls?.startsWith("ghost "),
+      );
+      expect(ghost, slot.key).toEqual(
+        ghostArt(slot.ghostType, slot.variant, look),
+      );
+    }
+  });
+
+  it("puts every Locked ghost in the same Cloche up to scale, with its padlock, and the whole drawing inside the slot", () => {
+    const locked = allSlots.filter((s) => s.state === "locked");
+    const clocheOf = (slot: SlotPlacement): string =>
+      JSON.stringify(nodesOf(slotArt(slot)).find((n) => n.part === "cloche"));
+    for (const slot of locked) {
+      const tree = slotArt(slot);
+      expect(clocheOf(slot)).toBe(clocheOf(locked[0] as SlotPlacement));
+      expect(nodesOf(tree).filter((n) => n.part === "padlock")).toHaveLength(1);
+      const group = nodesOf(tree).find((n) => n.cls === "slot-locked");
+      const [x = 0, y = 0] = group?.transform?.translate ?? [];
+      const c = group?.transform?.scale ?? 1;
+      const { x1, y1, x2, y2 } = CLOCHE_EXTENT;
+      const label = `${slot.key} of ${slot.rect.w}`;
+      expect(x + x1 * c, label).toBeGreaterThanOrEqual(slot.rect.x - 0.05);
+      expect(x + x2 * c, label).toBeLessThanOrEqual(
+        slot.rect.x + slot.rect.w + 0.05,
+      );
+      expect(y + y1 * c, label).toBeGreaterThanOrEqual(slot.rect.y - 0.05);
+      expect(y + y2 * c, label).toBeLessThanOrEqual(
+        slot.rect.y + slot.rect.h + 0.05,
+      );
+    }
+  });
+
+  it("draws an Exorcised slot as a lit candle on the slot bottom with a pool of light, and no ghost", () => {
+    for (const slot of allSlots.filter((s) => s.state === "exorcised")) {
+      const tree = slotArt(slot);
+      const parts = nodesOf(tree).map((n) => n.part);
+      expect(parts).toEqual(
+        expect.arrayContaining(["candle", "flame", "candle-light"]),
+      );
+      expect(classesOf(tree).filter((c) => /^ghost/.test(c))).toEqual([]);
+      const group = nodesOf(tree).find((n) => n.cls === "slot-exorcised");
+      const [x = 0, y = 0] = group?.transform?.translate ?? [];
+      const s = group?.transform?.scale ?? 1;
+      const { x1, y1, x2, y2 } = CANDLE_EXTENT;
+      // The candle stands on the slot bottom, inside the slot, about a third of its height.
+      expect(y + y2 * s).toBeCloseTo(slot.rect.y + slot.rect.h, 1);
+      expect(x + x1 * s).toBeGreaterThanOrEqual(slot.rect.x);
+      expect(x + x2 * s).toBeLessThanOrEqual(slot.rect.x + slot.rect.w);
+      expect((y2 - y1) * s).toBeLessThanOrEqual(slot.rect.h / 3 + 0.01);
+      expect((y2 - y1) * s).toBeGreaterThan(slot.rect.h / 3 / 2);
+    }
+  });
+
+  it("draws all 3 types at all 5 Variants in all 3 states within the Shape_Data rules", () => {
+    for (const floor of FLOORS) {
+      for (const state of STATES) {
+        for (let index = 0; index < 5; index += 1) {
+          expect(
+            shapeProblems(slotArt(slotOf(floor, state, index, 5))),
+          ).toEqual([]);
+        }
+      }
+    }
+  });
   it("every ghost box lies inside its slot, so no ghost pokes through a roof or floor line", () => {
     for (const slot of allSlots.filter((s) => s.state === "haunted")) {
       const holder = nodesOf(slotArt(slot)).find((n) =>

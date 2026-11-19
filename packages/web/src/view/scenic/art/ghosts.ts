@@ -135,7 +135,9 @@ const REF_GLOW = { cx: 0, cy: 80, rx: 90, ry: 130 } as const;
  * plain shape and the smallest; the Chained_Brute is stretched wider, as in
  * the reference (1.8 : 1.4).
  */
-const SCALE: Readonly<Record<GhostType, readonly [number, number]>> = {
+export const GHOST_REF_SCALE: Readonly<
+  Record<GhostType, readonly [number, number]>
+> = {
   wisp: [0.3125, 0.3125],
   "lantern-wraith": [0.5, 0.5],
   "chained-brute": [0.625, 0.5],
@@ -145,7 +147,7 @@ const round2 = (v: number): number => Math.round(v * 100) / 100;
 
 /** Reference point to local point: shifted so the silhouette starts at 0, 0. */
 function at(type: GhostType, x: number, y: number): [number, number] {
-  const [sx, sy] = SCALE[type];
+  const [sx, sy] = GHOST_REF_SCALE[type];
   return [round2((x + REF_ORIGIN[0]) * sx), round2((y + REF_ORIGIN[1]) * sy)];
 }
 
@@ -177,7 +179,10 @@ function spec(type: GhostType, idle: string): GhostTypeSpec {
   return {
     box,
     eyeHeight:
-      2 * round2((EYE_STYLES[0][0]?.ry ?? 1) * EYE_BOOST * SCALE[type][1]),
+      2 *
+      round2(
+        (EYE_STYLES[0][0]?.ry ?? 1) * EYE_BOOST * GHOST_REF_SCALE[type][1],
+      ),
     idle,
   };
 }
@@ -187,7 +192,7 @@ function lantern(id: (name: string) => string): ShapeNode {
   const t: GhostType = "lantern-wraith";
   const [cx, cy] = at(t, 64, 158);
   const [fx, fy] = at(t, 64, 157);
-  const [sx, sy] = SCALE[t];
+  const [sx, sy] = GHOST_REF_SCALE[t];
   return g(
     "ghost-lantern",
     [
@@ -208,7 +213,7 @@ function lantern(id: (name: string) => string): ShapeNode {
 /** Dark iron shackles on both wrists and two hanging chains. */
 function shackles(): ShapeNode[] {
   const t: GhostType = "chained-brute";
-  const [sx, sy] = SCALE[t];
+  const [sx, sy] = GHOST_REF_SCALE[t];
   return [
     path("ghost-shackle", fit(t, REF_SHACKLES), { part: "shackles" }),
     g(
@@ -271,7 +276,7 @@ export function ghostArt(
   look: "haunted" | "locked",
 ): ShapeNode {
   const id = (name: string): string => `${type}-${variant}-${name}`;
-  const [sx, sy] = SCALE[type];
+  const [sx, sy] = GHOST_REF_SCALE[type];
 
   const [gx, gy] = at(type, REF_GLOW.cx, REF_GLOW.cy);
   const eyes = EYE_STYLES[VARIANTS[variant].eyes].flatMap((eye) => {

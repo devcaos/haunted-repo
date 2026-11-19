@@ -654,7 +654,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.6, 5.9_
     - _Design: "Variants (Requirement 5.9)"_
 
-  - [ ] 9.3 Draw Locked and Exorcised slots on every floor
+  - [x] 9.3 Draw Locked and Exorcised slots on every floor
     - In `art/props.ts`: `slotArt` draws each Card with its own Variant (`slot.variant`; the Variant 0 limit of decision Q15 ends here), and `ghostArt` takes the `locked` look. A Locked Card is its ghost in `look-locked` inside the Cloche (bell jar with parts `cloche` and `padlock`, Brass base), as in "Ghost states", the same Cloche for every Locked Card up to scale. An Exorcised Card (director's decision, 19 Nov) draws no ghost (6.7), in one slot-exorcised group (the target of slot-return, task 14.9) a small lit candle standing at the slot bottom (`candle`, with a `flame` part) and a warm-orange radial pool of light around it (`candle-light`, 6.8), sized so it reads at house scale over the dark illustration. No window is drawn anywhere.
     - Extend `art.test.ts` (updating the two stage-1 tests that say Locked and Exorcised slots draw nothing; the no-window check stays): each slot draws the Variant of its Card; Haunted slots have a `glow` part; the Cloche subtree is the same for every Locked slot up to its scale and lies inside the slot; Exorcised slots have no ghost part and have a `candle` and a `candle-light` part; all 3 types × 5 Variants × 3 states pass the Shape_Data rules.
     - Verify: `npm run check` exits `0`.
