@@ -738,7 +738,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.6, 3.7, 3.10, 6.4, 6.5, 6.6, 6.9, 6.10, 8.3, 8.4, 8.5, 8.6, 8.7, 8.9, 8.12, 8.13, 17.3_
     - _Design: "DOM modules" (sceneControls.ts), "Accessible names"_
 
-  - [ ] 10.4 Apply focus after each render
+  - [x] 10.4 Apply focus after each render
     - In `renderer.ts`: record `FocusBefore` before the rebuild, apply `scenicFocusAfterRender` after it, then the safety net (if focus is on `body`, not connected, or inside `[hidden]` or `[inert]`, focus the Scene_Heading) before `render` returns. DOM order gives the tab order of the design table.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): move focus with the scenic scenes`

@@ -1,7 +1,9 @@
 import type { UserAction } from "../../logic/actions.js";
 import { TEXTS } from "../../logic/texts.js";
+import type { FocusBefore } from "../shared/focus.js";
 import { el } from "./dom.js";
 import type { NameplateView, SceneLayout } from "./model/sceneLayout.js";
+import type { ScenicFocusTarget } from "./model/scenicFocus.js";
 
 /** The three containers `stage.ts` builds once; this module fills them. */
 export interface SceneControlParts {
@@ -13,6 +15,12 @@ export interface SceneControlParts {
 export interface SceneControls {
   /** Rebuilds the Scene_Heading, the buttons and the Nameplates from the layout. */
   update(layout: SceneLayout): void;
+  /** Where keyboard focus is now, seen from the controls this module rebuilds. */
+  focusBefore(): FocusBefore;
+  /** Moves focus to the target; a key that is not on screen falls back to the Scene_Heading. */
+  focus(target: ScenicFocusTarget): void;
+  /** Puts focus on the Scene_Heading (the safety net of the renderer). */
+  focusHeading(): void;
 }
 
 /** One Nameplate: a labelled article. Only a startable Card gets a focusable control. */
@@ -37,6 +45,7 @@ function nameplate(
       {
         type: "button",
         class: "nameplate-start",
+        "data-focus-key": `start-ghost:${view.path}`,
         "aria-describedby": pathId,
       },
       [TEXTS.actionLabels["start-ghost"]],
@@ -67,16 +76,54 @@ export function createSceneControls(
   parts: SceneControlParts,
   send: (action: UserAction) => boolean,
 ): SceneControls {
+  const layers = [parts.sceneBar, parts.floorStair, parts.nameplates];
+  let heading: HTMLElement | null = null;
+  /** The element of the controls with this focus key, compared as plain text (no selector escaping). */
+  const byFocusKey = (key: string): HTMLElement | null => {
+    for (const layer of layers) {
+      for (const node of layer.querySelectorAll<HTMLElement>(
+        "[data-focus-key]",
+      )) {
+        if (node.dataset.focusKey === key) return node;
+      }
+    }
+    return null;
+  };
   return {
+    focusBefore(): FocusBefore {
+      const active = document.activeElement;
+      if (
+        !(active instanceof HTMLElement) ||
+        !layers.some((layer) => layer.contains(active))
+      ) {
+        return { where: "outside" };
+      }
+      return { where: "main", key: active.dataset.focusKey ?? null };
+    },
+    focus(target: ScenicFocusTarget): void {
+      if (target.kind === "keep") return;
+      const node = target.kind === "key" ? byFocusKey(target.key) : heading;
+      (node ?? heading)?.focus();
+    },
+    focusHeading(): void {
+      heading?.focus();
+    },
     update(layout: SceneLayout): void {
       // The Scene_Heading is a focus target, never a Tab stop.
-      const bar: HTMLElement[] = [
-        el("h2", { class: "scene-heading", tabindex: "-1" }, [layout.heading]),
-      ];
+      heading = el("h2", { class: "scene-heading", tabindex: "-1" }, [
+        layout.heading,
+      ]);
+      const bar: HTMLElement[] = [heading];
       if (layout.backButton) {
-        const back = el("button", { type: "button", class: "secondary" }, [
-          TEXTS.actionLabels["go-to-house"],
-        ]);
+        const back = el(
+          "button",
+          {
+            type: "button",
+            class: "secondary",
+            "data-focus-key": "go-to-house",
+          },
+          [TEXTS.actionLabels["go-to-house"]],
+        );
         back.addEventListener("click", () => {
           send({ type: "go-to-house" });
         });
@@ -90,6 +137,7 @@ export function createSceneControls(
           {
             type: "button",
             class: "secondary floor-button",
+            "data-focus-key": `go-to-floor:${view.floor}`,
             "aria-label": view.accessibleName,
           },
           [view.label],

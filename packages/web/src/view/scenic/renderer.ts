@@ -6,6 +6,7 @@ import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
 import { hudView } from "./model/hudView.js";
 import { sceneLayout } from "./model/sceneLayout.js";
+import { scenicFocusAfterRender } from "./model/scenicFocus.js";
 import { watchMedia } from "./motion.js";
 import { createSceneControls } from "./sceneControls.js";
 import { createStage, type StageView } from "./stage.js";
@@ -16,6 +17,26 @@ export interface ScenicOptions {
   sceneHref: string | null;
 }
 
+/**
+ * Safety net (Requirement 17.9): if this render removed or hid the element that had
+ * focus, focus goes to the Scene_Heading, so it never falls back to <body>.
+ * A page that never had focus keeps it where it is.
+ */
+function keepFocusInDocument(
+  had: Element | null,
+  focusHeading: () => void,
+): void {
+  if (had === null || had === document.body) return;
+  const now = document.activeElement;
+  if (
+    now === null ||
+    now === document.body ||
+    !now.isConnected ||
+    now.closest("[hidden], [inert]") !== null
+  ) {
+    focusHeading();
+  }
+}
 /**
  * Builds the Scenic shell once inside `root`, in document order: header, aside,
  * announcer, `main.stage` and the footer last (the Licence_Notice link is the
@@ -64,6 +85,10 @@ export function createScenicRenderer(
   return {
     render(model: ViewModel): void {
       // Never awaits: timers of later tasks check the newest model themselves.
+      const prev = guard.current();
+      // Focus is read before anything is rebuilt.
+      const had = document.activeElement;
+      const before = controls.focusBefore();
       guard.setModel(model);
       hud.update(hudView(model));
       const layout = sceneLayout(model);
@@ -77,6 +102,8 @@ export function createScenicRenderer(
       };
       stage.update(lastView);
       controls.update(layout);
+      controls.focus(scenicFocusAfterRender(prev, model, before, layout));
+      keepFocusInDocument(had, controls.focusHeading);
     },
   };
 }
