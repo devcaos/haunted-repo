@@ -711,7 +711,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 10. PR 2b — Floor_Scene, Camera moves, Nameplates, focus
+- [x] 10. PR 2b — Floor_Scene, Camera moves, Nameplates, focus
   - Branch: `feat/scenic-web-2b`. Stacks on: `feat/scenic-web-2a`.
   - Estimate: ~700 changed lines. Model: Auto.
   - _Design: "PR Split" row 2b_
@@ -766,7 +766,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5_
     - _Design: "Shots", "Flow per viewport"_
 
-  - [ ] 10.8 Checkpoint and PR 2b
+  - [x] 10.8 Checkpoint and PR 2b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 2c, task 11.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-2a -- . ':(exclude)package-lock.json'`.
