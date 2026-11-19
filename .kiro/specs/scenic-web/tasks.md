@@ -775,7 +775,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 11. PR 2c — Telephone
+- [x] 11. PR 2c — Telephone
   - Split on 19 Nov (director): part 1 = PR #65 (11.1, 11.4, 11.5, 11.7, with the brass plaque look); part 2 = 11.2, 11.3, 11.6, 11.8 on branch `feat/scenic-web-2c-2` from main.
   - Branch: `feat/scenic-web-2c`. Stacks on: `feat/scenic-web-2b`.
   - Estimate: ~630 changed lines. Model: Auto (Opus only with the director's yes).
@@ -788,7 +788,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 9.7, 9.10, 9.14_
     - _Design: "New texts"_
 
-  - [ ] 11.2 Add the Telephone state machine
+  - [x] 11.2 Add the Telephone state machine
     - Create `packages/web/src/view/scenic/model/phoneBell.ts`: `PhoneInputs`, `PhoneEvent`, `PhoneEffect`, `PhoneState`, `phoneStep(state, event)` and `callWaiting(state)`, following the state diagram of the design.
     - Create `packages/web/src/view/scenic/model/phoneBell.test.ts` with examples: Opening_Rings after `intro-ended` with a sample target (9.2); no Opening_Rings when the first render has no target; the 20 s Rings stop after a `ghost-started` that did not come from the Answer_Button (9.3, Q17); the Live_Call starts on busy then done with a live report and stops on answer, other report, error or busy, not on Scene changes (9.5); `answered` yields `stop` (9.12); `callWaiting` (9.14).
     - Verify: `npm run check` exits `0`.
@@ -796,7 +796,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.2, 9.3, 9.5, 9.6, 9.12, 9.14_
     - _Design: "scenic/model/phoneBell.ts", D13, decision Q17_
 
-  - [ ] 11.3 Property test for the Telephone
+  - [x] 11.3 Property test for the Telephone
     - **Property 15: After the first start the Telephone rings only for an exorcism**
     - **Validates: Requirements 9.3, 9.4, 9.12**
     - Generator: sequences of `PhoneEvent` values (renders with random `PhoneInputs`, timer ends, answers, ghost starts, exorcised moments, return-glow ends), at least 100 runs.
@@ -822,7 +822,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.7, 9.8, 9.9, 9.10, 9.11, 9.14, 17.4, 17.5_
     - _Design: "DOM modules" (phoneWidget.ts), D14_
 
-  - [ ] 11.6 Ring the Telephone from the renderer
+  - [x] 11.6 Ring the Telephone from the renderer
     - In `renderer.ts`: send `render` events with `PhoneInputs` every render; send `intro-ended` at the first House_Scene render (the Intro is cut, so the Opening_Rings start there, D13); send `ghost-started` whenever any `start-ghost` is sent (Answer_Button or Nameplate start button, Q17) and `answered` on the Answer_Button; run the effects with `window.setTimeout` (2 s per Ring, 20 s waits) and the `is-ringing` class; timers read `guard.current()` when they fire.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): ring the telephone in the house scenes`
@@ -836,7 +836,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.6, 9.13, 18.4, 20.1_
     - _Design: "Animation Catalogue" (phone rows)_
 
-  - [ ] 11.8 Checkpoint and PR 2c
+  - [x] 11.8 Checkpoint and PR 2c
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is the time check, group 12, then PR 3a, task 13.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2c`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-2b -- . ':(exclude)package-lock.json'`.

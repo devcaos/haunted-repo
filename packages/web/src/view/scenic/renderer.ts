@@ -1,10 +1,17 @@
-import type { ActionSink } from "../../logic/actions.js";
+import type { ActionSink, UserAction } from "../../logic/actions.js";
 import type { Renderer, ViewModel } from "../../logic/viewModel.js";
-import { el, setText } from "./dom.js";
+import { el } from "./dom.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
 import { hudView } from "./model/hudView.js";
+import {
+  INITIAL_PHONE_STATE,
+  callWaiting,
+  phoneStep,
+  type PhoneEvent,
+  type PhoneInputs,
+} from "./model/phoneBell.js";
 import { sceneLayout, type Frame } from "./model/sceneLayout.js";
 import { scenicFocusAfterRender } from "./model/scenicFocus.js";
 import { watchMedia } from "./motion.js";
@@ -75,12 +82,37 @@ export function createScenicRenderer(
     },
   });
   const stage = createStage(options.sceneHref);
-  const controls = createSceneControls(stage, (action) => guard.send(action));
+  let phoneState = INITIAL_PHONE_STATE;
+  let ringTimer: number | null = null;
+  let waitTimer: number | null = null;
+  let announceTimer: number | null = null;
+  let introSent = false;
+  let lastView: StageView | null = null;
+  let phoneView: PhoneView = { source: null, target: null, powerLine: null };
+  const telephoneLayer = stage.element.querySelector("g.telephone");
+  /** Every `start-ghost` of the page goes through here, so the bell hears of it (Q17). */
+  const send = (action: UserAction): boolean => {
+    const sent = guard.send(action);
+    if (sent && action.type === "start-ghost") {
+      dispatchPhone({ type: "ghost-started" });
+    }
+    return sent;
+  };
+  const controls = createSceneControls(stage, send);
   const phone = createPhoneWidget(
     stage,
-    (action) => guard.send(action),
+    send,
+    // Empty first, then fill after 50 ms, so a repeated sentence is announced again.
     (text) => {
-      setText(hud.announcer, text);
+      if (announceTimer !== null) window.clearTimeout(announceTimer);
+      hud.announcer.textContent = "";
+      announceTimer = window.setTimeout(() => {
+        announceTimer = null;
+        hud.announcer.textContent = text;
+      }, 50);
+    },
+    () => {
+      dispatchPhone({ type: "answered" });
     },
   );
   const shell = el("div", { class: "scenic", "data-scene": "house" }, [
@@ -92,8 +124,6 @@ export function createScenicRenderer(
   ]);
   root.replaceChildren(shell);
 
-  let lastView: StageView | null = null;
-  let phoneView: PhoneView = { source: null, target: null, powerLine: null };
   /** Puts the widget in its place for the last Stage view; false keeps the Phone_Bubble. */
   const placePhone = (sceneChanged: boolean): void => {
     if (lastView === null) return;
@@ -102,8 +132,58 @@ export function createScenicRenderer(
       visible: lastView.scene.kind !== "ghost",
       sceneChanged,
       phone: phoneView,
+      callWaiting: callWaiting(phoneState),
     });
   };
+  const clearRing = (): void => {
+    if (ringTimer !== null) window.clearTimeout(ringTimer);
+    ringTimer = null;
+  };
+  const clearWait = (): void => {
+    if (waitTimer !== null) window.clearTimeout(waitTimer);
+    waitTimer = null;
+  };
+  /** `is-ringing` on the widget and the telephone layer: Ringing or Live_Call, never in the Ghost_Scene. */
+  const showRinging = (): void => {
+    const mode = phoneState.mode;
+    const scene = guard.current()?.scene.kind;
+    const on =
+      (mode === "ringing" || mode === "live-call") && scene !== "ghost";
+    phone.element.classList.toggle("is-ringing", on);
+    telephoneLayer?.classList.toggle("is-ringing", on);
+  };
+  /** Feeds the bell and runs its effects. Timers read the newest model when they fire. */
+  function dispatchPhone(event: PhoneEvent, refresh = true): void {
+    const step = phoneStep(phoneState, event);
+    phoneState = step.state;
+    for (const effect of step.effects) {
+      switch (effect.type) {
+        case "ring":
+          clearRing();
+          ringTimer = window.setTimeout(() => {
+            ringTimer = null;
+            dispatchPhone({ type: "ring-ended" });
+          }, effect.rings * 2000);
+          break;
+        case "live-call":
+        case "stop":
+          clearRing();
+          break;
+        case "wait":
+          clearWait();
+          waitTimer = window.setTimeout(() => {
+            waitTimer = null;
+            dispatchPhone({ type: "wait-ended" });
+          }, effect.ms);
+          break;
+        case "cancel-wait":
+          clearWait();
+          break;
+      }
+    }
+    showRinging();
+    if (refresh) placePhone(false);
+  }
   const viewportOf = (wide: boolean): ViewportClass =>
     wide ? "wide" : "narrow";
   // A new viewport class reframes the current Scene at once, with no reload.
@@ -142,6 +222,27 @@ export function createScenicRenderer(
         target: layout.telephoneTarget,
         powerLine: model.house?.powerLine ?? null,
       };
+      const inputs: PhoneInputs = {
+        source: phoneView.source,
+        target: phoneView.target,
+        scene: model.scene.kind,
+        status: model.status.kind,
+        reportKey:
+          model.house === null
+            ? null
+            : [
+                model.house.source,
+                ...model.house.floors.flatMap((f) =>
+                  f.ghosts.map((g) => g.path),
+                ),
+              ].join("|"),
+      };
+      dispatchPhone({ type: "render", inputs }, false);
+      // The Intro is cut: the Opening_Rings start at the first House_Scene.
+      if (!introSent && model.scene.kind === "house") {
+        introSent = true;
+        dispatchPhone({ type: "intro-ended" }, false);
+      }
       placePhone(model.transition !== null);
       controls.update(layout);
       controls.focus(scenicFocusAfterRender(prev, model, before, layout));
