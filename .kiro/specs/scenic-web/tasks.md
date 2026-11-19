@@ -775,7 +775,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 11. PR 2c — Telephone
+- [x] 11. PR 2c — Telephone
   - Split on 19 Nov (director): part 1 = PR #65 (11.1, 11.4, 11.5, 11.7, with the brass plaque look); part 2 = 11.2, 11.3, 11.6, 11.8 on branch `feat/scenic-web-2c-2` from main.
   - Branch: `feat/scenic-web-2c`. Stacks on: `feat/scenic-web-2b`.
   - Estimate: ~630 changed lines. Model: Auto (Opus only with the director's yes).
@@ -836,7 +836,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 9.6, 9.13, 18.4, 20.1_
     - _Design: "Animation Catalogue" (phone rows)_
 
-  - [ ] 11.8 Checkpoint and PR 2c
+  - [x] 11.8 Checkpoint and PR 2c
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is the time check, group 12, then PR 3a, task 13.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2c`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat feat/scenic-web-2b -- . ':(exclude)package-lock.json'`.
