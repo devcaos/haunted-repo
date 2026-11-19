@@ -639,7 +639,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 2
 
-- [ ] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
+- [x] 9. PR 2a — Ghost_Types, Variants, states, Bestiary
   - Branch: `feat/scenic-web-2a`. Stacks on: an up-to-date `main` (PR 1f is merged and task 8.1 is approved); the PR targets `main`.
   - Estimate: ~700 changed lines (task 9.1 is withdrawn). Model: Auto (Opus only with the director's yes).
   - Split on 19 Nov (director): part 1 = PR #62 (9.2, 9.3, 9.4, 9.8 and the visual fixes); part 2 = 9.5, 9.6, 9.7, 9.9 on branch `feat/scenic-web-2a-2` from main.
@@ -702,7 +702,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.8_
     - _Design: "Gallery (dev only)"_
 
-  - [ ] 9.9 Checkpoint and PR 2a
+  - [x] 9.9 Checkpoint and PR 2a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 2b, task 10.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 2a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
