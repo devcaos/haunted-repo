@@ -959,6 +959,8 @@ Every button and every link that is not inside a sentence has `min-width` and `m
 
 Raised from 307,200 to 512,000 bytes on 19 Nov (director): the four Gate_Panel pictures add about 205 KB gzipped (panel-gargoyle 127, panel-pumpkin 35, panel-lantern 29, panel-frame 12). Measured on 19 Nov: total 401,165 bytes.
 
+**Gate_Panel motion (director, 19 Nov; Requirement 18.10 and 18.11).** Wide screens draw the gate in three SVG roots: `svg.gate-wide` (frame and gargoyle picture; it rises), `svg.gate-lights-wide` (lantern, halo and the gargoyle's eyes; it rises with the gate and has its own layer, so the light and the flicker never redraw the stone pictures) and `svg.gate-ground-wide` (112 pieces of earth and stone and 12 dust puffs from `art/gateDust.ts`, plus the pumpkin; it does not rise). `gate.ts` sets `data-gate` on the shell: `waiting` until the pictures have loaded after the house picture, `rising` for 5.8 s, then `up`. The rise is one keyframe list (`gate-rise`) in gate units, shared by the two gate roots and the three HUD boxes; each HUD box turns around gate point (240, 900), measured once by `riseOrigin`. Keyframes touch only transform and opacity, so each easing is written as more keyframes instead of a timing function per keyframe. At rest on wide screens 9 animations run (limit 15). The Motion_Button sets `data-motion="off"` on the shell, and one rule in `gate-motion.css` stops every animation and transition of the page.
+
 | Part | Estimate (gzipped) | Basis |
 | --- | --- | --- |
 | Entry chunk: `main.ts`, Logic_Layer, Core, `report.json`, `files.json`, `demo-script.json` (inlined with `?raw`) | about 22,000 B | the current bundle is 23,916 B and also holds the Simple_Renderer |
