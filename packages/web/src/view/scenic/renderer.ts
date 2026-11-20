@@ -146,11 +146,7 @@ export function createScenicRenderer(
   // First in the footer, so the Licence_Notice link stays the last Tab stop.
   hud.footer.prepend(createMotionToggle(shell));
   root.replaceChildren(shell);
-  gate.raise(
-    shell,
-    [hud.header, hud.aside, hud.footer],
-    stage.element.querySelector("image.scene-art"),
-  );
+  gate.raise(shell, stage.element.querySelector("image.scene-art"));
 
   /** Puts the widget in its place for the last Stage view; false keeps the Phone_Bubble. */
   const placePhone = (sceneChanged: boolean): void => {

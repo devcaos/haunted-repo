@@ -1,9 +1,11 @@
 /*
  * Motion of the Gate_Panel (director's decision, 19 Nov). On wide screens the
- * gate rises from the ground in 4.4 s with the HUD inside it: a rumble, four
+ * stone gate rises from the bottom of the window in 3 s: a rumble, four
  * pushes that rock it less and less, and a heavy landing, while pieces of
- * earth and stone fly up and fall. Then the gargoyle's eyes and the lantern
- * light up; the lantern flickers and the eye slits narrow now and then.
+ * earth and stone fly up and fall. Then the gargoyle's eyes, the lantern and
+ * the pumpkin light up, and the HUD texts appear with a cold flicker, top to
+ * bottom. The texts never move, so the page height never changes. The
+ * lantern flickers and the eye slits narrow now and then.
  * Keyframes touch only transform and opacity, and every animation sits in a
  * prefers-reduced-motion block (Requirements 18 and 20). The Motion button
  * sets data-motion="off" on the shell and stops every animation of the page.
@@ -11,7 +13,7 @@
  * after the house, "rising" while the gate rises, and "up" at the end.
  */
 
-/* The rise, in gate units (--gate-u is one gate unit in px on each box). */
+/* The rise, in gate units (--gate-u is one gate unit in px). */
 /* prettier-ignore */
 @keyframes gate-rise {
   0% { transform: translate(calc(var(--gate-u) * -1.6), calc(var(--gate-u) * 940)) rotate(0deg); }
@@ -169,6 +171,52 @@
   76% {
     transform: scale(0.25, 0.92);
     opacity: 0.85;
+  }
+}
+
+/* A cold flicker: the text appears, nearly goes out, and comes back for good. */
+@keyframes gate-text-on {
+  0% {
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 0.7;
+  }
+
+  30% {
+    opacity: 0.1;
+  }
+
+  48% {
+    opacity: 0.85;
+  }
+
+  58% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes gate-pumpkin-on {
+  0%,
+  50% {
+    opacity: 0.35;
+  }
+
+  62% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
   }
 }
 
@@ -361,27 +409,38 @@
       opacity: 0;
     }
 
+    /* Only the stone rises. It is fixed, so it never changes the page height. */
     .scenic[data-gate="rising"] .gate-wide,
-    .scenic[data-gate="rising"] .gate-lights-wide,
-    .scenic[data-gate="rising"] .hud-top,
-    .scenic[data-gate="rising"] .hud-side,
-    .scenic[data-gate="rising"] .hud-foot {
+    .scenic[data-gate="rising"] .gate-lights-wide {
       --gate-u: var(--sc-gate-u);
+      transform-origin: calc(var(--sc-gate-u) * 240)
+        calc(var(--sc-gate-u) * 900);
       animation: gate-rise var(--sc-dur-gate-rise) var(--sc-ease-linear)
         var(--sc-gate-rise-delay) both;
     }
 
-    /* Everything turns around the foot of the gate's middle (gate point 240, 900). */
-    .scenic[data-gate="rising"] .gate-wide,
-    .scenic[data-gate="rising"] .gate-lights-wide {
-      transform-origin: calc(var(--sc-gate-u) * 240)
-        calc(var(--sc-gate-u) * 900);
-    }
-
+    /* The texts stay put and light up after the landing, top to bottom. */
     .scenic[data-gate="rising"] .hud-top,
     .scenic[data-gate="rising"] .hud-side,
     .scenic[data-gate="rising"] .hud-foot {
-      transform-origin: var(--gate-origin);
+      animation: gate-text-on var(--sc-dur-gate-text-on) var(--sc-ease-linear)
+        var(--sc-gate-text-at) both;
+    }
+
+    .scenic[data-gate="rising"] .hud-side {
+      animation-delay: calc(var(--sc-gate-text-at) + var(--sc-gate-text-step));
+    }
+
+    .scenic[data-gate="rising"] .hud-foot {
+      animation-delay: calc(
+        var(--sc-gate-text-at) + 2 * var(--sc-gate-text-step)
+      );
+    }
+
+    /* The pumpkin waits dim in the dark and catches light at the landing. */
+    .scenic[data-gate="rising"] .gate-ground-wide .gate-pumpkin {
+      animation: gate-pumpkin-on var(--sc-dur-gate-light-on)
+        var(--sc-ease-linear) var(--sc-gate-lamp-at) both;
     }
 
     .scenic[data-gate="rising"] .gate-debris {

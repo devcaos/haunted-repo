@@ -848,7 +848,7 @@ These are settled by the approved design and are not reopened in these tasks:
 - [x] 11b. PR Gate_Panel part 1 (director, 19 Nov)
   - Pictures, manifest, Gate_Panel drawing, wide gate and narrow tombstone styles, size budget 512,000. Branch `feat/scenic-web-gate-1` from main. Part 2 (motion: rise from the ground, eyes, lantern, Motion button, art loaded after the house) is a separate PR.
 - [x] 11c. PR Gate_Panel part 2 (director, 19 Nov)
-  - Gate_Rise on wide screens (rise, earth, eyes and lantern), pictures loaded after the house, Motion_Button, Requirements 18.10 and 18.11. Branch `feat/scenic-web-gate-2` from main.
+  - Gate_Rise on wide screens (the stone rises in 3 s, earth, eyes, lantern and pumpkin light up, the texts appear with a cold flicker), pictures loaded after the house, Motion_Button, Requirements 18.10 and 18.11. Branch `feat/scenic-web-gate-2` from main.
 - [ ] 12. Time check, 23 Nov 2026 (conditional)
   - Do this check on 23 Nov 2026, whatever task is in progress. It sits before PR 3a because stage 2 should be merged by then. If PRs 2a, 2b and 2c are all merged into `main` on 23 Nov 2026, write "Not triggered" under tasks 12.2 and 12.5 and mark them `[x]` with no other change.
   - If they are not all merged, run tasks 12.2 and 12.5 as commits on the branch in progress (the newest open PR branch, or `feat/scenic-web-3a` if it is about to start) and list them in that PR's body. Cut 1 is already approved by the director (design "Cut List"). Cut 2 is withdrawn and cut 3 was applied on 19 Nov (tasks 12.3 and 12.4). **Cut 4 is NOT pre-approved**: it needs a new director decision and is not a task here.
