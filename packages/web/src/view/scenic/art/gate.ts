@@ -8,15 +8,23 @@ import {
   circle,
   type ShapeNode,
 } from "./shapes.js";
+import { gateDust } from "./gateDust.js";
 
 // The Gate_Panel: the HUD drawn as a stone gate inside the world (director's
 // decision, 19 Nov). Every number is in gate units: the frame picture is
 // 480 x 900 and fills the height of the screen, so one unit is 100vh / 900.
-// The pictures are local files `panel-*.svg`); this file only places them
+// The pictures are local files (`panel-*.svg`); this file only places them
 // and draws the gargoyle's eyes and the lantern's light over them.
 
-/** The whole gate drawing, wide screens only: frame, gargoyle, lantern, pumpkin. */
+/** The gate that rises, wide screens only: frame, gargoyle and lantern. */
 export const GATE_BOX = { x: 0, y: 0, w: 640, h: 900 } as const;
+
+/**
+ * The ground in front of the gate, wide screens only: the earth that the gate
+ * breaks and the pumpkin. It does not rise. Its bottom passes the bottom of
+ * the screen (y 900), so the pumpkin is never cut.
+ */
+export const GROUND_BOX = { x: 0, y: 660, w: 640, h: 250 } as const;
 
 /** Where each picture sits inside GATE_BOX. Heights keep each file's ratio. */
 // prettier-ignore
@@ -129,17 +137,29 @@ export function gargoyleArt(href: string | null): ShapeNode {
   );
 }
 
-/** The whole gate in GATE_BOX units (wide screens). */
+/** The gate that rises, in GATE_BOX units (wide screens): the stone only. */
 export function gateArt(hrefs: GateHrefs): ShapeNode {
   const gp = GATE_PLACES.gargoyle;
-  const lp = GATE_PLACES.lantern;
   return g("gate", [
+    ...placed("gate-frame", hrefs.frame, GATE_PLACES.frame),
+    ...placed("gate-gargoyle-art", hrefs.gargoyle, gp),
+  ]);
+}
+
+/**
+ * The lights of the gate in GATE_BOX units (wide screens): the lantern with
+ * its halo and the gargoyle's eyes. They have their own SVG, which rises with
+ * the gate, so their light and flicker never redraw the stone pictures.
+ */
+export function lightsArt(hrefs: GateHrefs): ShapeNode {
+  const gp = GATE_PLACES.gargoyle;
+  const lp = GATE_PLACES.lantern;
+  return g("gate-lights", [
     gradient("radialGradient", "lamp-halo", [
       ["gate-stop-lamp", 0],
       ["gate-stop-lamp-mid", 0.55],
       ["gate-stop-lamp-end", 1],
     ]),
-    ...placed("gate-frame", hrefs.frame, GATE_PLACES.frame),
     g("gate-lamp", [
       ...(hrefs.lantern === null
         ? []
@@ -150,9 +170,23 @@ export function gateArt(hrefs: GateHrefs): ShapeNode {
           ]),
       ...placed("gate-lantern", hrefs.lantern, lp),
     ]),
-    g("gate-crown", [gargoyleArt(hrefs.gargoyle)], {
-      transform: { translate: [gp.x, gp.y], scale: gp.w / GARGOYLE_BOX.w },
-    }),
-    ...placed("gate-pumpkin", hrefs.pumpkin, GATE_PLACES.pumpkin),
+    ...(hrefs.gargoyle === null
+      ? []
+      : [
+          g("gate-crown", [gargoyleEyes()], {
+            transform: {
+              translate: [gp.x, gp.y],
+              scale: gp.w / GARGOYLE_BOX.w,
+            },
+          }),
+        ]),
+  ]);
+}
+
+/** The ground in GROUND_BOX units (wide screens): the earth first, the pumpkin in front. */
+export function groundArt(pumpkin: string | null): ShapeNode {
+  return g("gate-ground", [
+    gateDust(),
+    ...placed("gate-pumpkin", pumpkin, GATE_PLACES.pumpkin),
   ]);
 }
