@@ -417,4 +417,45 @@
   --sc-tomb-pumpkin-w: 4.9rem;
   --sc-tomb-pumpkin-x: -0.4rem;
   --sc-tomb-pumpkin-y: -0.6rem;
+  /* Gate_Panel motion (director, 19 Nov): the gate rises from the ground in
+     3 s, breaks the earth, then the eyes, the lantern and the texts light up. */
+  --sc-gate-svg-u: 1px;
+  --sc-gate-ground-top: calc(var(--sc-gate-u) * 660);
+  --sc-gate-ground-h: calc(var(--sc-gate-u) * 250);
+  --sc-gate-motion-y: calc(var(--sc-gate-u) * 22);
+  --sc-gate-motion-h: calc(var(--sc-gate-u) * 44);
+  --sc-gate-rise-delay: 0.5s;
+  --sc-dur-gate-rise: 3s;
+  --sc-gate-eyes-at: 3.36s;
+  --sc-gate-lamp-at: 3.5s;
+  --sc-dur-gate-light-on: 0.9s;
+  --sc-gate-text-at: 3.9s;
+  --sc-gate-text-step: 0.15s;
+  --sc-dur-gate-text-on: 0.8s;
+  --sc-dur-house-in: 0.6s;
+  --sc-gate-flicker-at: 4.4s;
+  --sc-dur-gate-flicker: 3.4s;
+  --sc-gate-slits-at: 4.8s;
+  --sc-dur-gate-slits: 6s;
+  --sc-dur-gate-fly: 1.15s;
+  --sc-dur-gate-hop: 0.65s;
+  --sc-dur-gate-dust: 1.8s;
+  --sc-gate-burst-0: 0.6s;
+  --sc-gate-burst-1: 1.01s;
+  --sc-gate-burst-2: 1.54s;
+  --sc-gate-burst-3: 2.15s;
+  --sc-gate-burst-4: 2.75s;
+  --sc-gate-burst-5: 3.33s;
+  --sc-gate-lag-1: 0.12s;
+  --sc-gate-lag-2: 0.24s;
+  --sc-gate-lag-3: 0.36s;
+  --sc-gate-earth-1: #3b2e23;
+  --sc-gate-earth-2: #2f251c;
+  --sc-gate-earth-3: #45362a;
+  --sc-gate-stone-1: #3a3f4d;
+  --sc-gate-stone-2: #2c3140;
+  --sc-gate-debris-edge: #0a0c12;
+  --sc-gate-debris-line: 1.5;
+  --sc-gate-dust: rgb(115 100 85 / 0.5);
+  --sc-gate-dust-end: rgb(90 80 70 / 0);
 }

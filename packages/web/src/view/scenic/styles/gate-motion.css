@@ -1,0 +1,497 @@
+/*
+ * Motion of the Gate_Panel (director's decision, 19 Nov). On wide screens the
+ * stone gate rises from the bottom of the window in 3 s: a rumble, four
+ * pushes that rock it less and less, and a heavy landing, while pieces of
+ * earth and stone fly up and fall. Then the gargoyle's eyes, the lantern and
+ * the pumpkin light up, and the HUD texts appear with a cold flicker, top to
+ * bottom. The texts never move, so the page height never changes. The
+ * lantern flickers and the eye slits narrow now and then.
+ * Keyframes touch only transform and opacity, and every animation sits in a
+ * prefers-reduced-motion block (Requirements 18 and 20). The Motion button
+ * sets data-motion="off" on the shell and stops every animation of the page.
+ * `renderer.ts` sets data-gate: "waiting" until the pictures have loaded
+ * after the house, "rising" while the gate rises, and "up" at the end.
+ */
+
+/* The rise, in gate units (--gate-u is one gate unit in px). */
+/* prettier-ignore */
+@keyframes gate-rise {
+  0% { transform: translate(calc(var(--gate-u) * -1.6), calc(var(--gate-u) * 940)) rotate(0deg); }
+  1.2% { transform: translate(calc(var(--gate-u) * 1.6), calc(var(--gate-u) * 939.6)) rotate(0deg); }
+  2.5% { transform: translate(calc(var(--gate-u) * -1.5), calc(var(--gate-u) * 939.1)) rotate(0deg); }
+  3.7% { transform: translate(calc(var(--gate-u) * 1.5), calc(var(--gate-u) * 938.7)) rotate(0deg); }
+  5% { transform: translate(calc(var(--gate-u) * -1.5), calc(var(--gate-u) * 938.2)) rotate(0deg); }
+  6.2% { transform: translate(calc(var(--gate-u) * 1.4), calc(var(--gate-u) * 937.8)) rotate(0deg); }
+  7.5% { transform: translate(calc(var(--gate-u) * -1.4), calc(var(--gate-u) * 937.4)) rotate(0deg); }
+  8.8% { transform: translate(calc(var(--gate-u) * 1.4), calc(var(--gate-u) * 936.9)) rotate(0deg); }
+  10% { transform: translate(calc(var(--gate-u) * -1.3), calc(var(--gate-u) * 936.5)) rotate(0deg); }
+  11.2% { transform: translate(calc(var(--gate-u) * 1.3), calc(var(--gate-u) * 936)) rotate(0deg); }
+  12.5% { transform: translate(calc(var(--gate-u) * -1.2), calc(var(--gate-u) * 935.6)) rotate(0deg); }
+  13.7% { transform: translate(calc(var(--gate-u) * 1.2), calc(var(--gate-u) * 935.2)) rotate(0deg); }
+  15% { transform: translate(calc(var(--gate-u) * -1.2), calc(var(--gate-u) * 934.7)) rotate(0deg); }
+  16.2% { transform: translate(calc(var(--gate-u) * 1.1), calc(var(--gate-u) * 934.3)) rotate(0deg); }
+  17% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 934)) rotate(0deg); }
+  19.5% { transform: translate(calc(var(--gate-u) * 0.5), calc(var(--gate-u) * 917.9)) rotate(0.1deg); }
+  22% { transform: translate(calc(var(--gate-u) * 1.6), calc(var(--gate-u) * 875.9)) rotate(0.35deg); }
+  23.3% { transform: translate(calc(var(--gate-u) * 1.8), calc(var(--gate-u) * 849.9)) rotate(0.5deg); }
+  24.5% { transform: translate(calc(var(--gate-u) * 1.6), calc(var(--gate-u) * 824)) rotate(0.65deg); }
+  27% { transform: translate(calc(var(--gate-u) * 0.5), calc(var(--gate-u) * 781.9)) rotate(0.9deg); }
+  29.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 765.9)) rotate(1deg); }
+  32% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 766.8)) rotate(0.9deg); }
+  34.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 765.9)) rotate(1deg); }
+  37% { transform: translate(calc(var(--gate-u) * -0.3), calc(var(--gate-u) * 749.2)) rotate(0.9deg); }
+  39.5% { transform: translate(calc(var(--gate-u) * -1.2), calc(var(--gate-u) * 703)) rotate(0.61deg); }
+  42% { transform: translate(calc(var(--gate-u) * -1.8), calc(var(--gate-u) * 638.3)) rotate(0.2deg); }
+  42.5% { transform: translate(calc(var(--gate-u) * -1.8), calc(var(--gate-u) * 625.8)) rotate(0.12deg); }
+  44.5% { transform: translate(calc(var(--gate-u) * -1.5), calc(var(--gate-u) * 570.7)) rotate(-0.22deg); }
+  47% { transform: translate(calc(var(--gate-u) * -0.6), calc(var(--gate-u) * 516.2)) rotate(-0.56deg); }
+  49.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 487.9)) rotate(-0.74deg); }
+  50.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 485.7)) rotate(-0.75deg); }
+  52% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 487.6)) rotate(-0.68deg); }
+  52.7% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 486.6)) rotate(-0.68deg); }
+  54.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 485.7)) rotate(-0.73deg); }
+  55% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 485.7)) rotate(-0.75deg); }
+  57% { transform: translate(calc(var(--gate-u) * 0.2), calc(var(--gate-u) * 474.4)) rotate(-0.7deg); }
+  59.5% { transform: translate(calc(var(--gate-u) * 1), calc(var(--gate-u) * 432.9)) rotate(-0.51deg); }
+  62% { transform: translate(calc(var(--gate-u) * 1.7), calc(var(--gate-u) * 370.6)) rotate(-0.24deg); }
+  63% { transform: translate(calc(var(--gate-u) * 1.8), calc(var(--gate-u) * 345.6)) rotate(-0.12deg); }
+  64.5% { transform: translate(calc(var(--gate-u) * 1.6), calc(var(--gate-u) * 302.3)) rotate(0.07deg); }
+  67% { transform: translate(calc(var(--gate-u) * 0.8), calc(var(--gate-u) * 244.3)) rotate(0.33deg); }
+  69.5% { transform: translate(calc(var(--gate-u) * 0.1), calc(var(--gate-u) * 210.5)) rotate(0.48deg); }
+  70.9% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 205.5)) rotate(0.5deg); }
+  72% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 207.6)) rotate(0.46deg); }
+  73% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 206.4)) rotate(0.45deg); }
+  74.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 205.5)) rotate(0.48deg); }
+  75% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 205.5)) rotate(0.5deg); }
+  77% { transform: translate(calc(var(--gate-u) * -0.4), calc(var(--gate-u) * 192.2)) rotate(0.45deg); }
+  79.5% { transform: translate(calc(var(--gate-u) * -1.4), calc(var(--gate-u) * 145.4)) rotate(0.28deg); }
+  81.2% { transform: translate(calc(var(--gate-u) * -1.8), calc(var(--gate-u) * 102.7)) rotate(0.13deg); }
+  82% { transform: translate(calc(var(--gate-u) * -1.7), calc(var(--gate-u) * 82.3)) rotate(0.05deg); }
+  84.5% { transform: translate(calc(var(--gate-u) * -0.7), calc(var(--gate-u) * 27)) rotate(-0.15deg); }
+  87% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 0.7)) rotate(-0.25deg); }
+  87.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 0)) rotate(-0.25deg); }
+  88.2% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -8.2)) rotate(-0.13deg); }
+  89.1% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -10.2)) rotate(0.01deg); }
+  89.9% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -11.6)) rotate(0.08deg); }
+  90.6% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -12)) rotate(0.07deg); }
+  91.4% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -9.1)) rotate(0.03deg); }
+  92% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -2.3)) rotate(0deg); }
+  92.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 6)) rotate(-0.02deg); }
+  93.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 1.5)) rotate(-0.02deg); }
+  94.5% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -1.2)) rotate(-0.01deg); }
+  95.8% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * -0.9)) rotate(0.01deg); }
+  97.2% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 0.2)) rotate(0deg); }
+  98.7% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 0.1)) rotate(0deg); }
+  100% { transform: translate(calc(var(--gate-u) * 0), calc(var(--gate-u) * 0)) rotate(0deg); }
+}
+
+/* One piece of earth: up to its height, then down past the ground, gone. */
+/* prettier-ignore */
+@keyframes gate-fly {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  5% { opacity: 1; }
+  88% { opacity: 1; }
+  15% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx) * 0.15), calc(var(--sc-gate-svg-u) * var(--fly-h) * 0.556)) rotate(calc(1deg * var(--fly-r) * 0.15)); }
+  30% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx) * 0.3), calc(var(--sc-gate-svg-u) * var(--fly-h) * 0.889)) rotate(calc(1deg * var(--fly-r) * 0.3)); }
+  45% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx) * 0.45), calc(var(--sc-gate-svg-u) * var(--fly-h))) rotate(calc(1deg * var(--fly-r) * 0.45)); }
+  60% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx) * 0.6), calc(var(--sc-gate-svg-u) * (var(--fly-h) * 0.926 + 3.0))) rotate(calc(1deg * var(--fly-r) * 0.6)); }
+  75% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx) * 0.75), calc(var(--sc-gate-svg-u) * (var(--fly-h) * 0.702 + 11.9))) rotate(calc(1deg * var(--fly-r) * 0.75)); }
+  90% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx) * 0.9), calc(var(--sc-gate-svg-u) * (var(--fly-h) * 0.331 + 26.8))) rotate(calc(1deg * var(--fly-r) * 0.9)); }
+  100% { transform: translate(calc(var(--sc-gate-svg-u) * var(--fly-dx)), calc(var(--sc-gate-svg-u) * 40)) rotate(calc(1deg * var(--fly-r))); opacity: 0; }
+}
+
+@keyframes gate-dust {
+  0% {
+    transform: scale(0.3, 0.4);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(calc(var(--sc-gate-svg-u) * -26)) scale(1.6, 1.3);
+    opacity: 0;
+  }
+}
+
+/* A light that catches: on, a stutter, on for good. */
+@keyframes gate-light-on {
+  0%,
+  55% {
+    opacity: 0;
+  }
+
+  68% {
+    opacity: 1;
+  }
+
+  76% {
+    opacity: 0.2;
+  }
+
+  86%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes gate-lamp-flicker {
+  0%,
+  28%,
+  36%,
+  100% {
+    opacity: 1;
+  }
+
+  32% {
+    opacity: 0.78;
+  }
+
+  62% {
+    opacity: 0.9;
+  }
+
+  64% {
+    opacity: 0.7;
+  }
+}
+
+/* The eye slits narrow slowly, hold, and open again. They never follow the mouse. */
+@keyframes gate-slit-narrow {
+  0%,
+  62%,
+  100% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+
+  70%,
+  76% {
+    transform: scale(0.25, 0.92);
+    opacity: 0.85;
+  }
+}
+
+/* A cold flicker: the text appears, nearly goes out, and comes back for good. */
+@keyframes gate-text-on {
+  0% {
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 0.7;
+  }
+
+  30% {
+    opacity: 0.1;
+  }
+
+  48% {
+    opacity: 0.85;
+  }
+
+  58% {
+    opacity: 0.35;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes gate-pumpkin-on {
+  0%,
+  50% {
+    opacity: 0;
+  }
+
+  62% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Still look ---------- */
+
+.scenic .gate-lights-wide,
+.scenic .gate-ground-wide {
+  display: none;
+}
+
+/* Until the house picture is drawn, the stage waits out of sight. */
+.scenic[data-house="waiting"] .stage {
+  opacity: 0;
+}
+
+/* The pieces of earth and the dust are seen only while they fly. */
+.scenic .gate-debris,
+.scenic .gate-dust-puff {
+  opacity: 0;
+}
+
+.scenic .gate-debris {
+  stroke: var(--sc-gate-debris-edge);
+  stroke-width: var(--sc-gate-debris-line);
+  stroke-linejoin: round;
+}
+
+.scenic .gate-earth-1 {
+  fill: var(--sc-gate-earth-1);
+}
+
+.scenic .gate-earth-2 {
+  fill: var(--sc-gate-earth-2);
+}
+
+.scenic .gate-earth-3 {
+  fill: var(--sc-gate-earth-3);
+}
+
+.scenic .gate-stone-1 {
+  fill: var(--sc-gate-stone-1);
+}
+
+.scenic .gate-stone-2 {
+  fill: var(--sc-gate-stone-2);
+}
+
+.scenic .gate-stop-dust {
+  stop-color: var(--sc-gate-dust);
+}
+
+.scenic .gate-stop-dust-end {
+  stop-color: var(--sc-gate-dust-end);
+}
+
+/* Paths of the pieces, as plain numbers of gate units: sideways, height, turn. */
+/* prettier-ignore */
+.scenic .gate-fly-0 { --fly-dx: -60; --fly-h: -120; --fly-r: -380; --fly-dur: var(--sc-dur-gate-fly); }
+/* prettier-ignore */
+.scenic .gate-fly-1 { --fly-dx: 50; --fly-h: -95; --fly-r: 300; --fly-dur: var(--sc-dur-gate-fly); }
+/* prettier-ignore */
+.scenic .gate-fly-2 { --fly-dx: -30; --fly-h: -70; --fly-r: 220; --fly-dur: var(--sc-dur-gate-fly); }
+/* prettier-ignore */
+.scenic .gate-fly-3 { --fly-dx: 70; --fly-h: -130; --fly-r: -260; --fly-dur: var(--sc-dur-gate-fly); }
+/* prettier-ignore */
+.scenic .gate-fly-4 { --fly-dx: -18; --fly-h: -40; --fly-r: -200; --fly-dur: var(--sc-dur-gate-hop); }
+/* prettier-ignore */
+.scenic .gate-fly-5 { --fly-dx: 14; --fly-h: -28; --fly-r: 160; --fly-dur: var(--sc-dur-gate-hop); }
+/* prettier-ignore */
+.scenic .gate-fly-6 { --fly-dx: -8; --fly-h: -55; --fly-r: 260; --fly-dur: var(--sc-dur-gate-hop); }
+/* prettier-ignore */
+.scenic .gate-fly-7 { --fly-dx: 22; --fly-h: -18; --fly-r: -120; --fly-dur: var(--sc-dur-gate-hop); }
+
+.scenic .gate-burst-0 {
+  --burst-at: var(--sc-gate-burst-0);
+}
+
+.scenic .gate-burst-1 {
+  --burst-at: var(--sc-gate-burst-1);
+}
+
+.scenic .gate-burst-2 {
+  --burst-at: var(--sc-gate-burst-2);
+}
+
+.scenic .gate-burst-3 {
+  --burst-at: var(--sc-gate-burst-3);
+}
+
+.scenic .gate-burst-4 {
+  --burst-at: var(--sc-gate-burst-4);
+}
+
+.scenic .gate-burst-5 {
+  --burst-at: var(--sc-gate-burst-5);
+}
+
+.scenic .gate-lag-0 {
+  --lag: 0s;
+}
+
+.scenic .gate-lag-1 {
+  --lag: var(--sc-gate-lag-1);
+}
+
+.scenic .gate-lag-2 {
+  --lag: var(--sc-gate-lag-2);
+}
+
+.scenic .gate-lag-3 {
+  --lag: var(--sc-gate-lag-3);
+}
+
+/* The Motion button reads like the "Simple view" link. */
+.scenic .motion-toggle {
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--sc-text-link);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-body);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (min-width: 64rem) {
+  /* The lights lie exactly over the gate, on a layer of their own. */
+  .scenic .gate-lights-wide {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: var(--sc-gate-art-w);
+    height: var(--sc-viewport-height);
+    overflow: visible;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  /* On the gate's plinth, under the opening, so the panel keeps its height. */
+  .scenic .hud-foot .motion-toggle {
+    position: absolute;
+    right: 0;
+    bottom: var(--sc-gate-motion-y);
+    left: 0;
+    width: max-content;
+    min-height: var(--sc-gate-motion-h);
+    margin: 0 auto;
+    font-size: var(--sc-gate-tagline);
+  }
+
+  .scenic .gate-ground-wide {
+    display: block;
+    position: fixed;
+    top: var(--sc-gate-ground-top);
+    left: 0;
+    z-index: 3;
+    width: var(--sc-gate-art-w);
+    height: var(--sc-gate-ground-h);
+    overflow: visible;
+    pointer-events: none;
+  }
+}
+
+/* ---------- Motion ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The house fades in out of the dark once its picture is drawn. */
+  .scenic .stage {
+    transition: opacity var(--sc-dur-house-in) var(--sc-ease-out);
+  }
+
+  .scenic .gate-lights-wide .gate-eye-slit {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: gate-slit-narrow var(--sc-dur-gate-slits) var(--sc-ease-in-out)
+      var(--sc-gate-slits-at) infinite;
+  }
+
+  /* Motion off: every animation and transition of the page stops at its end. */
+  .scenic[data-motion="off"],
+  .scenic[data-motion="off"] *,
+  .scenic[data-motion="off"] *::before,
+  .scenic[data-motion="off"] *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @media (min-width: 64rem) {
+    /* Until the pictures have loaded the gate and its HUD wait out of sight. */
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .gate-wide,
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .gate-lights-wide,
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .gate-ground-wide,
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .hud-top,
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .hud-side,
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .hud-foot {
+      opacity: 0;
+    }
+
+    /* Only the stone rises. It is fixed, so it never changes the page height. */
+    .scenic[data-gate="rising"] .gate-wide,
+    .scenic[data-gate="rising"] .gate-lights-wide {
+      --gate-u: var(--sc-gate-u);
+      transform-origin: calc(var(--sc-gate-u) * 240)
+        calc(var(--sc-gate-u) * 900);
+      animation: gate-rise var(--sc-dur-gate-rise) var(--sc-ease-linear)
+        var(--sc-gate-rise-delay) both;
+    }
+
+    /* The texts stay put and light up after the landing, top to bottom. */
+    .scenic[data-gate="rising"] .hud-top,
+    .scenic[data-gate="rising"] .hud-side,
+    .scenic[data-gate="rising"] .hud-foot {
+      animation: gate-text-on var(--sc-dur-gate-text-on) var(--sc-ease-linear)
+        var(--sc-gate-text-at) both;
+    }
+
+    .scenic[data-gate="rising"] .hud-side {
+      animation-delay: calc(var(--sc-gate-text-at) + var(--sc-gate-text-step));
+    }
+
+    .scenic[data-gate="rising"] .hud-foot {
+      animation-delay: calc(
+        var(--sc-gate-text-at) + 2 * var(--sc-gate-text-step)
+      );
+    }
+
+    /* The pumpkin waits unseen in the dark and catches light at the landing. */
+    .scenic[data-gate="rising"] .gate-ground-wide .gate-pumpkin {
+      animation: gate-pumpkin-on var(--sc-dur-gate-light-on)
+        var(--sc-ease-linear) var(--sc-gate-lamp-at) both;
+    }
+
+    .scenic[data-gate="rising"] .gate-debris {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: gate-fly var(--fly-dur) var(--sc-ease-linear)
+        calc(var(--burst-at) + var(--lag)) both;
+    }
+
+    .scenic[data-gate="rising"] .gate-dust-puff {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: gate-dust var(--sc-dur-gate-dust) var(--sc-ease-out)
+        calc(var(--burst-at) + var(--lag)) both;
+    }
+
+    /* The lights wait for the landing; then only the lantern keeps flickering. */
+    .scenic[data-gate="rising"] .gate-lights-wide .gate-eyes {
+      animation: gate-light-on var(--sc-dur-gate-light-on) var(--sc-ease-linear)
+        var(--sc-gate-eyes-at) both;
+    }
+
+    .scenic[data-gate="rising"] .gate-lamp-halo {
+      animation:
+        gate-light-on var(--sc-dur-gate-light-on) var(--sc-ease-linear)
+          var(--sc-gate-lamp-at) both,
+        gate-lamp-flicker var(--sc-dur-gate-flicker) var(--sc-ease-in-out)
+          var(--sc-gate-flicker-at) infinite;
+    }
+
+    .scenic[data-gate="up"] .gate-lamp-halo {
+      animation: gate-lamp-flicker var(--sc-dur-gate-flicker)
+        var(--sc-ease-in-out) var(--sc-gate-flicker-at) infinite;
+    }
+  }
+}
+
+/* Reduced_Motion: nothing moves, so the Motion button has nothing to stop. */
+@media (prefers-reduced-motion: reduce) {
+  .scenic .motion-toggle {
+    display: none;
+  }
+}

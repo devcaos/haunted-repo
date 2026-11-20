@@ -17,6 +17,7 @@ import {
 import { sceneLayout, type Frame } from "./model/sceneLayout.js";
 import { scenicFocusAfterRender } from "./model/scenicFocus.js";
 import { watchMedia } from "./motion.js";
+import { createMotionToggle } from "./motionToggle.js";
 import {
   createPhoneWidget,
   type PhonePlace,
@@ -134,13 +135,18 @@ export function createScenicRenderer(
   if (gate.base !== null) hud.footer.append(gate.base);
   const shell = el("div", { class: "scenic", "data-scene": "house" }, [
     gate.wide,
+    gate.lights,
     hud.header,
     hud.aside,
     hud.announcer,
     stage.element,
     hud.footer,
+    gate.ground,
   ]);
+  // First in the footer, so the Licence_Notice link stays the last Tab stop.
+  hud.footer.prepend(createMotionToggle(shell));
   root.replaceChildren(shell);
+  gate.raise(shell, stage.element.querySelector("image.scene-art"));
 
   /** Puts the widget in its place for the last Stage view; false keeps the Phone_Bubble. */
   const placePhone = (sceneChanged: boolean): void => {

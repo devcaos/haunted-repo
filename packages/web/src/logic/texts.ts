@@ -69,6 +69,7 @@ export const TEXTS = {
   // Scenic view (scenic-web spec): shell texts.
   tagline: "Your repo is haunted. Let's fix that.",
   viewLinks: { simple: "Simple view", scenic: "Scenic view" },
+  motion: { on: "Motion: on", off: "Motion: off" },
   phone: {
     answer: "Answer the phone",
     answerWaiting: "Answer the phone, a call is waiting",

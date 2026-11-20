@@ -270,6 +270,12 @@ async function main(): Promise<void> {
       page.setDefaultTimeout(10_000);
       await page.goto(url);
       await page.waitForSelector(ready);
+      // The Gate_Panel rises after its pictures have loaded: wait until it is up.
+      if (url.includes("view=scenic")) {
+        await page.waitForSelector('.scenic[data-gate="up"]', {
+          timeout: 20_000,
+        });
+      }
       // The Opening_Rings last about 6 s: wait for them to end so the frame is stable.
       if (QUIET_PHONE_SHOTS.has(state)) {
         await page.waitForFunction(
