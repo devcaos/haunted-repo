@@ -432,6 +432,7 @@
   --sc-gate-text-at: 3.9s;
   --sc-gate-text-step: 0.15s;
   --sc-dur-gate-text-on: 0.8s;
+  --sc-dur-house-in: 0.6s;
   --sc-gate-flicker-at: 4.4s;
   --sc-dur-gate-flicker: 3.4s;
   --sc-gate-slits-at: 4.8s;

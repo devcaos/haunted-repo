@@ -204,7 +204,7 @@
 @keyframes gate-pumpkin-on {
   0%,
   50% {
-    opacity: 0.35;
+    opacity: 0;
   }
 
   62% {
@@ -225,6 +225,11 @@
 .scenic .gate-lights-wide,
 .scenic .gate-ground-wide {
   display: none;
+}
+
+/* Until the house picture is drawn, the stage waits out of sight. */
+.scenic[data-house="waiting"] .stage {
+  opacity: 0;
 }
 
 /* The pieces of earth and the dust are seen only while they fly. */
@@ -381,6 +386,11 @@
 /* ---------- Motion ---------- */
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The house fades in out of the dark once its picture is drawn. */
+  .scenic .stage {
+    transition: opacity var(--sc-dur-house-in) var(--sc-ease-out);
+  }
+
   .scenic .gate-lights-wide .gate-eye-slit {
     transform-box: fill-box;
     transform-origin: center;
@@ -403,6 +413,7 @@
     /* Until the pictures have loaded the gate and its HUD wait out of sight. */
     .scenic[data-gate="waiting"]:not([data-motion="off"]) .gate-wide,
     .scenic[data-gate="waiting"]:not([data-motion="off"]) .gate-lights-wide,
+    .scenic[data-gate="waiting"]:not([data-motion="off"]) .gate-ground-wide,
     .scenic[data-gate="waiting"]:not([data-motion="off"]) .hud-top,
     .scenic[data-gate="waiting"]:not([data-motion="off"]) .hud-side,
     .scenic[data-gate="waiting"]:not([data-motion="off"]) .hud-foot {
@@ -437,7 +448,7 @@
       );
     }
 
-    /* The pumpkin waits dim in the dark and catches light at the landing. */
+    /* The pumpkin waits unseen in the dark and catches light at the landing. */
     .scenic[data-gate="rising"] .gate-ground-wide .gate-pumpkin {
       animation: gate-pumpkin-on var(--sc-dur-gate-light-on)
         var(--sc-ease-linear) var(--sc-gate-lamp-at) both;

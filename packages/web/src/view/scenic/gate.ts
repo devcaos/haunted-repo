@@ -99,10 +99,14 @@ export function createGate(hrefs: GateHrefs): Gate {
       return;
     }
     set("waiting");
+    // The stage waits hidden until the house picture is drawn, so nothing
+    // floats over an empty night (director, 20 Nov).
+    shell.dataset["house"] = "waiting";
     const houseReady =
       house === null ? Promise.resolve() : loaded([house], GATE_LOAD_WAIT);
     void houseReady
       .then(() => {
+        shell.dataset["house"] = "ready";
         mount();
         const pictures = [...wide.querySelectorAll("image")];
         return loaded(pictures, GATE_LOAD_WAIT);
