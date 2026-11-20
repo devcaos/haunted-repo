@@ -2,6 +2,7 @@ import "./styles/scenic-tokens.css";
 import "./styles/base.css";
 import "./styles/hud.css";
 import "./styles/gate.css";
+import "./styles/gate-motion.css";
 import "./styles/stage.css";
 import "./styles/ghosts.css";
 import "./styles/motion.css";
