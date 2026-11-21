@@ -884,7 +884,7 @@ These are settled by the approved design and are not reopened in these tasks:
 ### Stage 3
 
 - [ ] 13. PR 3a — Room and Grimoire
-  - Branch: `feat/scenic-web-3a`. Stacks on: `feat/scenic-web-2c`.
+  - Branch: `feat/scenic-web-3a`. Branch from: `main` (PR 2c is already merged).
   - Estimate: ~900 changed lines. Model: Auto (Opus only with the director's yes).
   - _Design: "PR Split" row 3a_
 
