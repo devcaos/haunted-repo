@@ -33,21 +33,13 @@ Prove the idea on the real page `npm run dev` in `packages/web`, `?view=scenic` 
 Before saying a visual task is done, check every cell below with Playwright and report the result of each one. If any cell fails, the task is not done.
 
 | Check | Required |
-
 |---|---|
-
 | Viewports | 1920x1080, 1366x768, 2560x1440 and 390 px wide (mobile) |
-
 | Slow conditions | Slow network and 4x CPU slowdown (Playwright with CDP throttling) |
-
 | Height and scroll over time | Page height `document.documentElement.scrollHeight`) and `window.scrollY` sampled every 100 ms from navigation to the end of the animation |
-
 | Reload | Normal reload, and reload while scrolled down |
-
 | Motion toggle | Turn Motion off halfway through the animation |
-
 | Reduced motion | `prefers-reduced-motion: reduce` |
-
 | Simple view | The simple view still works and looks unchanged |
 
 The director's screen is 1920x1080 in Brave. If the director describes a bug, reproduce it exactly there first, then propose a cause.
