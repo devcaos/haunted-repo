@@ -1,4 +1,4 @@
-﻿import fc from "fast-check";
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { UserAction } from "../../../logic/actions.js";
 import type { GhostView, ViewModel } from "../../../logic/viewModel.js";
