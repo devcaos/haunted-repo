@@ -227,7 +227,8 @@ function toggleState(): string {
 }
 
 /**
- * A check no screenshot can show, on one page of the House_Scene:
+ * Checks no screenshot can show, on one page of the House_Scene:
+ * the page height stays the same when the Opening_Rings end, and
  * Reduced_Motion turned on and off while the page is open (16.3).
  */
 async function liveChecks(
@@ -237,7 +238,20 @@ async function liveChecks(
   const problems: string[] = [];
   const page = await context.newPage();
   page.setDefaultTimeout(10_000);
+  const height = (): Promise<number> =>
+    page.evaluate(() => document.documentElement.scrollHeight);
   await page.goto(url);
+  await page.waitForSelector(".phone-widget.is-ringing", { state: "attached" });
+  const ringing = await height();
+  await page.waitForFunction(
+    () => document.querySelector(".phone-widget.is-ringing") === null,
+  );
+  const quiet = await height();
+  if (quiet !== ringing) {
+    problems.push(
+      `the page height moves from ${ringing} px to ${quiet} px when the Opening_Rings end`,
+    );
+  }
   const off = `${TEXTS.lightning.off}, pressed false`;
   await page.emulateMedia({ reducedMotion: "reduce" });
   // The change event of the media query can come a few hundred ms later.

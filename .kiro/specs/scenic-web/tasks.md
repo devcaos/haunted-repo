@@ -1183,10 +1183,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 18.3, 18.4, 18.5, 18.6, 18.7_
     - _Design: "Animation Catalogue" (RM column)_
 
-  - [ ] 16.6 Polish the responsive layout
+  - [x] 16.6 Polish the responsive layout
     - In `base.css`, `hud.css`, `stage.css` and `room.css` (tokens only): the whole House_Scene fits 1440 × 900 with no scroll; at 390 × 844 the house is fully drawn and no wider than the viewport; the Grimoire is under the drawing below 64rem; no horizontal page scroll from 360 px up, also at 200 % zoom and in landscape; only the Code_Block scrolls horizontally.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): fit the scenic view to laptops and phones`
+    - Done 22 Nov: the sizes already fit (measured at 1440 × 900, 1280 × 720, 1024 × 768, 844 × 390, 720 × 450, 390 × 844 and 360 × 740). The one change: the docked telephone keeps the room of its "RING!" burst, so the page no longer moves 10 px at 390 px when the Opening_Rings end; `liveChecks` in the Shots_Script measures it.
     - _Requirements: 19.1, 19.2, 19.3, 19.4_
     - _Design: "Camera frames", D10, decisions Q9 and Q22_
 
