@@ -927,7 +927,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.11, 25.1_
     - _Design: "Source_Scan additions" item 14_
 
-  - [ ] 13.5 Build the Ghost_Scene
+  - [x] 13.5 Build the Ghost_Scene
     - Create `packages/web/src/view/scenic/ghostScene.ts`: the `.room` layer created on entering the Ghost_Scene and kept for the visit (`room` state), the close-up ghost (`.ghost-vigour` > `.ghost-react` > `svg` > `.ghost-idle`) with `layout.closeUp`, lit candles from `litCandles`, removal after the leave fade. In `renderer.ts` and `stage.ts`: `.world`, `.scene-dock`, `.floor-stair`, `.nameplates` and `.scene-bar` are `inert` in the Ghost_Scene; the Telephone group is `visibility: hidden` and the phone widget hidden and out of the tab order; the house loops are paused.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): open the close-up exorcism room`

@@ -25,6 +25,7 @@ export function createRenderer(
   const sceneHref = firstUrl("scene.house");
   return createScenicRenderer(root, onAction, {
     sceneHref,
+    roomHref: firstUrl("scene.ghost-room"),
     gate: {
       frame: firstUrl("panel.frame"),
       gargoyle: firstUrl("panel.gargoyle"),
