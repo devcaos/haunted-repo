@@ -76,6 +76,12 @@ export const TEXTS = {
     quiet: "The line is quiet.",
     ring: "RING!",
   },
+  lightning: {
+    on: "Lightning: on",
+    off: "Lightning: off",
+    reducedReason: "Off because your system asks for less motion",
+  },
+  finaleDone: "The demo is complete.",
   viewLoadFailed: "The page could not be loaded. Please reload it.",
   floorButtonName: (title: string, action: string) => `${title}. ${action}`,
   nameplateName: (

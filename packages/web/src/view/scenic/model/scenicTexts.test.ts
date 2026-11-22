@@ -87,6 +87,22 @@ describe("scenic texts (Requirements 2.2, 7.1 to 7.3, 7.5)", () => {
     });
   });
 
+  it("the Lightning_Toggle texts are exact (15.5, 15.9)", () => {
+    expect(TEXTS.lightning).toEqual({
+      on: "Lightning: on",
+      off: "Lightning: off",
+      reducedReason: "Off because your system asks for less motion",
+    });
+  });
+
+  it("the Finale banner has two lines, the second naming the Power (13.4, 25.4)", () => {
+    expect(TEXTS.finaleDone).toBe("The demo is complete.");
+    expect(POWER_TEXTS.finaleOtherGhosts).toBe(
+      "The other ghosts are waiting for your own Kiro with the Haunted Repo Power.",
+    );
+    expect(TEXTS.finaleDone).not.toContain("Power");
+  });
+
   it("every POWER_TEXTS line names the Power", () => {
     for (const line of Object.values(POWER_TEXTS)) {
       expect(line).toContain("Power");
