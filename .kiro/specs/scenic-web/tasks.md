@@ -934,7 +934,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 5.11, 9.1, 9.7, 10.1, 10.8, 10.9, 10.13, 17.14, 20.4_
     - _Design: "DOM modules" (ghostScene.ts), "Animation Catalogue" (Ghost_Scene pause)_
 
-  - [ ] 13.6 Build the Grimoire
+  - [x] 13.6 Build the Grimoire
     - Create `packages/web/src/view/scenic/grimoire.ts`: `section.grimoire` from `grimoireView` with the heading as focus target, the Answer_Box `textarea` with its label (kept while its key is unchanged, new and empty otherwise; never reads `.value`; no `input` or `change` listener), one button per choice sending through the guard, the Code_Block `pre` with `tabindex="0"`, and the Licence_Notice right after it, outside its scroll.
     - In `packages/web/src/source.test.ts` set `GRIMOIRE_REQUIRED = true`, so Source_Scan item 14 now fails if `grimoire.ts` is missing.
     - Verify: `npm run check` exits `0` (item 14 now covers the file).
