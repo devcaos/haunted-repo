@@ -849,19 +849,21 @@ These are settled by the approved design and are not reopened in these tasks:
   - Pictures, manifest, Gate_Panel drawing, wide gate and narrow tombstone styles, size budget 512,000. Branch `feat/scenic-web-gate-1` from main. Part 2 (motion: rise from the ground, eyes, lantern, Motion button, art loaded after the house) is a separate PR.
 - [x] 11c. PR Gate_Panel part 2 (director, 19 Nov)
   - Gate_Rise on wide screens (the stone rises in 3 s, earth, eyes, lantern and pumpkin light up, the texts appear with a cold flicker), pictures loaded after the house, Motion_Button, Requirements 18.10 and 18.11. Branch `feat/scenic-web-gate-2` from main.
-- [ ] 12. Time check, 23 Nov 2026 (conditional)
+- [x] 12. Time check, 23 Nov 2026 (conditional)
   - Do this check on 23 Nov 2026, whatever task is in progress. It sits before PR 3a because stage 2 should be merged by then. If PRs 2a, 2b and 2c are all merged into `main` on 23 Nov 2026, write "Not triggered" under tasks 12.2 and 12.5 and mark them `[x]` with no other change.
   - If they are not all merged, run tasks 12.2 and 12.5 as commits on the branch in progress (the newest open PR branch, or `feat/scenic-web-3a` if it is about to start) and list them in that PR's body. Cut 1 is already approved by the director (design "Cut List"). Cut 2 is withdrawn and cut 3 was applied on 19 Nov (tasks 12.3 and 12.4). **Cut 4 is NOT pre-approved**: it needs a new director decision and is not a task here.
   - These tasks are conditional, not optional: they run when the time check triggers.
   - _Design: "Cut List", "PR Split" (Time check)_
 
-  - [ ] 12.1 Run the time check
+  - [x] 12.1 Run the time check
     - On 23 Nov 2026 ask the director whether PRs 2a, 2b and 2c are merged, and write the answer under this task ("Triggered" or "Not triggered").
     - No commit of its own; it is marked `[x]` in the next commit.
+    - Not triggered. Checked 22 Nov 2026 by the director: 2a, 2b and 2c merged as PR #62 to #66.
     - _Requirements: none (planning)_
 
-  - [ ] 12.2 Conditional cut 1: reuse Variant 0 for the Lantern_Wraith and the Chained_Brute
+  - [x] 12.2 Conditional cut 1: reuse Variant 0 for the Lantern_Wraith and the Chained_Brute
     - Only if task 12.1 says "Triggered". In `art/ghosts.ts` Variants 1 to 4 of the Lantern_Wraith and the Chained_Brute reuse Variant 0 (the same scale, tilt and eye style); the Variant numbers still follow the position, so P4 still passes. In `art.test.ts` the "Variants differ" check (5.9) applies to the Wisp only; the size order of 5.6 and "each type keeps its own part" still run at every Variant. The Gallery shows repeated cells.
+    - Not triggered
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): reuse variant 0 for the wraith and the brute`
     - _Requirements: 5.9, 23.5_
@@ -874,8 +876,9 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 16.1, 18.2, 17.14_
     - _Design: "Cut List" order 3, D13_
 
-  - [ ] 12.5 Conditional: record cut 1 in `docs/decisiones.md`
+  - [x] 12.5 Conditional: record cut 1 in `docs/decisiones.md`
     - Only if task 12.1 says "Triggered". Add one line for cut 1 (it changes 5.9 and the "different look" part of 23.5 for the middle floor and the basement), with the date and the director's pre-approval. Cut 3 is already recorded (19 Nov) and cut 2 is withdrawn. Spanish is allowed.
+    - Not triggered
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: record the scenic-web time-check cut`
     - _Requirements: none (decision record)_
@@ -886,9 +889,10 @@ These are settled by the approved design and are not reopened in these tasks:
 - [ ] 13. PR 3a — Room and Grimoire
   - Branch: `feat/scenic-web-3a`. Branch from: `main` (PR 2c is already merged).
   - Estimate: ~900 changed lines. Model: Auto (Opus only with the director's yes).
+  - Split on 22 Nov (director): part 1 = 13.1, 13.2, 13.4 on `feat/scenic-web-3a`; part 2 = 13.3, 13.5 to 13.9 on `feat/scenic-web-3a-2` from `main` after part 1 is merged.
   - _Design: "PR Split" row 3a_
 
-  - [ ] 13.1 Add the Grimoire view
+  - [x] 13.1 Add the Grimoire view
     - Create `packages/web/src/view/scenic/model/grimoireView.ts`: `GrimoireBlock`, `GrimoireView` and `grimoireView(model)` (`null` outside the Ghost_Scene), blocks in the Simple_Renderer order, labels from `TEXTS.actionLabels` as in `simple/ghost.ts`, `litCandles` by Requirement 10.9, Answer_Box key `${path}\n${questionNumber}`.
     - Create `packages/web/src/view/scenic/model/grimoireView.test.ts`: for every ghost step reached with the committed script, the texts and titles (10.2), the Answer_Box (10.3), the code (10.6), the licence directly after the code (10.7, 25.5), the lit candles (10.9) and the Answer_Box key rule (10.10).
     - Verify: `npm run check` exits `0`.
@@ -896,7 +900,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.2, 10.3, 10.4, 10.6, 10.7, 10.9, 10.10, 10.12, 25.5_
     - _Design: "scenic/model/hudView.ts and scenic/model/grimoireView.ts"_
 
-  - [ ] 13.2 Property test for the Grimoire choices
+  - [x] 13.2 Property test for the Grimoire choices
     - **Property 17: Grimoire choices follow Available_Actions**
     - **Validates: Requirements 10.4, 10.12**
     - Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real `pageRunArb` run, at least 100 runs.
@@ -915,7 +919,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.1, 10.8, 22.1_
     - _Design: "Art System" (Close-up room), "Props and panels" (Question_Candles)_
 
-  - [ ] 13.4 Source_Scan item 14
+  - [x] 13.4 Source_Scan item 14
     - In `source.test.ts`: no `.value` read and no `input` or `change` listener in `src/view/scenic/grimoire.ts` (the test asserts the file exists from task 13.6 on; until then it skips only that existence check), and no scenic file reads `answerBox.value` or listens to it. Negative self-check.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the scenic answer box text is never read`
@@ -953,9 +957,9 @@ These are settled by the approved design and are not reopened in these tasks:
   - [ ] 13.9 Checkpoint and PR 3a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 3b, task 14.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3a`.
     - Run `npm run check`; it must exit `0`.
-    - Measure: `git diff --shortstat feat/scenic-web-2c -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-3a`. Body in `$env:TEMP\pr-scenic-web-3a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `05-ghost-explaining`, `06-ghost-asking`, `11-ghost-failed`, `18-reduced-ghost-asking`, each at both sizes", any time-check cuts of group 12, and the manual check: exorcise `bench/static.js` with the keyboard only.
-    - Run `gh pr create --base feat/scenic-web-2c --head feat/scenic-web-3a --title "feat: add the exorcism room and grimoire" --body-file $env:TEMP\pr-scenic-web-3a-body.md`.
+    - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
+    - Push with `git push -u origin feat/scenic-web-3a-2`. Body in `$env:TEMP\pr-scenic-web-3a-2-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `05-ghost-explaining`, `06-ghost-asking`, `11-ghost-failed`, `18-reduced-ghost-asking`, each at both sizes", any time-check cuts of group 12, and the manual check: exorcise `bench/static.js` with the keyboard only.
+    - Run `gh pr create --base main --head feat/scenic-web-3a-2 --title "feat: add the exorcism room and grimoire" --body-file $env:TEMP\pr-scenic-web-3a-2-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
