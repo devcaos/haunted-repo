@@ -1009,7 +1009,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.3, 4.4, 4.17, 12.6, 12.7_
     - _Design: "Correctness Properties", Property 10_
 
-  - [ ] 14.5 Property test for one-shot moments
+  - [x] 14.5 Property test for one-shot moments
     - **Property 11: One-shot moments start once and only on a real change**
     - **Validates: Requirements 12.1, 12.2, 12.8, 13.7**
     - Generator: `pageRunArb`, at least 100 runs.

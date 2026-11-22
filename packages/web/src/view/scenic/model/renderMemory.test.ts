@@ -13,6 +13,7 @@ import type {
 import { loadSample } from "../../../sample/sampleData.js";
 import { EMPTY_MEMORY, meterScale, nextMemory } from "./renderMemory.js";
 import type { RenderEffects, VisualMemory } from "./renderMemory.js";
+import { sceneLayout } from "./sceneLayout.js";
 import { pageRunArb, playPageRun } from "./viewModelArb.testutil.js";
 
 function read(relative: string): string {
@@ -305,5 +306,65 @@ describe("Properties", () => {
       { numRuns: 100 },
     );
     expect(ghostRenders).toBeGreaterThan(0);
+  });
+
+  // Feature: scenic-web, Property 11: One-shot moments start once and only on a real change
+  // **Validates: Requirements 12.1, 12.2, 12.8, 13.7**
+  it("Property 11: One-shot moments start once and only on a real change", async () => {
+    function firstStates(model: ViewModel): Map<string, GhostState> {
+      const states = new Map<string, GhostState>();
+      for (const floor of model.house?.floors ?? []) {
+        for (const card of floor.ghosts) {
+          if (!states.has(card.path)) states.set(card.path, card.state);
+        }
+      }
+      return states;
+    }
+    let renders = 0;
+    await fc.assert(
+      fc.asyncProperty(pageRunArb, async (run) => {
+        const models = await playPageRun(run, read);
+        let memory: VisualMemory = EMPTY_MEMORY;
+        let prev: ViewModel | null = null;
+        for (const model of models) {
+          const step = nextMemory(memory, model);
+          memory = step.memory;
+          renders += 1;
+          const sameSource =
+            prev?.house != null &&
+            model.house != null &&
+            prev.house.source === model.house.source;
+          const expected: string[] = [];
+          if (prev !== null && sameSource) {
+            const before = firstStates(prev);
+            for (const [path, state] of firstStates(model)) {
+              if (state === "exorcised" && before.get(path) === "haunted") {
+                expected.push(path);
+              }
+            }
+          }
+          // Exactly those paths, and no path twice.
+          expect([...step.effects.exorcisedMoments].sort()).toEqual(
+            expected.sort(),
+          );
+          expect(new Set(step.effects.exorcisedMoments).size).toBe(
+            step.effects.exorcisedMoments.length,
+          );
+          const shown = sceneLayout(model).finale;
+          const wasShown = prev === null ? false : sceneLayout(prev).finale;
+          expect(step.effects.finale.shown).toBe(shown);
+          expect(step.effects.finale.animate).toBe(
+            shown && !wasShown && sameSource,
+          );
+          // The same render again is no change: nothing starts a second time.
+          const again = nextMemory(memory, model);
+          expect(again.effects.exorcisedMoments).toEqual([]);
+          expect(again.effects.finale.animate).toBe(false);
+          prev = model;
+        }
+      }),
+      { numRuns: 100 },
+    );
+    expect(renders).toBeGreaterThan(0);
   });
 });
