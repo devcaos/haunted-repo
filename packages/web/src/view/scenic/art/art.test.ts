@@ -54,7 +54,14 @@ import {
   ringEffectsArt,
   slotArt,
 } from "./props.js";
-import { RAIN_BOTTOM, RAIN_STEP, rainPath, weatherLayer } from "./weather.js";
+import { BEAM_ORIGIN, effectsLayer } from "./effects.js";
+import {
+  RAIN_BOTTOM,
+  RAIN_STEP,
+  rainClipPath,
+  rainPath,
+  weatherLayer,
+} from "./weather.js";
 import { CANDLE_X, ROOM_BOX, roomArt, roomRainPath } from "./room.js";
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
@@ -1339,5 +1346,39 @@ describe("the exorcism room (Requirements 10.1, 10.8, 22.1)", () => {
     expect(wrap?.clip).toBe("room-glass");
     expect(roomRainPath()).toMatch(/^M/);
     expect(RAIN_STEP).toEqual([-80, 200]);
+  });
+});
+
+describe("the effects layer (Requirements 13.3, 14.1, 15.1, 22.1)", () => {
+  const tree = effectsLayer();
+  const nodes = nodesOf(tree);
+
+  it("passes the Shape_Data rules", () => {
+    expect(shapeProblems(tree)).toEqual([]);
+  });
+
+  it("starts the Search_Beam at the porch lantern of the illustration, (354, 629)", () => {
+    const beam = nodes.find((n) => n.part === "search-beam");
+    expect(BEAM_ORIGIN).toEqual([354, 629]);
+    expect(beam?.transform?.translate).toEqual([354, 629]);
+    const fan = nodes.find((n) => n.cls === "beam-fan");
+    expect(fan?.points?.slice(0, 2)).toEqual([0, -4]);
+  });
+
+  it("clips the dawn band to the sky of the rain, so it never covers the house", () => {
+    const dawn = nodes.find((n) => n.part === "dawn");
+    const clip = nodes.find((n) => n.id === dawn?.clip);
+    expect(clip?.kind).toBe("clipPath");
+    expect(clip?.children?.[0]?.d).toBe(rainClipPath());
+  });
+
+  it("holds the bolt and the full-world flash in one lightning group, and no bats", () => {
+    const lightning = nodes.find((n) => n.part === "lightning");
+    expect(classesOf(lightning as ShapeNode)).toEqual(
+      expect.arrayContaining(["lightning-sky", "lightning-bolt"]),
+    );
+    expect(nodes.some((n) => n.part === "bats" || n.cls === "bats")).toBe(
+      false,
+    );
   });
 });

@@ -8,6 +8,7 @@ import {
 } from "./art/house.js";
 import { chainedDoorArt, ringEffectsArt, slotArt } from "./art/props.js";
 import { defs, g, rect } from "./art/shapes.js";
+import { effectsLayer } from "./art/effects.js";
 import { weatherLayer } from "./art/weather.js";
 import { el } from "./dom.js";
 import { cameraFor, cssTransform, type ViewportClass } from "./model/camera.js";
@@ -85,8 +86,7 @@ export function createStage(sceneHref: string | null): Stage {
     // The Ring effects; the renderer adds `is-ringing` to this layer (task 11.7).
     mountShape(g("telephone", [ringEffectsArt()]), "house-"),
     mountShape(weatherLayer(), "house-"),
-    // Filled by the effects of task 15.4.
-    mountShape(g("effects", []), "house-"),
+    mountShape(effectsLayer(), "house-"),
   );
 
   const overlay = el("div", { class: "world-overlay" });

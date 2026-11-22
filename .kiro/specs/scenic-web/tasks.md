@@ -1098,7 +1098,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 15.1, 15.3_
     - _Design: "Correctness Properties", Property 16_
 
-  - [ ] 15.4 Draw the effects layer
+  - [x] 15.4 Draw the effects layer
     - There is no `art/sky.ts`: the weather overlay is in `art/weather.ts`. In a new `art/effects.ts` add `effectsLayer()`: the Search_Beam fan from the porch lantern painted in the illustration, at (354, 629) in house units (the lantern's lit centre in the asset is (319, 566), times 10/9; checked against `house-scene.svg`, element `porch-lantern-glow`); the lightning bolt with the full-world flash rect in one `lightning` group; and the dawn band in a `dawn` group, clipped to the sky like the rain (the clip of `weatherLayer`). No bats. `stage.ts` mounts it in place of the empty `effects` group.
     - Extend `art.test.ts`: the tree passes the rules; the beam starts at (354, 629); the dawn band uses the sky clip and never covers the house; there is no `bats` part.
     - Verify: `npm run check` exits `0`.
