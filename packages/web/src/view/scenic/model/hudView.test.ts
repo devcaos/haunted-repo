@@ -8,7 +8,7 @@ import { createRecordingRenderer } from "../../../logic/recordingRenderer.testut
 import { TEXTS } from "../../../logic/texts.js";
 import type { ViewModel } from "../../../logic/viewModel.js";
 import { loadSample } from "../../../sample/sampleData.js";
-import { hudView as hudViewOf } from "./hudView.js";
+import { hudView as hudViewOf, lightningToggleView } from "./hudView.js";
 import { EMPTY_MEMORY, meterScale, nextMemory } from "./renderMemory.js";
 import { viewModelArb } from "./viewModelArb.testutil.js";
 
@@ -212,5 +212,36 @@ describe("hudView properties", () => {
       }),
       { numRuns: 100 },
     );
+  });
+});
+
+describe("lightningToggleView (Requirements 15.5, 15.9)", () => {
+  it("says on and is pressed when the Lightning is on", () => {
+    expect(lightningToggleView(true, false)).toEqual({
+      text: "Lightning: on",
+      pressed: true,
+      disabled: false,
+      reason: null,
+    });
+  });
+
+  it("says off and is not pressed when the Lightning is off", () => {
+    expect(lightningToggleView(false, false)).toEqual({
+      text: "Lightning: off",
+      pressed: false,
+      disabled: false,
+      reason: null,
+    });
+  });
+
+  it("is off and disabled with its reason under Reduced_Motion, whatever the state", () => {
+    for (const on of [true, false]) {
+      expect(lightningToggleView(on, true)).toEqual({
+        text: "Lightning: off",
+        pressed: false,
+        disabled: true,
+        reason: "Off because your system asks for less motion",
+      });
+    }
   });
 });

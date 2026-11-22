@@ -1106,7 +1106,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 13.3, 14.1, 15.1, 22.1_
     - _Design: "Props and panels" (Search_Beam, Lightning, Dawn), "World geometry"_
 
-  - [ ] 15.5 Add the Lightning_Toggle
+  - [x] 15.5 Add the Lightning_Toggle
     - Extend `HudView` and `hudView` with the toggle (text, `aria-pressed`, disabled and reason under Reduced_Motion) and add examples to `hudView.test.ts` for on, off and Reduced_Motion. In `hud.ts` add the real `button` (flip on click, Enter or Space, same frame, focus kept, no UserAction) and the visible reason linked with `aria-describedby`. The state lives only in memory and starts on unless Reduced_Motion is on.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the lightning toggle`

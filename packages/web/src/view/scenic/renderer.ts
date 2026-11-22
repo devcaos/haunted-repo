@@ -29,6 +29,7 @@ import { sceneLayout, type Frame } from "./model/sceneLayout.js";
 import { scenicFocusAfterRender } from "./model/scenicFocus.js";
 import { watchMedia } from "./motion.js";
 import { createMotionToggle } from "./motionToggle.js";
+import { createLightningToggle } from "./lightningToggle.js";
 import {
   createPhoneWidget,
   type PhonePlace,
@@ -195,8 +196,12 @@ export function createScenicRenderer(
     hud.footer,
     gate.ground,
   ]);
-  // First in the footer, so the Licence_Notice link stays the last Tab stop.
-  hud.footer.prepend(createMotionToggle(shell));
+  // Task 15.7 makes the toggle start and stop the Lightning clock.
+  const toggle = createLightningToggle(reduced, () => undefined);
+  // Last in the HUD aside, so both buttons come before the Answer_Button in
+  // the Tab order (17.4); on wide screens the CSS draws them on the plinth.
+  toggle.element.prepend(createMotionToggle(shell));
+  hud.aside.append(toggle.element);
   root.replaceChildren(shell);
   gate.raise(shell, stage.element.querySelector("image.scene-art"));
 
