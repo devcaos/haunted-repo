@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import {
   FLASH_MAX_MS,
@@ -55,5 +56,24 @@ describe("lightningClock", () => {
     ],
   ])("flashAllowed: %s", (_reason, input, expected) => {
     expect(flashAllowed(input)).toBe(expected);
+  });
+});
+
+describe("lightningClock properties", () => {
+  // Feature: scenic-web, Property 16: Lightning flashes are 10 to 15 seconds apart
+  // **Validates: Requirements 15.1, 15.3**
+  it("nextFlashDelay is an integer from 10,000 to 15,000 for any r in [0, 1)", () => {
+    fc.assert(
+      fc.property(
+        fc.double({ min: 0, max: 1, maxExcluded: true, noNaN: true }),
+        (r) => {
+          const delay = nextFlashDelay(r);
+          expect(Number.isInteger(delay)).toBe(true);
+          expect(delay).toBeGreaterThanOrEqual(10_000);
+          expect(delay).toBeLessThanOrEqual(15_000);
+        },
+      ),
+      { numRuns: 200 },
+    );
   });
 });

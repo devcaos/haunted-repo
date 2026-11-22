@@ -1087,7 +1087,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 15.1, 15.2, 18.5_
     - _Design: "scenic/model/lightningClock.ts", D7, D8, decision Q7_
 
-  - [ ] 15.3 Property test for the Lightning interval
+  - [x] 15.3 Property test for the Lightning interval
     - **Property 16: Lightning flashes are 10 to 15 seconds apart**
     - **Validates: Requirements 15.1, 15.3**
     - Generator: numbers in [0, 1) (`fc.double` with `min: 0`, `max: 1`, `maxExcluded: true`, `noNaN: true`), at least 100 runs. Checks `nextFlashDelay(r)` is an integer from 10,000 to 15,000 inclusive.
