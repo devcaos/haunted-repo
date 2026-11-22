@@ -527,7 +527,7 @@ export function mountShape(node: ShapeNode, idPrefix: string): SVGElement;
 | `phoneWidget.ts` | `.phone-widget`: RING! bubble (`aria-hidden`), Answer_Button, Phone_Bubble | Lives in `.world-overlay` for the house and middle-floor frames, in `.scene-dock` for attic and basement frames (D14). Hidden and out of the tab order in the Ghost_Scene (9.7). |
 | `ghostScene.ts` | `.room` layer: room `svg`, close-up ghost (`.ghost-vigour` > `.ghost-react` > `.ghost-idle` > art), Question_Candles, light overlays, sparks | Created on entering the Ghost_Scene, kept for the visit, removed on leaving after the fade. |
 | `grimoire.ts` | Grimoire `section` from `grimoireView` | Keeps the Answer_Box element while its key is unchanged; never reads `.value` and adds no `input` or `change` listener. |
-| `effects.ts` | Lightning timer, Return_Glow timer, Finale class timing, Search_Beam class | Uses `window.setTimeout` only. |
+| `effects.ts` | Lightning timer, Finale class timing, Search_Beam class | Uses `window.setTimeout` only. The Return_Glow timer is not here: it is `stage.glow` with its timer in `renderer.ts`, director's decision of 22 Nov. |
 | `motion.ts` | `watchMedia(query, onChange)` for `(prefers-reduced-motion: reduce)` and `WIDE_QUERY` | Applies changes within the same task (18.9). |
 | `fonts.ts` | `loadScenicFonts()` | `new FontFace(family, \`url("${url}") format("woff2")\`, { weight: "400", style: "normal", display: "swap" })`, `document.fonts.add(face)`, `face.load().catch(() => undefined)`. A failed font only leaves the fallback stack (21.7). |
 
@@ -858,8 +858,8 @@ Every animation animates only `transform` and `opacity` (Requirement 20.1). Ever
 | `phone-glow` | `.phone-glow` | opacity 0 → 0.75 → 0.35 | 2 s per Ring | ease-in-out | same | none; still at 0.6 while Ringing |
 | `ring-pop` | `.ring-bubble` | transform scale 0.6 → 1.08 → 1, opacity | 250 ms | `--sc-ease-out` | one-shot per Ring | none; shown still while Ringing |
 | `bubble-in` | `.phone-bubble` | opacity | 200 ms | ease-out | one-shot | same (opacity only) |
-| room enter (transition) | `.room` | opacity 0 → 1, delay 200 ms | 500 ms | ease-out | one-shot | 150 ms fade, no delay |
-| room leave (transition) | `.room` | opacity 1 → 0 | 300 ms | ease-in | one-shot | 150 ms fade |
+| `room-in` | `.room[data-state="open"]` | opacity 0 → 1, no delay (director, 22 Nov) | 500 ms | ease-out | one-shot | 150 ms fade |
+| `room-out` | `.room[data-state="leaving"]` | opacity 1 → 0 | 300 ms | ease-in | one-shot | 150 ms fade |
 | candle light (transition) | `.qcandle .flame-wrap` | opacity | 300 ms | ease-out | one-shot | 150 ms |
 | `react-recoil` | `.ghost-react` | transform: translateX(18) scale(0.94) and back | 400 ms | `--sc-ease-out` | one-shot | `react-fade`: opacity 1 → 0.7 → 1, 200 ms |
 | `react-shudder` | `.ghost-react` | transform: rotate ±4°, translateX ±4 | 500 ms | linear | one-shot | `react-fade` |
@@ -1330,7 +1330,7 @@ Cut 1 is pre-approved by the director for the 23 Nov time check (see "PR Split")
 | --- | --- | --- |
 | D1 | Heading with `house` null: `TEXTS.pageTitle`. Floor button accessible name: `TEXTS.floorButtonName(title, TEXTS.actionLabels["go-to-floor"])` = "Attic. Go to this floor". | As answered by the director; the full stop makes screen readers pause between the two parts. |
 | D2 | Bestiary ranges are literal texts in `TEXTS.bestiary.ranges`, checked against `floorOf`. Below 64rem the Bestiary folds behind a `button` "Bestiary" with `aria-expanded` (closed at load); at 64rem and above it is always open and the button is not shown. Drawings `aria-hidden`, texts visible. | Saves about 200 px of height on phones; on wide screens there is room in the HUD column. |
-| D3 | All Camera moves (house, floors, into and out of the Ghost_Scene) last 700 ms with `cubic-bezier(0.65, 0, 0.35, 1)`. Dimmed floors get a Night overlay at 0.65 opacity (about 35 % brightness). | One timing feels consistent; an overlay is cheaper than a brightness filter and needs no filter (20.2). |
+| D3 | All Camera moves (house and floors) last 700 ms with `cubic-bezier(0.65, 0, 0.35, 1)`. The Camera stays still in the Ghost_Scene: the close-up room covers the stage (director, 22 Nov). Dimmed floors get a Night overlay at 0.65 opacity (about 35 % brightness). | One timing feels consistent; an overlay is cheaper than a brightness filter and needs no filter (20.2). |
 | D4 | Search_Beam: one sweep in 2.5 s (`rotate(-18deg)` to `rotate(12deg)`), `infinite alternate` while `live.busy`. | As answered. |
 | D5 | A render during the Exorcised_Moment lets it play; a Scene change jumps it to the end. Haunt_Meter move 800 ms. Named tokens `--sc-cold-blue` and `--sc-warm-orange`. The Exorcised candles are lit in House and Floor Scenes. | As answered. |
 | D6 | "Got it" Reaction first (0 to 400 ms), then spiral (400 to 1000 ms) and sparks (1000 to 1400 ms); the warm room light runs 0 to 1200 ms from the render. | The judge sees the hit, then the ghost leaving; both limits hold (11.10, 12.4). |
