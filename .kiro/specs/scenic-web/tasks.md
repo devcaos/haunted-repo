@@ -849,19 +849,21 @@ These are settled by the approved design and are not reopened in these tasks:
   - Pictures, manifest, Gate_Panel drawing, wide gate and narrow tombstone styles, size budget 512,000. Branch `feat/scenic-web-gate-1` from main. Part 2 (motion: rise from the ground, eyes, lantern, Motion button, art loaded after the house) is a separate PR.
 - [x] 11c. PR Gate_Panel part 2 (director, 19 Nov)
   - Gate_Rise on wide screens (the stone rises in 3 s, earth, eyes, lantern and pumpkin light up, the texts appear with a cold flicker), pictures loaded after the house, Motion_Button, Requirements 18.10 and 18.11. Branch `feat/scenic-web-gate-2` from main.
-- [ ] 12. Time check, 23 Nov 2026 (conditional)
+- [x] 12. Time check, 23 Nov 2026 (conditional)
   - Do this check on 23 Nov 2026, whatever task is in progress. It sits before PR 3a because stage 2 should be merged by then. If PRs 2a, 2b and 2c are all merged into `main` on 23 Nov 2026, write "Not triggered" under tasks 12.2 and 12.5 and mark them `[x]` with no other change.
   - If they are not all merged, run tasks 12.2 and 12.5 as commits on the branch in progress (the newest open PR branch, or `feat/scenic-web-3a` if it is about to start) and list them in that PR's body. Cut 1 is already approved by the director (design "Cut List"). Cut 2 is withdrawn and cut 3 was applied on 19 Nov (tasks 12.3 and 12.4). **Cut 4 is NOT pre-approved**: it needs a new director decision and is not a task here.
   - These tasks are conditional, not optional: they run when the time check triggers.
   - _Design: "Cut List", "PR Split" (Time check)_
 
-  - [ ] 12.1 Run the time check
+  - [x] 12.1 Run the time check
     - On 23 Nov 2026 ask the director whether PRs 2a, 2b and 2c are merged, and write the answer under this task ("Triggered" or "Not triggered").
     - No commit of its own; it is marked `[x]` in the next commit.
+    - Not triggered. Checked 22 Nov 2026 by the director: 2a, 2b and 2c merged as PR #62 to #66.
     - _Requirements: none (planning)_
 
-  - [ ] 12.2 Conditional cut 1: reuse Variant 0 for the Lantern_Wraith and the Chained_Brute
+  - [x] 12.2 Conditional cut 1: reuse Variant 0 for the Lantern_Wraith and the Chained_Brute
     - Only if task 12.1 says "Triggered". In `art/ghosts.ts` Variants 1 to 4 of the Lantern_Wraith and the Chained_Brute reuse Variant 0 (the same scale, tilt and eye style); the Variant numbers still follow the position, so P4 still passes. In `art.test.ts` the "Variants differ" check (5.9) applies to the Wisp only; the size order of 5.6 and "each type keeps its own part" still run at every Variant. The Gallery shows repeated cells.
+    - Not triggered
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): reuse variant 0 for the wraith and the brute`
     - _Requirements: 5.9, 23.5_
@@ -874,8 +876,9 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 16.1, 18.2, 17.14_
     - _Design: "Cut List" order 3, D13_
 
-  - [ ] 12.5 Conditional: record cut 1 in `docs/decisiones.md`
+  - [x] 12.5 Conditional: record cut 1 in `docs/decisiones.md`
     - Only if task 12.1 says "Triggered". Add one line for cut 1 (it changes 5.9 and the "different look" part of 23.5 for the middle floor and the basement), with the date and the director's pre-approval. Cut 3 is already recorded (19 Nov) and cut 2 is withdrawn. Spanish is allowed.
+    - Not triggered
     - Verify: `npm run check` exits `0`.
     - Commit message: `docs: record the scenic-web time-check cut`
     - _Requirements: none (decision record)_
