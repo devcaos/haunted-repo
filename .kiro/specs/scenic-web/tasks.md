@@ -968,9 +968,10 @@ These are settled by the approved design and are not reopened in these tasks:
 - [ ] 14. PR 3b — Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules
   - Branch: `feat/scenic-web-3b`. Branch from: an up-to-date `main`, after PR 3a part 2 is merged. Targets `main`.
   - Estimate: ~780 changed lines. Model: Auto.
+  - Split on 22 Nov, director: part 1 = 14.1 to 14.5 on `feat/scenic-web-3b`; part 2 = 14.6 to 14.11 on `feat/scenic-web-3b-2` from `main` after part 1 is merged.
   - _Design: "PR Split" row 3b_
 
-  - [ ] 14.1 Add the Reaction rules
+  - [x] 14.1 Add the Reaction rules
     - Create `packages/web/src/view/scenic/model/reactions.ts`: `ReactionKind`, `Vigour`, `VIGOUR_START`, `REACTION_MS`, `reactionFor`, `vigourAfterAction`, `vigourAfterRender` and `vigourStyle`, as in the design.
     - Create `packages/web/src/view/scenic/model/reactions.test.ts`: `reactionFor` gives a Reaction only for `rate` and `dont-know` (`self-check` `half` gives none); `vigourAfterRender` resets on entering `failed` (11.6); every `REACTION_MS` value is at most 1000 (11.10).
     - Verify: `npm run check` exits `0`.
@@ -978,7 +979,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.10_
     - _Design: "scenic/model/reactions.ts"_
 
-  - [ ] 14.2 Property test for the ghost's limits
+  - [x] 14.2 Property test for the ghost's limits
     - **Property 14: The close-up ghost stays within its size and opacity limits**
     - **Validates: Requirements 11.2, 11.3, 11.4, 11.5, 11.7**
     - Generator: sequences of `UserAction` values from `actionArb`, applied with `vigourAfterAction`, at least 100 runs.
@@ -989,7 +990,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 11.7_
     - _Design: "Correctness Properties", Property 14_
 
-  - [ ] 14.3 Add the render memory
+  - [x] 14.3 Add the render memory
     - In `packages/web/src/view/scenic/model/renderMemory.ts` add `VisualMemory`, `RenderEffects`, `EMPTY_MEMORY` and `nextMemory(memory, model)` with the rules of the design (frozen list meter in the Ghost_Scene, `from` only after a Ghost_Scene with moments and a non-null previous list progress, moments on a real Haunted-to-Exorcised change with the same source, Finale `shown`, `animate`, `announce`).
     - Create `packages/web/src/view/scenic/model/renderMemory.test.ts` with examples: "Show the sample again" with exorcised Cards shows them lit with no moment and no meter move; "Not yet" keeps the Card Exorcised and still gives a Return_Glow.
     - Verify: `npm run check` exits `0`.
@@ -997,7 +998,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.3, 4.4, 12.1, 12.2, 12.6, 12.7, 12.8, 13.7, 13.8_
     - _Design: "scenic/model/renderMemory.ts"_
 
-  - [ ] 14.4 Property test for the Haunt_Meter
+  - [x] 14.4 Property test for the Haunt_Meter
     - **Property 10: The Haunt_Meter shows the last list values while a ghost is open**
     - **Validates: Requirements 4.3, 4.4, 4.17, 12.6, 12.7**
     - Generator: `pageRunArb`, its models fed in order to `nextMemory`, at least 100 runs.
@@ -1008,7 +1009,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.3, 4.4, 4.17, 12.6, 12.7_
     - _Design: "Correctness Properties", Property 10_
 
-  - [ ] 14.5 Property test for one-shot moments
+  - [x] 14.5 Property test for one-shot moments
     - **Property 11: One-shot moments start once and only on a real change**
     - **Validates: Requirements 12.1, 12.2, 12.8, 13.7**
     - Generator: `pageRunArb`, at least 100 runs.
@@ -1058,8 +1059,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4a, task 15.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-3b`. Body in `$env:TEMP\pr-scenic-web-3b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know`, `12-exorcised-moment`, each at both sizes", and the manual check: after an exorcism, back on the floor the candle lights up, the Haunt_Meter moves, then the telephone rings once.
-    - Run `gh pr create --base main --head feat/scenic-web-3b --title "feat: add ghost reactions and the exorcised moment" --body-file $env:TEMP\pr-scenic-web-3b-body.md`.
+    - Push with `git push -u origin feat/scenic-web-3b-2`. Body in `$env:TEMP\pr-scenic-web-3b-2-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know`, `12-exorcised-moment`, each at both sizes", and the manual check: after an exorcism, back on the floor the candle lights up, the Haunt_Meter moves, then the telephone rings once.
+    - Run `gh pr create --base main --head feat/scenic-web-3b-2 --title "feat: add ghost reactions and the exorcised moment" --body-file $env:TEMP\pr-scenic-web-3b-2-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
