@@ -903,7 +903,7 @@ Notes:
 | --- | --- |
 | House | HUD (Simple_View_Link, Live_Plaque field and button, `show-sample` button if shown, Bestiary button on narrow screens, Motion button, Lightning_Toggle) → Answer_Button → floor buttons (attic, middle floor, basement) → Licence_Notice link of the footer (17.4) |
 | Floor | HUD → "Back to the house" → Answer_Button (pinned or docked) → floor buttons of the dimmed floors → start buttons of the focused floor in report order → Licence_Notice link of the footer (17.5) |
-| Ghost | HUD (Simple_View_Link, Bestiary button, Motion button, Lightning_Toggle) → Grimoire heading (focus target only) → Answer_Box → ghost-action buttons → Code_Block `tabindex="0"`) → Licence_Notice link of the Grimoire → Licence_Notice link of the footer (17.6) |
+| Ghost | HUD (Simple_View_Link, Bestiary button, Motion button, Lightning_Toggle) → Grimoire heading (focus target only) → Answer_Box → ghost-action buttons → Code_Block, with `tabindex="0"` → Licence_Notice link of the Grimoire → Licence_Notice link of the footer (17.6) |
 
 The HUD footer is the last element of the shell in the DOM, so its Licence_Notice link is the last Tab stop in every Scene, as Requirements 17.4 to 17.6 say (decision Q16). On wide screens it is drawn at the bottom left and on narrow screens under the stage, so tab order follows visual order. Grid areas, not DOM order, place the footer.
 

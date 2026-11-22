@@ -1068,7 +1068,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 - [x] 15. PR 4a — Finale, live analysis, Lightning
   - Branch: `feat/scenic-web-4a` for part 1 and `feat/scenic-web-4a-2` for part 2, see the split line below. Branch from: an up-to-date `main`, after the previous part is merged. Targets `main`.
-  - Estimate: ~490 changed lines. Model: Auto.
+  - Estimate: ~490 changed lines; measured after the split: part 1 155 (PR #78) and part 2 850 (PR #79). Model: Auto.
   - Split on 22 Nov, director: part 1 = 15.1 to 15.3 on `feat/scenic-web-4a`; part 2 = 15.4 to 15.10 on `feat/scenic-web-4a-2` from `main` after part 1 is merged.
   - _Design: "PR Split" row 4a_
 
@@ -1151,7 +1151,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 16. PR 4b — Reduced_Motion audit, responsive polish, default switch
+- [x] 16. PR 4b — Reduced_Motion audit, responsive polish, default switch
   - Branch: `feat/scenic-web-4b`. Branch from: an up-to-date `main`, after PR 4a is merged. Targets `main`.
   - Estimate: ~330 changed lines (the Intro, tasks 16.1 and 16.2, is cut). Model: Auto.
   - _Design: "PR Split" row 4b_
@@ -1191,10 +1191,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 19.1, 19.2, 19.3, 19.4_
     - _Design: "Camera frames", D10, decisions Q9 and Q22_
 
-  - [ ] 16.7 Complete the shot list
+  - [x] 16.7 Complete the shot list
     - In `shotList.ts` and `shots.ts`: all 19 states × 2 sizes = 38 PNG files; the flow has no Intro step (the Intro is cut); the `shotList` test expects 38 unique names; the script prints `Wrote 38 PNG files to packages/web/shots/`.
     - Verify: `npm run check` exits `0`; `npm run shots` writes 38 files and exits `0`.
     - Commit message: `feat(web): take every scenic screenshot`
+    - Done 22 Nov in PRs 4a: `SHOT_STATES` has the 19 states and `npm run shots` writes 38 files; nothing more to change.
     - _Requirements: 24.4, 24.5, 24.6, 24.10, 24.12_
     - _Design: "Shots", "Shots_Script (npm run shots)"_
 
@@ -1206,7 +1207,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.11, 1.12_
     - _Design: "Renderer choice and CSS loading", "Dark launch (director decision Q14)", "Simple_Renderer change (Scenic_View_Link)"_
 
-  - [ ] 16.9 Checkpoint and PR 4b
+  - [x] 16.9 Checkpoint and PR 4b
     - Update `PLAN.md` ("En curso": scenic-web complete after merge; "Pendientes"; "Para retomar": task 17.1 for the director after deploy), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
