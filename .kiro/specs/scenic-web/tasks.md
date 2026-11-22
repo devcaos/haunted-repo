@@ -1079,7 +1079,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 2.2, 13.4, 15.5, 15.9, 25.4_
     - _Design: "New texts"_
 
-  - [ ] 15.2 Add the Lightning clock
+  - [x] 15.2 Add the Lightning clock
     - Create `packages/web/src/view/scenic/model/lightningClock.ts`: `FLASH_MIN_MS`, `FLASH_MAX_MS`, `nextFlashDelay(random)` and `flashAllowed(input)`.
     - Create `packages/web/src/view/scenic/model/lightningClock.test.ts` with the `flashAllowed` table: no flash with the toggle off, under Reduced_Motion, in the Ghost_Scene, during the Finale (D8), during a Ring or an Exorcised_Moment (Q7).
     - Verify: `npm run check` exits `0`.
