@@ -958,8 +958,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 3b, task 14.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-3a`. Body in `$env:TEMP\pr-scenic-web-3a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `05-ghost-explaining`, `06-ghost-asking`, `11-ghost-failed`, `18-reduced-ghost-asking`, each at both sizes", any time-check cuts of group 12, and the manual check: exorcise `bench/static.js` with the keyboard only.
-    - Run `gh pr create --base main --head feat/scenic-web-3a-2 --title "feat: add the exorcism room and grimoire" --body-file $env:TEMP\pr-scenic-web-3a-body.md`.
+    - Push with `git push -u origin feat/scenic-web-3a-2`. Body in `$env:TEMP\pr-scenic-web-3a-2-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `05-ghost-explaining`, `06-ghost-asking`, `11-ghost-failed`, `18-reduced-ghost-asking`, each at both sizes", any time-check cuts of group 12, and the manual check: exorcise `bench/static.js` with the keyboard only.
+    - Run `gh pr create --base main --head feat/scenic-web-3a-2 --title "feat: add the exorcism room and grimoire" --body-file $env:TEMP\pr-scenic-web-3a-2-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
