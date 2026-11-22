@@ -30,6 +30,7 @@ import { scenicFocusAfterRender } from "./model/scenicFocus.js";
 import { watchMedia } from "./motion.js";
 import { createMotionToggle } from "./motionToggle.js";
 import { createLightningToggle } from "./lightningToggle.js";
+import { createLightning } from "./effects.js";
 import { POWER_TEXTS } from "../../logic/powerTexts.js";
 import { TEXTS } from "../../logic/texts.js";
 import {
@@ -194,12 +195,28 @@ export function createScenicRenderer(
     hud.footer,
     gate.ground,
   ]);
-  // Task 15.7 makes the toggle start and stop the Lightning clock.
-  const toggle = createLightningToggle(reduced, () => undefined);
+  let finaleShown = false;
+  let momentEnds = 0;
+  const lightning = createLightning(stage.element, () => {
+    const model = guard.current();
+    return {
+      toggleOn: toggle.isOn(),
+      reducedMotion: reduced.matches,
+      scene: model?.scene.kind ?? "house",
+      finale: finaleShown,
+      ringPlaying: phoneState.mode === "ringing",
+      exorcisedMomentPlaying: performance.now() < momentEnds,
+    };
+  });
+  const toggle = createLightningToggle(reduced, (on) => {
+    if (on) lightning.restart();
+    else lightning.stop();
+  });
   // Last in the HUD aside, so both buttons come before the Answer_Button in
   // the Tab order (17.4); on wide screens the CSS draws them on the plinth.
   toggle.element.prepend(createMotionToggle(shell));
   hud.aside.append(toggle.element);
+  if (toggle.isOn()) lightning.restart();
   /** The Finale banner: HTML in the stage, above the house (13.4, 13.5). */
   const banner = el("div", { class: "finale-banner", hidden: "" });
   stage.element.prepend(banner);
@@ -347,6 +364,7 @@ export function createScenicRenderer(
         // reachable today) shows only the Return_Glow, never the spiral.
         if (effects.exorcisedMoments.length > 0) {
           room.exorcise(momentMs());
+          momentEnds = performance.now() + momentMs();
           dispatchPhone({ type: "exorcised-moment" }, false);
         }
       } else {
@@ -361,6 +379,7 @@ export function createScenicRenderer(
           dispatchPhone({ type: "return-glow-ended" });
         }, ms);
       }
+      finaleShown = effects.finale.shown;
       stage.element.classList.toggle(
         "is-finale-in",
         effects.finale.shown &&

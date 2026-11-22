@@ -1120,7 +1120,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 3.3, 13.1, 13.2, 13.3, 13.4, 13.5, 13.7, 13.8, 14.1, 14.2, 14.5, 21.2_
     - _Design: "effects.ts" row of "DOM modules", "Props and panels" (Finale banner), decision Q8_
 
-  - [ ] 15.7 Flash the Lightning
+  - [x] 15.7 Flash the Lightning
     - In `effects.ts`: schedule each flash from the previous due time with `nextFlashDelay(Math.random())`, never from a render; skip a due flash when `flashAllowed` is false and keep counting; the first flash is due 10 s to 15 s after load or after turning the toggle on; turning it off starts no new flash and ends a showing one within 1 s.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): flash lightning over the house`
