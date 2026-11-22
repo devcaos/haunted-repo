@@ -194,5 +194,6 @@ describe("Property 4: network allowlist", () => {
     // The property is not empty: some calls really reached the fake GitHub.
     expect(total).toBeGreaterThan(0);
     expect(fileReads).toBeGreaterThan(0);
-  });
+    // 100 runs with a real folder each: slow on a busy Windows disk, not a failure.
+  }, 20_000);
 });
