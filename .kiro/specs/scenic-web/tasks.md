@@ -949,7 +949,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.6, 17.12, 17.13, 19.3, 19.4_
     - _Design: "Props and panels" (Grimoire), "Animation Catalogue", D10_
 
-  - [ ] 13.8 Add the room screenshots
+  - [x] 13.8 Add the room screenshots
     - In `shotList.ts` and `shots.ts` add `05-ghost-explaining`, `06-ghost-asking`, `11-ghost-failed` and `18-reduced-ghost-asking`, driving the sample flow of the design; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot the exorcism room`

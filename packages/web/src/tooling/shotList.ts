@@ -6,8 +6,12 @@ export const SHOT_STATES = [
   "02-floor-attic",
   "03-floor-middle",
   "04-floor-basement",
+  "05-ghost-explaining",
+  "06-ghost-asking",
+  "11-ghost-failed",
   "16-reduced-house",
   "17-reduced-floor-attic",
+  "18-reduced-ghost-asking",
   "19-gallery",
 ] as const;
 

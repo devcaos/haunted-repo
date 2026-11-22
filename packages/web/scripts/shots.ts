@@ -343,6 +343,50 @@ async function main(): Promise<void> {
         goTo(floor, title),
       );
     }
+    // The exorcism room of `bench/static.js`, reached from the attic like a visitor.
+    const choose = (label: string) => async (page: Page) => {
+      await page.click(`section.grimoire button.choice:has-text("${label}")`);
+    };
+    const openGhost = async (page: Page): Promise<void> => {
+      await goTo("attic", TEXTS.floorTitles.attic)(page);
+      await page.click(
+        'article.nameplate:has-text("bench/static.js") button.nameplate-start',
+      );
+      await page.waitForSelector('.room[data-state="open"]');
+    };
+    const inRoom =
+      (...steps: ((page: Page) => Promise<void>)[]) =>
+      async (page: Page) => {
+        await openGhost(page);
+        for (const run of steps) await run(page);
+      };
+    const roomShots: [ShotState, ((page: Page) => Promise<void>)[]][] = [
+      ["05-ghost-explaining", []],
+      ["06-ghost-asking", [choose("Continue")]],
+      [
+        "11-ghost-failed",
+        [
+          choose("Continue"),
+          choose("Show the model answer"),
+          choose("Missed it"),
+          choose("Show the model answer"),
+          choose("Partly"),
+          choose("Show the model answer"),
+          choose("Missed it"),
+        ],
+      ],
+    ];
+    for (const [state, steps] of roomShots) {
+      await shoot(
+        normal,
+        state,
+        size,
+        house,
+        "nav.floor-stair button",
+        tall,
+        inRoom(...steps),
+      );
+    }
     await shoot(reduced, "16-reduced-house", size, house, "svg.house");
     await shoot(
       reduced,
@@ -352,6 +396,15 @@ async function main(): Promise<void> {
       "nav.floor-stair button",
       tall,
       goTo("attic", TEXTS.floorTitles.attic),
+    );
+    await shoot(
+      reduced,
+      "18-reduced-ghost-asking",
+      size,
+      house,
+      "nav.floor-stair button",
+      tall,
+      inRoom(choose("Continue")),
     );
     await shoot(
       normal,
