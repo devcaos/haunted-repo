@@ -1175,10 +1175,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 18.4, 18.6_
     - _Design: "Source_Scan additions" item 8_
 
-  - [ ] 16.5 Complete the reduce blocks
+  - [x] 16.5 Complete the reduce blocks
     - In `motion.css` audit every row of the "Animation Catalogue" against its RM column and complete the `reduce` blocks: instant Camera cut, still loops, 200 ms fades with the same end states as with motion on. Remove the unused token `--sc-dur-intro` from `scenic-tokens.css` and its line in `contrast.test.ts` (the Intro is cut).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): complete the reduced motion styles`
+    - Done 22 Nov: the reduce blocks were already complete against the RM column; Source_Scan item 8 (16.4) now checks them. Only the unused token is removed.
     - _Requirements: 18.3, 18.4, 18.5, 18.6, 18.7_
     - _Design: "Animation Catalogue" (RM column)_
 
