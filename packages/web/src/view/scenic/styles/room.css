@@ -173,8 +173,7 @@
 }
 
 /* Question_Candles: Bone wax and Brass holders; unlit = black wick and a still Mist smoke line. */
-.room-svg .qcandle-holder,
-.room-svg .qcandle-cup {
+.room-svg .qcandle-holder {
   fill: var(--sc-brass);
 }
 

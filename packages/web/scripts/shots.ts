@@ -271,7 +271,7 @@ async function main(): Promise<void> {
       await page.goto(url);
       await page.waitForSelector(ready);
       // The Gate_Panel rises after its pictures have loaded: wait until it is up.
-      if (url.includes("view=scenic")) {
+      if (url.startsWith(PREVIEW_ORIGIN)) {
         await page.waitForSelector('.scenic[data-gate="up"]', {
           timeout: 20_000,
         });
@@ -315,7 +315,7 @@ async function main(): Promise<void> {
       context.setDefaultTimeout(10_000);
       await routeNonLocal(context, fake);
     }
-    const house = `${PREVIEW_ORIGIN}/haunted-repo/?view=scenic`;
+    const house = `${PREVIEW_ORIGIN}/haunted-repo/`;
     await shoot(normal, "01-house", size, house, "svg.house");
     // Floors are reached the way a visitor does: a click on the floor button of the House.
     const goTo = (floor: Floor, title: string) => async (page: Page) => {

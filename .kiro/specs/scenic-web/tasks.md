@@ -2,7 +2,7 @@
 
 ## Overview
 
-`packages/web` gets a second Renderer, the Scenic_Renderer, in `packages/web/src/view/scenic/`, built in the order of the design's "PR Split": 13 stacked pull requests in four stages. Stage 1 (PRs 1a to 1f) builds the renderer choice, the HUD shell, the tokens, the fonts, the Source_Scan rules, the Scene_Layout, the Camera, the scene illustration, the first Wisp and the tooling (Size_Check, Shots_Script, Gallery), and ends with the Vertical Slice Gate. Stage 2 (2a to 2c) adds the three Ghost_Types, the Floor_Scene and the Telephone. Stage 3 (3a, 3b) adds the exorcism room, the Grimoire, the Reactions and the Exorcised_Moment. Stage 4 (4a, 4b) adds the Finale, the live Search_Beam, Lightning, the Reduced_Motion audit, the responsive polish and the switch to the scenic view as the default.
+`packages/web` gets a second Renderer, the Scenic_Renderer, in `packages/web/src/view/scenic/`, built in the order of the design's "PR Split": 13 pull requests in four stages. Stage 1 (PRs 1a to 1f) builds the renderer choice, the HUD shell, the tokens, the fonts, the Source_Scan rules, the Scene_Layout, the Camera, the scene illustration, the first Wisp and the tooling (Size_Check, Shots_Script, Gallery), and ends with the Vertical Slice Gate. Stage 2 (2a to 2c) adds the three Ghost_Types, the Floor_Scene and the Telephone. Stage 3 (3a, 3b) adds the exorcism room, the Grimoire, the Reactions and the Exorcised_Moment. Stage 4 (4a, 4b) adds the Finale, the live Search_Beam, Lightning, the Reduced_Motion audit, the responsive polish and the switch to the scenic view as the default.
 
 Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node environment. DOM modules are covered by `npm run build`, the Source_Scan, the hand-run Shots_Script and the manual checks in each PR body. No file under `packages/core/`, `packages/web/src/sample/` or `packages/web/public/sirv-license.txt` changes; under `packages/web/src/logic/` only `texts.ts` and `powerTexts.ts` change, by additions only (Requirement 2).
 
@@ -43,7 +43,7 @@ Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node envi
 
 These are settled by the approved design and are not reopened in these tasks:
 
-- 13 stacked PRs, reviews per stage (Q1); partial shot lists until stage 4 (Q2).
+- 13 PRs, reviews per stage (Q1); partial shot lists until stage 4 (Q2).
 - Telephone_Target in floor order, then report order inside each floor (Q3). Variant = index modulo 5 (Q4).
 - No SVG or CSS filters anywhere; the rim light is a stroke path (Q5).
 - The 20 s Rings stop after the first `start-ghost` of the page load, whatever control sent it (Q17).
@@ -913,7 +913,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "Correctness Properties", Property 17_
 
   - [x] 13.3 Draw the exorcism room
-    - Create `packages/web/src/view/scenic/art/room.ts` with `roomArt(href)`: the overlays drawn on top of the declared room illustration `room-scene.svg` (viewBox `0 0 600 800`, director's decision, 22 Nov): window rain clipped to the glass, three Question_Candles `qcandle` with `flame-wrap`), cold and warm light overlays `room-light-cold`, `room-light-warm`), the `sparks` group (12 diamonds) and the smoke "?" `smoke-q`). With no picture it draws a plain token-colour rectangle.
+    - Create `packages/web/src/view/scenic/art/room.ts` with `roomArt(href)`: the overlays drawn on top of the declared room illustration `room-scene.svg` (viewBox `0 0 600 800`, director's decision, 22 Nov): window rain clipped to the glass, three Question_Candles, class `qcandle` with `flame-wrap`; cold and warm light overlays, classes `room-light-cold` and `room-light-warm`; the `sparks` group of 12 diamonds; and the smoke "?", class `smoke-q`. With no picture it draws a plain token-colour rectangle.
     - Extend `art.test.ts`: the tree passes the rules and has exactly three Question_Candles.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the exorcism room`
@@ -1042,7 +1042,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Design: "effects.ts" row of "DOM modules", D5, D6_
 
   - [x] 14.9 Animate Reactions and the exorcism
-    - In `motion.css`: `react-recoil`, `react-shudder`, `react-laugh`, `react-puzzle`, `smoke-question`, the vigour transition, `exorcise-spiral`, `exorcise-sparks`, `room-warm`, `slot-return` (duration token `--sc-dur-slot-return`; rename the unused 800 ms light-up token of `scenic-tokens.css`) and the meter transition in the no-preference block; under `reduce`, `react-fade`, `ghost-fade-out` and the 200 ms fades of the catalogue, the meter instant, the vigour scale instant.
+    - In `motion.css`: `react-recoil`, `react-shudder`, `react-laugh`, `react-puzzle`, `smoke-question`, the vigour transition, `exorcise-spiral`, `exorcise-sparks`, `room-warm`, `slot-return` on the 800 ms `--sc-dur-meter` token, reused with no rename by the director's decision of 22 Nov, and the meter transition in the no-preference block; under `reduce`, `react-fade`, `ghost-fade-out` and the 200 ms fades of the catalogue, the meter instant, the vigour scale instant.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate reactions and the exorcised moment`
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 12.3, 12.4, 12.6, 18.7, 20.1_
@@ -1193,10 +1193,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5, 24.6, 24.10, 24.12_
     - _Design: "Shots", "Shots_Script (npm run shots)"_
 
-  - [ ] 16.8 Make the scenic view the default
+  - [x] 16.8 Make the scenic view the default
     - One small commit: `chooseView` returns `"simple"` exactly when `new URLSearchParams(search).get("view") === "simple"`, else `"scenic"` (Requirement 1); `viewChoice.test.ts` examples become those of the design (`?view=SIMPLE`, `?view=`, `?view=simple&view=scenic`, `?view=scenic&view=simple`, hash and other parameters) and P12 takes the design's expectation; the Scenic_View_Link of `simple/renderer.ts` points to `./`; the Shots_Script opens `/haunted-repo/`.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): make the scenic view the default`
+    - Done early on 22 Nov in its own PR, branch `feat/scenic-web-default`, by the director's decision.
     - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.11, 1.12_
     - _Design: "Renderer choice and CSS loading", "Dark launch (director decision Q14)", "Simple_Renderer change (Scenic_View_Link)"_
 
