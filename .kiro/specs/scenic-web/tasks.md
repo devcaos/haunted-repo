@@ -1134,7 +1134,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 13.3, 13.7, 14.6, 15.4, 18.4, 18.5, 18.7_
     - _Design: "Animation Catalogue"_
 
-  - [ ] 15.9 Add the Finale and live screenshots
+  - [x] 15.9 Add the Finale and live screenshots
     - In `shotList.ts` and `shots.ts`: turn the Lightning_Toggle off before the first shot; add `13-finale`, `14-live-busy` (request held, shot taken at once, then released, Q21) and `15-live-report`; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot the finale and the live analysis`

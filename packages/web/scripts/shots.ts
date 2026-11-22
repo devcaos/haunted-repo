@@ -137,11 +137,14 @@ async function routeNonLocal(
       method: request.method(),
       headers,
     });
-    await route.fulfill({
-      status: answer.status,
-      headers: { ...Object.fromEntries(answer.headers), ...CORS_ANSWER },
-      body: Buffer.from(await answer.arrayBuffer()),
-    });
+    // A held answer can arrive after its page has closed: nothing to do then.
+    await route
+      .fulfill({
+        status: answer.status,
+        headers: { ...Object.fromEntries(answer.headers), ...CORS_ANSWER },
+        body: Buffer.from(await answer.arrayBuffer()),
+      })
+      .catch(() => undefined);
   });
 }
 
@@ -209,6 +212,7 @@ const QUIET_PHONE_SHOTS: ReadonlySet<ShotState> = new Set<ShotState>([
   "02-floor-attic",
   "03-floor-middle",
   "04-floor-basement",
+  "14-live-busy",
   "16-reduced-house",
   "17-reduced-floor-attic",
 ]);
@@ -282,6 +286,15 @@ async function main(): Promise<void> {
           () => document.querySelector(".phone-widget.is-ringing") === null,
         );
       }
+      // Lightning would flash at random times: turn it off, without moving focus.
+      await page.evaluate(() => {
+        const toggle = document.querySelector(".lightning-toggle");
+        if (
+          toggle instanceof HTMLButtonElement &&
+          toggle.getAttribute("aria-pressed") === "true"
+        )
+          toggle.click();
+      });
       if (act !== undefined) await act(page);
       await page.waitForFunction(noFiniteMotion);
       const result = await page.evaluate(runChecks);
@@ -413,6 +426,65 @@ async function main(): Promise<void> {
         inRoom(...steps),
       );
     }
+    // The Finale: both scripted ghosts exorcised, back on the attic floor.
+    const exorcise = (path: string) => async (page: Page) => {
+      await page.click(
+        `article.nameplate:has-text("${path}") button.nameplate-start`,
+      );
+      await page.waitForSelector('.room[data-state="open"]');
+      await choose("Continue")(page);
+      for (let i = 0; i < 3; i++) {
+        await choose("Show the model answer")(page);
+        await choose("Got it")(page);
+      }
+      await choose("Yes")(page);
+      await page.waitForSelector('main.stage[data-scene="floor"]');
+    };
+    await shoot(
+      normal,
+      "13-finale",
+      size,
+      house,
+      "nav.floor-stair button",
+      tall,
+      async (page) => {
+        await goTo("attic", TEXTS.floorTitles.attic)(page);
+        await exorcise("bench/static.js")(page);
+        await exorcise("builder.js")(page);
+        await page.waitForSelector('main.stage[data-finale="true"]');
+      },
+    );
+    // A live analysis of lukeed/sirv: shot while the fake GitHub holds its answers (Q21), then with the report.
+    const analyse = async (page: Page): Promise<void> => {
+      await page.fill(".live-plaque input", "https://github.com/lukeed/sirv");
+      await page.click('.live-plaque button[type="submit"]');
+    };
+    const release = holdGitHub();
+    await shoot(
+      normal,
+      "14-live-busy",
+      size,
+      house,
+      "svg.house",
+      false,
+      async (page) => {
+        await analyse(page);
+        await page.waitForSelector('main.stage[data-busy="true"]');
+      },
+    );
+    release();
+    await shoot(
+      normal,
+      "15-live-report",
+      size,
+      house,
+      "svg.house",
+      false,
+      async (page) => {
+        await analyse(page);
+        await page.waitForSelector('button:has-text("Show the sample again")');
+      },
+    );
     await shoot(reduced, "16-reduced-house", size, house, "svg.house");
     await shoot(
       reduced,
