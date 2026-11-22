@@ -23,6 +23,134 @@
     opacity: 0;
   }
 }
+/* Ghost Reactions, the Exorcised_Moment and the Return_Glow (PR 3b). Every
+   one-shot ends on the element's resting style. */
+@keyframes react-recoil {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  35% {
+    transform: translateX(var(--sc-recoil-shift)) scale(0.94);
+  }
+}
+@keyframes react-shudder {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  20%,
+  60% {
+    transform: translateX(var(--sc-shudder-shift)) rotate(4deg);
+  }
+  40%,
+  80% {
+    transform: translateX(calc(-1 * var(--sc-shudder-shift))) rotate(-4deg);
+  }
+}
+@keyframes react-laugh {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.12);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+  75% {
+    transform: scale(1.04);
+  }
+}
+@keyframes react-puzzle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40%,
+  70% {
+    transform: rotate(-12deg);
+  }
+}
+@keyframes react-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+@keyframes smoke-question {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--sc-smoke-rise));
+  }
+}
+@keyframes smoke-fade {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes exorcise-spiral {
+  from {
+    transform: translateY(0) rotate(0deg) scale(var(--vigour-scale, 1));
+    opacity: var(--vigour-opacity, 1);
+  }
+  to {
+    transform: translateY(var(--sc-spiral-rise)) rotate(540deg) scale(0.4);
+    opacity: 0;
+  }
+}
+@keyframes ghost-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+/* The sparks burst where the spiral ends: the rise is in room units (one
+   room unit is one CSS pixel inside the room drawing). */
+@keyframes exorcise-sparks {
+  0% {
+    opacity: 0;
+    transform: translateY(var(--sc-spark-rise)) scale(0.2);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--sc-spark-rise)) scale(1.4);
+  }
+}
+@keyframes room-warm {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slot-return {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* Rain falls by exactly one step of its pattern, so the loop never jumps. */
 @keyframes rain-fall {
   from {
@@ -236,6 +364,49 @@
   .stage[data-scene="ghost"] .world * {
     animation-play-state: paused;
   }
+  /* Reactions (Requirement 11): one class at a time on .ghost-react. */
+  .scenic .ghost-react.is-recoil {
+    animation: react-recoil var(--sc-dur-react-recoil) var(--sc-ease-out);
+  }
+  .scenic .ghost-react.is-shudder {
+    animation: react-shudder var(--sc-dur-react-shudder) var(--sc-ease-linear);
+  }
+  .scenic .ghost-react.is-laugh {
+    animation: react-laugh var(--sc-dur-react-laugh) var(--sc-ease-in-out);
+  }
+  .scenic .ghost-react.is-puzzle {
+    animation: react-puzzle var(--sc-dur-react-puzzle) var(--sc-ease-in-out);
+  }
+  .room-svg .smoke-q.is-rising {
+    animation: smoke-question var(--sc-dur-smoke-question) var(--sc-ease-out);
+  }
+  .scenic .ghost-vigour {
+    transition:
+      transform var(--sc-dur-vigour) var(--sc-ease-out),
+      opacity var(--sc-dur-vigour) var(--sc-ease-out);
+  }
+  /* Exorcised_Moment (D6): spiral after the recoil, then sparks; warm light from the render. */
+  .scenic .room.is-exorcising .ghost-vigour {
+    transform-origin: center;
+    animation: exorcise-spiral var(--sc-dur-exorcise-spiral) var(--sc-ease-in)
+      var(--sc-delay-spiral) both;
+  }
+  .scenic .room.is-exorcising .sparks {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: exorcise-sparks var(--sc-dur-exorcise-sparks) var(--sc-ease-out)
+      var(--sc-delay-sparks) both;
+  }
+  .scenic .room.is-exorcising .room-light-warm {
+    animation: room-warm var(--sc-dur-room-warm) var(--sc-ease-in-out) both;
+  }
+  .scenic .slot.is-returning .slot-exorcised {
+    animation: slot-return var(--sc-dur-meter) var(--sc-ease-out) both;
+  }
+  .scenic .meter-fill.is-moving {
+    transition: transform var(--sc-dur-meter) var(--sc-ease-out);
+  }
+
   /* The dev-only gallery draws every ghost in its resting pose. */
   [data-motion="still"] .ghost-idle {
     animation: none;
@@ -268,6 +439,26 @@
   .room-svg .flame-wrap {
     transition: opacity var(--sc-rm-room-fade) var(--sc-ease-out);
   }
+  /* Reactions become a short fade; the size change is an instant jump (Requirement 11 edge cases). */
+  .scenic .ghost-react.is-recoil,
+  .scenic .ghost-react.is-shudder,
+  .scenic .ghost-react.is-laugh,
+  .scenic .ghost-react.is-puzzle {
+    animation: react-fade var(--sc-rm-fade-long) var(--sc-ease-out);
+  }
+  .room-svg .smoke-q.is-rising {
+    animation: smoke-fade var(--sc-rm-fade-long) var(--sc-ease-out);
+  }
+  .scenic .room.is-exorcising .ghost-vigour {
+    animation: ghost-fade-out var(--sc-rm-fade-long) var(--sc-ease-out) both;
+  }
+  .scenic .room.is-exorcising .room-light-warm {
+    animation: room-warm var(--sc-rm-fade-long) var(--sc-ease-out) both;
+  }
+  .scenic .slot.is-returning .slot-exorcised {
+    animation: slot-return var(--sc-rm-fade-long) var(--sc-ease-out) both;
+  }
+
   /* The Phone_Bubble still fades in: opacity only, 200 ms. */
   .scenic .phone-bubble {
     animation: bubble-in var(--sc-rm-fade-long) var(--sc-ease-out);

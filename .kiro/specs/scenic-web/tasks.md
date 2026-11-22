@@ -1041,7 +1041,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 6.8, 9.4, 12.1, 12.3, 12.4, 12.6, 12.8, 12.9_
     - _Design: "effects.ts" row of "DOM modules", D5, D6_
 
-  - [ ] 14.9 Animate Reactions and the exorcism
+  - [x] 14.9 Animate Reactions and the exorcism
     - In `motion.css`: `react-recoil`, `react-shudder`, `react-laugh`, `react-puzzle`, `smoke-question`, the vigour transition, `exorcise-spiral`, `exorcise-sparks`, `room-warm`, `slot-return` (duration token `--sc-dur-slot-return`; rename the unused 800 ms light-up token of `scenic-tokens.css`) and the meter transition in the no-preference block; under `reduce`, `react-fade`, `ghost-fade-out` and the 200 ms fades of the catalogue, the meter instant, the vigour scale instant.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate reactions and the exorcised moment`
