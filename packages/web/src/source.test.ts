@@ -620,6 +620,84 @@ function motionPlacementBreaks(css: string): string[] {
   return breaks;
 }
 
+const REDUCE_MEDIA =
+  /^@media[^{]*\(\s*prefers-reduced-motion\s*:\s*reduce\s*\)/i;
+
+/** The longest a motion inside a reduce block may last (Requirement 18.6). */
+const REDUCE_MAX_MS = 200;
+
+/** Every `--name: <time>` of a tokens CSS text, in milliseconds. */
+function durationTokens(css: string): Map<string, number> {
+  const tokens = new Map<string, number>();
+  for (const m of css.matchAll(/(--[\w-]+)\s*:\s*([\d.]+)(ms|s)\s*;/g)) {
+    tokens.set(m[1] ?? "", Number(m[2]) * (m[3] === "s" ? 1000 : 1));
+  }
+  return tokens;
+}
+
+/** The properties set by each `@keyframes <name>` of a CSS text. */
+function keyframesProperties(css: string): Map<string, Set<string>> {
+  const frames = new Map<string, Set<string>>();
+  walkCss(parseCss(css), (node, ancestors) => {
+    const top = [...ancestors, node].find((n) =>
+      /^@(?:-webkit-)?keyframes\b/i.test(n.prelude),
+    );
+    if (top === undefined) return;
+    const name = top.prelude.split(/\s+/)[1] ?? "";
+    const set = frames.get(name) ?? new Set<string>();
+    for (const { property } of node.decls) set.add(property);
+    frames.set(name, set);
+  });
+  return frames;
+}
+
+/**
+ * Item 8 (reduce blocks): inside `@media (prefers-reduced-motion: reduce)`,
+ * animation and transition use only keyframes that animate opacity, a
+ * duration token of 200 ms or less, and no `infinite`.
+ */
+function reduceMotionBreaks(
+  css: string,
+  tokens: Map<string, number>,
+  frames: Map<string, Set<string>>,
+): string[] {
+  const breaks: string[] = [];
+  walkCss(parseCss(css), (node, ancestors) => {
+    if (![node, ...ancestors].some((n) => REDUCE_MEDIA.test(n.prelude))) return;
+    for (const { property, value } of node.decls) {
+      if (!MOTION_PROPERTY.test(property) || value === "none") continue;
+      if (/\binfinite\b/.test(value)) breaks.push(`${property}: ${value}`);
+      for (const m of value.matchAll(/var\((--[\w-]+)\)/g)) {
+        const name = m[1] ?? "";
+        if (/^--sc-(?:ease|delay)-/.test(name)) continue;
+        const ms = tokens.get(name);
+        if (ms === undefined || ms > REDUCE_MAX_MS) {
+          breaks.push(`${property} uses ${name} (${ms ?? "not a time"})`);
+        }
+      }
+      const isAnimation =
+        property === "animation" || property === "animation-name";
+      const isTransition =
+        property === "transition" || property === "transition-property";
+      for (const part of value.split(/,(?![^(]*\))/)) {
+        const first = part.trim().split(/\s+/)[0] ?? "";
+        if (isAnimation && !first.startsWith("var(")) {
+          const set = frames.get(first);
+          if (set === undefined || [...set].some((p) => p !== "opacity")) {
+            breaks.push(
+              `${property} plays ${first}, which is not an opacity fade`,
+            );
+          }
+        }
+        if (isTransition && first !== "opacity") {
+          breaks.push(`${property} names ${first}`);
+        }
+      }
+    }
+  });
+  return breaks;
+}
+
 /** Item 9: no filter, backdrop-filter or mix-blend-mode except none. */
 function filterBreaks(css: string): string[] {
   const breaks: string[] = [];
@@ -672,6 +750,23 @@ describe("scenic motion rules (Requirements 18.4, 20.1 to 20.3)", () => {
     expect(
       scenicCssFiles
         .map((f) => ({ path: f.path, breaks: motionPlacementBreaks(f.text) }))
+        .filter((r) => r.breaks.length > 0),
+    ).toEqual([]);
+  });
+
+  it("reduce blocks use only short opacity fades (item 8)", () => {
+    const all = scenicCssFiles.map((f) => f.text).join("\n");
+    const tokens = durationTokens(
+      viewFiles.find((f) => f.path === SCENIC_TOKENS_CSS)?.text ?? "",
+    );
+    const frames = keyframesProperties(all);
+    expect(tokens.size).toBeGreaterThan(0);
+    expect(
+      scenicCssFiles
+        .map((f) => ({
+          path: f.path,
+          breaks: reduceMotionBreaks(f.text, tokens, frames),
+        }))
         .filter((r) => r.breaks.length > 0),
     ).toEqual([]);
   });
@@ -763,6 +858,47 @@ describe("scenic motion rules (Requirements 18.4, 20.1 to 20.3)", () => {
           "a { color: red; }",
       ),
     ).toEqual([]);
+  });
+
+  it("self-check: item 8 catches long, looping or moving motion in reduce", () => {
+    const tokens = new Map([
+      ["--fast", 200],
+      ["--slow", 201],
+    ]);
+    const frames = new Map([
+      ["fade", new Set(["opacity"])],
+      ["slide", new Set(["opacity", "transform"])],
+    ]);
+    const reduce = (rule: string): string =>
+      `@media (prefers-reduced-motion: reduce) { a { ${rule} } }`;
+    const breaks = (rule: string): string[] =>
+      reduceMotionBreaks(reduce(rule), tokens, frames);
+    expect(breaks("animation: fade var(--slow);")).toHaveLength(1);
+    expect(breaks("animation: slide var(--fast);")).toHaveLength(1);
+    expect(breaks("animation: fade var(--fast) infinite;")).toHaveLength(1);
+    expect(breaks("animation: missing var(--fast);")).toHaveLength(1);
+    expect(breaks("transition: transform var(--fast);")).toHaveLength(1);
+    expect(
+      breaks("animation: fade var(--fast) var(--sc-ease-out) both;"),
+    ).toEqual([]);
+    expect(breaks("transition: opacity var(--fast); animation: none;")).toEqual(
+      [],
+    );
+    expect(
+      reduceMotionBreaks(
+        "@media (prefers-reduced-motion: no-preference) { a { animation: slide var(--slow) infinite; } }",
+        tokens,
+        frames,
+      ),
+    ).toEqual([]);
+    expect(
+      durationTokens(":root { --a: 150ms; --b: 1.5s; --c: 4px; }"),
+    ).toEqual(
+      new Map([
+        ["--a", 150],
+        ["--b", 1500],
+      ]),
+    );
   });
 
   it("self-check: item 9 catches filters and blend modes", () => {

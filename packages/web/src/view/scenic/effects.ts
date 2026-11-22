@@ -4,7 +4,7 @@ import {
   type FlashInput,
 } from "./model/lightningClock.js";
 
-/** How long one flash shows `--sc-dur-lightning`). */
+/** How long one flash shows: the token `--sc-dur-lightning`. */
 const FLASH_MS = 600;
 
 export interface Lightning {

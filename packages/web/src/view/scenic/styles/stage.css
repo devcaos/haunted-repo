@@ -517,6 +517,17 @@
 .scenic .phone-widget.is-ringing .ring-bubble {
   display: inline-block;
 }
+/*
+ * Docked: the burst always keeps its place in the row, hidden while the
+ * telephone is quiet, so the page never moves when a Ring ends.
+ */
+.scenic .phone-widget.is-docked .ring-bubble {
+  display: inline-block;
+  visibility: hidden;
+}
+.scenic .phone-widget.is-docked.is-ringing .ring-bubble {
+  visibility: visible;
+}
 .scenic .phone-widget.is-ringing .answer-button {
   border-color: var(--sc-pumpkin);
 }

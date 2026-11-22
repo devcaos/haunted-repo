@@ -214,7 +214,6 @@ describe("font tokens", () => {
 describe("durations of the Animation Catalogue", () => {
   it("matches the catalogue for the long moments", () => {
     expect(millis("--sc-dur-room-warm")).toBe(1200);
-    expect(millis("--sc-dur-intro")).toBe(1500);
     expect(millis("--sc-dur-camera")).toBe(700);
     expect(millis("--sc-dur-meter")).toBe(800);
     expect(millis("--sc-dur-press")).toBe(80);

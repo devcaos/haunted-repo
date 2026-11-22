@@ -1068,7 +1068,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 - [x] 15. PR 4a — Finale, live analysis, Lightning
   - Branch: `feat/scenic-web-4a` for part 1 and `feat/scenic-web-4a-2` for part 2, see the split line below. Branch from: an up-to-date `main`, after the previous part is merged. Targets `main`.
-  - Estimate: ~490 changed lines. Model: Auto.
+  - Estimate: ~490 changed lines; measured after the split: part 1 155 (PR #78) and part 2 850 (PR #79). Model: Auto.
   - Split on 22 Nov, director: part 1 = 15.1 to 15.3 on `feat/scenic-web-4a`; part 2 = 15.4 to 15.10 on `feat/scenic-web-4a-2` from `main` after part 1 is merged.
   - _Design: "PR Split" row 4a_
 
@@ -1151,7 +1151,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 16. PR 4b — Reduced_Motion audit, responsive polish, default switch
+- [x] 16. PR 4b — Reduced_Motion audit, responsive polish, default switch
   - Branch: `feat/scenic-web-4b`. Branch from: an up-to-date `main`, after PR 4a is merged. Targets `main`.
   - Estimate: ~330 changed lines (the Intro, tasks 16.1 and 16.2, is cut). Model: Auto.
   - _Design: "PR Split" row 4b_
@@ -1160,38 +1160,42 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [x] 16.2 (Withdrawn 19 Nov: the Intro is cut now, director's decision; `intro-ended` is sent at the first House_Scene render, D13)
 
-  - [ ] 16.3 Apply Reduced_Motion changes while the page is open
+  - [x] 16.3 Apply Reduced_Motion changes while the page is open
     - In `motion.ts` and `renderer.ts`: when Reduced_Motion turns on, every one-shot (Camera move, Reaction, Exorcised_Moment, Return_Glow, Finale change) jumps to its end state, loops stop through the media query, Lightning stops within 1 s and its toggle becomes off and disabled; when it turns off, loops start again and the toggle is enabled and stays off. Texts, controls, accessible names and Card states never depend on it.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): follow reduced motion changes without a reload`
+    - Done 22 Nov: `motion.ts`, `renderer.ts` and `lightningToggle.ts` already follow the change since PR 4a; this task adds the Shots_Script check `liveChecks`, which turns Reduced_Motion on and off on an open page at both shot sizes.
     - _Requirements: 15.9, 18.1, 18.8, 18.9_
     - _Design: "Error Handling" (Reduced_Motion changes while open), "motion.ts" row of "DOM modules"_
 
-  - [ ] 16.4 Source_Scan item 8, reduce-block rule
+  - [x] 16.4 Source_Scan item 8, reduce-block rule
     - In `source.test.ts`: inside `@media (prefers-reduced-motion: reduce)` blocks, `animation` and `transition` use only keyframes that animate `opacity`, a duration token whose value is 200 ms or less, and no `infinite`. Negative self-check.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check reduced motion uses short fades only`
     - _Requirements: 18.4, 18.6_
     - _Design: "Source_Scan additions" item 8_
 
-  - [ ] 16.5 Complete the reduce blocks
+  - [x] 16.5 Complete the reduce blocks
     - In `motion.css` audit every row of the "Animation Catalogue" against its RM column and complete the `reduce` blocks: instant Camera cut, still loops, 200 ms fades with the same end states as with motion on. Remove the unused token `--sc-dur-intro` from `scenic-tokens.css` and its line in `contrast.test.ts` (the Intro is cut).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): complete the reduced motion styles`
+    - Done 22 Nov: the reduce blocks were already complete against the RM column; Source_Scan item 8 (16.4) now checks them. Only the unused token is removed.
     - _Requirements: 18.3, 18.4, 18.5, 18.6, 18.7_
     - _Design: "Animation Catalogue" (RM column)_
 
-  - [ ] 16.6 Polish the responsive layout
+  - [x] 16.6 Polish the responsive layout
     - In `base.css`, `hud.css`, `stage.css` and `room.css` (tokens only): the whole House_Scene fits 1440 × 900 with no scroll; at 390 × 844 the house is fully drawn and no wider than the viewport; the Grimoire is under the drawing below 64rem; no horizontal page scroll from 360 px up, also at 200 % zoom and in landscape; only the Code_Block scrolls horizontally.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): fit the scenic view to laptops and phones`
+    - Done 22 Nov: the sizes already fit (measured at 1440 × 900, 1280 × 720, 1024 × 768, 844 × 390, 720 × 450, 390 × 844 and 360 × 740). The one change: the docked telephone keeps the room of its "RING!" burst, so the page no longer moves 10 px at 390 px when the Opening_Rings end; `liveChecks` in the Shots_Script measures it.
     - _Requirements: 19.1, 19.2, 19.3, 19.4_
     - _Design: "Camera frames", D10, decisions Q9 and Q22_
 
-  - [ ] 16.7 Complete the shot list
+  - [x] 16.7 Complete the shot list
     - In `shotList.ts` and `shots.ts`: all 19 states × 2 sizes = 38 PNG files; the flow has no Intro step (the Intro is cut); the `shotList` test expects 38 unique names; the script prints `Wrote 38 PNG files to packages/web/shots/`.
     - Verify: `npm run check` exits `0`; `npm run shots` writes 38 files and exits `0`.
     - Commit message: `feat(web): take every scenic screenshot`
+    - Done 22 Nov in PRs 4a: `SHOT_STATES` has the 19 states and `npm run shots` writes 38 files; nothing more to change.
     - _Requirements: 24.4, 24.5, 24.6, 24.10, 24.12_
     - _Design: "Shots", "Shots_Script (npm run shots)"_
 
@@ -1203,7 +1207,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.11, 1.12_
     - _Design: "Renderer choice and CSS loading", "Dark launch (director decision Q14)", "Simple_Renderer change (Scenic_View_Link)"_
 
-  - [ ] 16.9 Checkpoint and PR 4b
+  - [x] 16.9 Checkpoint and PR 4b
     - Update `PLAN.md` ("En curso": scenic-web complete after merge; "Pendientes"; "Para retomar": task 17.1 for the director after deploy), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
