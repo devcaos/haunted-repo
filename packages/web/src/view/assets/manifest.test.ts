@@ -26,6 +26,7 @@ const ALL_IDS: readonly AssetSlotId[] = [
 /** Slots with a file: the scene illustration and the Gate_Panel pictures. */
 const FILLED: Readonly<Partial<Record<AssetSlotId, string>>> = {
   "scene.house": "house-scene.svg",
+  "scene.ghost-room": "room-scene.svg",
   "panel.frame": "panel-frame.svg",
   "panel.gargoyle": "panel-gargoyle.svg",
   "panel.lantern": "panel-lantern.svg",
@@ -78,7 +79,7 @@ describe("asset manifest", () => {
     }
   });
 
-  it("fills only the scene illustration and the Gate_Panel pictures", () => {
+  it("fills only the two scene illustrations and the Gate_Panel pictures", () => {
     for (const slot of ASSET_SLOTS) {
       const file = FILLED[slot.id];
       expect(slot.layers.map((layer) => layer.file)).toEqual(

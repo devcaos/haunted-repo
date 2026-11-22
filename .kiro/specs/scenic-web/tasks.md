@@ -912,8 +912,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.4, 10.12_
     - _Design: "Correctness Properties", Property 17_
 
-  - [ ] 13.3 Draw the exorcism room
-    - Create `packages/web/src/view/scenic/art/room.ts` with `roomArt()`: the close-up room (viewBox `0 0 800 800`), window with rain, Night floor and vignette, three Question_Candles (`qcandle` with `flame-wrap`), cold and warm light overlays (`room-light-cold`, `room-light-warm`), the `sparks` group (12 diamonds) and the smoke "?" (`smoke-q`).
+  - [x] 13.3 Draw the exorcism room
+    - Create `packages/web/src/view/scenic/art/room.ts` with `roomArt(href)`: the overlays drawn on top of the declared room illustration `room-scene.svg` (viewBox `0 0 600 800`, director's decision, 22 Nov): window rain clipped to the glass, three Question_Candles `qcandle` with `flame-wrap`), cold and warm light overlays `room-light-cold`, `room-light-warm`), the `sparks` group (12 diamonds) and the smoke "?" `smoke-q`). With no picture it draws a plain token-colour rectangle.
     - Extend `art.test.ts`: the tree passes the rules and has exactly three Question_Candles.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the exorcism room`
