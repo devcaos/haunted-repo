@@ -1,3 +1,4 @@
+﻿import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import type { UserAction } from "../../../logic/actions.js";
 import type { GhostView, ViewModel } from "../../../logic/viewModel.js";
@@ -10,6 +11,7 @@ import {
   vigourStyle,
 } from "./reactions.js";
 import type { Vigour } from "./reactions.js";
+import { actionArb } from "./viewModelArb.testutil.js";
 
 /** Only the field vigourAfterRender reads is filled in. */
 function modelAtStep(step: GhostView["step"] | null): ViewModel {
@@ -126,5 +128,45 @@ describe("vigourStyle", () => {
       scale: 1.2,
       opacity: 0.55,
     });
+  });
+});
+
+describe("Properties", () => {
+  // Feature: scenic-web, Property 14: The close-up ghost stays within its size and opacity limits
+  // **Validates: Requirements 11.2, 11.3, 11.4, 11.5, 11.7**
+  it("Property 14: The close-up ghost stays within its size and opacity limits", () => {
+    fc.assert(
+      fc.property(fc.array(actionArb, { maxLength: 40 }), (actions) => {
+        let v: Vigour = VIGOUR_START;
+        for (const action of actions) {
+          const before = vigourStyle(v);
+          const after = vigourAfterAction(v, action);
+          const style = vigourStyle(after);
+          expect(style.opacity).toBeGreaterThanOrEqual(0.4);
+          expect(style.opacity).toBeLessThanOrEqual(1);
+          expect(style.scale).toBeGreaterThanOrEqual(1);
+          expect(style.scale).toBeLessThanOrEqual(1.3);
+          if (action.type === "rate" && action.rating === "right") {
+            expect(style.opacity).toBeLessThanOrEqual(before.opacity);
+            if (before.opacity > 0.4) {
+              expect(style.opacity).toBeLessThan(before.opacity);
+            }
+            expect(style.scale).toBe(before.scale);
+          } else if (action.type === "rate" && action.rating === "wrong") {
+            expect(style.scale).toBeGreaterThanOrEqual(before.scale);
+            if (before.scale < 1.3) {
+              expect(style.scale).toBeGreaterThan(before.scale);
+            }
+            expect(style.opacity).toBe(before.opacity);
+          } else if (action.type === "start-ghost" || action.type === "retry") {
+            expect(style).toEqual({ scale: 1, opacity: 1 });
+          } else {
+            expect(style).toEqual(before);
+          }
+          v = after;
+        }
+      }),
+      { numRuns: 100 },
+    );
   });
 });

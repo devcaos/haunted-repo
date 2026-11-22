@@ -979,7 +979,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.10_
     - _Design: "scenic/model/reactions.ts"_
 
-  - [ ] 14.2 Property test for the ghost's limits
+  - [x] 14.2 Property test for the ghost's limits
     - **Property 14: The close-up ghost stays within its size and opacity limits**
     - **Validates: Requirements 11.2, 11.3, 11.4, 11.5, 11.7**
     - Generator: sequences of `UserAction` values from `actionArb`, applied with `vigourAfterAction`, at least 100 runs.
