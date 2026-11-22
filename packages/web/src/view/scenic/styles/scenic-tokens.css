@@ -480,4 +480,10 @@
   --sc-rm-room-fade: 150ms;
   --sc-room-cold-opacity: 0.35;
   --sc-room-warm-opacity: 0.8;
+  /* PR 3b: Reactions and the Exorcised_Moment (lengths in room units). */
+  --sc-recoil-shift: 3cqh;
+  --sc-shudder-shift: 0.8cqh;
+  --sc-spiral-rise: -24cqh;
+  --sc-spark-rise: -192px;
+  --sc-smoke-rise: -20px;
 }

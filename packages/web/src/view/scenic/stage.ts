@@ -33,6 +33,8 @@ export interface Stage {
   overlay: HTMLElement;
   dock: HTMLElement;
   update(view: StageView): void;
+  /** Return_Glow (12.6): the Exorcised drawing of these Cards fades in for `ms`. */
+  glow(paths: readonly string[], ms: number): void;
 }
 
 const FLOORS: readonly Floor[] = ["attic", "middle floor", "basement"];
@@ -103,6 +105,8 @@ export function createStage(sceneHref: string | null): Stage {
 
   let signature: string | null = null;
   let lastTransform: string | null = null;
+  let slotPaths: string[] = [];
+  let glowTimer: number | null = null;
 
   return {
     element,
@@ -127,6 +131,7 @@ export function createStage(sceneHref: string | null): Stage {
       const next = slotSignature(layout);
       if (next !== signature) {
         signature = next;
+        slotPaths = layout.slots.map((slot) => slot.path);
         slots.replaceChildren(
           ...layout.slots.map((slot, i) =>
             mountShape(slotArt(slot), `house-s${i}-`),
@@ -150,6 +155,21 @@ export function createStage(sceneHref: string | null): Stage {
         world.style.transform = transform;
         world.style.setProperty("--cam-counter", String(camera.counterScale));
       }
+    },
+    glow(paths: readonly string[], ms: number): void {
+      if (glowTimer !== null) window.clearTimeout(glowTimer);
+      glowTimer = null;
+      const nodes = [...slots.children];
+      for (const node of nodes) node.classList.remove("is-returning");
+      if (ms <= 0) return;
+      nodes.forEach((node, i) => {
+        if (paths.includes(slotPaths[i] ?? ""))
+          node.classList.add("is-returning");
+      });
+      glowTimer = window.setTimeout(() => {
+        glowTimer = null;
+        for (const node of nodes) node.classList.remove("is-returning");
+      }, ms);
     },
   };
 }

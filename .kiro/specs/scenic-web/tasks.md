@@ -965,7 +965,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 14. PR 3b — Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules
+- [x] 14. PR 3b — Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules
   - Branch: `feat/scenic-web-3b`. Branch from: an up-to-date `main`, after PR 3a part 2 is merged. Targets `main`.
   - Estimate: ~780 changed lines. Model: Auto.
   - Split on 22 Nov, director: part 1 = 14.1 to 14.5 on `feat/scenic-web-3b`; part 2 = 14.6 to 14.11 on `feat/scenic-web-3b-2` from `main` after part 1 is merged.
@@ -1020,42 +1020,42 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 12.1, 12.2, 12.8, 13.7_
     - _Design: "Correctness Properties", Property 11_
 
-  - [ ] 14.6 Feed the HUD from the render memory
+  - [x] 14.6 Feed the HUD from the render memory
     - Change `hudView(model)` to `hudView(model, effects)`: the meter and the Ghost_Icons come from `effects.meter` (frozen in the Ghost_Scene, animated `from` after a Return_Glow). Update the calls in `renderer.ts`, the unit tests of task 1.7 and the P9 call (same assertions); add examples for the frozen meter and icons. `hud.ts` animates the fill from `from` to the new scale.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): freeze the haunt meter during an exorcism`
     - _Requirements: 4.3, 4.4, 12.6, 12.7_
     - _Design: "scenic/model/hudView.ts and scenic/model/grimoireView.ts", "scenic/model/renderMemory.ts"_
 
-  - [ ] 14.7 Play the Reactions
+  - [x] 14.7 Play the Reactions
     - In `ghostScene.ts` and `renderer.ts`: a ghost action sent through the guard updates `vigour` and starts its Reaction class on `.ghost-react` (a new action jumps the playing one to its end and restarts the class); `start-ghost` and `retry` reset the vigour; entering `failed` resets it; `.ghost-vigour` takes `vigourStyle`; the Grimoire is never delayed and focus never moves for a Reaction.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): make the ghost react to answers`
     - _Requirements: 11.1, 11.6, 11.7, 11.8, 11.9, 11.10, 11.11, 25.1_
     - _Design: "Purely visual state" (vigour, reaction), "Animation Catalogue" notes (Jumping to an end state)_
 
-  - [ ] 14.8 Play the Exorcised_Moment and the Return_Glow
-    - Create `packages/web/src/view/scenic/effects.ts` with the Return_Glow timer. In `renderer.ts` and `ghostScene.ts`: `effects.exorcisedMoments` starts the spiral, sparks and warm room (order of D6); a render in the same Scene lets it play, a Scene change jumps it to its end; `effects.returnGlow` adds `is-returning` to those slots for 800 ms, so the Exorcised candle and its light fade in (`slot-return`); send `exorcised-moment` and `return-glow-ended` to `phoneStep`, so one Ring follows the Return_Glow when a Telephone_Target exists (9.4).
+  - [x] 14.8 Play the Exorcised_Moment and the Return_Glow
+    - The Return_Glow is `stage.glow`, with its timer in `renderer.ts`; no `effects.ts`, director's decision of 22 Nov. In `renderer.ts` and `ghostScene.ts`: `effects.exorcisedMoments` starts the spiral, sparks and warm room (order of D6); a render in the same Scene lets it play, a Scene change jumps it to its end; `effects.returnGlow` adds `is-returning` to those slots for 800 ms, so the Exorcised candle and its light fade in (`slot-return`); send `exorcised-moment` and `return-glow-ended` to `phoneStep`, so one Ring follows the Return_Glow when a Telephone_Target exists (9.4).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): reward the exorcism with sparks and warm light`
     - _Requirements: 6.8, 9.4, 12.1, 12.3, 12.4, 12.6, 12.8, 12.9_
     - _Design: "effects.ts" row of "DOM modules", D5, D6_
 
-  - [ ] 14.9 Animate Reactions and the exorcism
+  - [x] 14.9 Animate Reactions and the exorcism
     - In `motion.css`: `react-recoil`, `react-shudder`, `react-laugh`, `react-puzzle`, `smoke-question`, the vigour transition, `exorcise-spiral`, `exorcise-sparks`, `room-warm`, `slot-return` (duration token `--sc-dur-slot-return`; rename the unused 800 ms light-up token of `scenic-tokens.css`) and the meter transition in the no-preference block; under `reduce`, `react-fade`, `ghost-fade-out` and the 200 ms fades of the catalogue, the meter instant, the vigour scale instant.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate reactions and the exorcised moment`
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 12.3, 12.4, 12.6, 18.7, 20.1_
     - _Design: "Animation Catalogue"_
 
-  - [ ] 14.10 Add the Reaction and exorcism screenshots
+  - [x] 14.10 Add the Reaction and exorcism screenshots
     - In `shotList.ts` and `shots.ts` add `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know` and `12-exorcised-moment`, captured at their end state; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot reactions and the exorcised moment`
     - _Requirements: 24.4, 24.5, 24.6_
     - _Design: "Shots", "Stable frames"_
 
-  - [ ] 14.11 Checkpoint and PR 3b
+  - [x] 14.11 Checkpoint and PR 3b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4a, task 15.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.

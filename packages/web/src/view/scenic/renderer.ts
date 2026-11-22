@@ -6,6 +6,14 @@ import { createGate } from "./gate.js";
 import { createGhostScene } from "./ghostScene.js";
 import { createGrimoire } from "./grimoire.js";
 import { grimoireView } from "./model/grimoireView.js";
+import { EMPTY_MEMORY, nextMemory } from "./model/renderMemory.js";
+import {
+  reactionFor,
+  VIGOUR_START,
+  vigourAfterAction,
+  vigourAfterRender,
+  vigourStyle,
+} from "./model/reactions.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
@@ -107,11 +115,24 @@ export function createScenicRenderer(
   let lastView: StageView | null = null;
   let phoneView: PhoneView = { source: null, target: null, powerLine: null };
   const telephoneLayer = stage.element.querySelector("g.telephone");
+  let memory = EMPTY_MEMORY;
+  let vigour = VIGOUR_START;
+  /** The action being dispatched now: its render applies it to the vigour first. */
+  let sending: UserAction | null = null;
   /** Every `start-ghost` of the page goes through here, so the bell hears of it (Q17). */
   const send = (action: UserAction): boolean => {
+    const inRoom = guard.current()?.scene.kind === "ghost";
+    sending = action;
     const sent = guard.send(action);
+    sending = null;
     if (sent && action.type === "start-ghost") {
       dispatchPhone({ type: "ghost-started" });
+    }
+    if (!sent) return sent;
+    // Reactions are visual state only: they never change the model or focus (11.9).
+    const kind = reactionFor(action);
+    if (inRoom && kind !== null && guard.current()?.scene.kind === "ghost") {
+      room.react(kind);
     }
     return sent;
   };
@@ -128,6 +149,13 @@ export function createScenicRenderer(
     stage.sceneBar,
   ].filter((n): n is HTMLElement => n instanceof HTMLElement);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const motionOff = (): boolean => shell.getAttribute("data-motion") === "off";
+  /** Exorcised_Moment length (D6): 1400 ms, 200 ms reduced, none with Motion off. */
+  const momentMs = (): number =>
+    motionOff() ? 0 : reduced.matches ? 200 : 1400;
+  /** Return_Glow length: 800 ms, 200 ms reduced, none with Motion off. */
+  const glowMs = (): number => (motionOff() ? 0 : reduced.matches ? 200 : 800);
+  let glowEndTimer: number | null = null;
   /** How long the room takes to fade out: none with Motion off, 150 ms reduced, else 300 ms. */
   const leaveMs = (): number =>
     shell.getAttribute("data-motion") === "off"
@@ -254,7 +282,10 @@ export function createScenicRenderer(
       const had = document.activeElement;
       const before = grimoire.focusBefore() ?? controls.focusBefore();
       guard.setModel(model);
-      hud.update(hudView(model));
+      const step = nextMemory(memory, model);
+      memory = step.memory;
+      const effects = step.effects;
+      hud.update(hudView(model, effects));
       const layout = sceneLayout(model);
       shell.setAttribute("data-scene", model.scene.kind);
       // No Camera transition exists yet, so the first render never animates.
@@ -303,8 +334,26 @@ export function createScenicRenderer(
           closeUp: layout.closeUp,
           grimoire: book,
         });
+        if (sending !== null) vigour = vigourAfterAction(vigour, sending);
+        vigour = vigourAfterRender(vigour, prev, model);
+        room.setVigour(vigourStyle(vigour));
+        // Only inside the room: a moment in a list render (design Q18, not
+        // reachable today) shows only the Return_Glow, never the spiral.
+        if (effects.exorcisedMoments.length > 0) {
+          room.exorcise(momentMs());
+          dispatchPhone({ type: "exorcised-moment" }, false);
+        }
       } else {
         room.hide(leaveMs());
+      }
+      if (!inRoom && effects.returnGlow.length > 0) {
+        const ms = glowMs();
+        stage.glow(effects.returnGlow, ms);
+        if (glowEndTimer !== null) window.clearTimeout(glowEndTimer);
+        glowEndTimer = window.setTimeout(() => {
+          glowEndTimer = null;
+          dispatchPhone({ type: "return-glow-ended" });
+        }, ms);
       }
       // Below 64rem the room is in the page flow: entering it shows its top, with the ghost.
       if (entering && viewport === "narrow") {

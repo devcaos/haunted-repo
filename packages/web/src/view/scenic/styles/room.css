@@ -53,6 +53,27 @@
   height: var(--sc-full);
 }
 
+/* Size and opacity after the answers (Requirements 11.2 to 11.7). */
+.scenic .ghost-vigour {
+  transform: scale(var(--vigour-scale, 1));
+  transform-origin: bottom center;
+  opacity: var(--vigour-opacity, 1);
+}
+.scenic .ghost-react {
+  transform-origin: bottom center;
+}
+/* After the Exorcised_Moment: no ghost and a warm room until the judge leaves (12.3, 12.4). */
+.scenic .room.is-exorcised .ghost-close {
+  visibility: hidden;
+}
+.scenic .room.is-exorcised .room-light-warm {
+  opacity: 1;
+}
+/* Return_Glow (12.6): the Exorcised candle of the slot fades in. */
+.scenic .slot.is-returning .slot-exorcised {
+  opacity: 1;
+}
+
 /* Narrow screens: in ghost scenes the house view sits behind the drawing. */
 .scenic .stage[data-scene="ghost"] .stage-view {
   position: absolute;
