@@ -1027,7 +1027,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.3, 4.4, 12.6, 12.7_
     - _Design: "scenic/model/hudView.ts and scenic/model/grimoireView.ts", "scenic/model/renderMemory.ts"_
 
-  - [ ] 14.7 Play the Reactions
+  - [x] 14.7 Play the Reactions
     - In `ghostScene.ts` and `renderer.ts`: a ghost action sent through the guard updates `vigour` and starts its Reaction class on `.ghost-react` (a new action jumps the playing one to its end and restarts the class); `start-ghost` and `retry` reset the vigour; entering `failed` resets it; `.ghost-vigour` takes `vigourStyle`; the Grimoire is never delayed and focus never moves for a Reaction.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): make the ghost react to answers`

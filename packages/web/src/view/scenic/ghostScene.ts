@@ -3,6 +3,7 @@ import { ghostArt } from "./art/ghosts.js";
 import { el } from "./dom.js";
 import type { Grimoire } from "./grimoire.js";
 import type { GrimoireView } from "./model/grimoireView.js";
+import type { ReactionKind } from "./model/reactions.js";
 import {
   GHOST_BOX,
   type GhostType,
@@ -25,6 +26,12 @@ export interface GhostScene {
   hide(fadeMs: number): void;
   /** True while the room is open or entering. */
   readonly open: boolean;
+  /** Plays one Reaction on the close-up ghost; a playing one jumps to its end first (11.11). */
+  react(kind: ReactionKind): void;
+  /** The ghost's size and opacity after the latest action (11.2 to 11.7). */
+  setVigour(style: { scale: number; opacity: number }): void;
+  /** The Exorcised_Moment (12.3, 12.4, D6); after `endMs` only its end state is left. */
+  exorcise(endMs: number): void;
 }
 
 const round4 = (n: number): number => Math.round(n * 10000) / 10000;
@@ -71,12 +78,30 @@ export function createGhostScene(
   let visit: string | null = null;
   let candles: Element[] = [];
   let leaveTimer: number | null = null;
-
+  let vigour = { scale: 1, opacity: 1 };
+  let exorciseTimer: number | null = null;
+  const reactClasses = ["recoil", "shudder", "laugh", "puzzle"].map(
+    (k) => `is-${k}`,
+  );
+  const applyVigour = (): void => {
+    const node = artBox.querySelector<HTMLElement>(".ghost-vigour");
+    node?.style.setProperty("--vigour-scale", String(vigour.scale));
+    node?.style.setProperty("--vigour-opacity", String(vigour.opacity));
+  };
+  const clearExorcise = (): void => {
+    if (exorciseTimer !== null) window.clearTimeout(exorciseTimer);
+    exorciseTimer = null;
+  };
+  /** End state of the Exorcised_Moment: no ghost, warm light. */
+  const exorciseEnd = (): void => {
+    clearExorcise();
+    element.classList.remove("is-exorcising");
+    element.classList.add("is-exorcised");
+  };
   const clearLeave = (): void => {
     if (leaveTimer !== null) window.clearTimeout(leaveTimer);
     leaveTimer = null;
   };
-
   return {
     element,
     get open(): boolean {
@@ -97,6 +122,9 @@ export function createGhostScene(
           svg,
           closeUpGhost(view.closeUp.ghostType, view.closeUp.variant),
         );
+        clearExorcise();
+        element.classList.remove("is-exorcising", "is-exorcised");
+        applyVigour();
         element.hidden = false;
         element.inert = false;
         // Restart the enter fade on every new visit.
@@ -112,6 +140,8 @@ export function createGhostScene(
     hide(fadeMs: number): void {
       if (visit === null) return;
       visit = null;
+      // A Scene change jumps the Exorcised_Moment to its end (12.9).
+      if (exorciseTimer !== null) exorciseEnd();
       element.setAttribute("data-state", "leaving");
       // Nothing in the fading room can take focus or a click.
       element.inert = true;
@@ -122,9 +152,33 @@ export function createGhostScene(
         element.removeAttribute("data-state");
         artBox.replaceChildren();
         candles = [];
+        element.classList.remove("is-exorcising", "is-exorcised");
       };
       if (fadeMs <= 0) done();
       else leaveTimer = window.setTimeout(done, fadeMs);
+    },
+    react(kind: ReactionKind): void {
+      const node = artBox.querySelector(".ghost-react");
+      const smoke = artBox.querySelector(".smoke-q");
+      if (node === null) return;
+      node.classList.remove(...reactClasses);
+      smoke?.classList.remove("is-rising");
+      // Read the layout once, so the same class starts again from its first frame.
+      void node.getBoundingClientRect();
+      node.classList.add(`is-${kind}`);
+      if (kind === "puzzle") smoke?.classList.add("is-rising");
+    },
+    setVigour(style: { scale: number; opacity: number }): void {
+      vigour = style;
+      applyVigour();
+    },
+    exorcise(endMs: number): void {
+      if (visit === null) return;
+      clearExorcise();
+      element.classList.remove("is-exorcised");
+      element.classList.add("is-exorcising");
+      if (endMs <= 0) exorciseEnd();
+      else exorciseTimer = window.setTimeout(exorciseEnd, endMs);
     },
   };
 }

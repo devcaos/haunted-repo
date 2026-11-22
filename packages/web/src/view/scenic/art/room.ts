@@ -188,9 +188,9 @@ export function roomArt(href: string | null): ShapeNode {
     g("smoke-q", [
       strokePath(
         "smoke-q-line",
-        "M226 214 C226 190 274 190 274 214 C274 232 250 236 250 256 L250 266",
+        "M191 174 C191 150 239 150 239 174 C239 192 215 196 215 216 L215 226",
       ),
-      ellipse("smoke-q-dot", 250, 286, 5, 5),
+      ellipse("smoke-q-dot", 215, 246, 5, 5),
     ]),
   ]);
 }
