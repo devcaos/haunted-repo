@@ -1168,7 +1168,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 15.9, 18.1, 18.8, 18.9_
     - _Design: "Error Handling" (Reduced_Motion changes while open), "motion.ts" row of "DOM modules"_
 
-  - [ ] 16.4 Source_Scan item 8, reduce-block rule
+  - [x] 16.4 Source_Scan item 8, reduce-block rule
     - In `source.test.ts`: inside `@media (prefers-reduced-motion: reduce)` blocks, `animation` and `transition` use only keyframes that animate `opacity`, a duration token whose value is 200 ms or less, and no `infinite`. Negative self-check.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check reduced motion uses short fades only`
