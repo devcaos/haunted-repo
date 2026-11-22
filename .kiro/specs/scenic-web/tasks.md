@@ -965,7 +965,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 14. PR 3b — Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules
+- [x] 14. PR 3b — Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules
   - Branch: `feat/scenic-web-3b`. Branch from: an up-to-date `main`, after PR 3a part 2 is merged. Targets `main`.
   - Estimate: ~780 changed lines. Model: Auto.
   - Split on 22 Nov, director: part 1 = 14.1 to 14.5 on `feat/scenic-web-3b`; part 2 = 14.6 to 14.11 on `feat/scenic-web-3b-2` from `main` after part 1 is merged.
@@ -1055,7 +1055,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5, 24.6_
     - _Design: "Shots", "Stable frames"_
 
-  - [ ] 14.11 Checkpoint and PR 3b
+  - [x] 14.11 Checkpoint and PR 3b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4a, task 15.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3b`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
