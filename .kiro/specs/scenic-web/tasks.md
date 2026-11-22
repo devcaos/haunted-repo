@@ -887,7 +887,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 3
 
-- [ ] 13. PR 3a — Room and Grimoire
+- [x] 13. PR 3a — Room and Grimoire
   - Branch: `feat/scenic-web-3a`. Branch from: `main` (PR 2c is already merged).
   - Estimate: ~900 changed lines. Model: Auto (Opus only with the director's yes).
   - Split on 22 Nov (director): part 1 = 13.1, 13.2, 13.4 on `feat/scenic-web-3a`; part 2 = 13.3, 13.5 to 13.9 on `feat/scenic-web-3a-2` from `main` after part 1 is merged.
@@ -956,7 +956,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5_
     - _Design: "Shots", "Flow per viewport"_
 
-  - [ ] 13.9 Checkpoint and PR 3a
+  - [x] 13.9 Checkpoint and PR 3a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 3b, task 14.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
