@@ -10,11 +10,11 @@ Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node envi
 
 ## Pull requests
 
-- 13 stacked pull requests, one per group below, in this order: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b, 2c, 3a, 3b, 4a, 4b (decision Q1). Each branch is created from the tip of the previous one: `git checkout <previous branch>` then `git checkout -b <new branch>`. PR 1a is created from an up-to-date `main`. PRs 1a to 1f are merged, so PR 2a is also created from an up-to-date `main` (`git checkout main`, `git pull`, `git checkout -b feat/scenic-web-2a`); PRs 2b onward are stacked as described.
-- PRs 1a to 1f and PR 2a target `main`; every PR from 2b on targets the previous PR's branch until that one is merged. After each merge, retarget the next pull request with `gh pr edit <number> --base main`.
+- 13 stacked pull requests, one per group below, in this order: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b, 2c, 3a, 3b, 4a, 4b (decision Q1). Each branch is created from the tip of the previous one: `git checkout <previous branch>` then `git checkout -b <new branch>`. PR 1a is created from an up-to-date `main`. PRs 1a to 1f are merged, so PR 2a is also created from an up-to-date `main` (`git checkout main`, `git pull`, `git checkout -b feat/scenic-web-2a`); From PR 2b on, every PR is created from an up-to-date `main` too: see the last bullet of this list.
+- Every PR targets `main`. The stacked PRs 1b to 1f were retargeted to `main` with `gh pr edit <number> --base main` after each merge; that is history and is not needed any more.
 - The director (Luis Miguel) merges, in order, each with "Create a merge commit" (no squash, no rebase merge). Kiro never merges.
 - Reviews happen per stage, not per PR (decision Q1).
-- Each PR body fills `.github/pull_request_template.md` and carries the size warning: the whole spec is about 10,000 changed lines, split into 13 stacked PRs of at most about 900 lines each (decision Q1), plus this PR's line count measured with `git diff --shortstat`. Tests are never cut to fit the size.
+- Each PR body fills `.github/pull_request_template.md` and carries the size warning: the whole spec is about 10,000 changed lines, split into 13 PRs of at most about 900 lines each (decision Q1), plus this PR's line count measured with `git diff --shortstat`. Tests are never cut to fit the size.
 - Each PR body lists the shots it adds (decision Q2; design section "Shots").
 - Each PR body includes the Requirement 2 check: `git diff --stat <base branch> -- packages/web/src/logic packages/web/src/sample packages/core packages/web/public/sirv-license.txt` shows only `texts.ts` and `powerTexts.ts` (or nothing).
 - Since 19 Nov (director's decision) PRs are no longer stacked: every scenic-web PR from 2b on is created from an up-to-date `main` after the previous one is merged, and targets `main`.
