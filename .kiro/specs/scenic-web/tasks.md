@@ -990,7 +990,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 11.7_
     - _Design: "Correctness Properties", Property 14_
 
-  - [ ] 14.3 Add the render memory
+  - [x] 14.3 Add the render memory
     - In `packages/web/src/view/scenic/model/renderMemory.ts` add `VisualMemory`, `RenderEffects`, `EMPTY_MEMORY` and `nextMemory(memory, model)` with the rules of the design (frozen list meter in the Ghost_Scene, `from` only after a Ghost_Scene with moments and a non-null previous list progress, moments on a real Haunted-to-Exorcised change with the same source, Finale `shown`, `animate`, `announce`).
     - Create `packages/web/src/view/scenic/model/renderMemory.test.ts` with examples: "Show the sample again" with exorcised Cards shows them lit with no moment and no meter move; "Not yet" keeps the Card Exorcised and still gives a Return_Glow.
     - Verify: `npm run check` exits `0`.
