@@ -1160,10 +1160,11 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [x] 16.2 (Withdrawn 19 Nov: the Intro is cut now, director's decision; `intro-ended` is sent at the first House_Scene render, D13)
 
-  - [ ] 16.3 Apply Reduced_Motion changes while the page is open
+  - [x] 16.3 Apply Reduced_Motion changes while the page is open
     - In `motion.ts` and `renderer.ts`: when Reduced_Motion turns on, every one-shot (Camera move, Reaction, Exorcised_Moment, Return_Glow, Finale change) jumps to its end state, loops stop through the media query, Lightning stops within 1 s and its toggle becomes off and disabled; when it turns off, loops start again and the toggle is enabled and stays off. Texts, controls, accessible names and Card states never depend on it.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): follow reduced motion changes without a reload`
+    - Done 22 Nov: `motion.ts`, `renderer.ts` and `lightningToggle.ts` already follow the change since PR 4a; this task adds the Shots_Script check `liveChecks`, which turns Reduced_Motion on and off on an open page at both shot sizes.
     - _Requirements: 15.9, 18.1, 18.8, 18.9_
     - _Design: "Error Handling" (Reduced_Motion changes while open), "motion.ts" row of "DOM modules"_
 

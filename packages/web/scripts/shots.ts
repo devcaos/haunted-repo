@@ -217,6 +217,52 @@ const QUIET_PHONE_SHOTS: ReadonlySet<ShotState> = new Set<ShotState>([
   "17-reduced-floor-attic",
 ]);
 
+/** The Lightning_Toggle as a visitor and a screen reader find it. */
+function toggleState(): string {
+  const toggle = document.querySelector(".lightning-toggle");
+  if (!(toggle instanceof HTMLButtonElement)) return "missing";
+  const pressed = toggle.getAttribute("aria-pressed") ?? "none";
+  const state = toggle.disabled ? "disabled" : "enabled";
+  return `${toggle.textContent ?? ""}, pressed ${pressed}, ${state}`;
+}
+
+/**
+ * A check no screenshot can show, on one page of the House_Scene:
+ * Reduced_Motion turned on and off while the page is open (16.3).
+ */
+async function liveChecks(
+  context: BrowserContext,
+  url: string,
+): Promise<string[]> {
+  const problems: string[] = [];
+  const page = await context.newPage();
+  page.setDefaultTimeout(10_000);
+  await page.goto(url);
+  const off = `${TEXTS.lightning.off}, pressed false`;
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  // The change event of the media query can come a few hundred ms later.
+  await page.waitForTimeout(1000);
+  const reducedState = await page.evaluate(toggleState);
+  if (reducedState !== `${off}, disabled`) {
+    problems.push(
+      `with Reduced_Motion turned on the toggle is ${reducedState}`,
+    );
+  }
+  const flashing = await page.evaluate(
+    () => document.querySelector(".stage.is-flashing") !== null,
+  );
+  if (flashing)
+    problems.push("Lightning still flashes 1 s after Reduced_Motion");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.waitForTimeout(1000);
+  const backState = await page.evaluate(toggleState);
+  if (backState !== `${off}, enabled`) {
+    problems.push(`with Reduced_Motion turned off the toggle is ${backState}`);
+  }
+  await page.close();
+  return problems;
+}
+
 async function main(): Promise<void> {
   if (!existsSync(fileURLToPath(new URL("../dist", import.meta.url)))) {
     console.error("packages/web/dist was not found. Run npm run build first.");
@@ -329,6 +375,15 @@ async function main(): Promise<void> {
       await routeNonLocal(context, fake);
     }
     const house = `${PREVIEW_ORIGIN}/haunted-repo/`;
+    await step(`live checks at ${size.width}x${size.height}`, async () => {
+      const problems = await liveChecks(normal, house);
+      for (const problem of problems) {
+        console.error(
+          `Check failed at ${size.width}x${size.height}: ${problem}`,
+        );
+        failedChecks++;
+      }
+    });
     await shoot(normal, "01-house", size, house, "svg.house");
     // Floors are reached the way a visitor does: a click on the floor button of the House.
     const goTo = (floor: Floor, title: string) => async (page: Page) => {
