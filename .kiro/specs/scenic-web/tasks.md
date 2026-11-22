@@ -1069,16 +1069,17 @@ These are settled by the approved design and are not reopened in these tasks:
 - [ ] 15. PR 4a — Finale, live analysis, Lightning
   - Branch: `feat/scenic-web-4a`. Branch from: an up-to-date `main`, after PR 3b is merged. Targets `main`.
   - Estimate: ~490 changed lines. Model: Auto.
+  - Split on 22 Nov, director: part 1 = 15.1 to 15.3 on `feat/scenic-web-4a`; part 2 = 15.4 to 15.10 on `feat/scenic-web-4a-2` from `main` after part 1 is merged.
   - _Design: "PR Split" row 4a_
 
-  - [ ] 15.1 Add the Lightning and Finale texts
+  - [x] 15.1 Add the Lightning and Finale texts
     - In `texts.ts` add `lightning` (`on`, `off`, `reducedReason`) and `finaleDone`; in `powerTexts.ts` add `finaleOtherGhosts` (additions only). Extend `scenicTexts.test.ts`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the lightning and finale texts`
     - _Requirements: 2.2, 13.4, 15.5, 15.9, 25.4_
     - _Design: "New texts"_
 
-  - [ ] 15.2 Add the Lightning clock
+  - [x] 15.2 Add the Lightning clock
     - Create `packages/web/src/view/scenic/model/lightningClock.ts`: `FLASH_MIN_MS`, `FLASH_MAX_MS`, `nextFlashDelay(random)` and `flashAllowed(input)`.
     - Create `packages/web/src/view/scenic/model/lightningClock.test.ts` with the `flashAllowed` table: no flash with the toggle off, under Reduced_Motion, in the Ghost_Scene, during the Finale (D8), during a Ring or an Exorcised_Moment (Q7).
     - Verify: `npm run check` exits `0`.
@@ -1086,7 +1087,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 15.1, 15.2, 18.5_
     - _Design: "scenic/model/lightningClock.ts", D7, D8, decision Q7_
 
-  - [ ] 15.3 Property test for the Lightning interval
+  - [x] 15.3 Property test for the Lightning interval
     - **Property 16: Lightning flashes are 10 to 15 seconds apart**
     - **Validates: Requirements 15.1, 15.3**
     - Generator: numbers in [0, 1) (`fc.double` with `min: 0`, `max: 1`, `maxExcluded: true`, `noNaN: true`), at least 100 runs. Checks `nextFlashDelay(r)` is an integer from 10,000 to 15,000 inclusive.
@@ -1144,8 +1145,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4b, task 16.3; tasks 16.1 and 16.2 are withdrawn), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
-    - Push with `git push -u origin feat/scenic-web-4a`. Body in `$env:TEMP\pr-scenic-web-4a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `13-finale`, `14-live-busy`, `15-live-report`, each at both sizes", and the manual check: flashes every 10 to 15 s; the toggle stops them; under Reduced_Motion the toggle is off and disabled with its reason.
-    - Run `gh pr create --base main --head feat/scenic-web-4a --title "feat: add the finale, live search beam and lightning" --body-file $env:TEMP\pr-scenic-web-4a-body.md`.
+    - Push with `git push -u origin feat/scenic-web-4a-2`. Body in `$env:TEMP\pr-scenic-web-4a-2-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `13-finale`, `14-live-busy`, `15-live-report`, each at both sizes", and the manual check: flashes every 10 to 15 s; the toggle stops them; under Reduced_Motion the toggle is off and disabled with its reason.
+    - Run `gh pr create --base main --head feat/scenic-web-4a-2 --title "feat: add the finale, live search beam and lightning" --body-file $env:TEMP\pr-scenic-web-4a-2-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
