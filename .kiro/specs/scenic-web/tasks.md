@@ -10,7 +10,7 @@ Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node envi
 
 ## Pull requests
 
-- 13 stacked pull requests, one per group below, in this order: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b, 2c, 3a, 3b, 4a, 4b (decision Q1). Each branch is created from the tip of the previous one: `git checkout <previous branch>` then `git checkout -b <new branch>`. PR 1a is created from an up-to-date `main`. PRs 1a to 1f are merged, so PR 2a is also created from an up-to-date `main` (`git checkout main`, `git pull`, `git checkout -b feat/scenic-web-2a`); From PR 2b on, every PR is created from an up-to-date `main` too: see the last bullet of this list.
+- 13 pull requests, one per group below, in this order: 1a, 1b, 1c, 1d, 1e, 1f, 2a, 2b, 2c, 3a, 3b, 4a, 4b (decision Q1). PRs 1a to 1f were stacked, each branch created from the previous one; that is history. From PR 2a on, each branch is created from an up-to-date `main` once the previous PR is merged: `git checkout main`, `git pull`, `git checkout -b <new branch>`.
 - Every PR targets `main`. The stacked PRs 1b to 1f were retargeted to `main` with `gh pr edit <number> --base main` after each merge; that is history and is not needed any more.
 - The director (Luis Miguel) merges, in order, each with "Create a merge commit" (no squash, no rebase merge). Kiro never merges.
 - Reviews happen per stage, not per PR (decision Q1).
