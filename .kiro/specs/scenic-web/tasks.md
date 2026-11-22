@@ -887,7 +887,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 3
 
-- [ ] 13. PR 3a — Room and Grimoire
+- [x] 13. PR 3a — Room and Grimoire
   - Branch: `feat/scenic-web-3a`. Branch from: `main` (PR 2c is already merged).
   - Estimate: ~900 changed lines. Model: Auto (Opus only with the director's yes).
   - Split on 22 Nov (director): part 1 = 13.1, 13.2, 13.4 on `feat/scenic-web-3a`; part 2 = 13.3, 13.5 to 13.9 on `feat/scenic-web-3a-2` from `main` after part 1 is merged.
@@ -912,8 +912,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.4, 10.12_
     - _Design: "Correctness Properties", Property 17_
 
-  - [ ] 13.3 Draw the exorcism room
-    - Create `packages/web/src/view/scenic/art/room.ts` with `roomArt()`: the close-up room (viewBox `0 0 800 800`), window with rain, Night floor and vignette, three Question_Candles (`qcandle` with `flame-wrap`), cold and warm light overlays (`room-light-cold`, `room-light-warm`), the `sparks` group (12 diamonds) and the smoke "?" (`smoke-q`).
+  - [x] 13.3 Draw the exorcism room
+    - Create `packages/web/src/view/scenic/art/room.ts` with `roomArt(href)`: the overlays drawn on top of the declared room illustration `room-scene.svg` (viewBox `0 0 600 800`, director's decision, 22 Nov): window rain clipped to the glass, three Question_Candles `qcandle` with `flame-wrap`), cold and warm light overlays `room-light-cold`, `room-light-warm`), the `sparks` group (12 diamonds) and the smoke "?" `smoke-q`). With no picture it draws a plain token-colour rectangle.
     - Extend `art.test.ts`: the tree passes the rules and has exactly three Question_Candles.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): draw the exorcism room`
@@ -927,14 +927,14 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.11, 25.1_
     - _Design: "Source_Scan additions" item 14_
 
-  - [ ] 13.5 Build the Ghost_Scene
+  - [x] 13.5 Build the Ghost_Scene
     - Create `packages/web/src/view/scenic/ghostScene.ts`: the `.room` layer created on entering the Ghost_Scene and kept for the visit (`room` state), the close-up ghost (`.ghost-vigour` > `.ghost-react` > `svg` > `.ghost-idle`) with `layout.closeUp`, lit candles from `litCandles`, removal after the leave fade. In `renderer.ts` and `stage.ts`: `.world`, `.scene-dock`, `.floor-stair`, `.nameplates` and `.scene-bar` are `inert` in the Ghost_Scene; the Telephone group is `visibility: hidden` and the phone widget hidden and out of the tab order; the house loops are paused.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): open the close-up exorcism room`
     - _Requirements: 5.11, 9.1, 9.7, 10.1, 10.8, 10.9, 10.13, 17.14, 20.4_
     - _Design: "DOM modules" (ghostScene.ts), "Animation Catalogue" (Ghost_Scene pause)_
 
-  - [ ] 13.6 Build the Grimoire
+  - [x] 13.6 Build the Grimoire
     - Create `packages/web/src/view/scenic/grimoire.ts`: `section.grimoire` from `grimoireView` with the heading as focus target, the Answer_Box `textarea` with its label (kept while its key is unchanged, new and empty otherwise; never reads `.value`; no `input` or `change` listener), one button per choice sending through the guard, the Code_Block `pre` with `tabindex="0"`, and the Licence_Notice right after it, outside its scroll.
     - In `packages/web/src/source.test.ts` set `GRIMOIRE_REQUIRED = true`, so Source_Scan item 14 now fails if `grimoire.ts` is missing.
     - Verify: `npm run check` exits `0` (item 14 now covers the file).
@@ -942,21 +942,21 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.10, 10.11, 10.12, 17.6, 25.1, 25.5_
     - _Design: "DOM modules" (grimoire.ts), "Props and panels" (Grimoire)_
 
-  - [ ] 13.7 Style the room and the Grimoire
+  - [x] 13.7 Style the room and the Grimoire
     - Create `packages/web/src/view/scenic/styles/room.css` (tokens only): room backdrop, Grimoire page (Slate backing, Brass corners, IM Fell English headings), choice rows with the Pumpkin `clip-path` marker, Code_Block max height from a token with its own scroll, Grimoire beside the drawing at 64rem and above and under it below (D10). In `motion.css`: room enter and leave and candle light transitions, with the reduced 150 ms fades.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): style the exorcism room and grimoire`
     - _Requirements: 10.6, 17.12, 17.13, 19.3, 19.4_
     - _Design: "Props and panels" (Grimoire), "Animation Catalogue", D10_
 
-  - [ ] 13.8 Add the room screenshots
+  - [x] 13.8 Add the room screenshots
     - In `shotList.ts` and `shots.ts` add `05-ghost-explaining`, `06-ghost-asking`, `11-ghost-failed` and `18-reduced-ghost-asking`, driving the sample flow of the design; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot the exorcism room`
     - _Requirements: 24.4, 24.5_
     - _Design: "Shots", "Flow per viewport"_
 
-  - [ ] 13.9 Checkpoint and PR 3a
+  - [x] 13.9 Checkpoint and PR 3a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 3b, task 14.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.

@@ -1,7 +1,8 @@
 // The single inventory of graphics of the web demo. Plain data only.
 // Files: the declared scene illustration `scene.house`, director's decision,
-// 18 Nov) and the four Gate_Panel pictures `panel.*`, director's decision,
-// 19 Nov). Every other slot is empty and uses its fallback.
+// 18 Nov), the four Gate_Panel pictures `panel.*`, director's decision,
+// 19 Nov) and the declared exorcism room `scene.ghost-room`, director's
+// decision, 22 Nov). Every other slot is empty and uses its fallback.
 
 export type AssetSlotId =
   | "scene.house"
@@ -75,7 +76,14 @@ export const ASSET_SLOTS: readonly AssetSlot[] = [
   {
     id: "scene.ghost-room",
     purpose: "Background of the room where one ghost is exorcised.",
-    layers: [],
+    layers: [
+      {
+        file: "room-scene.svg",
+        alt: "",
+        source:
+          "Illustration drafted with Claude (Anthropic AI), declared in the Devpost submission; integrated and animated with Kiro. MIT licence, like the repo.",
+      },
+    ],
     fallback: "token-colour",
   },
   {

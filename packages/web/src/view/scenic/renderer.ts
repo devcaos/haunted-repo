@@ -3,6 +3,9 @@ import type { Renderer, ViewModel } from "../../logic/viewModel.js";
 import type { GateHrefs } from "./art/gate.js";
 import { el } from "./dom.js";
 import { createGate } from "./gate.js";
+import { createGhostScene } from "./ghostScene.js";
+import { createGrimoire } from "./grimoire.js";
+import { grimoireView } from "./model/grimoireView.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
@@ -32,6 +35,8 @@ export interface ScenicOptions {
   sceneHref: string | null;
   /** Built URLs of the Gate_Panel pictures; a missing one is not drawn. */
   gate: GateHrefs;
+  /** Built URL of the room illustration of the Ghost_Scene, or null for the plain backdrop. */
+  roomHref?: string | null;
 }
 
 const NO_GATE: GateHrefs = {
@@ -111,6 +116,25 @@ export function createScenicRenderer(
     return sent;
   };
   const controls = createSceneControls(stage, send);
+  const grimoire = createGrimoire(send);
+  const room = createGhostScene(options.roomHref ?? null, grimoire);
+  stage.element.append(room.element);
+  /** The parts of the stage behind the room: never reachable while the room is shown (10.13, 17.14). */
+  const behindRoom = [
+    stage.element.querySelector(".world"),
+    stage.dock,
+    stage.floorStair,
+    stage.nameplates,
+    stage.sceneBar,
+  ].filter((n): n is HTMLElement => n instanceof HTMLElement);
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  /** How long the room takes to fade out: none with Motion off, 150 ms reduced, else 300 ms. */
+  const leaveMs = (): number =>
+    shell.getAttribute("data-motion") === "off"
+      ? 0
+      : reduced.matches
+        ? 150
+        : 300;
   const phone = createPhoneWidget(
     stage,
     send,
@@ -228,7 +252,7 @@ export function createScenicRenderer(
       const prev = guard.current();
       // Focus is read before anything is rebuilt.
       const had = document.activeElement;
-      const before = controls.focusBefore();
+      const before = grimoire.focusBefore() ?? controls.focusBefore();
       guard.setModel(model);
       hud.update(hudView(model));
       const layout = sceneLayout(model);
@@ -269,8 +293,32 @@ export function createScenicRenderer(
       }
       placePhone(model.transition !== null);
       controls.update(layout);
-      controls.focus(scenicFocusAfterRender(prev, model, before, layout));
-      keepFocusInDocument(had, controls.focusHeading);
+      const inRoom = model.scene.kind === "ghost";
+      for (const part of behindRoom) part.inert = inRoom;
+      const book = grimoireView(model);
+      const entering = inRoom && !room.open;
+      if (inRoom && book !== null && layout.closeUp !== null) {
+        room.show({
+          path: model.scene.kind === "ghost" ? model.scene.path : "",
+          closeUp: layout.closeUp,
+          grimoire: book,
+        });
+      } else {
+        room.hide(leaveMs());
+      }
+      // Below 64rem the room is in the page flow: entering it shows its top, with the ghost.
+      if (entering && viewport === "narrow") {
+        const top = room.element.getBoundingClientRect().top + window.scrollY;
+        window.scrollTo({ top, behavior: "instant" });
+      }
+      const target = scenicFocusAfterRender(prev, model, before, layout);
+      if (inRoom) {
+        grimoire.focus(target);
+        keepFocusInDocument(had, grimoire.focusHeading);
+      } else {
+        controls.focus(target);
+        keepFocusInDocument(had, controls.focusHeading);
+      }
     },
   };
 }

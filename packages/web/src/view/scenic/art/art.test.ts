@@ -55,6 +55,7 @@ import {
   slotArt,
 } from "./props.js";
 import { RAIN_BOTTOM, RAIN_STEP, rainPath, weatherLayer } from "./weather.js";
+import { CANDLE_X, ROOM_BOX, roomArt, roomRainPath } from "./room.js";
 // The Shape_Data rules (Requirements 22.1, 17.1; design "Shape_Data").
 // prettier-ignore
 const KINDS = new Set<string>([
@@ -1294,5 +1295,49 @@ describe("the Answer_Button icon (director's decision, 19 Nov)", () => {
       expect(y).toBeGreaterThanOrEqual(0);
       expect(y).toBeLessThanOrEqual(ICON_BOX);
     }
+  });
+});
+
+describe("the exorcism room (Requirements 10.1, 10.8, 22.1)", () => {
+  const withPicture = roomArt("/haunted-repo/assets/room-scene.svg");
+  const fallback = roomArt(null);
+
+  it("passes the Shape_Data rules, with the picture and with the fallback", () => {
+    expect(shapeProblems(withPicture)).toEqual([]);
+    expect(shapeProblems(fallback)).toEqual([]);
+  });
+
+  it("draws exactly three Question_Candles, each with a flame-wrap", () => {
+    for (const tree of [withPicture, fallback]) {
+      const candles = nodesOf(tree).filter((n) => n.cls === "qcandle");
+      expect(candles).toHaveLength(3);
+      expect(CANDLE_X).toHaveLength(3);
+      for (const candle of candles) {
+        expect(classesOf(candle)).toContain("flame-wrap");
+      }
+    }
+  });
+
+  it("has the cold and warm lights, twelve sparks and the smoke question mark", () => {
+    const names = classesOf(withPicture);
+    expect(names).toContain("room-light-cold");
+    expect(names).toContain("room-light-warm");
+    expect(names.filter((n) => n === "spark")).toHaveLength(12);
+    expect(names).toContain("smoke-q");
+  });
+
+  it("shows the picture as one image the size of the room, or a plain rectangle", () => {
+    const images = nodesOf(withPicture).filter((n) => n.kind === "image");
+    expect(images).toHaveLength(1);
+    expect(images[0]).toMatchObject({ width: ROOM_BOX.w, height: ROOM_BOX.h });
+    expect(nodesOf(fallback).some((n) => n.kind === "image")).toBe(false);
+    expect(classesOf(fallback)).toContain("room-fallback");
+  });
+
+  it("clips the window rain to the glass and repeats it by one rain step", () => {
+    const wrap = nodesOf(withPicture).find((n) => n.cls === "room-rain-wrap");
+    expect(wrap?.clip).toBe("room-glass");
+    expect(roomRainPath()).toMatch(/^M/);
+    expect(RAIN_STEP).toEqual([-80, 200]);
   });
 });

@@ -1,0 +1,361 @@
+/*
+ * The Ghost_Scene: close-up room and Grimoire (Requirement 10, D10). Tokens
+ * only. Wide screens: the room covers the stage, right of the gate, with the
+ * drawing and the Grimoire side by side; the Grimoire scrolls inside itself,
+ * so the page never changes height. Narrow screens: the room is in the page
+ * flow, the drawing on top and the Grimoire under it.
+ */
+
+/* While the room is shown the stage is its own layer, so the gate and the HUD stay on top. */
+.scenic .stage:has(> .room:not([hidden])) {
+  isolation: isolate;
+}
+
+.scenic .room {
+  position: relative;
+  z-index: 2;
+  background-color: var(--sc-backing);
+}
+
+.scenic .room-art {
+  position: relative;
+  overflow: hidden;
+  container-type: size;
+  aspect-ratio: var(--sc-room-aspect);
+  width: var(--sc-full);
+  background-color: var(--sc-backing);
+}
+
+.scenic .room-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: var(--sc-full);
+  height: var(--sc-full);
+}
+
+/* The close-up ghost fills the room band y 236 to 660 (of 800), centred on x 250 (of 600). */
+.scenic .ghost-close {
+  position: absolute;
+  bottom: var(--sc-close-up-bottom);
+  left: var(--sc-close-up-x);
+  height: var(--sc-close-up-h);
+  aspect-ratio: var(--ghost-ratio);
+  transform: var(--sc-centre-x);
+  pointer-events: none;
+}
+
+.scenic .ghost-vigour,
+.scenic .ghost-react,
+.scenic .ghost-close-art {
+  display: block;
+  width: var(--sc-full);
+  height: var(--sc-full);
+}
+
+/* Narrow screens: in ghost scenes the house view sits behind the drawing. */
+.scenic .stage[data-scene="ghost"] .stage-view {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+/* While it fades out the room lies over the page, so the page changes height once. */
+.scenic .room[data-state="leaving"] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+}
+
+@media (min-width: 64rem) {
+  .scenic .room,
+  .scenic .room[data-state="leaving"] {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--sc-grimoire-w);
+    grid-template-rows: minmax(0, 1fr);
+    padding-left: var(--sc-room-left);
+  }
+
+  .scenic .room[hidden] {
+    display: none;
+  }
+
+  /* Never narrower than 11:20, so the ghost and the candles are not cut on
+     4:3 and 5:4 screens; the room backing fills the bands above and below. */
+  .scenic .room-art {
+    align-self: center;
+    aspect-ratio: var(--sc-room-min-aspect);
+    height: auto;
+    max-height: var(--sc-full);
+  }
+
+  .scenic .stage[data-scene="ghost"] .stage-view {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* The house behind the room is not drawn: the room fades in from Night. */
+.scenic .stage[data-scene="ghost"] .stage-view,
+.scenic .stage[data-scene="ghost"] .scene-dock,
+.scenic .stage[data-scene="ghost"] .floor-stair,
+.scenic .stage[data-scene="ghost"] .nameplates {
+  visibility: hidden;
+}
+
+/* Room light: cold from the window; the warm light waits for the Exorcised_Moment (PR 3b). */
+.room-svg .room-fallback {
+  fill: var(--sc-backing);
+}
+
+.room-svg .room-rain .rain-streaks {
+  stroke: var(--sc-spectral);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  opacity: 0.55;
+}
+
+.room-svg .stop-room-cold-0 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: var(--sc-room-cold-opacity);
+}
+
+.room-svg .stop-room-cold-1 {
+  stop-color: var(--sc-cold-blue);
+  stop-opacity: 0;
+}
+
+.room-svg .stop-room-warm-0 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: var(--sc-room-warm-opacity);
+}
+
+.room-svg .stop-room-warm-1 {
+  stop-color: var(--sc-warm-orange);
+  stop-opacity: 0;
+}
+
+.room-svg .room-light-cold {
+  opacity: 0.6;
+}
+
+.room-svg .room-light-warm {
+  opacity: 0;
+}
+
+.room-svg .room-light-warm.is-warm {
+  opacity: 1;
+}
+
+/* Question_Candles: Bone wax and Brass holders; unlit = black wick and a still Mist smoke line. */
+.room-svg .qcandle-holder,
+.room-svg .qcandle-cup {
+  fill: var(--sc-brass);
+}
+
+.room-svg .qcandle-cup {
+  fill: var(--sc-brass-dark);
+}
+
+.room-svg .stop-wax-shade {
+  stop-color: var(--sc-mist);
+}
+
+.room-svg .stop-wax-light {
+  stop-color: var(--sc-bone);
+}
+
+.room-svg .qcandle-drip {
+  fill: var(--sc-bone);
+}
+
+.room-svg .qcandle-wick {
+  stroke: var(--sc-night);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.room-svg .qcandle-smoke {
+  stroke: var(--sc-mist);
+  stroke-width: 1.2;
+  opacity: 0.6;
+}
+
+.room-svg .qcandle.is-lit .qcandle-smoke {
+  opacity: 0;
+}
+
+.room-svg .flame-wrap {
+  opacity: 0;
+}
+
+.room-svg .qcandle.is-lit .flame-wrap {
+  opacity: 1;
+}
+
+.room-svg .stop-halo-0 {
+  stop-color: var(--sc-candle);
+  stop-opacity: 0.55;
+}
+
+.room-svg .stop-halo-1 {
+  stop-color: var(--sc-candle);
+  stop-opacity: 0;
+}
+
+.room-svg .stop-flame-0 {
+  stop-color: var(--sc-flame-pale);
+}
+
+.room-svg .stop-flame-1 {
+  stop-color: var(--sc-candle);
+}
+
+.room-svg .stop-flame-2 {
+  stop-color: var(--sc-pumpkin);
+}
+
+.room-svg .flame-core {
+  fill: var(--sc-flame-pale);
+}
+
+/* Sparks and the smoke "?" are drawn now and played by PR 3b. */
+.room-svg .sparks,
+.room-svg .smoke-q {
+  opacity: 0;
+}
+
+.room-svg .spark {
+  fill: var(--sc-candle);
+}
+
+.room-svg .smoke-q-line {
+  stroke: var(--sc-mist);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.room-svg .smoke-q-dot {
+  fill: var(--sc-mist);
+}
+
+/* ---------- The Grimoire: a book page beside (or under) the drawing ---------- */
+
+.scenic .grimoire {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-space-3);
+  padding: var(--sc-grimoire-pad);
+  background: var(--sc-card-backing);
+  border-top: var(--sc-line) solid var(--sc-brass);
+  color: var(--sc-text);
+}
+
+@media (min-width: 64rem) {
+  .scenic .grimoire {
+    height: var(--sc-full);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-top: 0;
+    border-left: var(--sc-line) solid var(--sc-brass);
+  }
+}
+
+.scenic .grimoire-heading {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: var(--sc-text-h2);
+  font-weight: var(--sc-weight-body);
+  color: var(--sc-text-heading);
+  overflow-wrap: anywhere;
+}
+
+.scenic .grimoire h3 {
+  margin: 0 0 var(--sc-space-1);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-h3);
+  font-weight: var(--sc-weight-body);
+  color: var(--sc-text-heading);
+}
+
+.scenic .grimoire p {
+  margin: 0;
+}
+
+.scenic .grimoire .judge-line {
+  color: var(--sc-text-muted);
+}
+
+.scenic .grimoire .field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-space-1);
+}
+
+.scenic .grimoire textarea {
+  box-sizing: border-box;
+  width: var(--sc-full);
+  padding: var(--sc-space-2);
+  background-color: var(--sc-backing);
+  color: var(--sc-text);
+  border: var(--sc-line) solid var(--sc-brass);
+  border-radius: var(--sc-radius);
+  font-family: var(--font-body);
+  font-size: var(--sc-text-body);
+  resize: vertical;
+}
+
+/* Choices: full-width rows with a Pumpkin triangle marker. */
+.scenic .grimoire .choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sc-space-2);
+}
+
+.scenic .grimoire .choice {
+  justify-content: flex-start;
+  gap: var(--sc-space-2);
+  width: var(--sc-full);
+  text-align: left;
+  border: var(--sc-line) solid var(--sc-brass);
+  background: var(--sc-plaque-backing);
+  box-shadow: var(--sc-plaque-lines);
+  color: var(--sc-candle);
+  font-size: var(--sc-text-body);
+}
+
+.scenic .grimoire .choice::before {
+  content: "";
+  flex: none;
+  width: var(--sc-space-2);
+  height: var(--sc-space-3);
+  background-color: var(--sc-pumpkin);
+  clip-path: var(--sc-choice-marker);
+}
+
+.scenic .grimoire .code-block {
+  flex: none;
+  max-height: var(--sc-code-max-h);
+  margin: 0;
+  padding: var(--sc-space-3);
+  overflow: auto;
+  background-color: var(--sc-backing);
+  border: var(--sc-line) solid var(--sc-brass-dark);
+  border-radius: var(--sc-radius);
+}
+
+.scenic .grimoire .code-block code {
+  white-space: pre;
+  overflow-wrap: normal;
+}
+
+.scenic .grimoire .licence {
+  font-size: var(--sc-text-small);
+  color: var(--sc-text-muted);
+}

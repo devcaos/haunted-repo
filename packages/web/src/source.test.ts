@@ -1061,7 +1061,7 @@ describe("display font files (Requirement 21.4)", () => {
 const GRIMOIRE_TS = `${SCENIC_DIR}grimoire.ts`;
 // Task 13.6 creates grimoire.ts and sets this to true. Until then only the
 // "the file exists" check is skipped; the other rules run over every file.
-const GRIMOIRE_REQUIRED = false;
+const GRIMOIRE_REQUIRED = true;
 /** Files that break item 14. Only grimoire.ts is also checked for any `.value`. */
 function answerBoxBreaks(files: SourceFile[]): string[] {
   const breaks: string[] = [];

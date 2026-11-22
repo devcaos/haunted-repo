@@ -120,9 +120,12 @@ export function createStage(sceneHref: string | null): Stage {
       element.setAttribute("data-finale", String(layout.finale));
       element.setAttribute("data-busy", String(view.busy));
 
-      // The house stays as it was behind the close-up room of the Ghost_Scene.
+      // The close-up room covers the stage in the Ghost_Scene, so the house
+      // behind it stays exactly as it was: no slot, dim or Camera change, which
+      // would repaint the whole illustration for nothing (director, 22 Nov).
+      if (scene.kind === "ghost") return;
       const next = slotSignature(layout);
-      if (scene.kind !== "ghost" && next !== signature) {
+      if (next !== signature) {
         signature = next;
         slots.replaceChildren(
           ...layout.slots.map((slot, i) =>
