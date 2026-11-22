@@ -1,4 +1,4 @@
-﻿import "../styles/scenic-tokens.css";
+import "../styles/scenic-tokens.css";
 import "../styles/base.css";
 import "../styles/ghosts.css";
 import "../styles/motion.css";
