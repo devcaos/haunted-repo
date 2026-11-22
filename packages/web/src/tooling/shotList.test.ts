@@ -25,8 +25,8 @@ describe("shot list (Requirements 24.4, 24.5, 24.10)", () => {
     }
   });
 
-  it("lists 16 states x 2 sizes for now (task 16.7 makes it 19 x 2 = 38)", () => {
-    expect(SHOT_STATES).toHaveLength(16);
-    expect(allShots()).toHaveLength(32);
+  it("lists 19 states x 2 sizes for now (task 16.7 makes it 19 x 2 = 38)", () => {
+    expect(SHOT_STATES).toHaveLength(19);
+    expect(allShots()).toHaveLength(38);
   });
 });

@@ -65,3 +65,31 @@ export function hudView(model: ViewModel, effects: RenderEffects): HudView {
     licence: model.licence,
   };
 }
+
+/** What the Lightning_Toggle shows (15.5, 15.9): under Reduced_Motion it is off and disabled, with its reason. */
+export interface LightningToggleView {
+  text: string;
+  pressed: boolean;
+  disabled: boolean;
+  reason: string | null;
+}
+
+export function lightningToggleView(
+  on: boolean,
+  reducedMotion: boolean,
+): LightningToggleView {
+  if (reducedMotion) {
+    return {
+      text: TEXTS.lightning.off,
+      pressed: false,
+      disabled: true,
+      reason: TEXTS.lightning.reducedReason,
+    };
+  }
+  return {
+    text: on ? TEXTS.lightning.on : TEXTS.lightning.off,
+    pressed: on,
+    disabled: false,
+    reason: null,
+  };
+}

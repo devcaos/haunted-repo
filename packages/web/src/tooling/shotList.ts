@@ -1,4 +1,4 @@
-﻿// Pure shot list for `npm run shots` (Requirements 24.4, 24.5, 24.10).
+// Pure shot list for `npm run shots` (Requirements 24.4, 24.5, 24.10).
 // The list grows with the stages; task 16.7 completes it (19 states in all).
 
 export const SHOT_STATES = [
@@ -14,6 +14,9 @@ export const SHOT_STATES = [
   "10-reaction-dont-know",
   "11-ghost-failed",
   "12-exorcised-moment",
+  "13-finale",
+  "14-live-busy",
+  "15-live-report",
   "16-reduced-house",
   "17-reduced-floor-attic",
   "18-reduced-ghost-asking",

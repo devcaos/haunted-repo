@@ -1,4 +1,4 @@
-﻿// Pure rules of the dist size check (`npm run size`) and of the external
+// Pure rules of the dist size check (`npm run size`) and of the external
 // address scan. No relative import and no Node import: `scripts/size.ts`
 // imports this file under Node's type stripping, and `source.test.ts` too.
 

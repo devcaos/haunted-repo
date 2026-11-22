@@ -1,4 +1,4 @@
-﻿# Spike: ¿las preguntas de Kiro obligan a entender un archivo?
+# Spike: ¿las preguntas de Kiro obligan a entender un archivo?
 
 Punto 3 de `PLAN.md`. Prueba rápida y desechable. Responde a una duda antes de construir: si las preguntas que genera Kiro sobre un archivo obligan de verdad a leer y entender el código.
 

@@ -32,7 +32,7 @@ Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node envi
 - Scripts must work on Windows PowerShell: only Node tools, no `rm -rf` or shell-only syntax.
 - Do not touch `requirements.md` or `design.md` of this spec, nor any file under `packages/core/`, `packages/web/src/sample/` or `packages/web/public/sirv-license.txt`. Under `packages/web/src/logic/` change only `texts.ts` and `powerTexts.ts`, and only by adding keys (Requirements 2.1 to 2.3). Under `src/view/simple/` change only what tasks 1.12, 10.1 and 16.8 say (Requirement 2.10).
 - New texts are additions only: no existing key of `TEXTS` or `POWER_TEXTS` changes value or disappears (Requirement 2.2). Every text that names the Kiro Power goes in `powerTexts.ts`.
-- Dark launch (decision Q14): until task 16.8, `chooseView` returns `"scenic"` only for `?view=scenic`, the Simple_Renderer stays the default, the Scenic_View_Link points to `?view=scenic`, and the Shots_Script opens `/haunted-repo/?view=scenic`.
+- Dark launch (decision Q14), ended on 22 Nov by task 16.8: until then `chooseView` returned `"scenic"` only for `?view=scenic`, the Simple_Renderer was the default, the Scenic_View_Link pointed to `?view=scenic`, and the Shots_Script opened `/haunted-repo/?view=scenic`. Now the bare address opens the Scenic view and `?view=simple` opens the Simple view.
 - Relative imports use the `.js` extension, except in `packages/web/scripts/*.ts`, which import `.ts` files (Node runs them directly).
 - Tests sit next to the code as `*.test.ts`; helpers are `*.testutil.ts`. No snapshot files. Tests that build a controller stub the global `fetch` to throw in `beforeEach`. Tests that read files start with `/// <reference types="node" />`.
 - Every property test is one `it` with `fc.assert(fc.property(...), { numRuns: 100 })` or more, with the comments `// Feature: scenic-web, Property N: <title>` and `// **Validates: Requirements ...**`.
@@ -47,7 +47,7 @@ These are settled by the approved design and are not reopened in these tasks:
 - Telephone_Target in floor order, then report order inside each floor (Q3). Variant = index modulo 5 (Q4).
 - No SVG or CSS filters anywhere; the rim light is a stroke path (Q5).
 - The 20 s Rings stop after the first `start-ghost` of the page load, whatever control sent it (Q17).
-- Dark launch until PR 4b (Q14). Temporary art in stage 1 is only visible behind `?view=scenic` (Q15).
+- Dark launch until task 16.8, done early on 22 Nov (Q14). Temporary art in stage 1 is only visible behind `?view=scenic` (Q15).
 - The HUD footer's Licence_Notice link is the last Tab stop in every Scene (Q16).
 - `npm ci` never downloads a browser; Chromium is installed by hand once (Q27).
 - D1 to D14 as written in the design section "Decisions Left to the Design".
@@ -1066,8 +1066,8 @@ These are settled by the approved design and are not reopened in these tasks:
 
 ### Stage 4
 
-- [ ] 15. PR 4a — Finale, live analysis, Lightning
-  - Branch: `feat/scenic-web-4a`. Branch from: an up-to-date `main`, after PR 3b is merged. Targets `main`.
+- [x] 15. PR 4a — Finale, live analysis, Lightning
+  - Branch: `feat/scenic-web-4a` for part 1 and `feat/scenic-web-4a-2` for part 2, see the split line below. Branch from: an up-to-date `main`, after the previous part is merged. Targets `main`.
   - Estimate: ~490 changed lines. Model: Auto.
   - Split on 22 Nov, director: part 1 = 15.1 to 15.3 on `feat/scenic-web-4a`; part 2 = 15.4 to 15.10 on `feat/scenic-web-4a-2` from `main` after part 1 is merged.
   - _Design: "PR Split" row 4a_
@@ -1098,7 +1098,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 15.1, 15.3_
     - _Design: "Correctness Properties", Property 16_
 
-  - [ ] 15.4 Draw the effects layer
+  - [x] 15.4 Draw the effects layer
     - There is no `art/sky.ts`: the weather overlay is in `art/weather.ts`. In a new `art/effects.ts` add `effectsLayer()`: the Search_Beam fan from the porch lantern painted in the illustration, at (354, 629) in house units (the lantern's lit centre in the asset is (319, 566), times 10/9; checked against `house-scene.svg`, element `porch-lantern-glow`); the lightning bolt with the full-world flash rect in one `lightning` group; and the dawn band in a `dawn` group, clipped to the sky like the rain (the clip of `weatherLayer`). No bats. `stage.ts` mounts it in place of the empty `effects` group.
     - Extend `art.test.ts`: the tree passes the rules; the beam starts at (354, 629); the dawn band uses the sky clip and never covers the house; there is no `bats` part.
     - Verify: `npm run check` exits `0`.
@@ -1106,42 +1106,43 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 13.3, 14.1, 15.1, 22.1_
     - _Design: "Props and panels" (Search_Beam, Lightning, Dawn), "World geometry"_
 
-  - [ ] 15.5 Add the Lightning_Toggle
-    - Extend `HudView` and `hudView` with the toggle (text, `aria-pressed`, disabled and reason under Reduced_Motion) and add examples to `hudView.test.ts` for on, off and Reduced_Motion. In `hud.ts` add the real `button` (flip on click, Enter or Space, same frame, focus kept, no UserAction) and the visible reason linked with `aria-describedby`. The state lives only in memory and starts on unless Reduced_Motion is on.
+  - [x] 15.5 Add the Lightning_Toggle
+    - In `hudView.ts` add the pure `lightningToggleView(on, reducedMotion)`: text, `aria-pressed`, disabled and reason under Reduced_Motion; add examples to `hudView.test.ts` for on, off and Reduced_Motion. In a new `lightningToggle.ts` add the real `button` (flip on click, Enter or Space, same frame, focus kept, no UserAction) and the visible reason linked with `aria-describedby`. The state lives only in memory and starts on unless Reduced_Motion is on.
+    - Placed by the director on 22 Nov at the bottom of the gate, next to the Motion button: `div.motion-controls` holds both buttons and the reason, last in the HUD aside, so the Tab order of Requirement 17.4 holds; on wide screens the CSS draws it on the gate's plinth.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add the lightning toggle`
     - _Requirements: 4.12, 15.5, 15.6, 15.8, 15.9_
     - _Design: "Accessible names" (Lightning_Toggle), decision Q26_
 
-  - [ ] 15.6 Show the Finale and the Search_Beam
+  - [x] 15.6 Show the Finale and the Search_Beam
     - In `effects.ts`, `stage.ts` and `renderer.ts`: `data-finale` from `layout.finale`, animated only when `effects.finale.animate` (after a Return_Glow of the same render, with an 0.8 s delay), end state otherwise; the `.finale-banner` with two lines (`TEXTS.finaleDone` and `POWER_TEXTS.finaleOtherGhosts`) or `house.houseClean`, announced through the Scenic_Announcer; `data-busy` from `live.busy` shows the Search_Beam. Banner styles in `stage.css` (line 1 `--font-title`, so Source_Scan item 12 now checks `.finale-banner .line-1`).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): show the dawn finale and the search beam`
     - _Requirements: 3.3, 13.1, 13.2, 13.3, 13.4, 13.5, 13.7, 13.8, 14.1, 14.2, 14.5, 21.2_
     - _Design: "effects.ts" row of "DOM modules", "Props and panels" (Finale banner), decision Q8_
 
-  - [ ] 15.7 Flash the Lightning
+  - [x] 15.7 Flash the Lightning
     - In `effects.ts`: schedule each flash from the previous due time with `nextFlashDelay(Math.random())`, never from a render; skip a due flash when `flashAllowed` is false and keep counting; the first flash is due 10 s to 15 s after load or after turning the toggle on; turning it off starts no new flash and ends a showing one within 1 s.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): flash lightning over the house`
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.7_
     - _Design: "scenic/model/lightningClock.ts", D7, D8_
 
-  - [ ] 15.8 Animate the Finale, the beam and the Lightning
+  - [x] 15.8 Animate the Finale, the beam and the Lightning
     - In `motion.css`: `finale-rain-stop`, `finale-dawn`, `banner-in`, `beam-sweep` and `lightning-flash` (at most 3 flashes per second) in the no-preference block; under `reduce` the 200 ms fades, the beam fixed at −3° and no Lightning. The Finale is: the page rain stops, the dawn band fades in over the sky, the banner appears. The clouds are painted and stay still. Remove the unused token `--sc-dur-finale-clouds` from `scenic-tokens.css`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate the finale and the search beam`
     - _Requirements: 13.3, 13.7, 14.6, 15.4, 18.4, 18.5, 18.7_
     - _Design: "Animation Catalogue"_
 
-  - [ ] 15.9 Add the Finale and live screenshots
+  - [x] 15.9 Add the Finale and live screenshots
     - In `shotList.ts` and `shots.ts`: turn the Lightning_Toggle off before the first shot; add `13-finale`, `14-live-busy` (request held, shot taken at once, then released, Q21) and `15-live-report`; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot the finale and the live analysis`
     - _Requirements: 24.4, 24.5, 24.6, 24.14_
     - _Design: "Shots", "No real GitHub, no network", decision Q21_
 
-  - [ ] 15.10 Checkpoint and PR 4a
+  - [x] 15.10 Checkpoint and PR 4a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4b, task 16.3; tasks 16.1 and 16.2 are withdrawn), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4a`.
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.

@@ -338,7 +338,7 @@
   box-shadow: none;
   color: var(--sc-text-link);
   font-family: var(--font-title);
-  font-size: var(--sc-text-body);
+  font-size: inherit;
   text-decoration: underline;
   cursor: pointer;
 }
@@ -358,13 +358,18 @@
     will-change: transform;
   }
 
+  /* Above the footer, which shares the gate's plinth with these buttons. */
+  .scenic > .hud-side {
+    z-index: 3;
+  }
+
   /* On the gate's plinth, under the opening, so the panel keeps its height. */
-  .scenic .hud-foot .motion-toggle {
-    position: absolute;
-    right: 0;
+  .scenic .hud-side .motion-controls {
+    position: fixed;
+    z-index: 2;
     bottom: var(--sc-gate-motion-y);
-    left: 0;
-    width: max-content;
+    left: var(--sc-gate-inner-x);
+    width: var(--sc-gate-inner-w);
     min-height: var(--sc-gate-motion-h);
     margin: 0 auto;
     font-size: var(--sc-gate-tagline);
@@ -448,6 +453,12 @@
       );
     }
 
+    /* The Motion and Lightning buttons light up with the footer, as before. */
+    .scenic[data-gate="rising"] .hud-side .motion-controls {
+      animation: gate-text-on var(--sc-dur-gate-text-on) var(--sc-ease-linear)
+        calc(var(--sc-gate-text-at) + 2 * var(--sc-gate-text-step)) both;
+    }
+
     /* The pumpkin waits unseen in the dark and catches light at the landing. */
     .scenic[data-gate="rising"] .gate-ground-wide .gate-pumpkin {
       animation: gate-pumpkin-on var(--sc-dur-gate-light-on)
@@ -487,6 +498,46 @@
         var(--sc-ease-in-out) var(--sc-gate-flicker-at) infinite;
     }
   }
+}
+
+/* The Motion and Lightning buttons side by side; the reason goes under them. */
+.scenic .motion-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: var(--sc-space-4);
+  font-size: var(--sc-text-body);
+}
+
+.scenic .lightning-toggle {
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  color: var(--sc-text-link);
+  font-family: var(--font-title);
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.scenic .lightning-toggle:disabled {
+  color: var(--sc-text-muted);
+  text-decoration: none;
+  cursor: default;
+}
+
+.scenic .lightning-reason {
+  flex-basis: var(--sc-full);
+  margin: 0;
+  color: var(--sc-text-muted);
+  font-size: var(--sc-text-small);
+  text-align: center;
+}
+
+.scenic .lightning-reason[hidden] {
+  display: none;
 }
 
 /* Reduced_Motion: nothing moves, so the Motion button has nothing to stop. */

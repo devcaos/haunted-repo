@@ -29,6 +29,10 @@ import { sceneLayout, type Frame } from "./model/sceneLayout.js";
 import { scenicFocusAfterRender } from "./model/scenicFocus.js";
 import { watchMedia } from "./motion.js";
 import { createMotionToggle } from "./motionToggle.js";
+import { createLightningToggle } from "./lightningToggle.js";
+import { createLightning } from "./effects.js";
+import { POWER_TEXTS } from "../../logic/powerTexts.js";
+import { TEXTS } from "../../logic/texts.js";
 import {
   createPhoneWidget,
   type PhonePlace,
@@ -163,22 +167,18 @@ export function createScenicRenderer(
       : reduced.matches
         ? 150
         : 300;
-  const phone = createPhoneWidget(
-    stage,
-    send,
-    // Empty first, then fill after 50 ms, so a repeated sentence is announced again.
-    (text) => {
-      if (announceTimer !== null) window.clearTimeout(announceTimer);
-      hud.announcer.textContent = "";
-      announceTimer = window.setTimeout(() => {
-        announceTimer = null;
-        hud.announcer.textContent = text;
-      }, 50);
-    },
-    () => {
-      dispatchPhone({ type: "answered" });
-    },
-  );
+  // Empty first, then fill after 50 ms, so a repeated sentence is announced again.
+  const announce = (text: string): void => {
+    if (announceTimer !== null) window.clearTimeout(announceTimer);
+    hud.announcer.textContent = "";
+    announceTimer = window.setTimeout(() => {
+      announceTimer = null;
+      hud.announcer.textContent = text;
+    }, 50);
+  };
+  const phone = createPhoneWidget(stage, send, announce, () => {
+    dispatchPhone({ type: "answered" });
+  });
   // The Gate_Panel is decoration around the HUD: the wide drawing comes
   // first and is skipped by screen readers; the narrow pieces sit inside the
   // header and the footer, so the Tab order does not change.
@@ -195,8 +195,31 @@ export function createScenicRenderer(
     hud.footer,
     gate.ground,
   ]);
-  // First in the footer, so the Licence_Notice link stays the last Tab stop.
-  hud.footer.prepend(createMotionToggle(shell));
+  let finaleShown = false;
+  let momentEnds = 0;
+  const lightning = createLightning(stage.element, () => {
+    const model = guard.current();
+    return {
+      toggleOn: toggle.isOn(),
+      reducedMotion: reduced.matches,
+      scene: model?.scene.kind ?? "house",
+      finale: finaleShown,
+      ringPlaying: phoneState.mode === "ringing",
+      exorcisedMomentPlaying: performance.now() < momentEnds,
+    };
+  });
+  const toggle = createLightningToggle(reduced, (on) => {
+    if (on) lightning.restart();
+    else lightning.stop();
+  });
+  // Last in the HUD aside, so both buttons come before the Answer_Button in
+  // the Tab order (17.4); on wide screens the CSS draws them on the plinth.
+  toggle.element.prepend(createMotionToggle(shell));
+  hud.aside.append(toggle.element);
+  if (toggle.isOn()) lightning.restart();
+  /** The Finale banner: HTML in the stage, above the house (13.4, 13.5). */
+  const banner = el("div", { class: "finale-banner", hidden: "" });
+  stage.element.prepend(banner);
   root.replaceChildren(shell);
   gate.raise(shell, stage.element.querySelector("image.scene-art"));
 
@@ -341,6 +364,7 @@ export function createScenicRenderer(
         // reachable today) shows only the Return_Glow, never the spiral.
         if (effects.exorcisedMoments.length > 0) {
           room.exorcise(momentMs());
+          momentEnds = performance.now() + momentMs();
           dispatchPhone({ type: "exorcised-moment" }, false);
         }
       } else {
@@ -355,6 +379,30 @@ export function createScenicRenderer(
           dispatchPhone({ type: "return-glow-ended" });
         }, ms);
       }
+      finaleShown = effects.finale.shown;
+      stage.element.classList.toggle(
+        "is-finale-in",
+        effects.finale.shown &&
+          (effects.finale.animate ||
+            stage.element.classList.contains("is-finale-in")),
+      );
+      banner.hidden = !effects.finale.shown;
+      if (effects.finale.shown) {
+        const clean = model.house?.houseClean ?? null;
+        const lines =
+          clean === null
+            ? [TEXTS.finaleDone, POWER_TEXTS.finaleOtherGhosts]
+            : [clean];
+        if (banner.dataset["text"] !== lines.join(" ")) {
+          banner.dataset["text"] = lines.join(" ");
+          banner.replaceChildren(
+            ...lines.map((line, i) =>
+              el("p", { class: `line-${i + 1}` }, [line]),
+            ),
+          );
+        }
+      }
+      if (effects.finale.announce) announce(banner.dataset["text"] ?? "");
       // Below 64rem the room is in the page flow: entering it shows its top, with the ghost.
       if (entering && viewport === "narrow") {
         const top = room.element.getBoundingClientRect().top + window.scrollY;

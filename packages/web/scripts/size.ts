@@ -1,4 +1,4 @@
-﻿// Run with: npm run size   (root script, part of npm run check)
+// Run with: npm run size   (root script, part of npm run check)
 // I/O only: the rules live in ../src/tooling/distRules.ts.
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
