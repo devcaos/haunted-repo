@@ -1020,7 +1020,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 12.1, 12.2, 12.8, 13.7_
     - _Design: "Correctness Properties", Property 11_
 
-  - [ ] 14.6 Feed the HUD from the render memory
+  - [x] 14.6 Feed the HUD from the render memory
     - Change `hudView(model)` to `hudView(model, effects)`: the meter and the Ghost_Icons come from `effects.meter` (frozen in the Ghost_Scene, animated `from` after a Return_Glow). Update the calls in `renderer.ts`, the unit tests of task 1.7 and the P9 call (same assertions); add examples for the frozen meter and icons. `hud.ts` animates the fill from `from` to the new scale.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): freeze the haunt meter during an exorcism`

@@ -120,6 +120,13 @@ export function createHud(handlers: HudHandlers): Hud {
       meter.hidden = view.meter === null;
       if (view.meter !== null) {
         setText(meterLine, view.meter.line);
+        // After a Return_Glow the bar starts at the old share and moves (12.6).
+        meterFill.classList.remove("is-moving");
+        if (view.meter.from !== null) {
+          meterFill.style.transform = view.meter.from;
+          void meterFill.getBoundingClientRect();
+          meterFill.classList.add("is-moving");
+        }
         meterFill.style.transform = view.meter.scale;
       }
 

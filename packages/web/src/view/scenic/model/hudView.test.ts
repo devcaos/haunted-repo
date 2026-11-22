@@ -8,9 +8,13 @@ import { createRecordingRenderer } from "../../../logic/recordingRenderer.testut
 import { TEXTS } from "../../../logic/texts.js";
 import type { ViewModel } from "../../../logic/viewModel.js";
 import { loadSample } from "../../../sample/sampleData.js";
-import { hudView } from "./hudView.js";
-import { meterScale } from "./renderMemory.js";
+import { hudView as hudViewOf } from "./hudView.js";
+import { EMPTY_MEMORY, meterScale, nextMemory } from "./renderMemory.js";
 import { viewModelArb } from "./viewModelArb.testutil.js";
+
+/** A first render: the effects of an empty memory. */
+const hudView = (m: ViewModel) =>
+  hudViewOf(m, nextMemory(EMPTY_MEMORY, m).effects);
 
 function readCommitted(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -133,6 +137,49 @@ describe("hudView", () => {
   });
 });
 
+describe("hudView with the render memory (task 14.6)", () => {
+  it("takes the meter and the icons from the effects, frozen in the Ghost_Scene (4.3, 4.4)", () => {
+    const model = sampleModel();
+    const effects = nextMemory(EMPTY_MEMORY, model).effects;
+    const view = {
+      line: "2 of 5 ghosts still haunting",
+      share: 0.4,
+      haunted: 2,
+      total: 5,
+    };
+    const hud = hudViewOf(model, { ...effects, meter: { view, from: null } });
+    expect(hud.meter).toEqual({
+      line: view.line,
+      scale: meterScale(0.4),
+      from: null,
+    });
+    expect(hud.icons).toEqual([
+      "exorcised",
+      "exorcised",
+      "exorcised",
+      "haunted",
+      "haunted",
+    ]);
+  });
+  it("moves the meter from the old share after a Return_Glow (12.6)", () => {
+    const model = sampleModel();
+    const effects = nextMemory(EMPTY_MEMORY, model).effects;
+    const view = {
+      line: "4 of 5 ghosts still haunting",
+      share: 0.8,
+      haunted: 4,
+      total: 5,
+    };
+    const hud = hudViewOf(model, { ...effects, meter: { view, from: 1 } });
+    expect(hud.meter?.from).toBe(meterScale(1));
+    expect(hud.meter?.scale).toBe(meterScale(0.8));
+  });
+  it("shows no meter when the effects have none (4.17)", () => {
+    const model = sampleModel();
+    const effects = nextMemory(EMPTY_MEMORY, model).effects;
+    expect(hudViewOf(model, { ...effects, meter: null }).meter).toBeNull();
+  });
+});
 describe("hudView properties", () => {
   // Feature: scenic-web, Property 9: The HUD view follows the ViewModel
   // **Validates: Requirements 4.8, 4.10, 4.13, 4.14, 4.15, 4.16, 14.4**

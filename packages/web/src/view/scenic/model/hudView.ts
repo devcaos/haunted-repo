@@ -1,6 +1,6 @@
 import { TEXTS } from "../../../logic/texts.js";
 import type { LicenceView, ViewModel } from "../../../logic/viewModel.js";
-import { meterScale } from "./renderMemory.js";
+import { meterScale, type RenderEffects } from "./renderMemory.js";
 
 export interface HudView {
   logo: string;
@@ -24,13 +24,14 @@ function has(model: ViewModel, type: string): boolean {
 }
 
 /**
- * Pure mapping from the ViewModel to the HUD. In this version the Haunt_Meter
- * always shows the model's own progress and never animates (`from` is null);
- * task 14.6 adds the Ghost_Scene rule and the animation.
+ * Pure mapping from the ViewModel to the HUD. The Haunt_Meter and the
+ * Ghost_Icons come from the render memory: frozen in the Ghost_Scene, and
+ * moving `from` the old share after a Return_Glow (4.3, 4.4, 12.6).
  */
-export function hudView(model: ViewModel): HudView {
+export function hudView(model: ViewModel, effects: RenderEffects): HudView {
   const house = model.house;
-  const progress = house?.progress ?? null;
+  const progress = effects.meter?.view ?? null;
+  const from = effects.meter?.from ?? null;
   const icons: HudView["icons"] = [];
   if (progress !== null) {
     const exorcised = Math.max(0, progress.total - progress.haunted);
@@ -50,7 +51,7 @@ export function hudView(model: ViewModel): HudView {
         : {
             line: progress.line,
             scale: meterScale(progress.share),
-            from: null,
+            from: from === null ? null : meterScale(from),
           },
     icons,
     plaque: {

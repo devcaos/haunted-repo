@@ -6,6 +6,7 @@ import { createGate } from "./gate.js";
 import { createGhostScene } from "./ghostScene.js";
 import { createGrimoire } from "./grimoire.js";
 import { grimoireView } from "./model/grimoireView.js";
+import { EMPTY_MEMORY, nextMemory } from "./model/renderMemory.js";
 import { createHud } from "./hud.js";
 import { createActionGuard } from "./model/actionGuard.js";
 import { WIDE_QUERY, type ViewportClass } from "./model/camera.js";
@@ -107,6 +108,7 @@ export function createScenicRenderer(
   let lastView: StageView | null = null;
   let phoneView: PhoneView = { source: null, target: null, powerLine: null };
   const telephoneLayer = stage.element.querySelector("g.telephone");
+  let memory = EMPTY_MEMORY;
   /** Every `start-ghost` of the page goes through here, so the bell hears of it (Q17). */
   const send = (action: UserAction): boolean => {
     const sent = guard.send(action);
@@ -254,7 +256,10 @@ export function createScenicRenderer(
       const had = document.activeElement;
       const before = grimoire.focusBefore() ?? controls.focusBefore();
       guard.setModel(model);
-      hud.update(hudView(model));
+      const step = nextMemory(memory, model);
+      memory = step.memory;
+      const effects = step.effects;
+      hud.update(hudView(model, effects));
       const layout = sceneLayout(model);
       shell.setAttribute("data-scene", model.scene.kind);
       // No Camera transition exists yet, so the first render never animates.
