@@ -13,10 +13,10 @@ import {
 } from "./shapes.js";
 
 // The close-up exorcism room, in the viewBox `0 0 600 800`. The room itself
-// is a declared illustration drafted with Claude `room-scene.svg`, director's
-// decision of 22 Nov); the page draws only what changes over it: the rain in
-// the window, the cold and warm light, the three Question_Candles, the sparks
-// and the smoke "?". No filter anywhere (decision Q5).
+// is a declared illustration drafted with Claude, `room-scene.svg`, by the
+// director's decision of 22 Nov; the page draws only what changes over it:
+// the rain in the window, the cold and warm light, the three Question_Candles,
+// the sparks and the smoke "?". No filter anywhere (decision Q5).
 
 /** The room picture's box. */
 export const ROOM_BOX = { w: 600, h: 800 } as const;
