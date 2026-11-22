@@ -900,7 +900,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.2, 10.3, 10.4, 10.6, 10.7, 10.9, 10.10, 10.12, 25.5_
     - _Design: "scenic/model/hudView.ts and scenic/model/grimoireView.ts"_
 
-  - [ ] 13.2 Property test for the Grimoire choices
+  - [x] 13.2 Property test for the Grimoire choices
     - **Property 17: Grimoire choices follow Available_Actions**
     - **Validates: Requirements 10.4, 10.12**
     - Generator: `viewModelArb` restricted to Ghost_Scenes, plus every step of a real `pageRunArb` run, at least 100 runs.

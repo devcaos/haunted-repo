@@ -1,5 +1,6 @@
 ﻿/// <reference types="node" />
 import { readFileSync } from "node:fs";
+import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AvailableAction } from "../../../logic/actions.js";
 import { parseDemoScript } from "../../../logic/demoScript.js";
@@ -11,6 +12,11 @@ import type { ViewModel } from "../../../logic/viewModel.js";
 import { loadSample } from "../../../sample/sampleData.js";
 import { grimoireView } from "./grimoireView.js";
 import type { GrimoireBlock } from "./grimoireView.js";
+import {
+  pageRunArb,
+  playPageRun,
+  viewModelArb,
+} from "./viewModelArb.testutil.js";
 
 function read(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -31,6 +37,15 @@ const sample = loadSample(
   read("../../../sample/files.json"),
 );
 const script = parseDemoScript(read("../../../sample/demo-script.json"));
+
+/** Every ghost action the Grimoire may show (all but the house actions). */
+const HOUSE_ACTIONS = new Set([
+  "submit-live",
+  "show-sample",
+  "go-to-floor",
+  "go-to-house",
+  "start-ghost",
+]);
 
 /** The type of each block, in order. */
 function kinds(blocks: GrimoireBlock[]): string[] {
@@ -92,6 +107,63 @@ async function committedGhostModels(): Promise<ViewModel[]> {
   const all: ViewModel[] = [];
   for (const strategy of STRATEGIES) all.push(...(await walk(strategy)));
   return all;
+}
+
+/** The ghost actions of `available`, as the labels the Grimoire must show. */
+function expectedChoices(model: ViewModel): { type: string; label: string }[] {
+  const result: { type: string; label: string }[] = [];
+  for (const entry of model.available) {
+    if (HOUSE_ACTIONS.has(entry.type)) continue;
+    let label: string;
+    if (entry.type === "rate") label = TEXTS.actionLabels.rate[entry.rating];
+    else if (entry.type === "self-check")
+      label = TEXTS.actionLabels["self-check"][entry.answer];
+    else
+      label =
+        TEXTS.actionLabels[
+          entry.type as Exclude<
+            keyof typeof TEXTS.actionLabels,
+            "rate" | "self-check"
+          >
+        ];
+    result.push({ type: nameOf(entry), label });
+  }
+  return result;
+}
+
+/** Everything Property 17 says, for one Ghost_Scene model. */
+function expectChoicesFollowAvailable(model: ViewModel): void {
+  const view = grimoireView(model);
+  expect(view).not.toBeNull();
+  const choices = view?.blocks.find((block) => block.kind === "choices");
+  const expected = expectedChoices(model);
+  if (expected.length === 0) {
+    expect(choices).toBeUndefined();
+  } else {
+    expect(choices?.kind).toBe("choices");
+    const items = choices?.kind === "choices" ? choices.items : [];
+    expect(
+      items.map((item) => ({
+        type: nameOf(item.action as AvailableAction),
+        label: item.label,
+      })),
+    ).toEqual(expected);
+  }
+  // The blocks keep the Simple_Renderer order (10.12).
+  const order = [
+    "judge-line",
+    "reading",
+    "question",
+    "answer-box",
+    "revealed",
+    "prompt",
+    "choices",
+    "code",
+    "licence",
+  ];
+  const positions = kinds(view?.blocks ?? []).map((k) => order.indexOf(k));
+  expect(positions.every((p) => p >= 0)).toBe(true);
+  expect([...positions].sort((a, b) => a - b)).toEqual(positions);
 }
 
 describe("grimoireView", () => {
@@ -279,5 +351,34 @@ describe("grimoireView", () => {
     expect(keyOf(model("a.js", 1))).toBe(keyOf(model("a.js", 1)));
     expect(keyOf(model("a.js", 1))).not.toBe(keyOf(model("a.js", 2)));
     expect(keyOf(model("a.js", 1))).not.toBe(keyOf(model("b.js", 1)));
+  });
+
+  // Feature: scenic-web, Property 17: Grimoire choices follow Available_Actions
+  // **Validates: Requirements 10.4, 10.12**
+  it("Property 17: Grimoire choices follow Available_Actions", async () => {
+    fc.assert(
+      fc.property(
+        viewModelArb.filter((model) => model.scene.kind === "ghost"),
+        (model) => {
+          expectChoicesFollowAvailable(model);
+        },
+      ),
+      { numRuns: 100 },
+    );
+    let ghostSteps = 0;
+    await fc.assert(
+      fc.asyncProperty(pageRunArb, async (run) => {
+        for (const model of await playPageRun(run, read)) {
+          if (model.scene.kind === "ghost") {
+            ghostSteps += 1;
+            expectChoicesFollowAvailable(model);
+          } else {
+            expect(grimoireView(model)).toBeNull();
+          }
+        }
+      }),
+      { numRuns: 100 },
+    );
+    expect(ghostSteps).toBeGreaterThan(0);
   });
 });
