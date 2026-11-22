@@ -1212,7 +1212,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - Run `npm run check`; it must exit `0`.
     - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
     - Push with `git push -u origin feat/scenic-web-4b`. Body in `$env:TEMP\pr-scenic-web-4b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: none new; the full set of 38 files", and the manual checklist: keyboard only in every Scene; screen reader spot check; Network tab shows no simple CSS at the default and no scenic CSS at `?view=simple`; 360 px with no horizontal scroll; system Reduced_Motion toggled while the page is open.
-    - Run `gh pr create --base main --head feat/scenic-web-4b --title "feat: add the reduced motion audit and the scenic default" --body-file $env:TEMP\pr-scenic-web-4b-body.md`.
+    - Run `gh pr create --base main --head feat/scenic-web-4b --title "feat: add the reduced motion audit and the responsive check" --body-file $env:TEMP\pr-scenic-web-4b-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
