@@ -5,6 +5,24 @@
  * The scene illustration is a still picture: only the page's own overlay
  * (rain, fog) and the ghosts move.
  */
+/* The close-up room fades in and out (opacity only). */
+@keyframes room-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes room-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
 /* Rain falls by exactly one step of its pattern, so the loop never jumps. */
 @keyframes rain-fall {
   from {
@@ -197,6 +215,27 @@
     animation: flame-flicker var(--sc-dur-flame-flicker) var(--sc-ease-in-out)
       infinite alternate;
   }
+  /* Ghost_Scene: the room fades in on entering and out when it leaves. */
+  .scenic .room[data-state="open"] {
+    animation: room-in var(--sc-dur-room-in) var(--sc-ease-out) both;
+  }
+
+  .scenic .room[data-state="leaving"] {
+    animation: room-out var(--sc-dur-room-out) var(--sc-ease-in) both;
+  }
+
+  .room-svg .room-rain {
+    animation: rain-fall var(--sc-dur-rain-fall) var(--sc-ease-linear) infinite;
+  }
+
+  .room-svg .flame-wrap {
+    transition: opacity var(--sc-dur-candle-light) var(--sc-ease-out);
+  }
+
+  /* The house loops do not run behind the room (Requirement 20.4). */
+  .stage[data-scene="ghost"] .world * {
+    animation-play-state: paused;
+  }
   /* The dev-only gallery draws every ghost in its resting pose. */
   [data-motion="still"] .ghost-idle {
     animation: none;
@@ -216,6 +255,18 @@
   }
   .scenic .house .fog {
     opacity: var(--sc-fog-still);
+  }
+  /* The room appears and leaves with a short fade, no delay; its rain is still. */
+  .scenic .room[data-state="open"] {
+    animation: room-in var(--sc-rm-room-fade) var(--sc-ease-out) both;
+  }
+
+  .scenic .room[data-state="leaving"] {
+    animation: room-out var(--sc-rm-room-fade) var(--sc-ease-in) both;
+  }
+
+  .room-svg .flame-wrap {
+    transition: opacity var(--sc-rm-room-fade) var(--sc-ease-out);
   }
   /* The Phone_Bubble still fades in: opacity only, 200 ms. */
   .scenic .phone-bubble {

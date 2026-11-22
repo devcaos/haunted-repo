@@ -942,7 +942,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.10, 10.11, 10.12, 17.6, 25.1, 25.5_
     - _Design: "DOM modules" (grimoire.ts), "Props and panels" (Grimoire)_
 
-  - [ ] 13.7 Style the room and the Grimoire
+  - [x] 13.7 Style the room and the Grimoire
     - Create `packages/web/src/view/scenic/styles/room.css` (tokens only): room backdrop, Grimoire page (Slate backing, Brass corners, IM Fell English headings), choice rows with the Pumpkin `clip-path` marker, Code_Block max height from a token with its own scroll, Grimoire beside the drawing at 64rem and above and under it below (D10). In `motion.css`: room enter and leave and candle light transitions, with the reduced 150 ms fades.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): style the exorcism room and grimoire`

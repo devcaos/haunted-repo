@@ -5,6 +5,7 @@ import "./styles/gate.css";
 import "./styles/gate-motion.css";
 import "./styles/stage.css";
 import "./styles/ghosts.css";
+import "./styles/room.css";
 import "./styles/motion.css";
 import { loadScenicFonts } from "./fonts.js";
 import { createScenicRenderer } from "./renderer.js";

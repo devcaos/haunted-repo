@@ -458,4 +458,26 @@
   --sc-gate-debris-line: 1.5;
   --sc-gate-dust: rgb(115 100 85 / 0.5);
   --sc-gate-dust-end: rgb(90 80 70 / 0);
+  /* Ghost_Scene room and Grimoire (PR 3a part 2, director 22 Nov). The room
+     content starts right of the gate's drawn edge (lantern included). */
+  --sc-room-gate-edge: calc(var(--sc-gate-u) * 520);
+  --sc-room-left: max(
+    0px,
+    calc(var(--sc-room-gate-edge) - (100vw - var(--sc-stage-wide)) / 2)
+  );
+  --sc-grimoire-w: clamp(23.75rem, 46%, 40rem);
+  --sc-grimoire-pad: var(--sc-space-4);
+  --sc-code-max-h: 18rem;
+  --sc-room-aspect: 3 / 4;
+  --sc-room-min-aspect: 11 / 20;
+  --sc-choice-marker: polygon(0 0, 100% 50%, 0 100%);
+  --sc-close-up-h: 53cqh;
+  --sc-close-up-bottom: 17.5cqh;
+  --sc-close-up-x: calc(50cqw - 6.25cqh);
+  --sc-dur-room-in: 500ms;
+  --sc-dur-room-out: 300ms;
+  --sc-dur-candle-light: 300ms;
+  --sc-rm-room-fade: 150ms;
+  --sc-room-cold-opacity: 0.35;
+  --sc-room-warm-opacity: 0.8;
 }
