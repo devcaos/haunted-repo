@@ -15,8 +15,8 @@ import {
   focusKeyOf,
 } from "../shared/focus.js";
 
-// Dark launch (decision Q14): task 16.8 changes this to "./".
-const SCENIC_HREF = "?view=scenic";
+// The Scenic view is the default (task 16.8), so its link is the bare address.
+const SCENIC_HREF = "./";
 /** Where focus is now, seen from the rebuilt `main` element. */
 function focusBefore(main: HTMLElement): FocusBefore {
   const active = document.activeElement;

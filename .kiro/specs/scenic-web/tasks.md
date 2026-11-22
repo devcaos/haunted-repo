@@ -1193,10 +1193,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 24.4, 24.5, 24.6, 24.10, 24.12_
     - _Design: "Shots", "Shots_Script (npm run shots)"_
 
-  - [ ] 16.8 Make the scenic view the default
+  - [x] 16.8 Make the scenic view the default
     - One small commit: `chooseView` returns `"simple"` exactly when `new URLSearchParams(search).get("view") === "simple"`, else `"scenic"` (Requirement 1); `viewChoice.test.ts` examples become those of the design (`?view=SIMPLE`, `?view=`, `?view=simple&view=scenic`, `?view=scenic&view=simple`, hash and other parameters) and P12 takes the design's expectation; the Scenic_View_Link of `simple/renderer.ts` points to `./`; the Shots_Script opens `/haunted-repo/`.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): make the scenic view the default`
+    - Done early on 22 Nov in its own PR, branch `feat/scenic-web-default`, by the director's decision.
     - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.11, 1.12_
     - _Design: "Renderer choice and CSS loading", "Dark launch (director decision Q14)", "Simple_Renderer change (Scenic_View_Link)"_
 

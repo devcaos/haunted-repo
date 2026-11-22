@@ -2,11 +2,11 @@ export type ViewName = "scenic" | "simple";
 
 /**
  * Reads only the query string. Never changes the address. Stores nothing.
- * Dark launch (decision Q14): until PR 4b the Scenic view is chosen only by
- * `?view=scenic`, and the Simple view stays the default.
+ * The Scenic view is the default; only an exact first `view=simple` gives
+ * the Simple view (Requirement 1, task 16.8).
  */
 export function chooseView(search: string): ViewName {
-  return new URLSearchParams(search).get("view") === "scenic"
-    ? "scenic"
-    : "simple";
+  return new URLSearchParams(search).get("view") === "simple"
+    ? "simple"
+    : "scenic";
 }
