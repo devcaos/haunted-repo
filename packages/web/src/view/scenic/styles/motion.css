@@ -256,7 +256,91 @@
     opacity: 1;
   }
 }
+/* Finale, Search_Beam and Lightning (PR 4a). */
+@keyframes beam-sweep {
+  from {
+    transform: rotate(-18deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes lightning-flash {
+  0% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.15;
+  }
+  32% {
+    opacity: 0.8;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes banner-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sc-banner-rise));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  /* Search_Beam: sweeps the house only while a live analysis runs. */
+  .stage[data-busy="true"] .house .beam-sweep {
+    animation: beam-sweep var(--sc-dur-beam-sweep) var(--sc-ease-in-out)
+      infinite alternate;
+  }
+
+  .stage.is-flashing .house .lightning {
+    animation: lightning-flash var(--sc-dur-lightning) var(--sc-ease-linear)
+      both;
+  }
+
+  /* The Finale change: after the Return_Glow, the rain stops, dawn comes, then the banner. */
+  .stage.is-finale-in .house .rain-wrap {
+    animation: fade-out var(--sc-dur-finale-rain-stop) var(--sc-ease-out)
+      var(--sc-delay-finale) both;
+  }
+
+  .stage.is-finale-in .house .dawn {
+    animation: fade-in var(--sc-dur-finale-dawn) var(--sc-ease-in-out)
+      var(--sc-delay-finale) both;
+  }
+
+  .stage.is-finale-in .finale-banner {
+    animation: banner-in var(--sc-dur-banner-in) var(--sc-ease-out)
+      var(--sc-delay-banner) both;
+  }
   /* The pinned widget keeps its size on screen while the Camera moves. */
   .scenic .world-overlay .phone-widget .answer-slot,
   .scenic .world-overlay .phone-widget .phone-bubble {
@@ -414,6 +498,19 @@
 }
 /* Reduced_Motion: rain and fog are drawn still (D9). */
 @media (prefers-reduced-motion: reduce) {
+  /* The beam stands still; the Finale is a short fade; no Lightning at all. */
+  .house .beam-sweep {
+    transform: rotate(var(--sc-beam-still));
+  }
+
+  .stage.is-finale-in .house .rain-wrap {
+    animation: fade-out var(--sc-rm-fade-long) var(--sc-ease-out) both;
+  }
+
+  .stage.is-finale-in .house .dawn,
+  .stage.is-finale-in .finale-banner {
+    animation: fade-in var(--sc-rm-fade-long) var(--sc-ease-out) both;
+  }
   /* Reduced_Motion: the Camera cuts to the new frame and the dim is a short fade. */
   .scenic .world {
     transition: none;

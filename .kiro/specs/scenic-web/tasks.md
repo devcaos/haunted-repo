@@ -1127,7 +1127,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.7_
     - _Design: "scenic/model/lightningClock.ts", D7, D8_
 
-  - [ ] 15.8 Animate the Finale, the beam and the Lightning
+  - [x] 15.8 Animate the Finale, the beam and the Lightning
     - In `motion.css`: `finale-rain-stop`, `finale-dawn`, `banner-in`, `beam-sweep` and `lightning-flash` (at most 3 flashes per second) in the no-preference block; under `reduce` the 200 ms fades, the beam fixed at −3° and no Lightning. The Finale is: the page rain stops, the dawn band fades in over the sky, the banner appears. The clouds are painted and stay still. Remove the unused token `--sc-dur-finale-clouds` from `scenic-tokens.css`.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): animate the finale and the search beam`

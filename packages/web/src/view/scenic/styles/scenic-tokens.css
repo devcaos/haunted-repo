@@ -208,7 +208,6 @@
   --sc-dur-window-light-up: 800ms;
   --sc-dur-room-warm: 1200ms;
   --sc-dur-finale-rain-stop: 1200ms;
-  --sc-dur-finale-clouds: 2000ms;
   --sc-dur-finale-dawn: 2000ms;
   --sc-dur-intro: 1500ms;
   --sc-dur-lightning: 600ms;
@@ -243,6 +242,9 @@
   --sc-delay-phase-1: 1.4s;
   --sc-delay-sparks: 1000ms;
   --sc-delay-finale: 800ms;
+  --sc-delay-banner: 2000ms;
+  --sc-banner-rise: 8px;
+  --sc-beam-still: -3deg;
   --sc-banner-top: 4.5rem;
   --sc-banner-top-floor: 7.75rem;
   --sc-banner-border: 2px;
