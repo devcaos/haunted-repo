@@ -556,3 +556,68 @@
   stop-color: var(--sc-rust);
   stop-opacity: 0;
 }
+
+.stage[data-busy="true"] .house .search-beam {
+  opacity: 1;
+}
+
+.stage[data-finale="true"] .house .dawn {
+  opacity: 1;
+}
+
+.stage[data-finale="true"] .house .rain-wrap {
+  opacity: 0;
+}
+
+/* Finale banner (13.4): real HTML over the sky, never over the house. */
+.scenic .finale-banner {
+  box-sizing: border-box;
+  margin: var(--sc-space-2);
+  padding: var(--sc-space-2) var(--sc-space-4);
+  border: var(--sc-banner-border) solid var(--sc-candle);
+  border-radius: var(--sc-radius);
+  background-color: var(--sc-night);
+  text-align: center;
+}
+
+.scenic .finale-banner[hidden] {
+  display: none;
+}
+
+.scenic .finale-banner p {
+  margin: 0;
+}
+
+.scenic .finale-banner .line-1 {
+  color: var(--sc-candle);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-banner);
+  line-height: var(--sc-leading-title);
+}
+
+.scenic .finale-banner .line-2 {
+  color: var(--sc-bone);
+  font-family: var(--font-body);
+  font-size: var(--sc-text-body);
+}
+
+@media (min-width: 64rem) {
+  .scenic .finale-banner {
+    position: absolute;
+    z-index: 1;
+    top: var(--sc-banner-top);
+    right: 0;
+    left: var(--sc-hud-width);
+    width: max-content;
+    max-width: min(
+      var(--sc-banner-max-w),
+      var(--sc-full) - var(--sc-hud-width) - 2 * var(--sc-space-3)
+    );
+    margin: 0 auto;
+  }
+
+  /* In a Floor_Scene the docked phone sits under the floor buttons: the banner goes under it. */
+  .scenic .stage[data-scene="floor"] .finale-banner {
+    top: var(--sc-banner-top-floor);
+  }
+}

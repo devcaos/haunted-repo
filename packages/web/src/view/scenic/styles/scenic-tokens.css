@@ -243,6 +243,10 @@
   --sc-delay-phase-1: 1.4s;
   --sc-delay-sparks: 1000ms;
   --sc-delay-finale: 800ms;
+  --sc-banner-top: 4.5rem;
+  --sc-banner-top-floor: 7.75rem;
+  --sc-banner-border: 2px;
+  --sc-banner-max-w: 40rem;
   /* Reduced_Motion fades, never longer than 200 ms */
   --sc-rm-fade: 150ms;
   --sc-rm-fade-long: 200ms;

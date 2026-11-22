@@ -1113,7 +1113,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.12, 15.5, 15.6, 15.8, 15.9_
     - _Design: "Accessible names" (Lightning_Toggle), decision Q26_
 
-  - [ ] 15.6 Show the Finale and the Search_Beam
+  - [x] 15.6 Show the Finale and the Search_Beam
     - In `effects.ts`, `stage.ts` and `renderer.ts`: `data-finale` from `layout.finale`, animated only when `effects.finale.animate` (after a Return_Glow of the same render, with an 0.8 s delay), end state otherwise; the `.finale-banner` with two lines (`TEXTS.finaleDone` and `POWER_TEXTS.finaleOtherGhosts`) or `house.houseClean`, announced through the Scenic_Announcer; `data-busy` from `live.busy` shows the Search_Beam. Banner styles in `stage.css` (line 1 `--font-title`, so Source_Scan item 12 now checks `.finale-banner .line-1`).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): show the dawn finale and the search beam`
