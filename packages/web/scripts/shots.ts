@@ -363,6 +363,32 @@ async function main(): Promise<void> {
     const roomShots: [ShotState, ((page: Page) => Promise<void>)[]][] = [
       ["05-ghost-explaining", []],
       ["06-ghost-asking", [choose("Continue")]],
+      // Reactions and the Exorcised_Moment, shot at their end state.
+      ...(
+        [
+          ["07-reaction-got-it", "Got it"],
+          ["08-reaction-partly", "Partly"],
+          ["09-reaction-missed-it", "Missed it"],
+        ] as const
+      ).map(
+        ([state, label]): [ShotState, ((page: Page) => Promise<void>)[]] => [
+          state,
+          [choose("Continue"), choose("Show the model answer"), choose(label)],
+        ],
+      ),
+      ["10-reaction-dont-know", [choose("Continue"), choose("I don't know")]],
+      [
+        "12-exorcised-moment",
+        [
+          choose("Continue"),
+          choose("Show the model answer"),
+          choose("Got it"),
+          choose("Show the model answer"),
+          choose("Got it"),
+          choose("Show the model answer"),
+          choose("Got it"),
+        ],
+      ],
       [
         "11-ghost-failed",
         [

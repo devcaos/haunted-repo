@@ -1048,7 +1048,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 11.2, 11.3, 11.4, 11.5, 12.3, 12.4, 12.6, 18.7, 20.1_
     - _Design: "Animation Catalogue"_
 
-  - [ ] 14.10 Add the Reaction and exorcism screenshots
+  - [x] 14.10 Add the Reaction and exorcism screenshots
     - In `shotList.ts` and `shots.ts` add `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know` and `12-exorcised-moment`, captured at their end state; update the `shotList` test count.
     - Verify: `npm run check` exits `0`; `npm run shots` exits `0`.
     - Commit message: `feat(web): screenshot reactions and the exorcised moment`
