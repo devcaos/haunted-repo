@@ -26,7 +26,7 @@ Do not start implementation until the table is approved.
 
 ## 2. Test on the real page
 
-Prove the idea on the real page, using `npm run dev` in `packages/web` and `?view=scenic` for the scenic view. A standalone mock-up or isolated HTML file is not enough.
+Prove the idea on the real page, using `npm run dev` in `packages/web`: the scenic view is the default page, and `?view=simple` opens the simple view. A standalone mock-up or isolated HTML file is not enough.
 
 ## 3. Fixed verification matrix
 

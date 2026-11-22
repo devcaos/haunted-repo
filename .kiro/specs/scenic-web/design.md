@@ -180,7 +180,7 @@ entry.then(
 - `src/view/scenic/entry.ts` imports the scenic CSS files, calls `loadScenicFonts()` and exports `createRenderer = createScenicRenderer`.
 - Vite turns each `import()` into its own chunk and moves the CSS of that chunk into its own CSS file, linked only when the chunk loads. `main.ts` imports no CSS, so `dist/index.html` links no stylesheet. The Size_Check fails if it ever does (guard for Requirements 1.9 and 1.10).
 - `index.html` gets `<meta name="color-scheme" content="dark">`, so the browser paints a dark canvas before a renderer's CSS arrives. This is not a CSS rule, so neither renderer leaks styles into the other.
-- **Dark launch (director decision Q14).** In stages 1 to 3 `chooseView` returns `"scenic"` only for `?view=scenic` and the Simple_Renderer stays the default, so `main` never shows a half-built scene. PR 4b switches to the rule above (Requirement 1) in one small commit. The Scenic_View_Link of the Simple_Renderer points to `?view=scenic` until then, and to `./` afterwards.
+- **Dark launch (director decision Q14), ended on 22 Nov.** In stages 1 to 3 `chooseView` returned `"scenic"` only for `?view=scenic` and the Simple_Renderer stayed the default, so `main` never showed a half-built scene. Task 16.8 switched to the rule above (Requirement 1) in its own small PR on 22 Nov, done early by the director's decision. The Scenic_View_Link of the Simple_Renderer now points to `./`.
 
 ### Purely visual state of the Scenic_Renderer
 
@@ -520,14 +520,14 @@ export function mountShape(node: ShapeNode, idPrefix: string): SVGElement;
 | Module | Builds | Notes |
 | --- | --- | --- |
 | `renderer.ts` | `createScenicRenderer(root, onAction): Renderer` | Builds the shell once, owns the visual state, runs the render pipeline above. |
-| `hud.ts` | header (logo `h1`, tagline, Haunt_Meter, Ghost_Icons, Lightning_Toggle, Simple_View_Link), aside (Live_Plaque, Status_Region, `show-sample`, Power line, warnings, Bestiary), `footer` (Licence_Notice), Scenic_Announcer | Built once; `update(hudView)` changes text, `hidden` and `disabled` only. The URL field is never replaced (4.9). |
+| `hud.ts` | header (logo `h1`, tagline, Haunt_Meter, Ghost_Icons, Simple_View_Link), aside (Live_Plaque, Status_Region, `show-sample`, Power line, warnings, Bestiary; the renderer appends `div.motion-controls` with the Motion button and the Lightning_Toggle of `lightningToggle.ts`), `footer` (Licence_Notice), Scenic_Announcer | Built once; `update(hudView)` changes text, `hidden` and `disabled` only. The URL field is never replaced (4.9). |
 | `bestiary.ts` | three entries with a small SVG (Variant 0, Haunted look, no idle animation) and HTML texts | On narrow screens a real `button` with `aria-expanded` folds the list (D2). |
 | `stage.ts` | `.stage` > `.world` (Camera) > house `svg` + `.world-overlay`; dim overlays; slot layer; effect classes | Sets `data-scene`, `data-floor`, `data-finale`, `data-busy` on `.stage`; sets `style.transform` and `--cam-counter` on `.world`. |
 | `sceneControls.ts` | Scene_Heading (`h2 tabindex="-1"`), "Back to the house", floor stair, Nameplate list or empty-floor line | Rebuilt every render (the "rebuilt part" of the focus rule). |
 | `phoneWidget.ts` | `.phone-widget`: RING! bubble (`aria-hidden`), Answer_Button, Phone_Bubble | Lives in `.world-overlay` for the house and middle-floor frames, in `.scene-dock` for attic and basement frames (D14). Hidden and out of the tab order in the Ghost_Scene (9.7). |
 | `ghostScene.ts` | `.room` layer: room `svg`, close-up ghost (`.ghost-vigour` > `.ghost-react` > `.ghost-idle` > art), Question_Candles, light overlays, sparks | Created on entering the Ghost_Scene, kept for the visit, removed on leaving after the fade. |
 | `grimoire.ts` | Grimoire `section` from `grimoireView` | Keeps the Answer_Box element while its key is unchanged; never reads `.value` and adds no `input` or `change` listener. |
-| `effects.ts` | Lightning timer, Finale class timing, Search_Beam class | Uses `window.setTimeout` only. The Return_Glow timer is not here: it is `stage.glow` with its timer in `renderer.ts`, director's decision of 22 Nov. |
+| `effects.ts` | Lightning clock: the flash timer and `is-flashing` on `.stage` | Uses `window.setTimeout` only. The Finale class `is-finale-in` and the banner are set by `renderer.ts`; the Search_Beam shows from `data-busy` in CSS. The Return_Glow timer is not here: it is `stage.glow` with its timer in `renderer.ts`, director's decision of 22 Nov. |
 | `motion.ts` | `watchMedia(query, onChange)` for `(prefers-reduced-motion: reduce)` and `WIDE_QUERY` | Applies changes within the same task (18.9). |
 | `fonts.ts` | `loadScenicFonts()` | `new FontFace(family, \`url("${url}") format("woff2")\`, { weight: "400", style: "normal", display: "swap" })`, `document.fonts.add(face)`, `face.load().catch(() => undefined)`. A failed font only leaves the fallback stack (21.7). |
 
@@ -535,9 +535,10 @@ The shell, in document order (this is also the tab order of Requirement 17, with
 
 ```html
 <div class="scenic" data-scene="house">
-  <header class="hud-top">h1 logo, p tagline, Haunt_Meter, Ghost_Icons, Lightning_Toggle (+ reason), Simple_View_Link</header>
+  <header class="hud-top">h1 logo, p tagline, Haunt_Meter, Ghost_Icons, Simple_View_Link</header>
   <aside class="hud-side">Live_Plaque form, p.status (role=status, aria-live=polite), show-sample button,
-    p.power-line, div.report-warnings, section.bestiary</aside>
+    p.power-line, div.report-warnings, section.bestiary,
+    div.motion-controls (Motion button, Lightning_Toggle, p.lightning-reason)</aside>
   <p class="announcer" aria-live="polite"></p>                       (Scenic_Announcer, visually hidden)
   <main class="stage" data-scene data-floor>
     <div class="scene-bar">h2.scene-heading, button "Back to the house"</div>
@@ -900,9 +901,9 @@ Notes:
 
 | Scene | Order |
 | --- | --- |
-| House | HUD (Lightning_Toggle, Simple_View_Link, Live_Plaque field and button, `show-sample` button if shown, Bestiary button on narrow screens) → Answer_Button → floor buttons (attic, middle floor, basement) → Licence_Notice link of the footer (17.4) |
+| House | HUD (Simple_View_Link, Live_Plaque field and button, `show-sample` button if shown, Bestiary button on narrow screens, Motion button, Lightning_Toggle) → Answer_Button → floor buttons (attic, middle floor, basement) → Licence_Notice link of the footer (17.4) |
 | Floor | HUD → "Back to the house" → Answer_Button (pinned or docked) → floor buttons of the dimmed floors → start buttons of the focused floor in report order → Licence_Notice link of the footer (17.5) |
-| Ghost | HUD (Lightning_Toggle, Simple_View_Link, Bestiary button) → Grimoire heading (focus target only) → Answer_Box → ghost-action buttons → Code_Block (`tabindex="0"`) → Licence_Notice link of the Grimoire → Licence_Notice link of the footer (17.6) |
+| Ghost | HUD (Simple_View_Link, Bestiary button, Motion button, Lightning_Toggle) → Grimoire heading (focus target only) → Answer_Box → ghost-action buttons → Code_Block `tabindex="0"`) → Licence_Notice link of the Grimoire → Licence_Notice link of the footer (17.6) |
 
 The HUD footer is the last element of the shell in the DOM, so its Licence_Notice link is the last Tab stop in every Scene, as Requirements 17.4 to 17.6 say (decision Q16). On wide screens it is drawn at the bottom left and on narrow screens under the stage, so tab order follows visual order. Grid areas, not DOM order, place the footer.
 
