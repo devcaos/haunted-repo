@@ -919,7 +919,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 10.1, 10.8, 22.1_
     - _Design: "Art System" (Close-up room), "Props and panels" (Question_Candles)_
 
-  - [ ] 13.4 Source_Scan item 14
+  - [x] 13.4 Source_Scan item 14
     - In `source.test.ts`: no `.value` read and no `input` or `change` listener in `src/view/scenic/grimoire.ts` (the test asserts the file exists from task 13.6 on; until then it skips only that existence check), and no scenic file reads `answerBox.value` or listens to it. Negative self-check.
     - Verify: `npm run check` exits `0`.
     - Commit message: `test(web): check the scenic answer box text is never read`

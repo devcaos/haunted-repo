@@ -1056,3 +1056,71 @@ describe("display font files (Requirement 21.4)", () => {
     expect(fontsourceSpecifiers('import "./fonts.js";')).toEqual([]);
   });
 });
+
+// Item 14: the scenic Answer_Box text is never read (Requirements 10.11, 25.1).
+const GRIMOIRE_TS = `${SCENIC_DIR}grimoire.ts`;
+// Task 13.6 creates grimoire.ts and sets this to true. Until then only the
+// "the file exists" check is skipped; the other rules run over every file.
+const GRIMOIRE_REQUIRED = false;
+/** Files that break item 14. Only grimoire.ts is also checked for any `.value`. */
+function answerBoxBreaks(files: SourceFile[]): string[] {
+  const breaks: string[] = [];
+  for (const f of files) {
+    const text = withoutComments(f.text);
+    if (ANSWER_BOX_READ.test(text)) breaks.push(f.path);
+    else if (
+      f.path === GRIMOIRE_TS &&
+      (READS_VALUE.test(text) || INPUT_LISTENER.test(text))
+    ) {
+      breaks.push(f.path);
+    }
+  }
+  return breaks;
+}
+describe("scenic Answer_Box (item 14, Requirements 10.11, 25.1)", () => {
+  const scenicTs = srcFiles.filter(
+    (f) => f.path.startsWith(SCENIC_DIR) && f.path.endsWith(".ts"),
+  );
+  it("grimoire.ts exists from task 13.6 on", () => {
+    const found = scenicTs.some((f) => f.path === GRIMOIRE_TS);
+    if (GRIMOIRE_REQUIRED) expect(found).toBe(true);
+  });
+  it("no .value read and no input or change listener in grimoire.ts", () => {
+    const grimoire = scenicTs.filter((f) => f.path === GRIMOIRE_TS);
+    expect(answerBoxBreaks(grimoire)).toEqual([]);
+  });
+  it("no scenic file reads answerBox.value or listens to it", () => {
+    expect(scenicTs.length).toBeGreaterThan(0);
+    expect(answerBoxBreaks(scenicTs)).toEqual([]);
+  });
+  it("self-check: the rule fails on text that breaks it", () => {
+    const sample = (path: string, text: string): SourceFile[] => [
+      { path, text },
+    ];
+    expect(
+      answerBoxBreaks(sample(GRIMOIRE_TS, "const text = box.value;")),
+    ).toEqual([GRIMOIRE_TS]);
+    expect(
+      answerBoxBreaks(sample(GRIMOIRE_TS, 'box.addEventListener("input", f);')),
+    ).toEqual([GRIMOIRE_TS]);
+    expect(answerBoxBreaks(sample(GRIMOIRE_TS, "box.onchange = f;"))).toEqual([
+      GRIMOIRE_TS,
+    ]);
+    const other = `${SCENIC_DIR}ghostScene.ts`;
+    expect(answerBoxBreaks(sample(other, "send(answerBox.value);"))).toEqual([
+      other,
+    ]);
+    expect(
+      answerBoxBreaks(sample(other, "answerBox.addEventListener('x', f);")),
+    ).toEqual([other]);
+  });
+  it("self-check: clean text and comments pass", () => {
+    const clean = "button.addEventListener('click', f); // box.value";
+    expect(
+      answerBoxBreaks([
+        { path: GRIMOIRE_TS, text: clean },
+        { path: `${SCENIC_DIR}hud.ts`, text: "const url = input.value;" },
+      ]),
+    ).toEqual([]);
+  });
+});
