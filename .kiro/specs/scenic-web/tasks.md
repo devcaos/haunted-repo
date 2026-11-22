@@ -998,7 +998,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 4.3, 4.4, 12.1, 12.2, 12.6, 12.7, 12.8, 13.7, 13.8_
     - _Design: "scenic/model/renderMemory.ts"_
 
-  - [ ] 14.4 Property test for the Haunt_Meter
+  - [x] 14.4 Property test for the Haunt_Meter
     - **Property 10: The Haunt_Meter shows the last list values while a ghost is open**
     - **Validates: Requirements 4.3, 4.4, 4.17, 12.6, 12.7**
     - Generator: `pageRunArb`, its models fed in order to `nextMemory`, at least 100 runs.

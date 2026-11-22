@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { readFileSync } from "node:fs";
+import fc from "fast-check";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPage } from "../../../logic/page.js";
 import { createRecordingRenderer } from "../../../logic/recordingRenderer.testutil.js";
@@ -10,8 +11,9 @@ import type {
   ViewModel,
 } from "../../../logic/viewModel.js";
 import { loadSample } from "../../../sample/sampleData.js";
-import { EMPTY_MEMORY, nextMemory } from "./renderMemory.js";
+import { EMPTY_MEMORY, meterScale, nextMemory } from "./renderMemory.js";
 import type { RenderEffects, VisualMemory } from "./renderMemory.js";
+import { pageRunArb, playPageRun } from "./viewModelArb.testutil.js";
 
 function read(relative: string): string {
   return readFileSync(new URL(relative, import.meta.url), "utf8");
@@ -230,5 +232,78 @@ describe("nextMemory", () => {
       transition: { from: base.scene, to: { kind: "floor", floor: "attic" } },
     };
     expect(feed([base, moved])[1]?.sceneChanged).toBe(true);
+  });
+});
+
+describe("Properties", () => {
+  // Feature: scenic-web, Property 10: The Haunt_Meter shows the last list values while a ghost is open
+  // **Validates: Requirements 4.3, 4.4, 4.17, 12.6, 12.7**
+  it("Property 10: The Haunt_Meter shows the last list values while a ghost is open", async () => {
+    let ghostRenders = 0;
+    await fc.assert(
+      fc.asyncProperty(pageRunArb, async (run) => {
+        const models = await playPageRun(run, read);
+        let memory: VisualMemory = EMPTY_MEMORY;
+        // What the property says, tracked apart from nextMemory.
+        let lastList: ProgressView | null = null;
+        let visitHadMoment = false;
+        let prev: ViewModel | null = null;
+        for (const model of models) {
+          const step = nextMemory(memory, model);
+          memory = step.memory;
+          const { effects } = step;
+          const progress = model.house?.progress ?? null;
+          if (model.scene.kind === "ghost") {
+            ghostRenders += 1;
+            if (prev === null || prev.scene.kind !== "ghost") {
+              visitHadMoment = false;
+            }
+            if (effects.exorcisedMoments.length > 0) visitHadMoment = true;
+            if (lastList === null) {
+              expect(effects.meter).toBeNull();
+            } else {
+              expect(effects.meter?.view).toEqual({
+                line: lastList.line,
+                haunted: lastList.haunted,
+                total: lastList.total,
+                share: lastList.share,
+              });
+              expect(effects.meter?.from).toBeNull();
+            }
+          } else {
+            if (progress === null) {
+              expect(effects.meter).toBeNull();
+            } else {
+              const view = effects.meter?.view;
+              expect(view?.line).toBe(progress.line);
+              expect(view?.haunted).toBe(progress.haunted);
+              expect(view?.total).toBe(progress.total);
+              expect(view?.share).toBe(progress.share);
+              const scale = Number(
+                /scaleX\(([\d.]+)\)/.exec(meterScale(progress.share))?.[1],
+              );
+              expect(Math.abs(scale - progress.share)).toBeLessThanOrEqual(
+                0.01,
+              );
+              const mustAnimate =
+                prev !== null &&
+                prev.scene.kind === "ghost" &&
+                visitHadMoment &&
+                lastList !== null;
+              if (mustAnimate) {
+                expect(effects.meter?.from).toBe(lastList?.share);
+              } else {
+                expect(effects.meter?.from).toBeNull();
+              }
+            }
+            lastList = progress;
+            visitHadMoment = false;
+          }
+          prev = model;
+        }
+      }),
+      { numRuns: 100 },
+    );
+    expect(ghostRenders).toBeGreaterThan(0);
   });
 });
