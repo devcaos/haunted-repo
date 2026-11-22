@@ -1034,8 +1034,8 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: 11.1, 11.6, 11.7, 11.8, 11.9, 11.10, 11.11, 25.1_
     - _Design: "Purely visual state" (vigour, reaction), "Animation Catalogue" notes (Jumping to an end state)_
 
-  - [ ] 14.8 Play the Exorcised_Moment and the Return_Glow
-    - Create `packages/web/src/view/scenic/effects.ts` with the Return_Glow timer. In `renderer.ts` and `ghostScene.ts`: `effects.exorcisedMoments` starts the spiral, sparks and warm room (order of D6); a render in the same Scene lets it play, a Scene change jumps it to its end; `effects.returnGlow` adds `is-returning` to those slots for 800 ms, so the Exorcised candle and its light fade in (`slot-return`); send `exorcised-moment` and `return-glow-ended` to `phoneStep`, so one Ring follows the Return_Glow when a Telephone_Target exists (9.4).
+  - [x] 14.8 Play the Exorcised_Moment and the Return_Glow
+    - The Return_Glow is `stage.glow`, with its timer in `renderer.ts`; no `effects.ts`, director's decision of 22 Nov. In `renderer.ts` and `ghostScene.ts`: `effects.exorcisedMoments` starts the spiral, sparks and warm room (order of D6); a render in the same Scene lets it play, a Scene change jumps it to its end; `effects.returnGlow` adds `is-returning` to those slots for 800 ms, so the Exorcised candle and its light fade in (`slot-return`); send `exorcised-moment` and `return-glow-ended` to `phoneStep`, so one Ring follows the Return_Glow when a Telephone_Target exists (9.4).
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): reward the exorcism with sparks and warm light`
     - _Requirements: 6.8, 9.4, 12.1, 12.3, 12.4, 12.6, 12.8, 12.9_
