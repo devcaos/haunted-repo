@@ -17,6 +17,7 @@ Pure rules live in `src/view/scenic/model/` and are tested in Vitest's Node envi
 - Each PR body fills `.github/pull_request_template.md` and carries the size warning: the whole spec is about 10,000 changed lines, split into 13 stacked PRs of at most about 900 lines each (decision Q1), plus this PR's line count measured with `git diff --shortstat`. Tests are never cut to fit the size.
 - Each PR body lists the shots it adds (decision Q2; design section "Shots").
 - Each PR body includes the Requirement 2 check: `git diff --stat <base branch> -- packages/web/src/logic packages/web/src/sample packages/core packages/web/public/sirv-license.txt` shows only `texts.ts` and `powerTexts.ts` (or nothing).
+- Since 19 Nov (director's decision) PRs are no longer stacked: every scenic-web PR from 2b on is created from an up-to-date `main` after the previous one is merged, and targets `main`.
 
 ## Working rules for every task
 
@@ -935,6 +936,7 @@ These are settled by the approved design and are not reopened in these tasks:
 
   - [ ] 13.6 Build the Grimoire
     - Create `packages/web/src/view/scenic/grimoire.ts`: `section.grimoire` from `grimoireView` with the heading as focus target, the Answer_Box `textarea` with its label (kept while its key is unchanged, new and empty otherwise; never reads `.value`; no `input` or `change` listener), one button per choice sending through the guard, the Code_Block `pre` with `tabindex="0"`, and the Licence_Notice right after it, outside its scroll.
+    - In `packages/web/src/source.test.ts` set `GRIMOIRE_REQUIRED = true`, so Source_Scan item 14 now fails if `grimoire.ts` is missing.
     - Verify: `npm run check` exits `0` (item 14 now covers the file).
     - Commit message: `feat(web): draw the grimoire panel`
     - _Requirements: 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 10.10, 10.11, 10.12, 17.6, 25.1, 25.5_
@@ -964,7 +966,7 @@ These are settled by the approved design and are not reopened in these tasks:
     - _Requirements: none (git workflow)_
 
 - [ ] 14. PR 3b — Reactions, Exorcised_Moment, Return_Glow, Haunt_Meter rules
-  - Branch: `feat/scenic-web-3b`. Stacks on: `feat/scenic-web-3a`.
+  - Branch: `feat/scenic-web-3b`. Branch from: an up-to-date `main`, after PR 3a part 2 is merged. Targets `main`.
   - Estimate: ~780 changed lines. Model: Auto.
   - _Design: "PR Split" row 3b_
 
@@ -1055,16 +1057,16 @@ These are settled by the approved design and are not reopened in these tasks:
   - [ ] 14.11 Checkpoint and PR 3b
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4a, task 15.1), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 3b`.
     - Run `npm run check`; it must exit `0`.
-    - Measure: `git diff --shortstat feat/scenic-web-3a -- . ':(exclude)package-lock.json'`.
+    - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
     - Push with `git push -u origin feat/scenic-web-3b`. Body in `$env:TEMP\pr-scenic-web-3b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `07-reaction-got-it`, `08-reaction-partly`, `09-reaction-missed-it`, `10-reaction-dont-know`, `12-exorcised-moment`, each at both sizes", and the manual check: after an exorcism, back on the floor the candle lights up, the Haunt_Meter moves, then the telephone rings once.
-    - Run `gh pr create --base feat/scenic-web-3a --head feat/scenic-web-3b --title "feat: add ghost reactions and the exorcised moment" --body-file $env:TEMP\pr-scenic-web-3b-body.md`.
+    - Run `gh pr create --base main --head feat/scenic-web-3b --title "feat: add ghost reactions and the exorcised moment" --body-file $env:TEMP\pr-scenic-web-3b-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
 ### Stage 4
 
 - [ ] 15. PR 4a — Finale, live analysis, Lightning
-  - Branch: `feat/scenic-web-4a`. Stacks on: `feat/scenic-web-3b`.
+  - Branch: `feat/scenic-web-4a`. Branch from: an up-to-date `main`, after PR 3b is merged. Targets `main`.
   - Estimate: ~490 changed lines. Model: Auto.
   - _Design: "PR Split" row 4a_
 
@@ -1140,14 +1142,14 @@ These are settled by the approved design and are not reopened in these tasks:
   - [ ] 15.10 Checkpoint and PR 4a
     - Update `PLAN.md` ("En curso", "Pendientes", "Para retomar": next is PR 4b, task 16.3; tasks 16.1 and 16.2 are withdrawn), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4a`.
     - Run `npm run check`; it must exit `0`.
-    - Measure: `git diff --shortstat feat/scenic-web-3b -- . ':(exclude)package-lock.json'`.
+    - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
     - Push with `git push -u origin feat/scenic-web-4a`. Body in `$env:TEMP\pr-scenic-web-4a-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: `13-finale`, `14-live-busy`, `15-live-report`, each at both sizes", and the manual check: flashes every 10 to 15 s; the toggle stops them; under Reduced_Motion the toggle is off and disabled with its reason.
-    - Run `gh pr create --base feat/scenic-web-3b --head feat/scenic-web-4a --title "feat: add the finale, live search beam and lightning" --body-file $env:TEMP\pr-scenic-web-4a-body.md`.
+    - Run `gh pr create --base main --head feat/scenic-web-4a --title "feat: add the finale, live search beam and lightning" --body-file $env:TEMP\pr-scenic-web-4a-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
 - [ ] 16. PR 4b — Reduced_Motion audit, responsive polish, default switch
-  - Branch: `feat/scenic-web-4b`. Stacks on: `feat/scenic-web-4a`.
+  - Branch: `feat/scenic-web-4b`. Branch from: an up-to-date `main`, after PR 4a is merged. Targets `main`.
   - Estimate: ~330 changed lines (the Intro, tasks 16.1 and 16.2, is cut). Model: Auto.
   - _Design: "PR Split" row 4b_
 
@@ -1200,9 +1202,9 @@ These are settled by the approved design and are not reopened in these tasks:
   - [ ] 16.9 Checkpoint and PR 4b
     - Update `PLAN.md` ("En curso": scenic-web complete after merge; "Pendientes"; "Para retomar": task 17.1 for the director after deploy), mark this task `[x]` and commit both. Commit message: `docs: update the plan for scenic-web PR 4b`.
     - Run `npm run check`; it must exit `0`.
-    - Measure: `git diff --shortstat feat/scenic-web-4a -- . ':(exclude)package-lock.json'`.
+    - Measure: `git diff --shortstat main -- . ':(exclude)package-lock.json'`.
     - Push with `git push -u origin feat/scenic-web-4b`. Body in `$env:TEMP\pr-scenic-web-4b-body.md` from the template, with the size warning and measured count, the Requirement 2 check, "Shots added: none new; the full set of 38 files", and the manual checklist: keyboard only in every Scene; screen reader spot check; Network tab shows no simple CSS at the default and no scenic CSS at `?view=simple`; 360 px with no horizontal scroll; system Reduced_Motion toggled while the page is open.
-    - Run `gh pr create --base feat/scenic-web-4a --head feat/scenic-web-4b --title "feat: add the reduced motion audit and the scenic default" --body-file $env:TEMP\pr-scenic-web-4b-body.md`.
+    - Run `gh pr create --base main --head feat/scenic-web-4b --title "feat: add the reduced motion audit and the scenic default" --body-file $env:TEMP\pr-scenic-web-4b-body.md`.
     - Never merge.
     - _Requirements: none (git workflow)_
 
