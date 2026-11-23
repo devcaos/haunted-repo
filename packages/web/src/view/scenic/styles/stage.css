@@ -192,6 +192,7 @@
     left: max(var(--sc-rail-left), var(--sc-hud-width));
     right: 0;
     flex-direction: row;
+    justify-content: center;
     box-sizing: border-box;
     height: var(--sc-rail-height);
     padding: var(--sc-space-tight);
