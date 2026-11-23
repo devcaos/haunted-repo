@@ -41,6 +41,27 @@
         "It hands bundt the file index.mjs, the folder packages/sirv to work in, and all current settings plus FORCE_COLOR set to 1. When bundt finishes, it shows bundt's report without its first character.",
         "It prints ERROR followed by the details of the error. Then it ends the program with the exit code 1, which means the build failed."
       ]
+    },
+    {
+      "path": "packages/sirv/index.mjs",
+      "kind": "logic",
+      "explanation": "This file is the heart of sirv, a package that hands out files from a folder to browsers. It exports one function. You call it with a folder name and some options, and it gives back a handler. A handler is a small function that answers one browser request at a time, like a clerk at a shop counter. At start-up it probably reads the whole folder once and remembers every file, so each request is quick. For each request it takes the address, tries it with endings like .html or as a folder with an index file, and sends the first file it finds. It also adds headers, which are notes about the file, such as its type and size. If nothing matches, it calls the next function it was given, or answers 404, which means \"not found\".",
+      "retryExplanation": "Think of a warehouse with a front desk. A visitor says what they want, the worker at the desk checks the shelves, and brings the box or says \"we don't have it\". This file builds that desk for a website. You give it a folder, which is the warehouse. It returns a handler, a small function that deals with one visitor request at a time. Most likely it writes a list of all the boxes when it starts, so it does not walk the shelves again for every visitor. For each request it tries a few names, such as the address plus .html, and hands over the first one that exists. With each box it sends a label with the type and size. If the box is missing, the desk calls the next helper it knows, or says 404, which means \"not found\".",
+      "questions": [
+        "What does the function exported by packages/sirv/index.mjs do when you give it a folder, and what does the handler it gives back do for each browser request?",
+        "A browser asks for /about and the folder has a file called about.html. What goes into the handler, and what does the browser get back?",
+        "What happens when no file in the folder matches the address that the browser asked for?"
+      ],
+      "simpler": [
+        "Imagine a hotel porter. When you arrive, the porter learns the hotel and keeps a list of all the rooms. Later, each guest asks for a room, and the porter takes them to it. This file is that porter for a folder of files. You call its exported function once and give it the folder name, which is like giving the porter the hotel. The function gives back a handler, a small function that deals with one request. Each time a browser asks for a file, the handler looks it up in the list and sends it back. So the file turns a plain folder into something that answers browsers.",
+        "Picture a mail room. A letter arrives with only a name on it, and the clerk tries a few likely places until one fits. Here the letter is the request. It carries the address, such as /about, and some notes called headers, for example which compression the browser accepts. The handler tries a short list of names: the address as it is, the address plus .html or .htm, and a folder of that name with an index file inside. The first match wins. What comes out is the file itself plus headers about it: its type, its size and when it last changed. A browser that asked for a piece of the file gets only that piece.",
+        "Think of a lost-property office. You ask for your umbrella, and the clerk looks and finds nothing. The clerk can call a manager, or just say \"nothing here\". This file works the same way. When no file matches, it first checks if it was given a next function, which is like the manager, and calls it. Otherwise it uses the function you set in the onNoMatch option, if there is one. If there is neither, it answers 404, which means \"not found\", with an empty reply."
+      ],
+      "modelAnswers": [
+        "You give it a folder and options, and it gives back a handler. For each request, the handler finds the matching file in that folder and sends it to the browser, with headers about it.",
+        "The request address /about goes in. The handler tries it with endings like .html, so it finds about.html and sends it back with headers such as type, size and last change.",
+        "If a next function was given, the handler calls it. Otherwise it uses the onNoMatch function if there is one, or answers 404, which means \"not found\", with an empty reply."
+      ]
     }
   ]
 }

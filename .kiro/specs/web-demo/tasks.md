@@ -487,7 +487,7 @@ These open doubts of the design are settled by the approved design and are not r
     - Commit message: `feat(web): add tutor texts for the fourth ghost`
     - _Requirements: 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.10_
 
-  - [ ]* 16.3 Tutor texts for the 5th easiest ghost
+  - [x]* 16.3 Tutor texts for the 5th easiest ghost
     - Show the texts to the director before the commit.
     - Verify: `npm run check` exits `0`.
     - Commit message: `feat(web): add tutor texts for the fifth ghost`
