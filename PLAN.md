@@ -30,6 +30,10 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 11. [x] Gate_Panel parte 2 (movimiento): la puerta sube del suelo, ojos de la gárgola, luz del farol, botón de movimiento y arte cargado después de la casa. Rama aparte, PR aparte. En la PR de la parte 2 (rama `feat/scenic-web-gate-2`).
 ## Pendientes (Low, ideas, "después si da tiempo")
+- Low (prueba de la web pública, 23 nov): "Motion: off" para todo menos los relámpagos; siguen cada 10 a 15 s hasta pulsar "Lightning: off". La spec los separa (requisito 15), así que no es un fallo; revisar si confunde.
+- Low (prueba de la web pública, 23 nov): el motivo de los carteles por decisiones dice "(N if/elif/for/while/switch/case/catch)": "elif" es de Python y, a 1920, el punto final cae solo en una línea. El texto sale de `packages/core/src/ghost-detection/factors.ts` y también lo usan el Power, la muestra y tres specs; cambiarlo después de la entrega.
+- Low (prueba de la web pública, 23 nov): con una red muy lenta (0,4 Mbit/s y CPU 4x) los fantasmas, las campanas y los botones se ven unos 10 s sobre el fondo oscuro antes de que llegue la ilustración de la casa. Con 1,6 Mbit/s no se nota.
+- Low (prueba de la web pública, 23 nov): el aviso del límite de GitHub ("GitHub allows only 60 requests per hour...") no dice a qué hora se puede volver a probar, aunque el motor ya lo sabe.
 - Cerrado (PR 4b, 22 nov): a 390 px la página bajaba 10 px a los 6 s. No era el panel: el teléfono de la planta medía 10 px más mientras sonaba. Ahora guarda siempre el hueco del "RING!", y el script de capturas lo mide.
 - Low (revisión de la PR #77, 22 nov): los pasos "Try it" del README describen la vista simple. Va en la reescritura del README del 30 nov.
 - Low (prototipo de la PR 4a, 22 nov): la ilustración `house-scene.svg` trae lluvia pintada; en el final la lluvia de la página se para, pero esas rayas pintadas siguen débiles sobre el amanecer.
