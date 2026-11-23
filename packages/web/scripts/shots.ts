@@ -495,7 +495,7 @@ async function main(): Promise<void> {
         inRoom(...steps),
       );
     }
-    // The Finale: both scripted ghosts exorcised, back on the attic floor.
+    // The Finale: the 3 scripted ghosts exorcised, then back on the attic floor.
     const exorcise = (path: string) => async (page: Page) => {
       await page.click(
         `article.nameplate:has-text("${path}") button.nameplate-start`,
@@ -520,6 +520,9 @@ async function main(): Promise<void> {
         await goTo("attic", TEXTS.floorTitles.attic)(page);
         await exorcise("bench/static.js")(page);
         await exorcise("builder.js")(page);
+        await goTo("middle floor", TEXTS.floorTitles["middle floor"])(page);
+        await exorcise("packages/sirv/index.mjs")(page);
+        await goTo("attic", TEXTS.floorTitles.attic)(page);
         await page.waitForSelector('main.stage[data-finale="true"]');
       },
     );

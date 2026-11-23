@@ -41,7 +41,7 @@ function committedScript(): DemoScript {
 }
 
 const EASIEST = "bench/static.js"; // attic, scripted
-const LOCKED = "packages/sirv/index.mjs"; // middle floor, no Ghost_Content
+const LOCKED = "packages/sirv-cli/index.js"; // attic, no Ghost_Content
 
 function contentFor(path: string): GhostContent {
   const content = contentOf(committedScript(), path);
