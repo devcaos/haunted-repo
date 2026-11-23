@@ -1216,10 +1216,11 @@ These are settled by the approved design and are not reopened in these tasks:
     - Never merge.
     - _Requirements: none (git workflow)_
 
-- [ ] 17. Director check of the public page (by hand)
-  - [ ] 17.1 Open the deployed demo in a clean browser
+- [x] 17. Director check of the public page (by hand)
+  - [x] 17.1 Open the deployed demo in a clean browser
     - **For the director (Luis Miguel), done by hand after PR 4b is merged and deployed.** Open https://devcaos.github.io/haunted-repo/ in a clean browser window, at the default view (scenic) and at `?view=simple`, each with the system Reduced_Motion setting on and off.
     - When the director reports the result, Kiro marks this task `[x]` and updates `PLAN.md` in one `docs:` commit on a new branch `docs/scenic-web-close` from `main`, with its own pull request. Never merge.
+    - Done 23 Nov 2026 (director): https://devcaos.github.io/haunted-repo/ opened in a private Brave window at 1920x1080, at the default view and at `?view=simple`, with Windows animation effects on and off. All four passed: the page loads, there is no horizontal scroll bar, nothing moves with reduced motion except short fades, and "Find the ghosts" with an empty field shows "That does not look like a GitHub repository URL".
     - Commit message: `docs: close the scenic-web tasks`
     - _Requirements: 25.3, 25.6, 25.7_
     - _Design: "Durability (until 29 January 2027)"_

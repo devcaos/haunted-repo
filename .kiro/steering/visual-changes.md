@@ -1,9 +1,6 @@
 ---
-
 inclusion: fileMatch
-
 fileMatchPattern: ["packages/web/src/view/**/*", "packages/web/*.html", "packages/web/public/**/*", ".kiro/specs/scenic-web/**/*"]
-
 ---
 
 # Visual changes and animations
