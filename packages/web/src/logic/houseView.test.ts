@@ -86,6 +86,17 @@ describe("buildLiveHouse", () => {
     });
   });
 
+  it("invites the visitor to their own repository on an empty floor of the sample", () => {
+    const house = buildSampleHouse(
+      report([ghost("x.ts", "attic", 10), ghost("y.ts", "middle floor", 40)]),
+      null,
+    );
+    expect(house.floors[2].emptyLine).toBe(
+      "No ghosts on this floor of the sample. The Chained Brute haunts files with a difficulty from 67 to 100. Find the ghosts of your own repository to meet it.",
+    );
+    expect(house.floors[0].emptyLine).toBeNull();
+  });
+
   it("shows the empty line on the two floors without ghosts", () => {
     const house = buildLiveHouse(
       report([ghost("x.ts", "basement", 80), ghost("y.ts", "basement", 70)]),
@@ -376,8 +387,12 @@ describe("grouping by floor", () => {
               reason: c.reason,
             }));
             expect(actual).toEqual(expected);
+            const empty =
+              house.source === "sample"
+                ? TEXTS.emptySampleFloor(floorView.floor)
+                : TEXTS.emptyFloor;
             expect(floorView.emptyLine).toBe(
-              expected.length === 0 ? TEXTS.emptyFloor : null,
+              expected.length === 0 ? empty : null,
             );
           });
         }

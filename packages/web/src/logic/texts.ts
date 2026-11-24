@@ -1,3 +1,5 @@
+import type { Floor } from "@haunted-repo/core";
+
 // Every page text except the ones in powerTexts.ts, in one object,
 // so wording changes in one place. All texts are English.
 export const TEXTS = {
@@ -16,6 +18,9 @@ export const TEXTS = {
     basement: "Basement",
   },
   emptyFloor: "No ghosts on this floor.",
+  // Only the sample: it invites the visitor to meet this floor's Ghost_Type in their own repository.
+  emptySampleFloor: (floor: Floor) =>
+    `No ghosts on this floor of the sample. The ${TEXTS.bestiary.names[floor]} haunts files with a difficulty from ${TEXTS.bestiary.ranges[floor]}. Find the ghosts of your own repository to meet it.`,
   busy: "Looking at the repository. This can take a few seconds.",
   liveDone: (owner: string, repo: string, n: number) =>
     `Found ${n} ${n === 1 ? "ghost" : "ghosts"} in ${owner}/${repo}.`,
