@@ -85,6 +85,21 @@ describe("rankKeyFiles", () => {
     ]);
   });
 
+  it("puts files under 200 bytes after every bigger file", () => {
+    const ranked = rankKeyFiles([
+      { path: "index.ts", size: 81 },
+      { path: "tools/deep/er/z.ts", size: 199 },
+      { path: "tools/deep/er/power.ts", size: 200 },
+      { path: "src/app.ts", size: 5000 },
+    ]);
+    expect(ranked.map((e) => e.path)).toEqual([
+      "src/app.ts",
+      "tools/deep/er/power.ts",
+      "index.ts",
+      "tools/deep/er/z.ts",
+    ]);
+  });
+
   it("breaks ties by path with a plain comparison", () => {
     const ranked = rankKeyFiles([
       { path: "src/b.ts", size: 1000 },
@@ -176,10 +191,12 @@ describe("pickKeyFiles properties", () => {
 
           const eligible = entries.filter((e) => isEligible(e.path));
           if (eligible.length >= 5) {
-            const best = eligible
-              .map(keyScore)
-              .sort((a, b) => b - a)
-              .slice(0, 5);
+            // Requirement 4.10: files under 200 bytes come after bigger ones.
+            const tiny = (e: { size: number }) => (e.size < 200 ? 1 : 0);
+            const best = [...eligible]
+              .sort((a, b) => tiny(a) - tiny(b) || keyScore(b) - keyScore(a))
+              .slice(0, 5)
+              .map(keyScore);
             expect(picked.map(keyScore)).toEqual(best);
           }
         },

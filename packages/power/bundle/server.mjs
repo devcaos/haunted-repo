@@ -29656,6 +29656,9 @@ function keyScore(entry) {
 }
 function rankKeyFiles(entries) {
   return entries.filter((entry) => isEligible(entry.path)).map((entry) => ({ entry, score: keyScore(entry) })).sort((a, b) => {
+    const aTiny = a.entry.size < MIN_SIZE;
+    const bTiny = b.entry.size < MIN_SIZE;
+    if (aTiny !== bTiny) return aTiny ? 1 : -1;
     if (a.score !== b.score) return b.score - a.score;
     if (a.entry.path < b.entry.path) return -1;
     if (a.entry.path > b.entry.path) return 1;

@@ -91,6 +91,7 @@ Deadline: finished and tested by 20 Nov 2026.
 7. WHEN the Ghost_Detector picks 1 or 2 files, THE Ghost_Detector SHALL return a Haunted_Report with `fewFiles` set to `true` and an English message that says the repository is a small project.
 8. WHEN the repository is a monorepo, THE Ghost_Detector SHALL apply the same rules to the whole tree, so that the location points of Requirement 4.3 are counted from the repository root only.
 9. FOR ALL lists of paths and sizes, running the pick twice on the same input SHALL return the same Ghosts in the same order (determinism property).
+10. WHEN an Eligible_File is smaller than 200 bytes, THE Ghost_Detector SHALL rank it after every Eligible_File of 200 bytes or more, whatever its Key_Score, so that a file with almost no code is picked only when nothing bigger exists.
 
 ### Requirement 5: Calculate the Difficulty_Score
 
