@@ -412,6 +412,17 @@ export function createScenicRenderer(
       if (inRoom) {
         grimoire.focus(target);
         keepFocusInDocument(had, grimoire.focusHeading);
+        // Below 64rem a new Grimoire screen above the window scrolls back to its heading.
+        if (
+          !entering &&
+          viewport === "narrow" &&
+          target.kind === "scene-heading"
+        ) {
+          const top = grimoire.element.getBoundingClientRect().top;
+          if (top < 0) {
+            window.scrollTo({ top: top + window.scrollY, behavior: "instant" });
+          }
+        }
       } else {
         controls.focus(target);
         keepFocusInDocument(had, controls.focusHeading);
