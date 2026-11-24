@@ -204,6 +204,10 @@
     flex: 1 1 0;
     max-width: var(--sc-nameplate-max);
   }
+  .scenic .nameplates > li.nameplates-empty {
+    max-width: var(--sc-empty-line-max);
+    text-align: center;
+  }
   /* A card is only as tall as its content; the score and the state share one line. */
   .scenic .nameplate {
     flex-direction: row;

@@ -101,14 +101,17 @@ function buildProgress(
 
 function buildFloors(
   cards: GhostCardView[],
+  source: "sample" | "live",
 ): [FloorView, FloorView, FloorView] {
   const floorView = (floor: Floor): FloorView => {
     const ghosts = cards.filter((card) => card.floor === floor);
+    const empty =
+      source === "sample" ? TEXTS.emptySampleFloor(floor) : TEXTS.emptyFloor;
     return {
       floor,
       title: TEXTS.floorTitles[floor],
       ghosts,
-      emptyLine: ghosts.length === 0 ? TEXTS.emptyFloor : null,
+      emptyLine: ghosts.length === 0 ? empty : null,
     };
   };
   return [floorView("attic"), floorView("middle floor"), floorView("basement")];
@@ -122,7 +125,7 @@ function buildHouse(
   return {
     source,
     repoName: `${owner}/${repo}`,
-    floors: buildFloors(hauntedCards(report)),
+    floors: buildFloors(hauntedCards(report), source),
     warnings: buildWarnings(report.overview),
     powerLine: source === "live" ? POWER_TEXTS.liveReport : null,
     progress: null,
@@ -154,7 +157,7 @@ export function buildSampleHouse(
   );
   return {
     ...house,
-    floors: buildFloors(sampleCards(report, exorcism, exorcised)),
+    floors: buildFloors(sampleCards(report, exorcism, exorcised), "sample"),
     progress: buildProgress(report, exorcism.progress, exorcised),
     houseClean: exorcism.step === "house-clean" ? TEXTS.houseClean : null,
   };
