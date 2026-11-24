@@ -166,6 +166,7 @@ button:disabled {
   width: var(--size-full);
   max-width: var(--size-full);
   height: auto;
+  aspect-ratio: 1440 / 900;
 }
 
 .floor {
