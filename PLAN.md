@@ -31,6 +31,7 @@ Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en K
 
 11. [x] Gate_Panel parte 2 (movimiento): la puerta sube del suelo, ojos de la gárgola, luz del farol, botón de movimiento y arte cargado después de la casa. Rama aparte, PR aparte. En la PR de la parte 2 (rama `feat/scenic-web-gate-2`).
 ## Pendientes (Low, ideas, "después si da tiempo")
+- Low (revisión de la PR #85, 24 nov): en este repo siguen saliendo en el ático 3 fantasmas casi vacíos de 200 bytes o más, que son `core/src/ghost-detection/index.ts`, `power/src/server.ts` y `core/src/exorcism/index.ts`, con dificultad 3 y 4, y ninguno en la planta media. La demo usa sirv, que no cambia. Revisar después de la entrega.
 - Medium (revisión backend, 24 nov): cada respuesta del Power repite el archivo entero del fantasma (con power.ts, unos 23 KB por respuesta y unas 6 respuestas por fantasma; con 100 KB serían unos 150.000 tokens). Después de la entrega: enviarlo solo al elegir el fantasma. Mencionarlo como límite en el README.
 - Medium (revisión backend, 24 nov): el Power lee el fantasma por nombre de rama, no por commit; si el alumno borra o renombra el archivo, ese fantasma no se puede exorcizar y la casa nunca queda limpia. Después de la entrega.
 - Low (revisión backend, 24 nov): todo 403 de GitHub se toma como límite de peticiones, aunque GitHub también usa 403 para repos bloqueados.

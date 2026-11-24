@@ -86,7 +86,7 @@ Deadline: finished and tested by 20 Nov 2026.
 2. THE Ghost_Detector SHALL add 40 points to the Key_Score WHEN the file name without extension is `main`, `index`, `app`, `server`, `program` or `__main__`.
 3. THE Ghost_Detector SHALL add 30 points WHEN the file is in the repository root, 20 points WHEN its parent folder is `src`, `app` or `lib` at the repository root, and 10 points WHEN its path has exactly one more folder level than those, and 0 points otherwise.
 4. THE Ghost_Detector SHALL add between 0 and 30 points for size, growing in a straight line from 0 points at 200 bytes to 30 points at 20,000 bytes, and staying at 30 points above that.
-5. THE Ghost_Detector SHALL pick the 5 Eligible_Files with the highest Key_Score, breaking ties by path in ascending alphabetical order.
+5. THE Ghost_Detector SHALL pick the 5 Eligible_Files with the highest Key_Score, breaking ties by path in ascending alphabetical order (see 4.10 for files under 200 bytes).
 6. WHEN the repository has fewer than 5 Eligible_Files, THE Ghost_Detector SHALL pick all of them.
 7. WHEN the Ghost_Detector picks 1 or 2 files, THE Ghost_Detector SHALL return a Haunted_Report with `fewFiles` set to `true` and an English message that says the repository is a small project.
 8. WHEN the repository is a monorepo, THE Ghost_Detector SHALL apply the same rules to the whole tree, so that the location points of Requirement 4.3 are counted from the repository root only.

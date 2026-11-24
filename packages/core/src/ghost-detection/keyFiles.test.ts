@@ -171,7 +171,7 @@ describe("pickKeyFiles properties", () => {
 
   it("Property 3: Picking is deterministic and bounded", () => {
     // Feature: ghost-detection, Property 3: Picking is deterministic and bounded
-    // **Validates: Requirements 4.5, 4.6, 4.9**
+    // **Validates: Requirements 4.5, 4.6, 4.9, 4.10**
     fc.assert(
       fc.property(
         entriesArb,
