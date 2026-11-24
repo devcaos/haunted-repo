@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
+import { detectGhosts } from "@haunted-repo/core";
 import { describe, expect, it } from "vitest";
 import {
   ForbiddenUrlError,
@@ -132,6 +133,45 @@ describe("guardFetch", () => {
       expect((cause as Error).message).toBe("unexpected redirect");
     } finally {
       await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
+  });
+});
+
+describe("guardFetch with detectGhosts", () => {
+  it("tells the Student that a redirect was refused", async () => {
+    const server = createServer((_request, response) => {
+      response.writeHead(301, {
+        Location: "https://api.github.com/repos/new-owner/repo",
+      });
+      response.end();
+    });
+    await new Promise<void>((resolve) =>
+      server.listen(0, "127.0.0.1", resolve),
+    );
+    const { port } = server.address() as AddressInfo;
+    // The guard checks the api.github.com URL; the inner fetch sends it to
+    // the local server, which answers with a real 301.
+    const inner: typeof fetch = (input, init) =>
+      fetch(
+        String(input).replace(
+          "https://api.github.com",
+          `http://127.0.0.1:${port}`,
+        ),
+        init,
+      );
+    try {
+      const result = await detectGhosts("https://github.com/old-owner/repo", {
+        fetch: guardFetch(inner),
+      });
+      expect(result).toEqual({
+        ok: false,
+        error: {
+          code: "NETWORK_ERROR",
+          message: new RedirectRefusedError().message,
+        },
+      });
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
     }
   });
 });

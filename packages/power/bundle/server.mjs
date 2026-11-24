@@ -29524,7 +29524,10 @@ function createGitHubClient(opts = {}) {
         },
         signal: AbortSignal.timeout(timeoutMs)
       });
-    } catch {
+    } catch (error2) {
+      if (error2 instanceof Error && error2.name === "RedirectRefusedError") {
+        throw new DetectError("NETWORK_ERROR", error2.message);
+      }
       throw networkError();
     }
     if (response.status === 403 || response.status === 429) {

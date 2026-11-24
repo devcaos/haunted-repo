@@ -139,6 +139,19 @@ describe("createGitHubClient", () => {
     expect(await codeOf(client.getRepo("o", "r"))).toBe("NETWORK_ERROR");
   });
 
+  it("keeps the message of a refused redirect", async () => {
+    const refused = new Error(
+      "Request refused: GitHub answered with a redirect.",
+    );
+    refused.name = "RedirectRefusedError";
+    const client = createGitHubClient({
+      fetch: (() => Promise.reject(refused)) as typeof fetch,
+    });
+    const error = await client.getRepo("o", "r").catch((e: unknown) => e);
+    expect(isCode(error, "NETWORK_ERROR")).toBe(true);
+    expect((error as Error).message).toBe(refused.message);
+  });
+
   it("maps a timeout to NETWORK_ERROR", async () => {
     const { client } = setup(undefined, { hang: true }, 20);
     expect(await codeOf(client.getRepo("o", "r"))).toBe("NETWORK_ERROR");
