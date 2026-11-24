@@ -223,7 +223,7 @@ PR 1 may go over about 500 lines. If either PR goes over, Kiro warns the project
 2. THE Tokens_File SHALL define every font, spacing and size used by the Web_Page CSS.
 3. THE Web_Page CSS files other than the Tokens_File SHALL contain no literal colour value, checked by a test.
 4. THE Web_Page SHALL use system font stacks only, with a serif stack such as Georgia for titles.
-5. THE Web_Page SHALL load no external font, image, CDN resource or third-party script.
+5. THE Web_Page SHALL load no external font, image, CDN resource or third-party script. Exception (decision of 24 Nov): the Finale banner's "Get the Power" link to the repository README; it loads nothing and its address lives in `src/logic/powerTexts.ts`.
 6. THE Web_Page SHALL contain no drawing of a house, a building or an illustration.
 7. THE Logic_Layer modules SHALL have no import of DOM types or access to `document` or `window`, so that their tests run without a browser.
 8. THE Presentation_Layer SHALL build the DOM only from plain view data given by the Logic_Layer.
