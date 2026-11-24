@@ -97,7 +97,12 @@ export function createGitHubClient(
         },
         signal: AbortSignal.timeout(timeoutMs),
       });
-    } catch {
+    } catch (error) {
+      // The Power's guardFetch refuses redirects with its own clear message
+      // (decisiones.md, 16 Nov); keep that message instead of the general one.
+      if (error instanceof Error && error.name === "RedirectRefusedError") {
+        throw new DetectError("NETWORK_ERROR", error.message);
+      }
       throw networkError();
     }
     if (response.status === 403 || response.status === 429) {

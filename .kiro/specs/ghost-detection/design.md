@@ -475,9 +475,9 @@ For any list of paths and any permutation of it, the set of paths accepted by `i
 
 ### Property 3: Picking is deterministic and bounded
 
-For any list of `FileEntry`, calling `pickKeyFiles` twice returns the same list in the same order; the same list is returned for any permutation of the input; it has at most 5 items; every item is eligible; and when there are 5 or more eligible files the picked ones have the 5 highest scores.
+For any list of `FileEntry`, calling `pickKeyFiles` twice returns the same list in the same order; the same list is returned for any permutation of the input; it has at most 5 items; every item is eligible; and when there are 5 or more eligible files the picked ones have the 5 highest scores, counting first the files of 200 bytes or more (Requirement 4.10).
 
-**Validates: Requirements 4.5, 4.6, 4.9**
+**Validates: Requirements 4.5, 4.6, 4.9, 4.10**
 
 ### Property 4: Difficulty score is an integer from 0 to 100
 
@@ -609,6 +609,7 @@ Module paths are inside `packages/core/src/ghost-detection/`.
 | 4.7         | `report.ts`                                  | report unit test                                  |
 | 4.8         | `keyFiles.ts`                                | score table (monorepo path)                       |
 | 4.9         | `keyFiles.ts`                                | Property 3                                        |
+| 4.10        | `keyFiles.ts`                                | files under 200 bytes unit test, Property 3       |
 | 5.1 to 5.4  | `factors.ts`                                 | factor snippets (including `elif`), reason table  |
 | 5.5         | `factors.ts`                                 | long line, CRLF, Property 7                       |
 | 5.6 to 5.9  | `factors.ts`                                 | Properties 4 to 7                                 |

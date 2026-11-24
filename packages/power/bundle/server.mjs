@@ -29524,7 +29524,10 @@ function createGitHubClient(opts = {}) {
         },
         signal: AbortSignal.timeout(timeoutMs)
       });
-    } catch {
+    } catch (error2) {
+      if (error2 instanceof Error && error2.name === "RedirectRefusedError") {
+        throw new DetectError("NETWORK_ERROR", error2.message);
+      }
       throw networkError();
     }
     if (response.status === 403 || response.status === 429) {
@@ -29656,6 +29659,9 @@ function keyScore(entry) {
 }
 function rankKeyFiles(entries) {
   return entries.filter((entry) => isEligible(entry.path)).map((entry) => ({ entry, score: keyScore(entry) })).sort((a, b) => {
+    const aTiny = a.entry.size < MIN_SIZE;
+    const bTiny = b.entry.size < MIN_SIZE;
+    if (aTiny !== bTiny) return aTiny ? 1 : -1;
     if (a.score !== b.score) return b.score - a.score;
     if (a.entry.path < b.entry.path) return -1;
     if (a.entry.path > b.entry.path) return 1;
