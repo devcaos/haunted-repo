@@ -273,6 +273,31 @@ async function liveChecks(
   if (backState !== `${off}, enabled`) {
     problems.push(`with Reduced_Motion turned off the toggle is ${backState}`);
   }
+  // Below 64rem the Grimoire is in the page flow: each new screen starts in view.
+  await page.reload();
+  await page.click(
+    `nav.floor-stair button:has-text("${TEXTS.floorTitles.attic}")`,
+  );
+  await page.click(
+    'article.nameplate:has-text("bench/static.js") button.nameplate-start',
+  );
+  await page.waitForSelector('.room[data-state="open"]');
+  for (const label of ["Continue", "Show the model answer"]) {
+    const choice = `section.grimoire button.choice:has-text("${label}")`;
+    await page.click(choice);
+    const top = await page.evaluate(() =>
+      Math.round(
+        document
+          .querySelector("section.grimoire .grimoire-heading")
+          ?.getBoundingClientRect().top ?? -1,
+      ),
+    );
+    if (top < 0) {
+      problems.push(
+        `after "${label}" the Grimoire heading is ${-top} px above the window`,
+      );
+    }
+  }
   await page.close();
   return problems;
 }
