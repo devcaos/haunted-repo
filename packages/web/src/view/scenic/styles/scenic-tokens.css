@@ -431,6 +431,7 @@
   --sc-gate-ground-h: calc(var(--sc-gate-u) * 250);
   --sc-gate-motion-y: calc(var(--sc-gate-u) * 22);
   --sc-gate-motion-h: calc(var(--sc-gate-u) * 44);
+  --sc-gate-motion-y-reduced: calc(var(--sc-gate-u) * 4);
   --sc-gate-rise-delay: 0.5s;
   --sc-dur-gate-rise: 3s;
   --sc-gate-eyes-at: 3.36s;
