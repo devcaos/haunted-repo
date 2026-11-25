@@ -116,7 +116,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** se tradujo a mano en GitHub (PR #10).
 
-- **Estado:** resuelto. Causa: to confirm with Luis Miguel.
+- **Estado:** resuelto. Causa: el cuerpo salió en español porque la regla de inglés de `working-rules.md` todavía no cubría los títulos ni los cuerpos de las PR (la PR #10 la amplió ese mismo día). Causa probable de los acentos: `Ning├║n` es justo lo que sale al leer los bytes UTF-8 de `ú` con la página de códigos 850 o 437 de la consola de Windows, es decir, el texto pasó por PowerShell 5 con otra codificación. No quedó registrada la orden exacta.
 
 ## 2026-11-12 — tasks.md de exorcism mandaba crear una rama que ya existía (anotada con retraso el 2026-11-13)
 
@@ -136,7 +136,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** reordenar las tareas en `tasks.md`.
 
-- **Estado:** resuelto. Causa probable: las instrucciones del paso "choosing" necesitan `suggestGhost`; to confirm with Luis Miguel.
+- **Estado:** resuelto. Causa: las instrucciones del paso `choosing` usan `suggestGhost` (`packages/core/src/exorcism/instructions.ts` lo importa), así que el progreso y la sugerencia tenían que existir antes que las instrucciones.
 
 ## 2026-11-12 — el navegador no deja fijar la cabecera User-Agent (anotada con retraso el 2026-11-13)
 
@@ -148,9 +148,15 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Estado:** resuelto con comprobación manual.
 
-## Aviso del validador de specs (anotada con retraso el 2026-11-13)
+## 2026-11-12 o antes — Aviso del validador de specs (anotada con retraso el 2026-11-13)
 
-- Sin rastro en el repo (commits, PR ni archivos). Fecha, qué pasó y cómo se rodeó: to confirm with Luis Miguel.
+- **Qué intentaba:** no consta.
+
+- **Qué pasó:** Kiro mostró un aviso del validador de specs. No se guardaron ni el texto ni la fecha exacta, y no hay rastro en commits, PR ni archivos del repo. Fue el 12 nov o antes, porque una revisión de ese día ya lo mencionaba.
+
+- **Cómo lo rodeé:** se ignoró. El encargo de los requisitos de `scenic-web` (17 nov) volvía a pedir que se ignorara si aparecía.
+
+- **Estado:** cerrado. Causa no determinada.
 
 ## 2026-11-13 — el chat no puede poner una tarea de la spec en curso
 
@@ -210,7 +216,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** guardarlo con `git stash` (sin borrarlo; está en `stash@{0}`, con un mensaje que lo explica) y seguir desde `main`.
 
-- **Estado:** abierto: falta saber la causa y decidir si se borra el stash.
+- **Estado:** cerrado. Causa no determinada. El `README.md` del stash era idéntico a una versión que ya está en el historial (blob `132e2d7`), así que el stash no guarda nada que se pueda perder.
 
 ## 2026-11-15 — El formato de Power de la documentación no coincide con `tech.md`
 
@@ -350,7 +356,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** se trabajó en la rama de la PR #42 (`feat/kiro-power-tools-read`), que es la que encaja con el número de PR, con "la de arriba de la pila" y con las líneas citadas. Se avisa a Luis Miguel en la respuesta.
 
-- **Estado:** resuelto con rodeo (pendiente de que Luis Miguel lo confirme).
+- **Estado:** resuelto. La rama era la correcta: la PR #42 se fusionó desde `feat/kiro-power-tools-read` (commit `5179659`).
 
 ## 2026-11-16 — Una copia de seguridad y una edición lanzadas a la vez
 
@@ -380,7 +386,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** dejé la 11.1 sin marcar y apunté en `docs/spike-power-e2e.md` la segunda ronda corta que falta. Para la próxima: escribir antes un guion con la respuesta que dará el Student a cada pregunta, para que cada paso del motor se vea.
 
-- **Estado:** abierto (falta la segunda ronda).
+- **Estado:** cerrado. La segunda y la tercera ronda se hicieron el 17 nov y la tarea 11.1 quedó marcada (PR #48, `docs/spike-power-e2e.md`).
 
 ## 2026-11-17 — Kiro pide aprobación en cada llamada del Power y la skill no cubre "I don't know" a la pregunta de Java
 
@@ -392,95 +398,182 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Estado:** abierto (sin cambiar la skill todavía).
 
-## 17 nov 2026: Kiro IDE no deja llamar a una herramienta sin cargarla antes
+## 2026-11-17 — Kiro IDE no deja llamar a una herramienta sin cargarla antes
+
 - **Qué intentaba:** en la segunda ronda de la 11.1, llamar a `pick_ghost` justo después de `continue_house`.
+
 - **Qué pasó:** `Tool "...::pick_ghost" has not been loaded yet`. Hay que cargar el esquema de cada herramienta del Power (`load_resource`) antes de poder llamarla con `tool_call`; las otras herramientas también.
+
 - **Cómo lo rodeé:** cargar `send_event`, `judge_answer` y `pick_ghost` y repetir la llamada. No se perdió estado.
+
 - **Estado:** abierto. Es de Kiro IDE, no del Power, pero puede confundir al Student en la demo. Valorar si la skill debe decirlo (sin cambiar nada todavía).
-## 17 nov 2026: Un fantasma con 2 buenas de 3 acaba en failed si la pregunta principal da dos I dont know
+
+## 2026-11-17 — Un fantasma con 2 buenas de 3 acaba en `failed` si la pregunta principal da dos "I don't know"
+
 - **Qué intentaba:** Seguir la skill con el guion: dos "I don't know" seguidos en la pregunta 1 y bien las preguntas 2 y 3 (tercera ronda de la 11.1).
+
 - **Qué pasó:** El paso model-answer apareció bien. Pero al final el fantasma quedó en failed con 2 right de 3: el motor guarda el segundo "I don't know" como wrong y la pregunta principal (la primera) no puede ser wrong (decide en engine.ts; coincide con product.md).
+
 - **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md como comportamiento esperado, y como Low en PLAN.md. Para la próxima ronda con self-check, no usar I don't know en la pregunta 1.
+
 - **Estado:** abierto (sin cambiar nada; valorar un aviso en la skill)
 
-## 17 nov 2026: La skill no tiene forma de provocar un warning
+## 2026-11-17 — La skill no tiene forma de provocar un warning
+
 - **Qué intentaba:** Probar que el Tutor avisa una sola vez de un warning (tercera ronda de la 11.1).
+
 - **Qué pasó:** La skill solo dice qué hacer si llega un warning. En el código solo sale cuando la carpeta de datos no se puede escribir (MEMORY_MODE_WARNING) o falla un guardado (saveFailedWarning). El Student no puede provocarlo con ninguna respuesta.
+
 - **Cómo lo rodeé:** Lo dejé como no probado en docs/spike-power-e2e.md y como Low en PLAN.md. Queda el test automático de power.test.ts.
+
 - **Estado:** abierto (haría falta ejecutar el Power con una carpeta de datos sin permiso de escritura)
 
-## 17 nov 2026: El Tutor no trata igual una respuesta en español en cada ronda
+## 2026-11-17 — El Tutor no trata igual una respuesta en español en cada ronda
+
 - **Qué intentaba:** Comprobar la regla de la skill de escribir solo en inglés (tercera ronda de la 11.1).
+
 - **Qué pasó:** El Student contestó la pregunta 3 en español. En la primera ronda el Tutor le pidió inglés; esta vez la aceptó y juzgó el contenido. La skill obliga al Tutor a escribir en inglés, pero no dice nada de las respuestas del Student.
+
 - **Cómo lo rodeé:** Lo anoté en docs/spike-power-e2e.md y amplié el Low que ya estaba en PLAN.md.
+
 - **Estado:** abierto (sin cambiar la skill todavía)
 
-## 17 nov 2026: PowerShell 5 estropeó los caracteres de tasks.md al editarlo con un script
+## 2026-11-17 — PowerShell 5 estropeó los caracteres de tasks.md al editarlo con un script
+
 - **Qué intentaba:** Marcar la tarea 4.5 de `scenic-web` con un script de PowerShell (`Get-Content -Raw` y `WriteAllText`).
+
 - **Qué pasó:** PowerShell 5 lee un archivo UTF-8 sin BOM como si fuera ANSI. Los símbolos ×, − y ° de 22 líneas de `tasks.md` quedaron rotos y entraron en el commit de la tarea 4.5, que aún no estaba subido.
+
 - **Cómo lo rodeé:** Restauré `tasks.md` desde el commit anterior, marqué la tarea con la herramienta de edición de Kiro y corregí el commit con `--amend` antes de subirlo. Para archivos con caracteres no ASCII, no usar `Get-Content -Raw` sin `-Encoding utf8`.
+
 - **Estado:** cerrado
 
-## 17 nov 2026: La regla de "sin nombres del DOM" salta con una clase CSS
+## 2026-11-17 — La regla de "sin nombres del DOM" salta con una clase CSS
+
 - **Qué intentaba:** Dibujar la torre de la casa (tarea 4.4) con una ventana de clase `tower-window`.
+
 - **Qué pasó:** El elemento 10 del Source_Scan busca la palabra `window` en `model/` y `art/`, y el guion de `tower-window` cuenta como límite de palabra. El test falló.
+
 - **Cómo lo rodeé:** Cambié la clase a `tower-slit`. La tarea 5.2 dibujará las ventanas de los huecos en `art/` y tendrá el mismo problema; lo anoté en "Pendientes" de PLAN.md.
-- **Estado:** abierto (falta decidir un nombre de clase o afinar la regla)
 
-## 17 nov 2026: Un test de propiedad del Power pasó de 5 s una vez
+- **Estado:** cerrado. El 17 nov se decidió que en `art/` la clase de las formas de ventana se llama `pane`; la regla no cambió (ver `PLAN.md`).
+
+## 2026-11-17 — Un test de propiedad del Power pasó de 5 s una vez
+
 - **Qué intentaba:** Pasar `npm run check` después de la tarea 4.4 de `scenic-web`.
+
 - **Qué pasó:** `packages/power/src/dataFile.roundtrip.property.test.ts` (Property 3, guardado en una carpeta real) superó el límite de 5000 ms. El cambio no tocaba el Power.
+
 - **Cómo lo rodeé:** Volví a ejecutar `npm run check` y pasó. Las siguientes ejecuciones también pasaron.
-- **Estado:** abierto (si se repite, subir el tiempo límite de ese test o bajar sus ejecuciones)
 
-## 17 nov 2026: frictions.md tiene caracteres de control que confunden la edición
+- **Estado:** cerrado. Se repitió el 18 nov (entrada siguiente) y el límite del test subió a 20 s.
+
+## 2026-11-17 — frictions.md tiene caracteres de control que confunden la edición
+
 - **Qué intentaba:** Añadir estas entradas a `docs/frictions.md` con la herramienta de edición de Kiro.
+
 - **Qué pasó:** Una entrada anterior (la de "2 buenas de 3") tiene un salto de página y un retorno de carro sueltos donde iban `` `f `` y `` `r `` (escapes de PowerShell). La edición borró una línea de otra entrada.
+
 - **Cómo lo rodeé:** Restauré el archivo desde git y añadí las entradas al final con Node. Los caracteres de control siguen ahí.
-- **Estado:** abierto (arreglar esa entrada a mano en una limpieza de docs)
 
-## 18 nov 2026: El test de propiedad del Power vuelve a pasar de 5 s (repetido)
+- **Estado:** cerrado. Los dos caracteres se quitaron en el commit `6f95924` (17 nov).
+
+## 2026-11-18 — El test de propiedad del Power vuelve a pasar de 5 s (repetido)
+
 - **Qué intentaba:** Pasar `npm run check` después de la tarea 7.8 de `scenic-web` (capturas de la PR 1f).
+
 - **Qué pasó:** `packages/power/src/dataFile.roundtrip.property.test.ts` (Property 3, 100 guardados en una carpeta real) superó los 5000 ms en tres ejecuciones completas seguidas. Solo, el mismo test pasa en unos 700 ms. El cambio no toca el Power; lo único nuevo desde la última vez que pasó es la instalación de Chromium para Playwright.
+
 - **Cómo lo rodeé:** No lo rodeé. Paré y pregunté a Luis Miguel, como pide la regla de "si falla dos veces, para".
-- **Estado:** abierto (propuesta: subir el tiempo límite de ese test a 20 s, como ya decía la entrada del 17 nov)
 
-## 18 nov 2026: Una edición con PowerShell escribió tres archivos en la raíz del repo
+- **Estado:** cerrado. El 18 nov se decidió subir el límite de `dataFile.roundtrip.property.test.ts` a 20 s, porque escribe 100 veces en disco (ver `PLAN.md`).
+
+## 2026-11-18 — Una edición con PowerShell escribió tres archivos en la raíz del repo
+
 - **Qué intentaba:** Cambiar tres CSS de la vista escénica (PR 1f, punto 4: la lluvia) con `[IO.File]::ReadAllText` y rutas relativas.
+
 - **Qué pasó:** .NET resuelve las rutas relativas desde la carpeta del proceso, no desde `cwd`. La lectura falló y la escritura creó `motion.css`, `scenic-tokens.css` y `stage.css` en la raíz con otro contenido. `npm run check` falló en el formato.
+
 - **Cómo lo rodeé:** Borré los tres archivos (no estaban en git) y desde entonces uso rutas absolutas (`Resolve-Path`) o la herramienta de edición.
+
 - **Estado:** cerrado
 
-## 18 nov 2026: `npm run shots` no pudo escribir una captura abierta
+## 2026-11-18 — `npm run shots` no pudo escribir una captura abierta
+
 - **Qué intentaba:** Rehacer las capturas tras el punto 1 de la PR 1f.
+
 - **Qué pasó:** El script paró con `UNKNOWN: unknown error, open ...01-house-1440x900.png`, porque yo acababa de abrir esa imagen para mirarla y Windows la tenía bloqueada.
+
 - **Cómo lo rodeé:** Repetí `npm run shots` (pasó) y desde entonces copio las capturas a una carpeta temporal antes de mirarlas.
+
 - **Estado:** cerrado
 
-## 18 nov 2026: La herramienta de terminal devolvió antes de que acabara el comando
+## 2026-11-18 — La herramienta de terminal devolvió antes de que acabara el comando
+
 - **Qué intentaba:** Editar un test con PowerShell y, en la misma orden, ejecutar `npm run check` y hacer el commit (PR 1f, extras y punto 13).
+
 - **Qué pasó:** Varias veces la herramienta devolvió solo un trozo del propio comando (por ejemplo `, $t)`) sin la salida. El resto siguió corriendo detrás: un commit apareció después, cuando yo ya había lanzado otro `npm run check`.
+
 - **Cómo lo rodeé:** Separé cada edición en su propia llamada y usé un script (`hr-check.ps1`) que guarda la salida de `npm run check` en un archivo y solo hace el commit si pasa. Revisé con `git log` y `git show --stat` que cada commit tenía lo que debía.
+
 - **Estado:** cerrado
 
-## 18 nov 2026: Llamadas en paralelo que se pisaron (ronda 3 de la PR 1f)
+## 2026-11-18 — Llamadas en paralelo que se pisaron (ronda 3 de la PR 1f)
+
 - **Qué intentaba:** Ir más rápido en la ronda 3 de arte enviando a la vez una edición y la orden que formateaba, probaba y hacía el commit.
+
 - **Qué pasó:** Las llamadas en paralelo no esperan unas a otras. Tres veces las pruebas o las capturas corrieron antes de que llegara la edición, y una vez el commit pudo salir sin ella. Además pasé del límite de unas 900 líneas de la ronda (llegué a 1.011) sin parar a preguntar, porque no medí después de cada punto.
+
 - **Cómo lo rodeé:** Repetí cada prueba y cada captura en una llamada sola, después de la edición, y comprobé cada commit con `git show --stat`. Desde entonces mando una sola llamada cada vez cuando una depende de otra, y mido las líneas después de cada commit.
+
 - **Estado:** cerrado
-## 18 nov 2026: Scripts temporales dentro del repo y otra vez llamadas en paralelo (ronda 4 de la PR 1f)
+
+## 2026-11-18 — Scripts temporales dentro del repo y otra vez llamadas en paralelo (ronda 4 de la PR 1f)
 
 - **Qué intentaba:** Ajustar los huecos de los fantasmas sobre la ilustración con capturas hechas por un script temporal, y cerrar el `PLAN.md` rápido.
+
 - **Qué pasó:** Puse el script temporal en `packages/web/shots/tuning/`. Git lo ignora, pero ESLint y Prettier no, y `npm run check` falló por él. Además, la herramienta de terminal rechazó un `node -e` con expresiones regulares porque no lo podía analizar. Y volví a mandar a la vez una edición de `PLAN.md` y su commit; esta vez la edición llegó antes, pero fue suerte.
+
 - **Cómo lo rodeé:** Moví los scripts a `%TEMP%\haunted-tuning\` (fuera del repo) y dejé en `shots/tuning/` solo los PNG. Comprobé las reglas del escaneo con los propios tests en vez del `node -e`. Revisé el commit con `git show` y confirmé que tenía los tres cambios.
+
 - **Estado:** cerrado
-## 19 nov 2026: Las tareas 9.2 y 9.3 pasaron el límite de ~200 líneas cambiadas
+
+## 2026-11-19 — Las tareas 9.2 y 9.3 pasaron el límite de ~200 líneas cambiadas
+
 - **Qué intentaba:** Hacer las tareas 9.2 y 9.3 de la PR 2a, cada una en su commit.
+
 - **Qué pasó:** Las dos pasaron de unas 200 líneas cambiadas y no me di cuenta hasta después de hacer el commit.
+
 - **Cómo lo rodeé:** Lo avisé al director. Lección: ejecutar `git diff --shortstat` antes de cada commit.
+
 - **Estado:** cerrado
-## 19 nov 2026: La banda del ático aprobada pasaba del suelo del ático (arreglos visuales de la PR 2a)
+
+## 2026-11-19 — La banda del ático aprobada pasaba del suelo del ático (arreglos visuales de la PR 2a)
+
 - **Qué intentaba:** Hacer el commit C: banda del ático `{ x: 570, y: 370, w: 370, h: 106 }`.
+
 - **Qué pasó:** La banda acababa en y 476, 3 unidades por debajo del suelo del ático (`FLOOR_RECT` y `FLOOR_LINE`, 473). Fallaron la propiedad «Ghost_Slots fit their floor and never overlap» y el test «every slot stands above its floor line». La regla del encargo era no cambiar esas pruebas, así que paré y pregunté.
+
 - **Cómo lo rodeé:** El director eligió subir la banda a y 367 con la misma altura (106). `FLOOR_RECT` y `FLOOR_LINE` no cambian.
+
 - **Estado:** cerrado
+
+## 2026-11-20 — La animación del Gate_Panel (PR #70) necesitó tres rondas de arreglos (anotada con retraso el 2026-11-25)
+
+- **Qué intentaba:** que la puerta de piedra del panel subiera del suelo después de cargar la casa, con sus luces y el botón Motion (rama `feat/scenic-web-gate-2`).
+
+- **Qué pasó:** hicieron falta tres rondas de arreglos. Cada ronda comprobaba lo que el fallo anterior había sacado a la luz, pero nadie había fijado lo que nunca puede pasar: que cambie la altura de la página o que algo se vea antes que la casa. Se aprobaban vídeos del caso feliz, con la casa ya cargada y la red rápida, en vez de la página real, y el director acabó siendo la única prueba de verdad. Los dos últimos arreglos fueron `fcdc2db` (solo sube la piedra y los textos aparecen después del aterrizaje) y `0dd83c6` (el escenario se enseña cuando la casa ya está pintada y la calabaza espera al aterrizaje).
+
+- **Cómo lo rodeé:** una auditoría del método el 20 nov y la regla nueva `.kiro/steering/visual-changes.md` (PR #71, 21 nov): tabla por capas aprobada antes del código, prueba en la página real, matriz fija de verificación y criterios de terminado medibles.
+
+- **Estado:** cerrado. Las PR visuales siguientes (3a, 3b, 4a y 4b) empezaron con su tabla de capas aprobada por el director.
+
+## 2026-11-25 — El README pegado en el chat perdió el formato (PR #93)
+
+- **Qué intentaba:** sustituir el README por la versión final de la entrega, con el texto que llegó en el encargo.
+
+- **Qué pasó:** al copiar el texto se colaron líneas en blanco de más (entre filas de tabla, entre elementos de lista, dentro de los bloques de código y al principio) y a 9 enlaces les faltaba el corchete de apertura. Las tablas no se pintaban en GitHub.
+
+- **Cómo lo rodeé:** un script temporal, que no se subió, reconstruyó el texto y solo escribió `README.md` si su huella SHA-256 coincidía con la del texto correcto (commit `0eb0181`). Desde entonces los textos largos llegan como archivo, con un script que comprueba la huella SHA-256.
+
+- **Estado:** cerrado.
