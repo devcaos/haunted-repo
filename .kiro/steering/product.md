@@ -5,7 +5,7 @@ inclusion: always
 # Product: Haunted Repo
 
 ## What it is
-Haunted Repo finds the AI-written code in a repository that its owner does not yet understand (the "ghosts") and helps the owner "exorcise" it by really understanding it, through explanations and questions.
+Haunted Repo finds the key files of a repository that its owner does not yet understand (the "ghosts") and helps the owner "exorcise" them by really understanding them, through explanations and questions.
 
 ## The problem
 - More and more people build software by directing an AI. The code works, but nobody has read it or understands it.
