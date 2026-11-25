@@ -546,3 +546,18 @@
     display: none;
   }
 }
+
+/* Reduced_Motion on wide screens: the reason takes one small line under the
+   Lightning button, in the plinth's bottom band, so the controls stay clear
+   of the Licence_Notice. */
+@media (prefers-reduced-motion: reduce) {
+  @media (min-width: 64rem) {
+    .scenic .hud-side .motion-controls {
+      bottom: var(--sc-gate-motion-y-reduced);
+    }
+    .scenic .hud-side .lightning-reason {
+      font-size: var(--sc-gate-foot-text);
+      line-height: var(--sc-gate-foot-leading);
+    }
+  }
+}
