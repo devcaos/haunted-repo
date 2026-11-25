@@ -616,6 +616,19 @@
   font-family: var(--font-body);
   font-size: var(--sc-text-body);
 }
+.scenic .finale-banner .line-link {
+  margin-top: var(--sc-space-1);
+  font-family: var(--font-title);
+  font-size: var(--sc-text-h3);
+}
+/* The banner's only link: candle like its title, the usual hover colour. */
+.scenic .finale-banner .line-link a,
+.scenic .finale-banner .line-link a:visited {
+  color: var(--sc-candle);
+}
+.scenic .finale-banner .line-link a:hover {
+  color: var(--sc-text-link-hover);
+}
 
 @media (min-width: 64rem) {
   .scenic .finale-banner {

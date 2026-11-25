@@ -339,6 +339,30 @@ describe("external addresses (Requirement 11.5)", () => {
   });
 });
 
+describe("the Get the Power link (decision of 24 Nov)", () => {
+  const POWER_LINK = "https://github.com/devcaos/haunted-repo#readme";
+  const POWER_FILE = "src/logic/powerTexts.ts";
+  it("is the only address in src/logic that leaves the site", () => {
+    expect(
+      logicFiles
+        .filter((f) => f.path.startsWith("src/logic/"))
+        .filter((f) =>
+          hasExternalAddress(
+            f.path === POWER_FILE
+              ? f.text.replace(JSON.stringify(POWER_LINK), '""')
+              : f.text,
+          ),
+        )
+        .map((f) => f.path),
+    ).toEqual([]);
+  });
+  it("is written once, in powerTexts.ts", () => {
+    const holders = srcFiles.filter((f) => f.text.includes(POWER_LINK));
+    expect(holders.map((f) => f.path)).toEqual([POWER_FILE]);
+    expect(holders[0]?.text.split(POWER_LINK)).toHaveLength(2);
+  });
+});
+
 describe("Simple_Renderer CSS (Requirements 11.2, 11.3)", () => {
   it("scans simple.css and skips tokens.css", () => {
     const paths = simpleCssFiles.map((f) => f.path);

@@ -31,7 +31,7 @@ import { watchMedia } from "./motion.js";
 import { createMotionToggle } from "./motionToggle.js";
 import { createLightningToggle } from "./lightningToggle.js";
 import { createLightning } from "./effects.js";
-import { POWER_TEXTS } from "../../logic/powerTexts.js";
+import { POWER_LINK, POWER_TEXTS } from "../../logic/powerTexts.js";
 import { TEXTS } from "../../logic/texts.js";
 import {
   createPhoneWidget,
@@ -400,6 +400,13 @@ export function createScenicRenderer(
               el("p", { class: `line-${i + 1}` }, [line]),
             ),
           );
+          if (clean === null) {
+            banner.append(
+              el("p", { class: "line-link" }, [
+                el("a", { href: POWER_LINK }, [POWER_TEXTS.getPower]),
+              ]),
+            );
+          }
         }
       }
       if (effects.finale.announce) announce(banner.dataset["text"] ?? "");
