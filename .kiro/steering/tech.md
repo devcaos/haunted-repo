@@ -16,16 +16,16 @@ inclusion: always
 |---|---|
 | Language | TypeScript 6.0 (strict mode) on Node.js v24 |
 | Package manager | npm, with workspaces |
-| Kiro Power | `POWER.md` + steering files + a small MCP server in TypeScript (`@modelcontextprotocol/sdk`). Exact format to confirm in the Power spec against kiro.dev/docs/powers |
+| Kiro Power | A Power folder, `packages/power/`: `plugin.json`, `mcp.json`, the skill `skills/exorcise-ghosts/SKILL.md` and a small MCP server in TypeScript (`@modelcontextprotocol/sdk`), bundled with esbuild into `bundle/server.mjs` and committed, because Kiro installs no dependencies (see the `kiro-power` spec) |
 | Test hook | `.kiro/hooks/test-after-task.json`: a single command hook that runs `npm run check` after each spec task (PostTaskExec). There is no agent hook |
-| Ghost report and progress | Plain JSON values (HauntedReport, ExorcismProgress) read with parseReport and parseProgress. Where the Power keeps them is decided in the Power spec |
+| Ghost report and progress | Plain JSON values (HauntedReport, ExorcismProgress) read with parseReport and parseProgress. The Power keeps one JSON file per repository in the data folder Kiro gives it (`PLUGIN_DATA`) |
 | Core logic | `packages/core` (@haunted-repo/core): ghost detection and the exorcism engine, pure TypeScript that also runs in the browser (only fetch, TextDecoder and AbortSignal) |
 | Demo website | Vite + TypeScript, no framework, built to static files |
 | Hosting | GitHub Pages (public repo) |
 | Lint / format | ESLint + Prettier |
 | Tests | Vitest, plus fast-check for property-based tests |
-| Visual review (planned, scenic-web spec) | Playwright at an exact version, only for the hand-run `npm run shots` screenshots. Not part of `npm run check` and not run in CI |
-| Display fonts (planned, scenic-web spec) | `@fontsource/creepster` and `@fontsource/im-fell-english` at exact versions, bundled locally (Latin subset, regular weight). SIL Open Font Licence |
+| Visual review | Playwright at an exact version, only for the hand-run `npm run shots` screenshots. Not part of `npm run check` and not run in CI |
+| Display fonts | `@fontsource/creepster` and `@fontsource/im-fell-english` at exact versions, bundled locally (Latin subset, regular weight). SIL Open Font Licence |
 
 ## Layout
 - `packages/core/`: ghost detection and the exorcism engine, used by the web and the Power

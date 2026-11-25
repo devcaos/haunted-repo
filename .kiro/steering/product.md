@@ -22,10 +22,10 @@ Haunted Repo finds the key files of a repository that its owner does not yet und
 - The repository is a **haunted house**: it has three floors: attic (easy), middle floor and basement (hard).
 - Ghost detection (done, packages/core/src/ghost-detection/): from a public GitHub repository URL it picks up to 5 key source files (TypeScript, JavaScript, Java or Python). Each one is a ghost with a difficulty score from 0 to 100, a floor and one plain sentence that says why. Ghosts are ordered from easy to hard.
 - Exorcism (done, packages/core/src/exorcism/): a pure engine guides the user's own Kiro (the Tutor). The Tutor explains the file in plain words and asks 3 questions about its behaviour, one at a time; the first one is the core question. "I don't know" gets a simpler explanation and the same question again; a second one gets a short model answer. The ghost is exorcised with at least 2 good answers out of 3 when the core question is not wrong.
-- A map shows how much of the project is still haunted.
+- The house shows how much of the project is still haunted: a counter on the website and the `house_status` tool in the Power.
 
 ## Deliverables
-- **Kiro Power**: the real tool, built on packages/core. The AI that explains and judges is the user's own Kiro, so there are no paid APIs. Exact format to confirm in the Power spec.
+- **Kiro Power**: the real tool, built on packages/core. The AI that explains and judges is the user's own Kiro, so there are no paid APIs. It is the folder `packages/power/`: `plugin.json`, `mcp.json`, the skill `skills/exorcise-ghosts/SKILL.md` and the bundled MCP server `bundle/server.mjs` (see the `kiro-power` spec).
 - **Static demo website** on GitHub Pages (https://devcaos.github.io/haunted-repo/): the ghosts and a recorded exorcism of the public repository lukeed/sirv (MIT licence; its notice must be shown), so judges can try it without installing anything. What the judge can do on the page is decided in the web demo spec. It must stay online and free until 29 January 2027.
 
 ## Out of scope (for now)

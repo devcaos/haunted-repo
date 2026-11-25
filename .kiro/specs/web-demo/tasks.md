@@ -291,7 +291,7 @@ These open doubts of the design are settled by the approved design and are not r
 
 ### PR 2 — feat/web-exorcism
 
-- [ ] 8. Branch and Demo_Script
+- [x] 8. Branch and Demo_Script
   - [x] 8.1 Create the branch `feat/web-exorcism`
     - Only after the director confirms that piece 4 of PR 1 (`feat/web-demo-4`, the last of the 4 stacked pull requests) is merged. Run `git checkout main`, `git pull`, then `git checkout -b feat/web-exorcism`. Check that `main` contains the commits of the 4 pieces.
     - No commit of its own; mark this task and task 7.2 `[x]` in the commit of task 8.2.
