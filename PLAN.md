@@ -1,180 +1,124 @@
 # PLAN
 
-Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en Kiro. Aquí va el **estado**; las **reglas** van en `.kiro/steering/` y la idea en `docs/idea.md`.
+Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en Kiro. Aquí va el **estado**; las **reglas** van en `.kiro/steering/`, la idea en `docs/idea.md` y los motivos de cada decisión en `docs/decisiones.md`.
 
-**Entrega:** 4 dic 2026, 23:00 (España) · **Versión mínima funcionando:** 20 nov 2026 · **Código congelado:** 27 nov 2026 (después solo vídeo y textos) · **Demo en línea y gratis hasta:** 29 ene 2027
+| Hito | Fecha | Estado |
+|---|---|---|
+| Versión mínima funcionando | 20 nov 2026 | Hecho |
+| Código congelado | viernes 27 nov 2026 | Después solo vídeo y textos |
+| Entrega en Devpost | 4 dic 2026, 23:00 (España) | Se envía el 4 dic por la mañana |
+| Demo en línea y gratis | hasta el 29 ene 2027 | GitHub Pages, sin coste |
 
 ## En curso
-- El código está terminado y fusionado, sin PR abiertas; se congela el viernes 27 nov 2026. La última PR de código es la #92 y la #93 es el README final (25 nov). Las siete specs están cerradas: solo siguen abiertas a propósito las tareas opcionales marcadas con `*` (exorcism 8.1 a 8.7, kiro-power 5.4 y 7.7, web-demo 16.1 y 16.2).
-- Queda: el vídeo (28 a 30 nov), los textos de Devpost y los posts de DEV.to y #KiroweenHackathon26 (30 nov a 2 dic), los datos y el justificante de estudiante (antes del 3 dic) y el envío (4 dic por la mañana; límite 23:00, hora de España).
+- Vídeo (decidido el 26 nov): menos de 3 minutos, **sin voz**, con carteles y subtítulos en inglés, en YouTube público. Las tomas de la web y un primer montaje ya existen (fuera del repo); faltan las dos tomas de Kiro que graba Luis Miguel: el Power sobre `packages/sirv-cli/bin.js` y las specs, el steering y los tests.
 - Créditos de Kiro (25 nov): usados 3.129,51 de 4.000. El modelo por defecto es **Auto**.
 
-## Siguientes (en orden; el coordinador puede reordenar con Luis Miguel)
-1. [x] Spec: esqueleto del proyecto (package.json con workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check, `.gitattributes`) para que funcionen lint, build y test
-2. [x] Crear el hook de tests (Post Task Execution) cuando exista el stack (PR #5; confirmado en real: se dispara al completar una tarea; desde el 15 nov solo queda el hook de comando)
-3. [x] Spike: ¿las preguntas que genera Kiro sobre un archivo hacen pensar de verdad? (criterio: Luis Miguel responde a 3 preguntas sobre un archivo real y dice si le han obligado a entenderlo; hechos los 3 spikes del 2026-11-11)
-4. [x] Spec: detección de fantasmas (qué archivos cuentan como fantasma y cómo se guardan)
-5. [x] Spec: exorcismo (explicación + preguntas + corrección; rama `feat/exorcism`, PR #14)
-6. [x] Spec: web de demostración con repo de ejemplo encantado (spec `web-demo`). PR 1: lista de fantasmas, formulario en vivo, informe de ejemplo si falla y aviso de licencia, en cuatro PR apiladas (#19, #20, #21 y #22, fusionadas). PR 2: exorcismo de ejemplo de los 2 fantasmas más fáciles, con progreso y fantasmas bloqueados, en cuatro PR apiladas (#24, #25, #27 y #29, fusionadas). Del grupo 16 (textos opcionales) solo se hizo la 16.3 (23 nov, PR #84): el fantasma de la planta media
-7. [x] Spec: empaquetar como Kiro Power (hecho y fusionado el 16 nov: PR #34 a #46; el 17 nov la tarea 11.2 pasó y la 11.1 se marcó tras la tercera ronda, con `warning`, `house-clean` y `replace: true` sin probar; ver `docs/spike-power-e2e.md`). Veredicto estricto: si llega `INVALID_VERDICT`, el Power vuelve a pedir el veredicto
-7b. [x] Diseño visual de la web (spec `scenic-web`: requisitos, diseño y `tasks.md` fusionados en las PR #50, #51 y #52; PR 1a, 1b, 1c, 1d, 1e y 1f fusionadas; la 1f en la PR #59). Decidido el 16 nov: la vista escénica realista se descartó; la web será un SVG hecho con cuidado, con aspecto de videojuego (estilo Halloween), con animación y un diseño de fantasma distinto para cada planta de la casa. Terminado: código en la PR #80 (22 nov) y tarea 17.1 hecha el 23 nov.
-8. [ ] Anotar en docs/frictions.md cada fricción el mismo día que ocurra
-9. [x] Spec: despliegue en GitHub Pages (`pages-deploy`: Vite en `packages/web`, botón de comprobación, CI y deploy; PR #13 fusionada)
-10. [ ] Vídeo, textos de Devpost y bonus: entrada de blog (DEV.to) y post con #KiroweenHackathon26 (se hacen todos; decidido el 15 nov). Es lo último: el código se congela el 27 nov y la entrega es el 4 dic 2026 a las 23:00 (hora de España)
+## Siguientes (en orden)
+El código está terminado: las siete specs están cerradas y solo siguen abiertas a propósito las tareas opcionales marcadas con `*` (exorcism 8.1 a 8.7, kiro-power 5.4 y 7.7, web-demo 16.1 y 16.2). Lo que queda no toca el código:
 
-11. [x] Gate_Panel parte 2 (movimiento): la puerta sube del suelo, ojos de la gárgola, luz del farol, botón de movimiento y arte cargado después de la casa. Rama aparte, PR aparte. En la PR de la parte 2 (rama `feat/scenic-web-gate-2`).
-## Pendientes (Low, ideas, "después si da tiempo")
-- Low (revisión de la PR #85, 24 nov): en este repo siguen saliendo en el ático 3 fantasmas casi vacíos de 200 bytes o más, que son `core/src/ghost-detection/index.ts`, `power/src/server.ts` y `core/src/exorcism/index.ts`, con dificultad 3 y 4, y ninguno en la planta media. La demo usa sirv, que no cambia. Revisar después de la entrega.
-- Medium (revisión backend, 24 nov): cada respuesta del Power repite el archivo entero del fantasma (con power.ts, unos 23 KB por respuesta y unas 6 respuestas por fantasma; con 100 KB serían unos 150.000 tokens). Después de la entrega: enviarlo solo al elegir el fantasma. Mencionarlo como límite en el README.
-- Medium (revisión backend, 24 nov): el Power lee el fantasma por nombre de rama, no por commit; si el alumno borra o renombra el archivo, ese fantasma no se puede exorcizar y la casa nunca queda limpia. Después de la entrega.
-- Low (revisión backend, 24 nov): todo 403 de GitHub se toma como límite de peticiones, aunque GitHub también usa 403 para repos bloqueados.
-- Low (revisión backend, 24 nov): la ruta del fantasma va fuera del bloque de código en las instrucciones del Tutor; git admite saltos de línea en rutas.
-- Low (revisión backend, 24 nov): el informe guarda el dueño como se escribió en la URL, no como está en GitHub.
-- Low (revisión backend, 24 nov): los 6 archivos se leen uno tras otro, 1,7 a 2,2 s; en paralelo serían unos 0,5 s, pero cambia el corte por límite de peticiones.
-- Low (revisión backend, 24 nov): el límite de 10 s cubre también la descarga del árbol; un repo enorme con red lenta puede dar "Could not reach GitHub". Sin verificar en vivo.
-- Low (revisión backend, 24 nov): los archivos `*.testutil.ts` cuentan como archivos elegibles y pueden salir como fantasmas.
-- Low (revisión de la PR #84, 23 nov): la explicación del fantasma de la planta media dice "calls the next function it was given" sin definir qué es esa función `next`; la tercera explicación sencilla sí lo explica con el encargado de objetos perdidos. Revisar después de la entrega.
-- Low (prueba de la web pública, 23 nov): el motivo de los carteles por decisiones dice "(N if/elif/for/while/switch/case/catch)": "elif" es de Python y, a 1920, el punto final cae solo en una línea. El texto sale de `packages/core/src/ghost-detection/factors.ts` y también lo usan el Power, la muestra y tres specs; cambiarlo después de la entrega.
-- Low (prueba de la web pública, 23 nov): con una red muy lenta (0,4 Mbit/s y CPU 4x) los fantasmas, las campanas y los botones se ven unos 10 s sobre el fondo oscuro antes de que llegue la ilustración de la casa. Con 1,6 Mbit/s no se nota.
-- Low (prueba de la web pública, 23 nov): el aviso del límite de GitHub ("GitHub allows only 60 requests per hour...") no dice a qué hora se puede volver a probar, aunque el motor ya lo sabe.
-- Cerrado (PR 4b, 22 nov): a 390 px la página bajaba 10 px a los 6 s. No era el panel: el teléfono de la planta medía 10 px más mientras sonaba. Ahora guarda siempre el hueco del "RING!", y el script de capturas lo mide.
-- Low (revisión de la PR #77, 22 nov): los pasos "Try it" del README describen la vista simple. Va en la reescritura del README del 30 nov.
-- Low (prototipo de la PR 4a, 22 nov): la ilustración `house-scene.svg` trae lluvia pintada; en el final la lluvia de la página se para, pero esas rayas pintadas siguen débiles sobre el amanecer.
-- Low (revisión de la PR #72, 22 nov): la función que elige las etiquetas de las acciones del fantasma está repetida en `simple/ghost.ts` y en `scenic/model/grimoireView.ts`. El diseño lo permite; unificarla solo si cambia una de las dos.
-- Low (scenic-web, fix/scenic-nameplate-rail, 19 nov): a 1024x768 el raíl de Nameplates aún hace un poco de scroll con cuatro Cards; el botón "Start the exorcism" se alcanza con Tab, que lo desplaza a la vista.
-- Seguimiento (PR 1f, ronda 4, 18 nov): el fuego, el péndulo del reloj y los faroles de la ilustración están quietos, porque la imagen es un dibujo fijo. Si da tiempo, animarlos con capas propias de la página encima de la imagen (sin filtros), como la lluvia y la niebla.
-- Low (PR 1f, ronda 4, 18 nov): quedan tokens del arte borrado sin uso en `scenic-tokens.css` (`--sc-depth-*`, `--sc-dur-motes`, `--sc-mote-drift-*`, `--sc-dur-window-flicker`, `--sc-fg-rim-opacity`, entre otros). Quitarlos o reutilizarlos cuando se animen el fuego y los faroles.
-- Low (PR 1f, ronda 4, 18 nov): el encuadre de la casa (camera.ts, sceneArea) cuenta con que la barra lateral (22 rem) tapa hasta x 400 del escenario, que es cierto a 1440 x 900. A 1280 x 720 también sale bien (400), pero a 1024 de ancho la barra tapa hasta x 550 y el porche (x 280 a 362) queda medio detrás. Si hace falta, calcular el área visible con el ancho real de la ventana.
-- Cerrado (19 nov, PR 2b): las capturas de plantas (`02` a `04` y `17`) ya están en `npm run shots`, con los botones de planta.
-- Low (scenic-web PR 2b, 19 nov): en el marco del sótano la fila de botones de planta (arriba a la izquierda) queda sobre el interior de la casa (reloj y teléfono), no sobre cielo; solo se comprobó que en la casa y el ático cubre cielo. Si estorba, bajar la fila o moverla en ese marco.
-- Low (scenic-web PR 2b, 19 nov): la cámara también se desliza (700 ms) cuando cambia la clase de pantalla (ancha a estrecha), aunque el comentario del renderizador dice "de golpe". Solo pasa al cambiar el tamaño de la ventana; arreglarlo si se nota.
-- Low (scenic-web PR 2b, 19 nov): la red de seguridad del foco solo actúa si la página ya tenía foco antes del render; en la carga inicial el foco se queda en `body`, a propósito, para no robarlo.
-- Low (scenic-web PR 2a parte 2, 19 nov): la tarea 9.7 se partió en dos commits (iconos del HUD y Bestiario) por pasar de unas 280 líneas, con permiso del director; `tasks.md` pedía uno solo. En pantallas estrechas el `h2` "Bestiary" se oculta con CSS y queda solo el botón del mismo nombre (en pantallas anchas pasa al revés).
-- Low (scenic-web PR 1f, 18 nov): en una ejecución completa de `npm run check` el test `packages/power/src/networkAllowlist.property.test.ts` también pasó de 5 s una vez (solo tarda menos de 1 s); volvió a pasar una vez el 19 nov en la PR 2b (el `npm run check` siguiente pasó). Si se repite, darle más tiempo como al de `dataFile.roundtrip` (ver `docs/frictions.md`, 18 nov). Volvió a pasar de 5 s en las PR #77 a #79: desde la PR 4b tiene 20 s, como el de `dataFile.roundtrip`.
-- Low (scenic-web PR 1d, 17 nov): el diseño dice a la vez "room backs Night" y paredes del sótano Slate. En la PR 1d el fondo de cada habitación es Slate y los detalles son Night. Revisarlo en la parada de capturas (Vertical Slice Gate).
-- [ ] Comprobación a mano de la PR 1b (la hace Luis Miguel): con `npm run dev` abre `?view=scenic` y en DevTools, pestaña Network, comprueba que se cargan dos archivos `.woff2` (Creepster e IM Fell English) desde el propio sitio; bloquéalos y comprueba que el texto sigue visible.
-- Low (spec kiro-power, 15 nov): `tech.md` dice que un Power es "`POWER.md` + steering + servidor MCP"; la documentación actual de Kiro dice `plugin.json` + `skills/` + `mcp.json`. Corregirlo en una rama de docs aparte.
-- Low (tarea 11.1, 17 nov): Kiro IDE pide aprobación en cada llamada a una herramienta del Power; no se probó si se puede marcar el Power como de confianza (ya anotado más abajo para el vídeo).
-- Low (tarea 11.1, tercera ronda, 17 nov): la skill no tiene forma de provocar un `warning` (solo sale si la carpeta de datos no se puede escribir o falla un guardado), así que no se probó con el Student. Decidir si basta con el test automático de `power.test.ts`.
-- Low (tarea 11.1, tercera ronda, 17 nov): un fantasma con 2 `right` de 3 puede quedar en `failed` si la pregunta principal terminó en dos "I don't know" (cuenta como `wrong`). Es lo que pide el motor, pero puede sorprender al Student; valorar un aviso en la skill.
-- Low (tarea 11.1, 17 nov): la skill exige inglés al Tutor, pero el Student puede contestar en otro idioma (contestó en español una vez); el Tutor le pidió inglés; en la tercera ronda contestó en español otra vez y el Tutor lo aceptó sin pedirlo. Decidir si la skill debe decirlo.
-- Low (revisión de requisitos kiro-power, 15 nov): la línea de corte ("Cut line") no incluye 7.8, aunque 11.4 pide su test de propiedad.
-- Low (revisión de requisitos kiro-power, 15 nov): si se recorta 7.5, no se dice qué pasa con `INVALID_REPORT`.
-- Low (revisión de requisitos kiro-power, 15 nov): el glosario dice "3 rejections before the failure", pero el tercer rechazo ya es el fallo.
-- Low (diseño kiro-power, 15 nov): los requisitos 7.6 y 7.10 se solapan; el diseño los separa añadiendo "at start-up" a 7.10 y "after start-up" a 7.6. Cambio de palabras pendiente en `requirements.md` (con el de la línea de corte para 7.8).
-- Low (revisión diseño kiro-power, PR #35, 15 nov): 7.6 pide avisar cuando falla una escritura, pero el diseño avisa una sola vez por cambio de estado: mejor avisar en cada guardado fallido y una sola vez por el modo memoria del arranque.
-- Low (revisión diseño kiro-power, PR #35, 15 nov): El archivo de prueba `haunted-repo--probe.tmp` tiene un nombre fijo y dos ventanas de Kiro pueden chocar: mejor un sufijo aleatorio.
-- Low (revisión diseño kiro-power, PR #35, 15 nov): Un argumento inválido no llega al manejador: el SDK devuelve su propio error -32602 y no el JSON `{ok:false, code}`; la skill debe decir que lo trate como `INVALID_EVENT`.
-- Low (revisión de `tasks.md` kiro-power, PR #36, 16 nov): si el servidor muere a mitad de una escritura, pueden quedar archivos `.tmp` sueltos en la carpeta de datos (inofensivos, nunca se leen).
-- Low (revisión diseño kiro-power, PR #35, 15 nov): El razonamiento del Judgement puede citar la respuesta del alumno (4.7): que la skill lo prohíba y que el servidor nunca registre el texto del Judgement en logs.
-- Low (revisión diseño kiro-power, PR #35, 15 nov): Para el vídeo, comprobar en la prueba manual si Kiro pide "Allow" en cada llamada MCP y si se puede marcar el Power como de confianza.
-- Low (kiro-power PR 1, 16 nov): npm avisa de que el script de instalación de esbuild no está aprobado en `allowScripts`. El build funciona igual, porque el binario de cada plataforma es un paquete aparte (`@esbuild/win32-x64`, `@esbuild/linux-x64`). Decidir si se aprueba o se deja así.
-- Low (kiro-power PR 1, 16 nov): `npm audit` da 9 avisos moderados de minimatch, que llega a través de eslint y typescript-eslint (solo dev). Es el mismo caso que el Low de la tarea 1.1 del esqueleto (antes eran 10); no aplicar `npm audit fix`.
-- Cerrado (kiro-power PR 3, tarea 5.3): `void pluginData` ya no está en `packages/power/src/server.ts`; ahora llama a `createPower(process.env.PLUGIN_DATA, globalThis.fetch)`.
-- Low (kiro-power PR 3, 16 nov): si el archivo de datos existe pero no se puede leer (por ejemplo, sin permiso), se informa como `INVALID_REPORT`. El diseño solo dice "igual que un archivo roto", sin decir qué código.
-- Low (kiro-power PR 3, 16 nov): el aviso de lista incompleta (`partial`) y el aviso de almacenamiento se juntan con un espacio en el único campo `warning` de la respuesta.
-- Low (kiro-power PR 3, 16 nov): el aviso de almacenamiento se guarda hasta la siguiente respuesta aceptada; nunca va en una respuesta de error.
-- Low (kiro-power PR 3, 16 nov): en las tareas 7.2 y 7.3, los guardados de `send_event` y `judge_answer` deben reutilizar `save` y `withStorageWarning` de `power.ts`, para no romper la regla del aviso una sola vez.
-- Low (revisión de la PR #42, 3c, 16 nov): `store.ts` (hacia la línea 149): el mensaje de error de Node puede incluir la ruta completa de la carpeta del usuario y llega al campo `warning`. Limpiarlo antes de enseñárselo al Student.
-- Cerrado (revisión de la PR #42, 3c, 16 nov): `register.ts` (hacia las líneas 89-127): `pick_ghost`, `send_event` y `judge_answer` respondían `NO_SESSION` aunque hubiera sesión. La PR 4 (#43 a #45) los conectó a los métodos reales de `HauntedPower`.
-- Low (kiro-power PR 4, tarea 7.1): `pick_ghost` crea un cliente de GitHub nuevo en cada llamada (lo pide el requisito 3.2), así que el límite de 8 peticiones por cliente nunca se alcanza a través de `pick_ghost`. El caso "límite de peticiones" de 3.2 solo se prueba con la función `coreMessage`, no con una llamada real.
-- Cerrado (kiro-power PR 4, tareas 7.2 y 7.3): tras un guardado fallido, `send_event` y `judge_answer` vuelven a intentar guardar en el siguiente evento aceptado (comparan con el último progreso guardado, `savedProgress`). Ese reintento ya tiene sus tests en `sendEvent.test.ts` y `judgeAnswer.test.ts` (aviso una sola vez, reintento y vuelta al estado bueno).
-- Low (rama `feat/scenic-web-tasks`, 17 nov): en un `npm run check` completo, dos tests de propiedad de `packages/power` pasaron del límite de 5 s (uno era `networkAllowlist.property.test.ts`, Property 4); la segunda ejecución pasó entera. Mismo caso que la línea siguiente. El 17 nov, en la tarea 1.8, falló una vez `dataFile.roundtrip.property.test.ts` (también de `packages/power`, mismo límite de 5 s) y pasó al repetir.
-- Low (kiro-power PR 5, 16 nov): `dataFile.roundtrip.property.test.ts` pasó una vez del límite de 5 s en un `npm run check` completo, aunque solo tarda ~1 s cuando se ejecuta solo. Valorar darle un tiempo límite más largo.
-- Low (kiro-power PR 4, tarea 7.1): el error del límite de peticiones del cliente de core es un `Error` sin `code`, así que el Student recibe el mensaje general en inglés ("Could not read the file ... from GitHub") y no el texto de core.
-- Cerrado (kiro-power PR 2, 16 nov): el bundle subido (`packages/power/bundle/server.mjs`) sale idéntico en Windows y en Linux: el paso de CI de la PR #37 pasó en Linux con el bundle hecho en Windows (duda 12.4 de `design.md`; tarea 1.4 marcada).
-- Low (revisión de la PR 2b, 16 nov): `store.ts` no hace `fsync` (obligar al disco a guardar de verdad lo escrito) antes del `rename`. Un corte de luz repentino podría dejar un archivo vacío; el diseño solo promete seguridad si el programa se cuelga.
-- Low (kiro-power PR 2, 16 nov): los mensajes en inglés de `src/dataFile.ts` (y los de módulos futuros) están escritos dentro de cada módulo; moverlos a `src/messages.ts` en la tarea 5.2.
-- Low (requisitos kiro-power, opción A, 15 nov): la carpeta de `PLUGIN_DATA` lleva el nombre del último trozo de la URL de import (`power`), así que choca con la de cualquier otro Power importado desde una URL que acabe en `/power`. El requisito 7.11 pide nombres de archivo con el repositorio; el diseño debe comprobarlo.
-- Cerrado (rama `docs/power-requirements-option-a`): la línea "Lo próximo" de "Para retomar" todavía tenía la frase antigua del veredicto estricto. Ahora apunta al requisito 5 de `requirements.md`.
-- Low (spike del Power, 15 nov): el paso 3 de la lista del spike (la lista de servidores MCP: cuál de `spike-root` y `spike-relative` estaba en marcha) no se anotó.
-- "Certificado de exorcismo" para profesores: fuera de alcance por ahora; Luis Miguel quiere reconsiderarlo (decisión pendiente)
-- Low (PR #1): comprobar en kiro.dev/docs el formato real de los hooks (nombre y extensión del archivo en `.kiro/hooks/`) y si hay un trigger que distinga lo que escribe el agente de lo que guarda el usuario; corregir `tech.md` en la spec de detección de fantasmas
-- Low (PR #1): quitar de `tech.md` las reglas repetidas de `testing.md` (mocks) y `git-workflow.md` (secretos) y dejar solo una referencia, para que no se contradigan si se cambia una
-- Low (tarea 1.1): npm audit: 10 avisos moderados de minimatch (solo dev). No aplicar npm audit fix: bajaría eslint a 9. Revisar cuando typescript-eslint/eslint publiquen versión corregida.
-- Cerrado (hook de tests, historial): en la sesión de la PR de `feat/test-hook` no se pudo disparar PostTaskExec editando `tasks.md`. Se añadió la opción B (segundo hook de tipo agente que ejecuta `npm run check`). La prueba real en la spec de detección confirmó que el hook se dispara al completar una tarea (ver la siguiente línea).
-- Cerrado (hook de tests, prueba real en la tarea 2.1): el hook PostTaskExec está confirmado. Se dispara al marcar una tarea como completada, no al pulsar Start task. Al completar la 2.1 llegó al agente la instrucción de ejecutar `npm run check`. Decidido el 15 nov: solo queda el hook de comando; el de agente se borró.
-- Cerrado (hook de tests): 'Agent Hooks v2' no obliga a migrar. La documentación actual (kiro.dev/docs/hooks, actualizada oct 2026) usa `"version": "v1"` con `trigger` y `action`, igual que nuestro archivo. `timeout` va al nivel del hook, no dentro de `action`. Solo cambió el formato de IDE 0.x (`.kiro.hook`) a `.kiro/hooks/*.json`. La documentación no dice que la salida de un hook PostTaskExec llegue al agente.
-- Low (PR #4): `vitest.config.ts` y `eslint.config.js` no los comprueba tsc (solo `src/`). Valorar un tsconfig para la raíz si los configs crecen.
-- Cerrado (13 nov, docs/pre-web-cleanup): Medium (spec ghost-detection, enfoque aprobado 11 nov): actualizar product.md y tech.md. El enfoque nuevo (elegir de 3 a 5 archivos clave de un repo público de GitHub, ordenados de fácil a difícil) sustituye a la idea de un hook que marca cada archivo escrito por el agente. Revisar también las secciones 'Deliverables', 'Kiro hook' y 'Ghost state'.
-- Low (PR #11, revisión): `parseReport` acepta campos desconocidos sin quitarlos.
-- Cerrado (13 nov, docs/pre-web-cleanup): Medium (auditoría 11 nov): la línea .kiro/specs/*/tasks.meta.json de .gitignore puede chocar con las bases; decidir si se quita
-- Cerrado (web-demo PR 1): Medium (auditoría 11 nov): la demo debe mostrar el aviso de licencia MIT de lukeed/sirv. El pie de la página muestra la línea de copyright y enlaza a `sirv-license.txt`.
-- Low (spec exorcism): siete propiedades opcionales aplazadas (grupo 8 de `tasks.md`): P3 tipo de archivo estable, P7 ida y vuelta del progreso, P8 rango de `hauntedShare`, P9 `hauntedShare` monótono, P10 frase del fantasma determinista, P15 ida y vuelta de la grabación, P17 las `sampleAnswer` se ignoran. Solo se hacen si queda tiempo (decidido el 15 nov), en una rama nueva (feat/exorcism-properties) y una PR nueva (la PR #14 ya está fusionada).
-- Low (revisión exorcism): `buildInstructions` lanza un Error si el estado no trae `current` o `pendingQuestion` (solo pasa con un estado imposible; el motor no lo produce).
-- Low (revisión exorcism): las instrucciones no tienen una sección aparte de "formato de salida": el formato del VERDICT va como regla `verdict-format`.
-- Low (revisión exorcism): `classifyFileKind` no reconoce como barrel un import de TypeScript escrito en varias líneas.
-- Low (revisión exorcism): al repetir una pregunta tras simplificar, el motor acepta `answer-rated` aunque el texto de la pregunta no sea el de `pendingQuestion` (el Power debe mandar el mismo texto).
-- Low (revisión exorcism): en la propiedad P4 el texto del driver siempre da el tipo general, así que solo se comprueban los objetivos de ese tipo.
-- Low (revisión exorcism): `advance` comparte con el estado de entrada los arrays que no cambian (`ghosts`, `asked`): quien lo use no debe modificar estados antiguos.
-- Low (revisión exorcism): el comentario de `tinySession.testutil.ts` dice que los eventos se generaron ejecutando el motor, pero están escritos a mano (el test de replay los valida).
-- Low (revisión 13 nov): si falla por red la lectura de un solo archivo, detectGhosts devuelve error y descarta los ya leídos; solo el límite de peticiones da informe parcial (así lo pide la spec).
-- Low (revisión 13 nov): cualquier respuesta 403 de GitHub se trata como límite de peticiones, aunque la causa sea otra.
-- Low (revisión 13 nov): parseReport no comprueba que el informe sea coherente (picked igual al número de fantasmas, planta según la puntuación, rutas sin repetir). El fixture tinySession no lo es (fewFiles: true con 3 fantasmas).
-- Low (revisión PR #19, web-demo pieza 1): el test de la Propiedad 5 en `houseView.test.ts` recalcula el resultado con la misma lógica que `buildWarnings`, así que un fallo en esa lógica no lo detectaría. Los tests de ejemplo con valores fijos sí lo cubren. Sin acción por ahora.
-- Medium (revisión PR #20, web-demo pieza 2): `page.test.ts` (líneas 15-16) importa `sessionArb.testutil` y `reportArb.testutil` con rutas relativas dentro de `packages/core/src`; se rompe si Core los mueve. Arreglo mínimo: exportarlos desde un único punto de entrada de Core solo para tests.
-- Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 90-103): `go-to-floor` sigue disponible durante un análisis en vivo y, al terminar, la escena vuelve a la planta principal. Arreglo: no ofrecer navegación mientras `busy`, o no reiniciar la escena.
-- Low (revisión PR #20, web-demo pieza 2): `page.ts` (líneas 94-100): el estado "Live report ready" o el de error se queda al cambiar de planta (cosmético).
-- Cerrado (web-demo PR 2, tarea 10.2): Low (revisión PR #20, web-demo pieza 2): `submit-live` se ofrecía en la escena del fantasma aunque el formulario está oculto. Ahora en esa escena solo están disponibles las acciones del fantasma.
-- Cerrado (web-demo PR 2, fix tras la tarea 12.2): Medium (revisión PR #21, web-demo pieza 3): `main.replaceChildren` volvía a crear los botones en cada render y el foco del teclado caía a `<body>` (requisito 12.1). Ahora una función pura (`view/simple/focus.ts`) decide dónde va el foco después de cada render: el título del panel en cada pantalla nueva, el mismo botón si sigue ofrecido, el botón "Start" del fantasma al salir de él, o el título de la lista.
-- Medium (revisión PR #21, web-demo pieza 3): `manifest.test.ts` (líneas 33-50) recorre `allLayers`, que está vacío, así que esos tests hoy no pueden fallar. Arreglo: sacar la comprobación a una función y probarla con una capa de ejemplo válida y otra con `https://`.
-- Low (revisión PR #21, web-demo pieza 3): `resolve.ts` y `house.ts` no tienen tests; el caso "hueco con capas y un archivo que falta" no se ejecuta. Arreglo: pasar el mapa de URL a `resolveSlot` como parámetro y probarlo en Node.
-- Low (revisión PR #21, web-demo pieza 3): en `house.ts`, `ghostStateNodes` repite el `map` de `img` de `slotImages`; que llame a `slotImages`.
-- Low (revisión PR #25, web-demo PR 2 pieza 2): la lista de pasos del fantasma está duplicada en `page.ts` y en `exorcism.ts`; dejar una sola fuente.
-- Low (revisión PR #27, web-demo PR 2 pieza 3): el test "Reload" crea una página nueva desde cero, así que casi nunca puede fallar (solo detecta estado compartido en una variable, no datos guardados en el navegador).
-- Low (revisión PR #27, web-demo PR 2 pieza 3): del juicio final "yes", "half" y "no", solo "yes" tiene un test sobre el estado de la tarjeta; "half" y "no" solo se comprueban como acciones que el motor acepta.
-- Low (web-demo PR 2, fix de foco): durante un análisis en vivo se desactiva el botón de enviar del formulario y algunos navegadores sueltan el foco de un botón desactivado; el formulario está fuera de `main` y `focusAfterRender` no lo trata.
-- Low (revisión PR #29, web-demo PR 2 pieza 4): `renderer.ts`: el test de la caja de respuesta (`source.test.ts`) solo lo detecta si la variable se llama `answerBox`.
-- Low (revisión PR #29, web-demo PR 2 pieza 4): la parte del renderizador que mueve el foco del teclado en la página real no tiene test; solo tiene tests la función pura que decide adónde va el foco. Se cubre con la comprobación manual.
-- Gallery (dev only): the candle light is cut at the card edges and the type titles show underscores. Low.
-- Scenic SVG: gradient ids are repeated in every slot (cloche-glass, candle-pool, flame-halo... and the ghost ids per type and Variant). It renders fine because the copies are identical; make them unique per slot if it ever causes a problem. Low.
-- Attic Cloche is ~5% smaller than on the middle floor (the 106 high band fits 0.257, not 0.27). Accepted. Low.
-- Cerrado (revisión PR #29): `docs/kiro-usage-log.md` citaba el commit `8c4ab18`, que tras el rebase se llama `69b2b50`. Corregido en la rama `docs/cleanup-after-exorcism`.
+1. [ ] Vídeo terminado y subido a YouTube (28 a 30 nov).
+2. [ ] Textos de Devpost: descripción y texto de cómo se usó Kiro (30 nov a 2 dic).
+3. [ ] Bonus: entrada de blog en DEV.to y post con #KiroweenHackathon26 (30 nov a 2 dic; se hacen todos, decidido el 15 nov).
+4. [ ] Datos y justificante de estudiante preparados (antes del 3 dic).
+5. [ ] Rellenar el formulario de Devpost (3 dic) y enviarlo (4 dic por la mañana; límite 23:00, hora de España).
+
+## Pendientes (después de entregar)
+Nada de esta lista bloquea la entrega. Se revisa después del 4 dic, salvo que algo rompa la demo.
+
+### Seguridad (revisión del 25 nov: 0 Critical, 0 High, 0 Medium, 4 Low)
+- Low: `npm audit` da 9 avisos moderados de minimatch, que llega por eslint y typescript-eslint (solo dev; sin dev, 0 avisos). No aplicar `npm audit fix`: bajaría ESLint a 9. Revisar cuando eslint y typescript-eslint publiquen versión corregida.
+- Low: la ruta del fantasma va fuera del bloque de código en las instrucciones del Tutor (`packages/core/src/exorcism/instructions.ts`); git admite saltos de línea en rutas.
+- Low: las acciones de GitHub de `ci.yml` y `deploy.yml` están fijadas por versión, no por hash de commit.
+- Low: la web no tiene Content-Security-Policy. GitHub Pages no deja poner cabeceras; se podría con una etiqueta `meta`.
+
+### Power y motor
+- Medium (revisión backend, 24 nov): cada respuesta del Power repite el archivo entero del fantasma (con `power.ts`, unos 23 KB por respuesta y unas 6 respuestas por fantasma). Enviarlo solo al elegir el fantasma.
+- Medium (revisión backend, 24 nov): el Power lee el fantasma por nombre de rama, no por commit; si el alumno borra o renombra el archivo, ese fantasma no se puede exorcizar y la casa nunca queda limpia.
+- Low: todo 403 de GitHub se toma como límite de peticiones, aunque GitHub también lo usa para repos bloqueados.
+- Low: el informe guarda el dueño como se escribió en la URL, no como está en GitHub.
+- Low: los 6 archivos se leen uno tras otro (1,7 a 2,2 s); en paralelo serían unos 0,5 s, pero cambia el corte por límite de peticiones.
+- Low: el límite de 10 s cubre también la descarga del árbol; un repo enorme con red lenta puede dar "Could not reach GitHub". Sin verificar en vivo.
+- Low: los archivos `*.testutil.ts` cuentan como elegibles y pueden salir como fantasmas. En este mismo repo salen en el ático 3 fantasmas casi vacíos (`core/src/ghost-detection/index.ts`, `power/src/server.ts` y `core/src/exorcism/index.ts`) y ninguno en la planta media. La demo usa sirv, que no cambia.
+- Low: si falla por red la lectura de un solo archivo, `detectGhosts` devuelve error y descarta los ya leídos; solo el límite de peticiones da informe parcial (así lo pide la spec).
+- Low: `parseReport` acepta campos desconocidos sin quitarlos y no comprueba que el informe sea coherente (el fixture `tinySession` no lo es).
+- Low: el error del límite de peticiones del cliente de core es un `Error` sin `code`, así que el Student recibe el mensaje general en inglés y no el texto de core. `pick_ghost` crea un cliente nuevo en cada llamada, así que su límite de 8 peticiones solo se prueba con `coreMessage`.
+- Low: la skill no puede provocar un `warning`, así que no se probó con el Student; `warning`, `house-clean` y `replace: true` solo tienen test automático.
+- Low: un fantasma con 2 `right` de 3 puede quedar en `failed` si la pregunta principal terminó en dos "I don't know". Valorar un aviso en la skill.
+- Low: la skill exige inglés al Tutor, pero el Student a veces contesta en español y el Tutor lo acepta. Decidir si la skill debe decirlo.
+- Low: Kiro IDE pide aprobación en cada llamada a una herramienta del Power; no se probó si se puede marcar el Power como de confianza.
+- Low: el razonamiento del Judgement puede citar la respuesta del alumno: que la skill lo prohíba y que el servidor nunca lo registre en logs.
+- Low: almacén del Power. Sin `fsync` antes del `rename`; archivos `.tmp` sueltos si el servidor muere a mitad de una escritura (inofensivos); la sonda `haunted-repo--probe.tmp` tiene nombre fijo; un archivo de datos sin permiso de lectura se informa como `INVALID_REPORT`; el mensaje de error de Node puede llevar la ruta de la carpeta del usuario al campo `warning` (`store.ts`).
+- Low: avisos del Power. `partial` y el aviso de almacenamiento se juntan con un espacio en el único campo `warning`; el aviso de almacenamiento espera a la siguiente respuesta aceptada; un argumento inválido devuelve el error -32602 del SDK y no `{ok:false, code}` (la skill debe tratarlo como `INVALID_EVENT`).
+- Low: la carpeta de `PLUGIN_DATA` se llama `power`, como el último trozo de la URL de import, y choca con cualquier otro Power importado desde una URL que acabe en `/power`.
+- Low: npm avisa de que el script de instalación de esbuild no está aprobado en `allowScripts`; el build funciona igual.
+- Low: los mensajes en inglés de `src/dataFile.ts` siguen dentro del módulo, no en `src/messages.ts`.
+- Low (motor de exorcismo): `buildInstructions` lanza un Error con un estado imposible; el formato del VERDICT va como regla y no como sección propia; `classifyFileKind` no reconoce un barrel con import en varias líneas; al repetir una pregunta el motor no comprueba que el texto sea el de `pendingQuestion`; `advance` comparte arrays con el estado de entrada; el comentario de `tinySession.testutil.ts` dice que los eventos salen del motor, pero están escritos a mano.
+- Low (redacción de la spec `kiro-power`): la línea de corte no incluye 7.8; no dice qué pasa con `INVALID_REPORT` si se recorta 7.5; el glosario dice "3 rejections before the failure"; 7.6 y 7.10 se solapan; 7.6 debería avisar en cada guardado fallido.
+
+### Web
+- Low (1280x720, sin movimiento reducido): el hueco entre el botón de relámpagos y la línea de licencia es de 12 px, menos de los 13 px del criterio. Igual que antes de la PR #92.
+- Low: a 1024 de ancho la barra lateral tapa hasta x 550 y el porche de la casa queda medio detrás (camera.ts cuenta con x 400). A 1024x768 el raíl de Nameplates aún hace un poco de scroll con cuatro Cards.
+- Low: con red muy lenta (0,4 Mbit/s y CPU 4x) los fantasmas, las campanas y los botones se ven unos 10 s sobre fondo oscuro antes de que llegue la casa.
+- Low: el aviso del límite de GitHub no dice a qué hora se puede volver a probar, aunque el motor ya lo sabe.
+- Low: el motivo de los carteles por decisiones dice "if/elif/..." ("elif" es de Python). El texto sale de `packages/core/src/ghost-detection/factors.ts` y lo usan también el Power, la muestra y tres specs.
+- Low: la explicación del fantasma de la planta media dice "calls the next function it was given" sin definir esa función.
+- Low: la ilustración `house-scene.svg` trae lluvia pintada, que sigue débil sobre el amanecer del final.
+- Low: el fuego, el péndulo y los faroles de la ilustración están quietos; si se animan, con capas propias encima y sin filtros. Quedan tokens sin uso en `scenic-tokens.css` (`--sc-depth-*`, `--sc-dur-motes`, `--sc-fg-rim-opacity`, entre otros).
+- Low: en el marco del sótano la fila de botones de planta queda sobre el interior de la casa; la cámara también se desliza al cambiar de pantalla ancha a estrecha.
+- Low: en la carga inicial el foco se queda en `body` a propósito; durante un análisis en vivo algunos navegadores sueltan el foco del botón desactivado.
+- Low: la función que elige las etiquetas de las acciones del fantasma está repetida en `simple/ghost.ts` y `scenic/model/grimoireView.ts`, y la lista de pasos del fantasma en `page.ts` y `exorcism.ts`.
+- Low: `go-to-floor` sigue disponible durante un análisis en vivo y el estado "Live report ready" se queda al cambiar de planta.
+- Low (dev): en la galería de desarrollo la luz de la vela se corta en el borde de las tarjetas; los ids de degradado del SVG se repiten en cada hueco (se ve bien porque son idénticos); la Cloche del ático es un 5 % más pequeña (aceptado).
+- Low (diseño): el diseño dice a la vez "room backs Night" y paredes del sótano Slate; se hizo fondo Slate y detalles Night.
+- Comprobación a mano sin hacer (PR 1b): con `npm run dev`, en DevTools, comprobar que las dos fuentes `.woff2` se cargan desde el propio sitio y que, bloqueadas, el texto sigue visible.
+
+### Tests y herramientas
+- Medium: varios tests de `packages/web` importan utilidades de test de core con rutas relativas a `packages/core/src` (`page.test.ts`, `exorcism.test.ts`, `houseView.test.ts` y otros); se rompen si core las mueve.
+- Low: el test de la Propiedad 5 de `houseView.test.ts` recalcula con la misma lógica que `buildWarnings`; el test "Reload" casi nunca puede fallar; de "yes", "half" y "no" solo "yes" tiene test sobre la tarjeta; el test de la caja de respuesta solo funciona si la variable se llama `answerBox`; el foco real del renderizador no tiene test.
+- Low: `resolve.ts` y `house.ts` no tienen tests, y `ghostStateNodes` repite el `map` de `slotImages`.
+- Low: en la propiedad P4 del exorcismo solo se comprueban los objetivos del tipo general.
+- Low: `vitest.config.ts` y `eslint.config.js` no los comprueba tsc.
+- Low: `tech.md` repite reglas de `testing.md` (mocks) y de `git-workflow.md` (secretos); dejar solo una referencia.
+- Low: en `docs/kiro-usage-log.md` la fila del 22 nov va después de la del 23, y la entrada del stash (15 nov) no dice que se borró el 25 nov.
+- Low (spike del Power, 15 nov): no se anotó cuál de `spike-root` y `spike-relative` estaba en marcha.
+
+### Ideas
+- Certificado de exorcismo para profesores: fuera de alcance para la entrega (ver `docs/decisiones.md`).
+- Siete propiedades opcionales del exorcismo (grupo 8 de su `tasks.md`) y las 5.4 y 7.7 del Power, en una rama nueva.
+- Textos del Tutor para los otros dos fantasmas de sirv (web-demo 16.1 y 16.2). `packages/sirv-cli/bin.js` sigue bloqueado en la web a propósito, para el vídeo del Power.
+- Web en varios idiomas.
 
 ## Hecho
-- [x] Elegir idea (6 nov)
-- [x] Créditos de Kiro (4.000) canjeados (6 nov)
-- [x] Repo creado con licencia MIT (6 nov)
-- [x] Generar `product.md` y `tech.md` con Kiro a partir de `docs/idea.md` (PR #1, 6 nov)
-- [x] Crear `docs/frictions.md` y su recordatorio en el plan (PR #2, 6 nov)
+- [x] Idea elegida, 4.000 créditos de Kiro canjeados y repo creado con licencia MIT (6 nov)
+- [x] `product.md` y `tech.md` generados con Kiro a partir de `docs/idea.md` (PR #1) y `docs/frictions.md` creado (PR #2) (6 nov)
 - [x] Esqueleto del proyecto: workspaces, TypeScript, ESLint, Prettier, Vitest y fast-check (PR #4)
-- [x] Hook de tests (PR #5; confirmado en real: se dispara al completar una tarea). Desde el 15 nov solo queda el hook de comando; el de agente se borró
-- [x] Spec de detección de fantasmas: `packages/core` con `detectGhosts`, cliente de GitHub, GitHub falso estricto y test en vivo (PR #11 y #12)
-- [x] Spec de exorcismo: motor puro en `packages/core/src/exorcism/` (sesión, eventos, preguntas, veredicto, progreso, grabación y repetición) y nueva frase del fantasma según la planta (PR #14, 12 nov)
+- [x] Hook de tests (PR #5; se dispara al completar una tarea). Desde el 15 nov solo queda el hook de comando
+- [x] Spikes de preguntas y explicaciones con Kiro (11 nov; `docs/spike-preguntas.md` y `docs/spike-explicacion.md`)
+- [x] Spec de detección de fantasmas: `detectGhosts` en `packages/core`, cliente de GitHub, GitHub falso estricto y test en vivo (PR #11 y #12)
 - [x] Despliegue en GitHub Pages: web pública, CI en cada PR y despliegue al fusionar (PR #13, 12 nov)
-- [x] Web de demostración, PR 1: lista de fantasmas de lukeed/sirv por plantas, formulario en vivo, informe de ejemplo si falla y aviso de licencia (PR #19, #20, #21 y #22, 14-15 nov)
-- [x] Web de demostración, PR 2: exorcismo de ejemplo de los 2 fantasmas más fáciles de lukeed/sirv, con progreso y fantasmas bloqueados (PR #24, #25, #27 y #29)
+- [x] Spec de exorcismo: motor puro en `packages/core/src/exorcism/` (PR #14, 12 nov)
+- [x] Web de demostración, PR 1: fantasmas de lukeed/sirv por plantas, formulario en vivo, informe de ejemplo y aviso de licencia (PR #19 a #22, 14-15 nov)
+- [x] Web de demostración, PR 2: exorcismo de ejemplo de los 2 fantasmas más fáciles, con progreso y fantasmas bloqueados (PR #24, #25, #27 y #29)
 - [x] Categoría decidida: Costume Contest (15 nov)
-- [x] Kiro Power: bundle, archivo de datos y almacén, herramientas `find_ghosts`, `continue_house`, `house_status`, `pick_ghost`, `send_event` y `judge_answer` con veredicto estricto, skill del Tutor, manifiesto y test en vivo (PR #34 a #46, 16 nov). La prueba manual de instalación desde GitHub `main` (tarea 11, 17 nov) pasó la 11.2 y la 11.1 se cerró tras la tercera ronda (ver `docs/spike-power-e2e.md`)
-- [x] Power instalado desde GitHub `main` y probado en vivo (17 nov, tarea 11 cerrada). No se probaron en vivo `warning`, `house-clean` ni `replace: true`
-- [x] Spec `scenic-web` completa: requisitos (PR #50), diseño (PR #51) y `tasks.md` (PR #52) (17 nov)
-- [x] Web escénica, PR 1a (#53), 1b, 1c (#55), 1d (#56) y 1e (#57) de las 13 PR fusionadas (17 nov). La 1e hace que `?view=scenic` dibuje la casa con Wisps en el ático
-- [x] Web escénica, PR 1f (#59, 18 nov): la herramienta de capturas (`npm run shots`, galería de desarrollo y `npm run size`) y tres rondas de pulido de la casa programada. Decisión final del 18 nov: la casa es ahora una ilustración declarada, hecha con Claude (`house-scene.svg`), integrada, animada y conectada a la app por Kiro. Fantasmas encapuchados nuevos (Wisp, Lantern_Wraith y Chained_Brute), sin ventana por hueco ni sombra bajo los fantasmas, lluvia recortada fuera de la casa y cámara encuadrada a la derecha de la barra lateral
-- [x] Web escénica terminada: PR 2a a 4b (#62 a #80, 19-22 nov) y prueba a mano de la página pública (tarea 17.1, 23 nov)
-- [x] README final con la captura de la casa (PR #93, 25 nov)
+- [x] Kiro Power: bundle, almacén, las seis herramientas con veredicto estricto, skill del Tutor, manifiesto y test en vivo (PR #34 a #46, 16 nov). Instalado desde GitHub `main` y probado en vivo (tarea 11, 17 nov; ver `docs/spike-power-e2e.md`)
+- [x] Spec `scenic-web`: requisitos, diseño y tareas (PR #50 a #52, 17 nov)
+- [x] Web escénica, PR 1a a 1f (#53 a #59, 17-18 nov): la casa es una ilustración declarada, hecha con Claude (`house-scene.svg`), integrada, animada y conectada a la app por Kiro
+- [x] Web escénica, PR 2a a 2c (#62 a #67, 19 nov): fantasmas por planta, botones de planta, teléfono y raíl de Nameplates
+- [x] Puerta de piedra (Gate_Panel) parte 1 y parte 2 con su movimiento (PR #68 y #70, 20 nov)
+- [x] Regla de cambios visuales `.kiro/steering/visual-changes.md` (PR #71, 21 nov)
+- [x] Web escénica, PR 3a a 4b (#72 a #80, 22 nov): sala del fantasma, exorcismo, amanecer final y vista escénica por defecto. Prueba a mano de la página pública (tarea 17.1, 23 nov)
+- [x] Fantasma de la planta media exorcizable en la web (web-demo 16.3, PR #84, 23 nov)
+- [x] Orden de fantasmas y redirecciones (PR #85), SVG optimizados (PR #86), favicon (PR #87) y arreglos de la vista simple y del Grimoire en móvil (PR #88 y #89) (24 nov)
+- [x] Planta vacía de la muestra (PR #90), enlace "Get the Power" en el final (PR #91) y solape de la licencia con movimiento reducido (PR #92) (25 nov)
+- [x] README final con la captura de la casa (PR #93) y limpieza final de fricciones, registro de uso de Kiro, steering y decisiones (PR #94 y #95) (25 nov)
+- [x] Revisión de seguridad de `main` en solo lectura: 0 Critical, 0 High, 0 Medium, 4 Low (25 nov)
+- [x] Arreglo: la línea de copyright de sirv ya no tapa el Bestiary de la puerta tras el análisis en vivo (PR #96)
 
 ## Para retomar (traspaso)
-
-- Traspaso (25 nov): el código está terminado y no hay PR abiertas; se congela el viernes 27 nov. Después solo vídeo y textos, en el orden de "En curso". Si hay que cambiar un documento del repo, sigue yendo por Kiro, en una rama `docs/...` desde `main` y contra `main`.
-- Decisiones de diseño del 16 nov (detalle y motivos en `docs/decisiones.md`): la vista escénica realista se descartó (el prototipo `proto/scenic-demo` parecía un botón y un pergamino; rama descartada, sin fusionar). La web será un SVG hecho con cuidado, con aspecto de videojuego (estilo Halloween), con animación y un diseño de fantasma distinto para cada planta de la casa. La web multilingüe es solo una idea de futuro (no antes del 4 dic).
-- Reglas del Power que siguen vigentes: el bundle `packages/power/bundle/server.mjs` se reconstruye en cada `npm run check`, y cualquier cambio en código que llegue a `src/server.ts` debe subir también ese archivo. `.kiro/specs/kiro-power/tasks.meta.json` SÍ se sube a git y nunca se ignora (las bases exigen `.kiro/` completo; ver `git-workflow.md`).
-- Aviso: el Power del spike (`spike-root` y `spike-relative`, `docs/spike-power.md`) hay que desinstalarlo antes de importar el Power real, porque los dos se instalan en una carpeta llamada `power` y chocan (mismo `PLUGIN_DATA`).
-- Comprobaciones a mano de la PR #29: no se marcaron una a una; la página pública se probó a mano en la tarea 17.1 de `scenic-web` (23 nov).
-- web-demo, después de esta versión: Del grupo 16 de `tasks.md` solo se hizo la 16.3 (23 nov): el fantasma de la planta media, `packages/sirv/index.mjs`, ya se puede exorcizar en la web y el final del amanecer sale tras el tercer exorcismo. Las 16.1 y 16.2 siguen abiertas a propósito: `packages/sirv-cli/bin.js` sigue bloqueado para el vídeo del Power. La vista escénica realista (imágenes en los huecos del manifiesto de `view/assets/`) se descartó el 16 nov; en su lugar habrá un SVG con aspecto de videojuego (ver "Siguientes", 7b). Esta spec solo tiene el renderizador simple.
-- Hitos: versión mínima funcionando el 20 nov (según `tasks.md` de web-demo, la PR 1 sola ya es la versión mínima), código congelado el 27 nov y entrega el 4 dic de 2026 a las 23:00 (hora de España). Si vamos tarde, `tasks.md` de web-demo dice qué recortar y en qué orden ("If we run late").
-- Qué existe en `packages/core` (`@haunted-repo/core`, carpeta `src/ghost-detection/`): `detectGhosts(url, opts)` devuelve un `Result` con un `HauntedReport`; `parseReport`, `parseRepoUrl`, `isEligible`, `pickKeyFiles`, `measureFactors`, `difficultyScore`, `floorOf`, `buildReport` y `createGitHubClient`, todo exportado desde `src/index.ts`. Solo usa `fetch`, `TextDecoder` y `AbortSignal` (sin APIs de Node), para que funcione en el navegador.
-- Test en vivo: `npm run test:live` llama al GitHub real (`lukeed/sirv`, sin token). Los dos tests en vivo gastan unas 17 de las 60 peticiones por hora. No forma parte de `npm run check` ni de `npm test`. Si falla por límite de peticiones, esperar a que se reinicie y repetir.
-- `web` ya depende de `@haunted-repo/core`; `power` todavía NO. Cada spec posterior que use `core` en un paquete que aún no lo tenga debe añadir `"@haunted-repo/core": "0.0.0"` en su `package.json` y actualizar `package-lock.json`. El script `build` de la raíz lista `core`, `power` y `web` en ese orden; un paquete nuevo se añade en el sitio correcto.
-- Spec de exorcismo (fusionada, PR #14):
-  - Qué existe en `packages/core/src/exorcism/`: funciones puras, sin red, sin `Date` ni `Math.random` (lo vigila `purity.test.ts`). `startSession`, `advance` (devuelve un `Transition`: un objeto con `ok: true`, el nuevo estado y las instrucciones; o con `ok: false`, un error y el mismo estado), `decide`, `buildInstructions`, `parseEvent`, `ALLOWED_EVENTS`, `formatVerdict`/`parseVerdict`, `classifyFileKind`, `QUESTION_SETS`, `suggestGhost`, `isPickable`, progreso (`normaliseProgress`, `parseProgress`, `formatProgress`, `hauntedShare`) y grabación (`parseRecording`, `formatRecording`, `replay`). Todo se exporta desde `src/index.ts`.
-  - Cómo empezar una sesión: `startSession(report, { progress, profile })` y después `advance(state, event)` con cada evento (`pick-ghost`, `explanation-done`, `answer-rated`, `dont-know`, ...). El estado y las instrucciones son JSON puro, así que se pueden guardar.
-  - Cómo repetir una grabación: `parseRecording(jsonText)` y `replay(recording)` devuelve todos los pasos; los `sampleAnswer` se ignoran. La grabación de ejemplo está en `exorcism/tinySession.testutil.ts` (JSON incluido).
-  - El texto del Tutor (explicaciones, preguntas, corrección) solo se comprueba con los spikes manuales (`docs/spike-explicacion.md` y el spike del 11 nov); ningún test automático puede llamar a Kiro.
-  - Las specs siguientes (Power y web) usarán este motor y la grabación del fixture. La web puede enseñar la grabación sin Kiro; el Power conecta el motor con el Kiro del usuario (debe enviar la misma pregunta al repetirla; ver "Pendientes").
-  - `.kiro/specs/ghost-detection/design.md` tiene un puntero a la sección "Ghost_Sentence" del diseño de exorcismo, que sustituye a su tabla de frases.
-- Notas para specs futuras: (a) Power: no empaquetar los tests compilados de `dist/`; (c) npm ci comprobado en Linux con el lockfile de Windows (11 nov)
-  - (d) web: el informe guardado de la demo sale de una ejecución real de detectGhosts sobre el commit fijado de lukeed/sirv, no escrito a mano, y se carga con parseReport; la página no llama a GitHub al arrancar.
-  - (e) web: en el navegador no se guarda nada (ni progreso ni SessionState); lo vigila `packages/web/src/source.test.ts`.
-  - (f) web: la grabación no guarda el texto del "por qué" de cada veredicto; si la demo lo enseña, necesita un campo propio, y una grabación más rica que tinySession.
-  - (g) web: npm test sin npm run build antes usa el dist/ compilado de core (falla si no existe y prueba código viejo si está desfasado); en el diseño, valorar un alias de @haunted-repo/core a packages/core/src en vitest.config.ts. Usada: el alias está en `vitest.config.ts` (web-demo, tarea 1.1).
-  - (h) Power: parseVerdict rechaza "**VERDICT: right**", un espacio delante o un punto final; el Power debe volver a pedir el veredicto si recibe INVALID_VERDICT.
+- Traspaso (26 nov): el código está terminado y no hay PR abiertas. Lo que queda está en "Siguientes" y no toca el código. Si hay que cambiar un documento del repo, sigue yendo por Kiro, en una rama `docs/...` desde `main` y contra `main`.
+- Cada fricción se anota en `docs/frictions.md` el mismo día que ocurre.
+- Power: el bundle `packages/power/bundle/server.mjs` se reconstruye en cada `npm run check`, y cualquier cambio que llegue a `src/server.ts` debe subir también ese archivo. `.kiro/specs/kiro-power/tasks.meta.json` se sube a git y nunca se ignora (las bases exigen `.kiro/` completo).
+- Power: antes de importar el Power real hay que desinstalar el del spike (`spike-root` y `spike-relative`), porque los dos usan una carpeta llamada `power` y chocan.
+- Core solo usa `fetch`, `TextDecoder` y `AbortSignal`, sin APIs de Node, para que funcione en el navegador. El motor de exorcismo es puro: sin red, sin `Date` ni `Math.random` (lo vigila `purity.test.ts`).
+- Web: la demo carga un informe guardado de una ejecución real de `detectGhosts` sobre un commit fijado de lukeed/sirv, no llama a GitHub al arrancar y no guarda nada en el navegador (lo vigila `packages/web/src/source.test.ts`).
+- Tests: `npm run test:live` llama al GitHub real sin token (unas 17 de las 60 peticiones por hora) y no forma parte de `npm run check`. El texto del Tutor solo se comprueba con los spikes manuales: ningún test automático puede llamar a Kiro.
