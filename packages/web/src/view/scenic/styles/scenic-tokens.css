@@ -376,6 +376,8 @@
   --sc-gate-bestiary-title: min(1.35rem, calc(var(--sc-gate-u) * 22));
   --sc-gate-bestiary-gap: 0.45rem;
   --sc-gate-niche-h: calc(var(--sc-gate-u) * 122);
+  /* The niches may shrink to this when the live report fills the panel. */
+  --sc-gate-niche-min-h: calc(var(--sc-gate-u) * 96);
   --sc-gate-niche-arch: 3rem 3rem 4px 4px;
   --sc-gate-niche-border: 2px;
   --sc-gate-niche-pad: 0.35rem 0.2rem 0;

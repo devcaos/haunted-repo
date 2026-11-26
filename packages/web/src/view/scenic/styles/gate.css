@@ -216,8 +216,13 @@
     clip-path: var(--sc-gate-cta-cut);
   }
 
-  /* The Bestiary: three tall arched niches in a row. */
+  /*
+   * The Bestiary: three tall arched niches in a row. When the live report
+   * fills the panel, the niches shrink (down to a minimum) before the panel
+   * has to scroll, so the Bestiary texts are not cut above the footer.
+   */
   .scenic .bestiary {
+    min-height: 0;
     gap: var(--sc-gate-gap);
   }
 
@@ -236,6 +241,8 @@
   }
 
   .scenic .bestiary[data-open] .bestiary-list {
+    flex: 1 1 auto;
+    min-height: 0;
     flex-direction: row;
     justify-content: space-between;
     gap: var(--sc-gate-bestiary-gap);
@@ -243,6 +250,7 @@
 
   .scenic .bestiary-entry {
     flex: 1 1 0;
+    min-height: 0;
     flex-direction: column;
     align-items: center;
     gap: var(--sc-space-1);
@@ -254,8 +262,10 @@
   }
 
   .scenic .bestiary-art {
+    flex: 0 1 var(--sc-gate-niche-h);
     width: var(--sc-full);
-    height: var(--sc-gate-niche-h);
+    height: auto;
+    min-height: var(--sc-gate-niche-min-h);
     padding: var(--sc-gate-niche-pad);
     border: var(--sc-gate-niche-border) solid var(--sc-brass-dark);
     border-radius: var(--sc-gate-niche-arch);
