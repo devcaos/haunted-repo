@@ -100,6 +100,35 @@
   gap: var(--sc-space-2);
   padding: var(--sc-space-3);
 }
+/* Floor_Hint: a Pumpkin pill on a floor button that counts the ghosts still waiting on that floor. */
+.scenic .floor-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sc-space-1);
+  margin-left: var(--sc-space-2);
+  padding: 0 var(--sc-space-2) 0 var(--sc-space-1);
+  border-radius: var(--sc-radius-pill);
+  background: var(--sc-pumpkin);
+  color: var(--sc-night);
+  font-family: var(--font-body);
+  font-size: var(--sc-text-small);
+  font-weight: var(--sc-weight-button);
+  line-height: var(--sc-icon-size);
+}
+.scenic .floor-hint-icon {
+  flex: none;
+  width: var(--sc-icon-size);
+  height: var(--sc-icon-size);
+}
+.scenic .floor-hint .icon-wisp-hood {
+  fill: var(--sc-ghost-0);
+}
+.scenic .floor-hint .icon-wisp-face {
+  fill: var(--sc-night);
+}
+.scenic .floor-hint .icon-wisp-eye {
+  fill: var(--sc-ghost-eye);
+}
 /* Nameplates: one card per Card of the framed floor, a column on narrow screens. */
 .scenic .nameplates {
   display: flex;

@@ -114,6 +114,8 @@ export interface SlotPlacement {
 export interface FloorButtonView {
   floor: Floor;
   label: string;
+  /** Sample ghosts on this floor the visitor can still exorcise (state "haunted"); 0 in a live report or with no progress. */
+  waiting: number;
   accessibleName: string;
 }
 
@@ -248,14 +250,22 @@ export function sceneLayout(model: ViewModel): SceneLayout {
         (entry) => entry.type === "go-to-floor" && entry.floor === view.floor,
       ),
     )
-    .map((view) => ({
-      floor: view.floor,
-      label: view.title,
-      accessibleName: TEXTS.floorButtonName(
-        view.title,
-        TEXTS.actionLabels["go-to-floor"],
-      ),
-    }));
+    .map((view) => {
+      const waiting =
+        house?.source === "sample" && house.progress !== null
+          ? view.ghosts.filter((card) => card.state === "haunted").length
+          : 0;
+      return {
+        floor: view.floor,
+        label: view.title,
+        waiting,
+        accessibleName: TEXTS.floorButtonName(
+          view.title,
+          TEXTS.actionLabels["go-to-floor"],
+          waiting,
+        ),
+      };
+    });
 
   let heading: string = TEXTS.pageTitle;
   let frame: Frame = { kind: "house" };
