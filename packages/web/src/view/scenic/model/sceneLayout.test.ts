@@ -212,10 +212,85 @@ describe("sceneLayout", () => {
       {
         floor: "basement",
         label: "Basement",
+        waiting: 0,
         accessibleName: "Basement. Go to this floor",
       },
     ]);
     expect(layout.backButton).toBe(true);
+  });
+
+  it("counts the ghosts still waiting on each floor of the sample (Floor_Hint)", () => {
+    const sampleGhosts = [
+      ghost("a1.ts", "attic"),
+      ghost("a2.ts", "attic"),
+      ghost("a3.ts", "attic"),
+      ghost("m1.ts", "middle floor"),
+    ];
+    const toFloors: AvailableAction[] = FLOORS_IN_ORDER.map((floor) => ({
+      type: "go-to-floor",
+      floor,
+    }));
+    const houseWith = (exorcised: string[]): HouseView =>
+      buildSampleHouse(reportOf(sampleGhosts), {
+        progress: {
+          ghosts: exorcised.map((path) => ({
+            path,
+            state: "exorcised",
+            ratings: [],
+            selfCheck: null,
+          })),
+        },
+        step: "choosing",
+        // a3.ts is not scripted, so it stays "locked" and never counts.
+        scripted: new Set(["a1.ts", "a2.ts", "m1.ts"]),
+        startAllowed: true,
+      });
+    const waitingOf = (house: HouseView): number[] =>
+      sceneLayout(modelOf(house, { kind: "house" }, toFloors)).floorButtons.map(
+        (b) => b.waiting,
+      );
+
+    expect(waitingOf(houseWith([]))).toEqual([2, 1, 0]);
+    expect(waitingOf(houseWith(["a1.ts", "a2.ts"]))).toEqual([0, 1, 0]);
+    const clean = houseWith(["a1.ts", "a2.ts", "m1.ts"]);
+    expect(waitingOf(clean)).toEqual([0, 0, 0]);
+    expect(
+      sceneLayout(modelOf(clean, { kind: "house" }, toFloors)).floorButtons.map(
+        (b) => b.accessibleName,
+      ),
+    ).toEqual([
+      "Attic. Go to this floor",
+      "Middle floor. Go to this floor",
+      "Basement. Go to this floor",
+    ]);
+    const atAttic = sceneLayout(
+      modelOf(
+        houseWith(["a1.ts", "a2.ts"]),
+        { kind: "floor", floor: "attic" },
+        [
+          { type: "go-to-floor", floor: "middle floor" },
+          { type: "go-to-floor", floor: "basement" },
+        ],
+      ),
+    );
+    expect(atAttic.floorButtons).toEqual([
+      {
+        floor: "middle floor",
+        label: "Middle floor",
+        waiting: 1,
+        accessibleName: "Middle floor. Go to this floor. 1 ghost to exorcise",
+      },
+      {
+        floor: "basement",
+        label: "Basement",
+        waiting: 0,
+        accessibleName: "Basement. Go to this floor",
+      },
+    ]);
+    // A live report never shows a Floor_Hint.
+    expect(waitingOf(buildLiveHouse(reportOf(sampleGhosts)))).toEqual([
+      0, 0, 0,
+    ]);
   });
 
   it("falls back to Variant 0 when no Card matches the ghost", () => {
@@ -493,11 +568,25 @@ describe("Property 7", () => {
                 (a) => a.type === "go-to-floor" && a.floor === view.floor,
               ),
             )
-            .map((view) => ({
-              floor: view.floor,
-              label: view.title,
-              accessibleName: `${view.title}. ${TEXTS.actionLabels["go-to-floor"]}`,
-            }));
+            .map((view) => {
+              const house = model.house;
+              const waiting =
+                house !== null &&
+                house.source === "sample" &&
+                house.progress !== null
+                  ? view.ghosts.filter((c) => c.state === "haunted").length
+                  : 0;
+              const name = `${view.title}. ${TEXTS.actionLabels["go-to-floor"]}`;
+              return {
+                floor: view.floor,
+                label: view.title,
+                waiting,
+                accessibleName:
+                  waiting === 0
+                    ? name
+                    : `${name}. ${waiting} ${waiting === 1 ? "ghost" : "ghosts"} to exorcise`,
+              };
+            });
           expect(layout.floorButtons).toEqual(expected);
           expect(layout.backButton).toBe(
             model.available.some((a) => a.type === "go-to-house"),

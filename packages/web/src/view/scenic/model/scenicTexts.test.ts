@@ -72,8 +72,14 @@ describe("scenic texts (Requirements 2.2, 7.1 to 7.3, 7.5)", () => {
     expect(TEXTS.viewLinks.simple).not.toBe("");
     expect(TEXTS.viewLinks.scenic).not.toBe("");
     expect(TEXTS.viewLoadFailed).not.toBe("");
-    expect(TEXTS.floorButtonName("Attic", "Go to this floor")).toBe(
+    expect(TEXTS.floorButtonName("Attic", "Go to this floor", 0)).toBe(
       "Attic. Go to this floor",
+    );
+    expect(TEXTS.floorButtonName("Attic", "Go to this floor", 1)).toBe(
+      "Attic. Go to this floor. 1 ghost to exorcise",
+    );
+    expect(TEXTS.floorButtonName("Attic", "Go to this floor", 2)).toBe(
+      "Attic. Go to this floor. 2 ghosts to exorcise",
     );
     expect(TEXTS.nameplateName("a.ts", "Attic", 12, "Haunted", null)).toBe(
       "a.ts, Attic, difficulty 12 of 100, Haunted",

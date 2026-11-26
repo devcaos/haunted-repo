@@ -1,9 +1,11 @@
 import type { UserAction } from "../../logic/actions.js";
 import { TEXTS } from "../../logic/texts.js";
+import { ghostIconArt, ICON_BOX } from "./art/icons.js";
 import type { FocusBefore } from "../shared/focus.js";
 import { el } from "./dom.js";
 import type { NameplateView, SceneLayout } from "./model/sceneLayout.js";
 import type { ScenicFocusTarget } from "./model/scenicFocus.js";
+import { createSvgRoot, mountShape } from "./svg.js";
 
 /** The three containers `stage.ts` builds once; this module fills them. */
 export interface SceneControlParts {
@@ -21,6 +23,19 @@ export interface SceneControls {
   focus(target: ScenicFocusTarget): void;
   /** Puts focus on the Scene_Heading (the safety net of the renderer). */
   focusHeading(): void;
+}
+
+/** The Floor_Hint: a small Pumpkin pill with a Spectral Wisp head and the number of ghosts still waiting on that floor. Decoration only: the button's accessible name says the same. */
+function floorHint(waiting: number): HTMLElement {
+  const icon = createSvgRoot(
+    { x: 0, y: 0, w: ICON_BOX, h: ICON_BOX },
+    "floor-hint-icon",
+  );
+  icon.append(mountShape(ghostIconArt("haunted"), "floor-hint-"));
+  return el("span", { class: "floor-hint", "aria-hidden": "true" }, [
+    icon,
+    String(waiting),
+  ]);
 }
 
 /** One Nameplate: a labelled article. Only a startable Card gets a focusable control. */
@@ -140,7 +155,9 @@ export function createSceneControls(
             "data-focus-key": `go-to-floor:${view.floor}`,
             "aria-label": view.accessibleName,
           },
-          [view.label],
+          view.waiting > 0
+            ? [view.label, floorHint(view.waiting)]
+            : [view.label],
         );
         button.addEventListener("click", () => {
           send({ type: "go-to-floor", floor: view.floor });

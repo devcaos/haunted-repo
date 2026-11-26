@@ -88,7 +88,10 @@ export const TEXTS = {
   },
   finaleDone: "The demo is complete.",
   viewLoadFailed: "The page could not be loaded. Please reload it.",
-  floorButtonName: (title: string, action: string) => `${title}. ${action}`,
+  floorButtonName: (title: string, action: string, waiting: number) =>
+    waiting === 0
+      ? `${title}. ${action}`
+      : `${title}. ${action}. ${waiting} ${waiting === 1 ? "ghost" : "ghosts"} to exorcise`,
   nameplateName: (
     path: string,
     floor: string,
