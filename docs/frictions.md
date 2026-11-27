@@ -24,7 +24,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Qué pasó:** la IA que explica y pregunta es el Kiro de cada usuario, y un test automático no puede invocarla.
 
-- **Cómo lo rodeé:** excepción anotada en `docs/decisiones.md`; se cubre con el spike manual (punto 3 de `PLAN.md`).
+- **Cómo lo rodeé:** excepción anotada en `docs/decisiones.md`; se cubre con los spikes manuales (`docs/spike-preguntas.md`, `docs/spike-explicacion.md` y, para el Power, `docs/spike-power-e2e.md`).
 
 - **Estado:** resuelto con excepción.
 
@@ -54,7 +54,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Qué pasó:** creé una spec desechable con una tarea que añadía `expect(1).toBe(2)` y la marqué como hecha editando `tasks.md`. No apareció ninguna salida de hook en el contexto del agente, dos veces (con el hook de comando solo y con un segundo hook de agente). `npm run check` lanzado a mano sí fallaba como se esperaba. Probablemente PostTaskExec solo se dispara con el cambio de estado de la tarea hecho por el propio IDE, no al editar el archivo. Además, la documentación de triggers no dice que la salida de PostTaskExec llegue al agente.
 
-- **Cómo lo rodeé:** añadí un segundo hook de tipo agente (opción B) que ejecuta `npm run check` y corrige fallos. La prueba real queda pendiente en la próxima spec (ver `PLAN.md`).
+- **Cómo lo rodeé:** añadí un segundo hook de tipo agente (opción B) que ejecuta `npm run check` y corrige fallos. La prueba real quedó para la siguiente spec.
 
 - **Estado:** resuelto: confirmado en la tarea 2.1 de ghost-detection (commit 6ed8f75, 11 nov). El 15 nov se decidió dejar solo el hook de comando; el de agente se borró.
 
@@ -216,7 +216,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** guardarlo con `git stash` (sin borrarlo; está en `stash@{0}`, con un mensaje que lo explica) y seguir desde `main`.
 
-- **Estado:** cerrado. Causa no determinada. El `README.md` del stash era idéntico a una versión que ya está en el historial (blob `132e2d7`), así que el stash no guarda nada que se pueda perder.
+- **Estado:** cerrado. Causa no determinada. El `README.md` del stash era idéntico a una versión que ya está en el historial (blob `132e2d7`), así que el stash no guarda nada que se pueda perder. Kiro borró el stash el 25 nov.
 
 ## 2026-11-15 — El formato de Power de la documentación no coincide con `tech.md`
 
@@ -226,7 +226,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** los requisitos siguen la documentación actual; corregir `tech.md` queda en "Pendientes" de `PLAN.md`, y cómo se ejecuta el servidor instalado queda como pregunta abierta para el diseño.
 
-- **Estado:** abierto (falta corregir `tech.md` y decidir cómo se distribuye el servidor).
+- **Estado:** cerrado. El diseño de `kiro-power` sube a git el servidor empaquetado (`packages/power/bundle/server.mjs`), y `tech.md` describe la carpeta del Power y ese bundle desde el 25 nov (PR #95).
 
 ## 2026-11-15 — Las herramientas de editar archivos desaparecieron a mitad de sesión
 
@@ -454,9 +454,9 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Qué pasó:** El elemento 10 del Source_Scan busca la palabra `window` en `model/` y `art/`, y el guion de `tower-window` cuenta como límite de palabra. El test falló.
 
-- **Cómo lo rodeé:** Cambié la clase a `tower-slit`. La tarea 5.2 dibujará las ventanas de los huecos en `art/` y tendrá el mismo problema; lo anoté en "Pendientes" de PLAN.md.
+- **Cómo lo rodeé:** Cambié la clase a `tower-slit`. La tarea 5.2 dibujará las ventanas de los huecos en `art/` y tendrá el mismo problema; lo anoté en "Pendientes" de PLAN.md (se cerró el mismo día; ver "Estado").
 
-- **Estado:** cerrado. El 17 nov se decidió que en `art/` la clase de las formas de ventana se llama `pane`; la regla no cambió (ver `PLAN.md`).
+- **Estado:** cerrado. El 17 nov se decidió que en `art/` la clase de las formas de ventana se llama `pane`; la regla no cambió.
 
 ## 2026-11-17 — Un test de propiedad del Power pasó de 5 s una vez
 
@@ -486,7 +486,7 @@ Formato de cada entrada: qué intentaba, qué pasó, cómo lo rodeé, y si sigue
 
 - **Cómo lo rodeé:** No lo rodeé. Paré y pregunté a Luis Miguel, como pide la regla de "si falla dos veces, para".
 
-- **Estado:** cerrado. El 18 nov se decidió subir el límite de `dataFile.roundtrip.property.test.ts` a 20 s, porque escribe 100 veces en disco (ver `PLAN.md`).
+- **Estado:** cerrado. El 18 nov se decidió subir el límite de `dataFile.roundtrip.property.test.ts` a 20 s, porque escribe 100 veces en disco.
 
 ## 2026-11-18 — Una edición con PowerShell escribió tres archivos en la raíz del repo
 

@@ -49,7 +49,7 @@ inclusion: always
 ## Testing strategy
 - Unit tests with Vitest.
 - Property-based tests (fast-check) for rules that must always hold, for example "replaying a recording always gives the same steps" or "the ghost file always parses back to the same data".
-- External services: the only AI is the user's Kiro, which an automated test cannot call. The real-service check is the manual spike (see `PLAN.md`, point 3). Any future RSS, API or cloud service must have at least one test against the real service.
+- External services: the only AI is the user's Kiro, which an automated test cannot call. The real-service checks are the manual spikes (see `docs/spike-preguntas.md`, `docs/spike-explicacion.md` and `docs/spike-power-e2e.md`). Any future RSS, API or cloud service must have at least one test against the real service.
 - Mocks must never be more permissive than the real service.
 
 ## Demo durability checklist

@@ -9,7 +9,7 @@
 Documento de partida. Lo usa Kiro para generar `.kiro/steering/product.md` y `tech.md`, y lo lee el coordinador de Claude.
 
 ## En una frase
-Haunted Repo encuentra el código escrito por IA que todavía no entiendes (los "fantasmas" de tu repo) y te ayuda a "exorcizarlo" entendiéndolo de verdad, con explicaciones y preguntas.
+Haunted Repo elige los archivos clave de tu repo que todavía no entiendes (los "fantasmas") y te ayuda a "exorcizarlos" entendiéndolos de verdad, con explicaciones y preguntas.
 
 ## El problema
 - Cada vez más gente construye software dirigiendo a una IA. El código funciona, pero nadie lo ha leído ni lo entiende.
@@ -20,11 +20,11 @@ Haunted Repo encuentra el código escrito por IA que todavía no entiendes (los 
 ## Para quién (público concreto)
 1. **Público principal:** principiantes que hacen proyectos con IA sin entender el código (por ejemplo, estudiantes de 1.º de FP). Primero van las explicaciones, con palabras sencillas, y las preguntas son sobre comportamiento.
 2. **Secundario:** cualquiera que programe dirigiendo agentes (vibe coding).
-3. **Idea para más adelante, no en esta versión:** profesores que quieren saber si el alumno entiende el código que entrega, con el "certificado de exorcismo" (decisión pendiente; Luis Miguel quiere reconsiderarla).
+3. **Idea para más adelante, no en esta versión:** profesores que quieren saber si el alumno entiende el código que entrega, con el "certificado de exorcismo" (descartado para la entrega el 19 nov; ver `docs/decisiones.md`).
 
 ## Cómo funciona (concepto)
-- El repo es una **casa encantada** con tres plantas: desván (fácil), planta media y sótano (difícil). No hay una habitación por carpeta. La web la dibujará como un SVG con aspecto de videojuego (estilo Halloween, con animación y un diseño de fantasma distinto para cada planta), decidido el 16 nov.
-- El código hecho por la IA que no has validado son **fantasmas**. Versión mínima: un fantasma por archivo, no por línea.
+- El repo es una **casa encantada** con tres plantas: desván (fácil), planta media y sótano (difícil). No hay una habitación por carpeta. La web la dibuja como una ilustración SVG (`house-scene.svg`) con aspecto de videojuego (estilo Halloween, con animación y un diseño de fantasma distinto para cada planta), decidido el 16 nov.
+- Los **fantasmas** son los archivos clave que elige la detección (hasta 5, de fácil a difícil). La detección no sabe quién escribió cada archivo: el caso típico es código hecho por una IA que nadie ha leído, pero vale para cualquier código. Un fantasma por archivo, no por línea.
 - Para exorcizar un fantasma: explicación para principiantes y **preguntas que hacen pensar** (abiertas o de predecir qué devuelve el código), corregidas por la IA. Si las superas, el fantasma desaparece.
 - Un mapa muestra cuánta parte del proyecto está encantada.
 
@@ -37,7 +37,7 @@ Haunted Repo encuentra el código escrito por IA que todavía no entiendes (los 
 Decidida: **Costume Contest** (interfaz de terror que ayuda a la función).
 
 ## Riesgos conocidos
-1. "Nadie quiere deberes": por eso el público principal son estudiantes y profesores.
+1. "Nadie quiere deberes": por eso el público principal son principiantes que hacen proyectos con IA y necesitan entender su código (cambio del 11 nov; antes eran estudiantes y profesores).
 2. Que las preguntas no midan comprensión de verdad. **Probarlo lo primero** (spike).
 3. La demo necesita una web, aparte del Power.
 4. Ya existen modos de "explicar código". La diferencia: medir y seguir qué partes entiendes.
