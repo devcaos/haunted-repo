@@ -1,26 +1,26 @@
 # PLAN
 
-Estado del proyecto. Lo actualizan el coordinador de Claude y `#close-task` en Kiro. Aquí va el **estado**; las **reglas** van en `.kiro/steering/`, la idea en `docs/idea.md` y los motivos de cada decisión en `docs/decisiones.md`.
+Estado del proyecto. Lo actualiza Kiro, con `#close-task` o con un bloque de instrucciones que redacta Claude y que Kiro aplica en una PR. Aquí va el **estado**; las **reglas** van en `.kiro/steering/`, la idea en `docs/idea.md` y los motivos de cada decisión en `docs/decisiones.md`.
 
 | Hito | Fecha | Estado |
 |---|---|---|
 | Versión mínima funcionando | 20 nov 2026 | Hecho |
-| Código congelado | viernes 27 nov 2026 | Después solo vídeo y textos |
-| Entrega en Devpost | 4 dic 2026, 23:00 (España) | Se envía el 4 dic por la mañana |
+| Código congelado | viernes 27 nov 2026 | Hecho: la PR #98 fue el último cambio de código; después, solo documentos y textos |
+| Entrega en Devpost | 4 dic 2026, 23:00 (España) | Enviada el 27 nov: https://devpost.com/software/haunted-repo-zt15ka |
 | Demo en línea y gratis | hasta el 29 ene 2027 | GitHub Pages, sin coste |
 
 ## En curso
-- Vídeo (decidido el 26 nov): menos de 3 minutos, **sin voz**, con carteles y subtítulos en inglés, en YouTube público. Las tomas de la web y un primer montaje ya existen (fuera del repo); faltan las dos tomas de Kiro que graba Luis Miguel: el Power sobre `packages/sirv-cli/bin.js` y las specs, el steering y los tests.
+- Bonus: la entrada de blog en DEV.to está en borrador, fuera del repo. Falta que Luis Miguel la revise y la publique antes del límite de entrega.
 - Créditos de Kiro (25 nov): usados 3.129,51 de 4.000. El modelo por defecto es **Auto**.
 
 ## Siguientes (en orden)
 El código está terminado: las siete specs están cerradas y solo siguen abiertas a propósito las tareas opcionales marcadas con `*` (exorcism 8.1 a 8.7, kiro-power 5.4 y 7.7, web-demo 16.1 y 16.2). Lo que queda no toca el código:
 
-1. [ ] Vídeo terminado y subido a YouTube (28 a 30 nov).
-2. [ ] Textos de Devpost: descripción y texto de cómo se usó Kiro (30 nov a 2 dic).
-3. [ ] Bonus: entrada de blog en DEV.to y post con #KiroweenHackathon26 (30 nov a 2 dic; se hacen todos, decidido el 15 nov).
-4. [ ] Datos y justificante de estudiante preparados (antes del 3 dic).
-5. [ ] Rellenar el formulario de Devpost (3 dic) y enviarlo (4 dic por la mañana; límite 23:00, hora de España).
+1. [x] Vídeo terminado y publicado en YouTube, público, sin voz y con subtítulos en inglés (26 nov): https://youtu.be/frjs4b9tGpM
+2. [x] Textos de Devpost: descripción y texto de cómo se usó Kiro (listos para el envío del 27 nov).
+3. [ ] Bonus (se hacen todos, decidido el 15 nov): el post con #KiroweenHackathon26 está publicado en X (26 nov); falta la entrada de blog en DEV.to (ver "En curso").
+4. [x] Datos y justificante de estudiante preparados (26 nov).
+5. [x] Formulario de Devpost rellenado y enviado (27 nov). El límite era el 4 dic a las 23:00, hora de España.
 
 ## Pendientes (después de entregar)
 Nada de esta lista bloquea la entrega. Se revisa después del 4 dic, salvo que algo rompa la demo.
@@ -38,13 +38,14 @@ Nada de esta lista bloquea la entrega. Se revisa después del 4 dic, salvo que a
 - Low: el informe guarda el dueño como se escribió en la URL, no como está en GitHub.
 - Low: los 6 archivos se leen uno tras otro (1,7 a 2,2 s); en paralelo serían unos 0,5 s, pero cambia el corte por límite de peticiones.
 - Low: el límite de 10 s cubre también la descarga del árbol; un repo enorme con red lenta puede dar "Could not reach GitHub". Sin verificar en vivo.
-- Low: los archivos `*.testutil.ts` cuentan como elegibles y pueden salir como fantasmas. En este mismo repo salen en el ático 3 fantasmas casi vacíos (`core/src/ghost-detection/index.ts`, `power/src/server.ts` y `core/src/exorcism/index.ts`) y ninguno en la planta media. La demo usa sirv, que no cambia.
+- Low: los archivos `*.testutil.ts` cuentan como elegibles y pueden salir como fantasmas. En este mismo repo salen en el ático 3 fantasmas casi vacíos (`core/src/ghost-detection/index.ts`, `power/src/server.ts` y `core/src/exorcism/index.ts`) y ninguno en la planta media (comprobado en vivo el 27 nov sobre `main` en `26bed2e`). La demo usa sirv, que no cambia.
 - Low: si falla por red la lectura de un solo archivo, `detectGhosts` devuelve error y descarta los ya leídos; solo el límite de peticiones da informe parcial (así lo pide la spec).
 - Low: `parseReport` acepta campos desconocidos sin quitarlos y no comprueba que el informe sea coherente (el fixture `tinySession` no lo es).
 - Low: el error del límite de peticiones del cliente de core es un `Error` sin `code`, así que el Student recibe el mensaje general en inglés y no el texto de core. `pick_ghost` crea un cliente nuevo en cada llamada, así que su límite de 8 peticiones solo se prueba con `coreMessage`.
 - Low: la skill no puede provocar un `warning`, así que no se probó con el Student; `warning`, `house-clean` y `replace: true` solo tienen test automático.
 - Low: un fantasma con 2 `right` de 3 puede quedar en `failed` si la pregunta principal terminó en dos "I don't know". Valorar un aviso en la skill.
 - Low: la skill exige inglés al Tutor, pero el Student a veces contesta en español y el Tutor lo acepta. Decidir si la skill debe decirlo.
+- Low (visto al grabar la toma del Power para el vídeo): la primera explicación del Tutor sale solo dentro del bloque de la herramienta y no en el chat.
 - Low: Kiro IDE pide aprobación en cada llamada a una herramienta del Power; no se probó si se puede marcar el Power como de confianza.
 - Low: el razonamiento del Judgement puede citar la respuesta del alumno: que la skill lo prohíba y que el servidor nunca lo registre en logs.
 - Low: almacén del Power. Sin `fsync` antes del `rename`; archivos `.tmp` sueltos si el servidor muere a mitad de una escritura (inofensivos); la sonda `haunted-repo--probe.tmp` tiene nombre fijo; un archivo de datos sin permiso de lectura se informa como `INVALID_REPORT`; el mensaje de error de Node puede llevar la ruta de la carpeta del usuario al campo `warning` (`store.ts`).
@@ -58,6 +59,7 @@ Nada de esta lista bloquea la entrega. Se revisa después del 4 dic, salvo que a
 ### Web
 - Low (1280x720, sin movimiento reducido): el hueco entre el botón de relámpagos y la línea de licencia es de 12 px, menos de los 13 px del criterio. Igual que antes de la PR #92.
 - Low: a 1024 de ancho la barra lateral tapa hasta x 550 y el porche de la casa queda medio detrás (camera.ts cuenta con x 400). A 1024x768 el raíl de Nameplates aún hace un poco de scroll con cuatro Cards.
+- Low (aceptado): a 1366x768 el panel del análisis en vivo hace scroll por dentro.
 - Low: con red muy lenta (0,4 Mbit/s y CPU 4x) los fantasmas, las campanas y los botones se ven unos 10 s sobre fondo oscuro antes de que llegue la casa.
 - Low: el aviso del límite de GitHub no dice a qué hora se puede volver a probar, aunque el motor ya lo sabe.
 - Low: el motivo de los carteles por decisiones dice "if/elif/..." ("elif" es de Python). El texto sale de `packages/core/src/ghost-detection/factors.ts` y lo usan también el Power, la muestra y tres specs.
@@ -79,7 +81,6 @@ Nada de esta lista bloquea la entrega. Se revisa después del 4 dic, salvo que a
 - Low: en la propiedad P4 del exorcismo solo se comprueban los objetivos del tipo general.
 - Low: `vitest.config.ts` y `eslint.config.js` no los comprueba tsc.
 - Low: `tech.md` repite reglas de `testing.md` (mocks) y de `git-workflow.md` (secretos); dejar solo una referencia.
-- Low: en `docs/kiro-usage-log.md` la fila del 22 nov va después de la del 23, y la entrada del stash (15 nov) no dice que se borró el 25 nov.
 - Low (spike del Power, 15 nov): no se anotó cuál de `spike-root` y `spike-relative` estaba en marcha.
 
 ### Ideas
@@ -112,10 +113,15 @@ Nada de esta lista bloquea la entrega. Se revisa después del 4 dic, salvo que a
 - [x] Planta vacía de la muestra (PR #90), enlace "Get the Power" en el final (PR #91) y solape de la licencia con movimiento reducido (PR #92) (25 nov)
 - [x] README final con la captura de la casa (PR #93) y limpieza final de fricciones, registro de uso de Kiro, steering y decisiones (PR #94 y #95) (25 nov)
 - [x] Revisión de seguridad de `main` en solo lectura: 0 Critical, 0 High, 0 Medium, 4 Low (25 nov)
-- [x] Arreglo: la línea de copyright de sirv ya no tapa el Bestiary de la puerta tras el análisis en vivo (PR #96)
+- [x] Arreglo: la línea de copyright de sirv ya no tapa el Bestiary de la puerta tras el análisis en vivo (PR #96, 26 nov)
+- [x] `PLAN.md` reescrito para el tramo final (PR #97, 26 nov)
+- [x] Vídeo de la demo publicado en YouTube y post con #KiroweenHackathon26 en X (26 nov)
+- [x] Pista de planta (Floor_Hint): cada botón de planta de la muestra dice cuántos fantasmas quedan por exorcizar en esa planta (PR #98, 27 nov). Último cambio de código antes de congelarlo
+- [x] Proyecto enviado en Devpost (27 nov)
+- [x] Documentos internos puestos al día tras una auditoría en solo lectura (27 nov)
 
 ## Para retomar (traspaso)
-- Traspaso (26 nov): el código está terminado y no hay PR abiertas. Lo que queda está en "Siguientes" y no toca el código. Si hay que cambiar un documento del repo, sigue yendo por Kiro, en una rama `docs/...` desde `main` y contra `main`.
+- Traspaso (27 nov): el código está congelado y el proyecto está enviado en Devpost. Solo queda la entrada de blog de DEV.to (ver "En curso"), que no toca el repo. Si hay que cambiar un documento del repo, sigue yendo por Kiro, en una rama `docs/...` desde `main` y contra `main`.
 - Cada fricción se anota en `docs/frictions.md` el mismo día que ocurre.
 - Power: el bundle `packages/power/bundle/server.mjs` se reconstruye en cada `npm run check`, y cualquier cambio que llegue a `src/server.ts` debe subir también ese archivo. `.kiro/specs/kiro-power/tasks.meta.json` se sube a git y nunca se ignora (las bases exigen `.kiro/` completo).
 - Power: antes de importar el Power real hay que desinstalar el del spike (`spike-root` y `spike-relative`), porque los dos usan una carpeta llamada `power` y chocan.
