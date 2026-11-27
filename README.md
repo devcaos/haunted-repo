@@ -10,6 +10,7 @@ It is for beginners who build projects by directing an AI, like first-year progr
 
 - **The product: a Kiro Power.** Install it in Kiro and your own Kiro becomes the Tutor, for any public GitHub repository. See [Use the Kiro Power](#use-the-kiro-power) and the [`packages/power/`](packages/power/) folder.
 - **The showcase: a website.** Try the whole idea in one minute, with nothing to install: **https://devcaos.github.io/haunted-repo/**
+- **The demo video.** Under three minutes, with English subtitles: [watch it on YouTube](https://youtu.be/frjs4b9tGpM).
 
 ![The haunted house of the website: a stone gate with the form and the Bestiary on the left, and the house of lukeed/sirv with its ghosts in the attic and on the middle floor](docs/readme-house.jpg)
 
@@ -161,4 +162,4 @@ Kiro integrated all of them, connected them to the app and animated everything d
 - **Fonts**: Creepster and IM Fell English, SIL Open Font License 1.1, served from this site; see [the font credits](packages/web/public/fonts/CREDITS.txt).
 - **Comprehension debt**: the term and its definition come from [Addy Osmani](https://addyosmani.com/blog/comprehension-debt).
 
-Built for [Kiroween 2026](https://kiroween.devpost.com/), Costume Contest category.
+Built for [Kiroween 2026](https://kiroween.devpost.com/), Costume Contest category. See [the Devpost submission](https://devpost.com/software/haunted-repo-zt15ka).
